@@ -1,0 +1,85 @@
+#cloud-config
+# BFSG-Check Tag-1-Bootstrap. Macht beim ersten Boot komplett alles:
+# SSH-Key, Firewall, Docker, Repo, Phase-1-Config (HTTP-only), App+Caddy hoch.
+# Phase 2 (Brevo/Stripe + Let's Encrypt) deployen wir später per Push/GitHub Actions.
+
+hostname: bfsg-fix
+
+users:
+  - name: root
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINWLfkNJJv0x1V/bKfIvJv3fg+J5OwSCDcT/tRTF5fdx claude-bfsg-deploy@bfsg-fix.de
+
+package_update: true
+packages:
+  - docker.io
+  - docker-compose-v2
+  - git
+  - curl
+  - ufw
+
+write_files:
+  - path: /opt/bfsg-check-bootstrap.sh
+    permissions: '0755'
+    content: |
+      #!/bin/bash
+      set -e
+      exec > >(tee -a /var/log/bfsg-bootstrap.log) 2>&1
+      echo "=== BFSG-Check Bootstrap gestartet $(date -u) ==="
+
+      # Firewall
+      ufw allow OpenSSH || true
+      ufw allow 80/tcp
+      ufw allow 443/tcp
+      ufw --force enable
+
+      # Docker enable
+      systemctl enable docker
+      systemctl start docker
+
+      # Repo klonen (public)
+      if [ ! -d /opt/bfsg-check ]; then
+        git clone https://github.com/matzeseba/bfsg-check.git /opt/bfsg-check
+      fi
+      cd /opt/bfsg-check
+      git fetch origin
+      git checkout main
+      git pull
+
+      # Phase-1 .env (ohne Stripe/SMTP — App startet im DRY-RUN-Mailer)
+      cat > /opt/bfsg-check/deployment/.env <<'EOF'
+      PUBLIC_URL=http://178.105.83.0
+      PORT=8080
+      ENABLE_ABO=false
+      MAX_CONCURRENT_SCANS=2
+      EOF
+
+      # Phase-1 Caddyfile: HTTP-only, kein TLS bis DNS gesetzt
+      cat > /opt/bfsg-check/deployment/Caddyfile <<'EOF'
+      :80 {
+          reverse_proxy app:8080
+          encode gzip
+          header {
+              X-Robots-Tag "noindex, nofollow"
+          }
+      }
+      EOF
+
+      # Phase-1 docker-compose Override: nur Port 80 binden, kein 443
+      cat > /opt/bfsg-check/deployment/docker-compose.override.yml <<'EOF'
+      services:
+        caddy:
+          ports: !override
+            - "80:80"
+      EOF
+
+      cd /opt/bfsg-check/deployment
+      docker compose pull || true
+      docker compose up -d --build
+
+      sleep 20
+      docker compose ps
+      echo "=== Bootstrap fertig $(date -u) ==="
+
+runcmd:
+  - /opt/bfsg-check-bootstrap.sh
