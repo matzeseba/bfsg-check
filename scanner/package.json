@@ -11,6 +11,7 @@
     "start": "node app.js",
     "audit": "node audit.js",
     "server": "node server.js",
+    "test": "node --test ./test/diff.test.js",
     "postinstall": "playwright install chromium"
   },
   "dependencies": {

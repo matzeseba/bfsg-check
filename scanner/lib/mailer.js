@@ -48,6 +48,18 @@ export function requireMailerOrExit() {
 const oneLine = (s = '') => String(s).replace(/[\r\n]+/g, ' ').slice(0, 120);
 const isEmail = (s = '') => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
 
+// Sendet die passende Variante (BFSG-Erstreport / Cookie-Report / Re-Check mit Diff)
+// auf Basis von emailKind aus PKG_CONFIG.
+export async function sendReportFor({ to, company = '', pdfPath, stmtPath, emailKind = 'bfsg', diffText = '' }) {
+  if (emailKind === 'cookie') {
+    return sendCookieReport({ to, company, pdfPath });
+  }
+  if (emailKind === 'recheck') {
+    return sendRecheckReport({ to, company, pdfPath, diffText });
+  }
+  return sendReport({ to, company, pdfPath, stmtPath });
+}
+
 export async function sendReport({ to, company = '', pdfPath, stmtPath }) {
   if (!isEmail(to)) throw new Error('Ungültige Empfängeradresse: ' + to);
   const subject = `Ihr BFSG-Barrierefreiheits-Report${company ? ' — ' + oneLine(company) : ''}`;
@@ -74,11 +86,72 @@ ${FROM_NAME}`;
       content: await readFile(stmtPath)
     });
 
+  return deliver({ to, subject, text, attachments });
+}
+
+export async function sendCookieReport({ to, company = '', pdfPath }) {
+  if (!isEmail(to)) throw new Error('Ungültige Empfängeradresse: ' + to);
+  const subject = `Ihr Cookie- & Consent-Report (§ 25 TDDDG)${company ? ' — ' + oneLine(company) : ''}`;
+  const text = `Vielen Dank für Ihre Bestellung.
+
+Im Anhang finden Sie Ihren Cookie- & Consent-Report (PDF): welche Tracker und
+Cookies VOR einer Einwilligung auf Ihrer Seite feuern (§ 25 TDDDG / DSGVO),
+mit konkretem Handlungsvorschlag pro Fund.
+
+Dieser Report ist eine automatisierte technische Einzelmessung ohne
+Banner-Interaktion. Er ersetzt keine vollständige manuelle Prüfung und keine
+Rechtsberatung.
+
+Bei Fragen antworten Sie einfach auf diese E-Mail.
+
+Mit freundlichen Grüßen
+${FROM_NAME}`;
+
+  const attachments = [];
+  if (pdfPath) attachments.push({ filename: 'Cookie-Report.pdf', content: await readFile(pdfPath) });
+  return deliver({ to, subject, text, attachments });
+}
+
+export async function sendRecheckReport({ to, company = '', pdfPath, diffText = '' }) {
+  if (!isEmail(to)) throw new Error('Ungültige Empfängeradresse: ' + to);
+  const subject = `Ihr monatlicher BFSG-Re-Check${company ? ' — ' + oneLine(company) : ''}`;
+  const text = `Hier ist Ihr aktueller Re-Check.
+
+VERÄNDERUNGEN SEIT LETZTEM SCAN
+${diffText || 'Keine Veränderungen erkannt.'}
+
+Den vollständigen Report mit allen aktuellen Befunden und Lösungshinweisen
+finden Sie im Anhang.
+
+Sie können Ihr Abo jederzeit über /kuendigen.html beenden.
+
+Mit freundlichen Grüßen
+${FROM_NAME}`;
+
+  const attachments = [];
+  if (pdfPath) attachments.push({ filename: 'BFSG-Recheck.pdf', content: await readFile(pdfPath) });
+  return deliver({ to, subject, text, attachments });
+}
+
+export async function sendCancellationConfirmation({ to, company = '' }) {
+  if (!isEmail(to)) return { dryRun: true, skipped: 'no-recipient' };
+  const subject = `Bestätigung: Ihr BFSG-Re-Check-Abo wurde beendet${company ? ' — ' + oneLine(company) : ''}`;
+  const text = `Wir bestätigen die Beendigung Ihres BFSG-Re-Check-Abos.
+
+Es werden keine weiteren Beträge abgebucht und keine weiteren Re-Checks
+durchgeführt. Sollte das nicht in Ihrem Sinne sein, antworten Sie einfach
+auf diese E-Mail.
+
+Mit freundlichen Grüßen
+${FROM_NAME}`;
+  return deliver({ to, subject, text, attachments: [] });
+}
+
+async function deliver({ to, subject, text, attachments = [] }) {
   if (!enabled) {
-    console.log(`[mailer DRY-RUN] An ${to} | ${subject} | Anhänge: ${attachments.map((a) => a.filename).join(', ')}`);
+    console.log(`[mailer DRY-RUN] An ${to} | ${subject} | Anhänge: ${attachments.map((a) => a.filename).join(', ') || '—'}`);
     return { dryRun: true };
   }
-
   const info = await transporter.sendMail({
     from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
     to,
@@ -87,7 +160,7 @@ ${FROM_NAME}`;
     text,
     attachments
   });
-  console.log(`[mailer] Report an ${to} versendet (${info.messageId})`);
+  console.log(`[mailer] An ${to} versendet (${info.messageId})`);
   return { dryRun: false, messageId: info.messageId };
 }
 

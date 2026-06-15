@@ -53,7 +53,9 @@ export function renderReport(
     pruefnorm = 'WCAG 2.1 A/AA (EN 301 549)',
     introTitle = 'Was das BFSG fuer Sie bedeutet',
     introHtml = '<p>Das Barrierefreiheitsstaerkungsgesetz (BFSG) ist seit dem 28.06.2025 in Kraft. Betroffene Unternehmen muessen ihre Websites und Online-Shops barrierefrei gestalten. Dieser Fix-Plan zeigt die konkreten technischen Maengel Ihrer Seite, nach Dringlichkeit priorisiert.</p>',
-    legalHtml = '<strong>Wichtiger Hinweis:</strong> Dieser Fix-Plan ist eine automatisierte technische Erstpruefung auf Basis von axe-core (WCAG 2.1), KI-gestuetzt erstellt und vor Auslieferung menschlich geprueft. Er ist <strong>keine Rechtsberatung</strong> und keine Garantie fuer BFSG-Konformitaet. Automatisierte Tests erkennen erfahrungsgemaess rund 30&ndash;50&nbsp;% aller Barrieren; Aspekte wie Tastaturbedienung im Detail, Vorlese-Logik und Verstaendlichkeit erfordern eine manuelle Ergaenzung. Fuer eine rechtsverbindliche Bewertung ziehen Sie bitte fachkundige Beratung hinzu.'
+    legalHtml = '<strong>Wichtiger Hinweis:</strong> Dieser Fix-Plan ist eine automatisierte technische Erstpruefung auf Basis von axe-core (WCAG 2.1), KI-gestuetzt erstellt und vor Auslieferung menschlich geprueft. Er ist <strong>keine Rechtsberatung</strong> und keine Garantie fuer BFSG-Konformitaet. Automatisierte Tests erkennen erfahrungsgemaess rund 30&ndash;50&nbsp;% aller Barrieren; Aspekte wie Tastaturbedienung im Detail, Vorlese-Logik und Verstaendlichkeit erfordern eine manuelle Ergaenzung. Fuer eine rechtsverbindliche Bewertung ziehen Sie bitte fachkundige Beratung hinzu.',
+    diff = null,
+    pagesScanned = null
   } = {}
 ) {
   const { score, grade, verdict } = computeScore(scan.violations);
@@ -90,6 +92,34 @@ export function renderReport(
     month: 'long',
     year: 'numeric'
   });
+
+  // Diff-Block (nur im Re-Check-Abo gefüllt) — listet Veränderungen seit dem Vor-Scan.
+  let diffHtml = '';
+  if (diff && !diff.firstScan) {
+    const delta = diff.score - diff.prevScore;
+    const deltaSign = delta >= 0 ? '+' : '';
+    const deltaCol = delta > 0 ? 'var(--ok)' : delta < 0 ? 'var(--crit)' : 'var(--mut)';
+    const block = (title, items, cls) => items.length
+      ? `<div class="diffcol"><h4 class="${cls}">${esc(title)} (${items.length})</h4><ul>${items.slice(0, 8).map((i) => `<li>${esc(i.title)}${i.before != null ? ' (' + i.before + ' &rarr; ' + i.after + ')' : ''}</li>`).join('')}${items.length > 8 ? `<li>… und ${items.length - 8} weitere</li>` : ''}</ul></div>`
+      : '';
+    diffHtml = `
+    <div class="diffcard">
+      <div class="diffhead">
+        <h2>Veränderungen seit letztem Scan</h2>
+        <span style="color:${deltaCol};font-weight:700">Score ${deltaSign}${delta}</span>
+      </div>
+      <div class="diffgrid">
+        ${block('Behoben', diff.resolved, 'ok')}
+        ${block('Neu', diff.newly, 'bad')}
+        ${block('Veränderte Häufigkeit', diff.changed, 'mut')}
+      </div>
+      ${(!diff.resolved.length && !diff.newly.length && !diff.changed.length) ? '<p>Keine Veränderungen seit dem letzten Scan.</p>' : ''}
+    </div>`;
+  }
+
+  const pagesHtml = pagesScanned && pagesScanned > 1
+    ? `<div class="sub">Geprüfte Unterseiten: ${pagesScanned}</div>`
+    : '';
 
   return `<!doctype html>
 <html lang="de">
@@ -131,6 +161,13 @@ export function renderReport(
   .checklist .box{font-size:18px;line-height:1.2;color:var(--accent)}
   .legalbox{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:16px 18px;margin:28px 0;font-size:13px}
   footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;color:var(--mut)}
+  .diffcard{background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:18px 20px;margin:24px 0}
+  .diffhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+  .diffhead h2{margin:0;font-size:17px}
+  .diffgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+  .diffcol h4{margin:0 0 6px;font-size:14px}
+  .diffcol h4.ok{color:var(--ok)} .diffcol h4.bad{color:var(--crit)} .diffcol h4.mut{color:var(--mut)}
+  .diffcol ul{margin:0;padding-left:18px;font-size:13px;color:var(--mut)}
   @media print{.wrap{padding:24px}}
 </style>
 </head>
@@ -141,9 +178,12 @@ export function renderReport(
       <h1>${esc(reportTitle)}</h1>
       <div class="sub">${company ? '<strong>' + esc(company) + '</strong> &middot; ' : ''}${esc(scan.url)}</div>
       <div class="sub">Erstellt am ${today} &middot; Pruefnorm: ${esc(pruefnorm)}</div>
+      ${pagesHtml}
     </div>
     ${logo ? `<img src="${esc(logo)}" alt="" style="max-height:48px">` : ''}
   </header>
+
+  ${diffHtml}
 
   <div class="scorecard">
     <div class="grade ${grade}">${grade}</div>

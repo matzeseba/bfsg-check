@@ -3,6 +3,10 @@
 // Landingpage + Gratis-Scan + Stripe-Verkauf + automatischer, nachverfolgbarer
 // Report-Versand. Schutz: SSRF-Guard, Rate-Limit, Concurrency-Cap, Webhook-
 // Idempotenz, persistente Bestell-States, Betreiber-Alarm, Fail-fast bei Live.
+//
+// Welle 2: Re-Check-Abo (invoice.paid → Re-Scan + Diff;
+//          customer.subscription.deleted → Bestätigung),
+//          Cookie-Scan-Produkt, Multi-Page-Crawl.
 
 import express from 'express';
 import path from 'node:path';
@@ -10,16 +14,23 @@ import { fileURLToPath } from 'node:url';
 import Stripe from 'stripe';
 import { scanUrl } from './lib/scan.js';
 import { renderTeaser } from './lib/report.js';
-import { fulfillOrder } from './lib/fulfill.js';
-import { sendReport, sendAlert, mailerStatus, requireMailerOrExit } from './lib/mailer.js';
+import { fulfillOrder, PKG_CONFIG } from './lib/fulfill.js';
+import {
+  sendReportFor, sendAlert, sendCancellationConfirmation,
+  mailerStatus, requireMailerOrExit
+} from './lib/mailer.js';
+import { diffSummaryText } from './lib/diff.js';
 import { assertPublicHttpUrl } from './lib/url-guard.js';
 import { rateLimit, concurrencyGate } from './lib/limits.js';
 import { alreadyProcessed, recordPaid, markStatus } from './lib/orders.js';
+import {
+  recordSubscription, saveSnapshot, getSubscription, markCancelled
+} from './lib/subscriptions.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 8080;
 const PUBLIC_URL = process.env.PUBLIC_URL || `http://localhost:${PORT}`;
-const ENABLE_ABO = process.env.ENABLE_ABO === 'true'; // Abo standardmäßig AUS (Subscription-Lifecycle fehlt)
+const ENABLE_ABO = process.env.ENABLE_ABO === 'true'; // Abo standardmäßig AUS, bis Webhook-Endpoint aktiv getestet.
 
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 
@@ -27,8 +38,10 @@ const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SEC
 requireMailerOrExit();
 
 const PACKAGES = {
-  basis: { name: 'BFSG-Report Basis', amount: 19900, mode: 'payment' },
-  profi: { name: 'BFSG-Report Profi', amount: 49900, mode: 'payment' },
+  basis:          { name: 'BFSG-Report Basis',         amount: 19900, mode: 'payment' },
+  profi:          { name: 'BFSG-Report Profi',         amount: 49900, mode: 'payment' },
+  'cookie-basis': { name: 'Cookie-Check (§25 TDDDG)',  amount:  4900, mode: 'payment' },
+  'cookie-profi': { name: 'Cookie-Check Profi',        amount:  7900, mode: 'payment' },
   ...(ENABLE_ABO
     ? { abo: { name: 'BFSG Re-Check Abo', amount: 4900, mode: 'subscription', interval: 'month' } }
     : {})
@@ -56,36 +69,70 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  if (event.type !== 'checkout.session.completed') return res.json({ received: true });
-
-  const s = event.data.object;
-  // Nur tatsächlich bezahlte Sessions erfüllen (SEPA u.a. können 'unpaid' melden).
-  if (s.payment_status && s.payment_status !== 'paid') {
-    console.warn(`[webhook] Session ${s.id} payment_status=${s.payment_status} — keine Erfüllung.`);
-    return res.json({ received: true });
-  }
-
-  // Idempotenz: doppelte Webhooks nicht erneut verarbeiten.
+  // Idempotenz für alle Event-Typen (gilt auch für invoice.paid Duplikate).
   if (await alreadyProcessed(event.id)) {
     return res.json({ received: true, duplicate: true });
   }
 
+  // Webhook SOFORT quittieren — Stripe-Retry vermeidet sich, asynchron arbeiten wir.
+  res.json({ received: true });
+
+  try {
+    if (event.type === 'checkout.session.completed') {
+      await handleCheckoutCompleted(event);
+    } else if (event.type === 'invoice.paid' || event.type === 'invoice.payment_succeeded') {
+      await handleInvoicePaid(event);
+    } else if (event.type === 'customer.subscription.deleted') {
+      await handleSubscriptionDeleted(event);
+    }
+  } catch (err) {
+    console.error('[webhook] Event-Handling Fehler:', event.type, err.message);
+  }
+});
+
+async function handleCheckoutCompleted(event) {
+  const s = event.data.object;
+  if (s.payment_status && s.payment_status !== 'paid') {
+    console.warn(`[webhook] Session ${s.id} payment_status=${s.payment_status} — keine Erfüllung.`);
+    return;
+  }
   const meta = s.metadata || {};
   const email = s.customer_details?.email || s.customer_email || meta.email;
   const pkg = PACKAGES[meta.pkg] ? meta.pkg : 'basis';
+  const isSub = s.mode === 'subscription' && !!s.subscription;
 
   // Zahlung SOFORT persistieren — bevor irgendetwas erzeugt wird.
   await recordPaid({ eventId: event.id, sessionId: s.id, email, url: meta.url, pkg, amount: s.amount_total });
 
-  res.json({ received: true }); // Webhook sofort quittieren, dann asynchron erfüllen.
+  // Bei Subscription: Subscription-Eintrag anlegen (Snapshot kommt nach Erstausführung).
+  if (isSub) {
+    await recordSubscription({
+      subscriptionId: s.subscription,
+      customerId: s.customer || null,
+      email,
+      url: meta.url,
+      company: meta.company || '',
+      pkg
+    });
+  }
 
   try {
-    await assertPublicHttpUrl(meta.url); // SSRF-Schutz auch im bezahlten Pfad
+    await assertPublicHttpUrl(meta.url);
     await markStatus(s.id, 'FULFILLING');
     const order = await scanGate(() =>
       fulfillOrder({ url: meta.url, company: meta.company || '', email: email || '', pkg })
     );
-    await sendReport({ to: email, company: meta.company || '', pdfPath: order.pdfPath, stmtPath: order.stmtPath });
+    // Subject/Anschreiben passend zum Paket (BFSG / Cookie / Re-Check).
+    const emailKind = isSub ? PKG_CONFIG[pkg]?.emailKind || 'bfsg' : order.emailKind;
+    await sendReportFor({
+      to: email, company: meta.company || '',
+      pdfPath: order.pdfPath, stmtPath: order.stmtPath,
+      emailKind,
+      diffText: diffSummaryText(order.diff)
+    });
+    if (isSub) {
+      await saveSnapshot(s.subscription, order.snapshot);
+    }
     await markStatus(s.id, 'MAILED', { pdfPath: order.pdfPath });
     console.log(`[webhook] Report ausgeliefert: ${s.id} -> ${email}`);
   } catch (err) {
@@ -96,7 +143,64 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
     );
     console.error('[webhook] ERFÜLLUNG FEHLGESCHLAGEN', s.id, err.message);
   }
-});
+}
+
+async function handleInvoicePaid(event) {
+  const inv = event.data.object;
+  // Erste Rechnung läuft bereits über checkout.session.completed — sonst Doppel-Scan.
+  if (inv.billing_reason && inv.billing_reason !== 'subscription_cycle') {
+    return;
+  }
+  if (!inv.subscription) return;
+
+  const sub = await getSubscription(inv.subscription);
+  if (!sub) {
+    console.warn(`[webhook] invoice.paid für unbekannte Subscription ${inv.subscription} — übersprungen.`);
+    return;
+  }
+  if (sub.status !== 'ACTIVE') {
+    console.warn(`[webhook] invoice.paid für Subscription ${inv.subscription} mit Status ${sub.status} — übersprungen.`);
+    return;
+  }
+
+  try {
+    await assertPublicHttpUrl(sub.url);
+    const order = await scanGate(() =>
+      fulfillOrder({
+        url: sub.url, company: sub.company || '', email: sub.email,
+        pkg: sub.pkg || 'abo',
+        prevSnapshot: sub.lastSnapshot || null
+      })
+    );
+    await sendReportFor({
+      to: sub.email, company: sub.company || '',
+      pdfPath: order.pdfPath,
+      emailKind: 'recheck',
+      diffText: diffSummaryText(order.diff)
+    });
+    await saveSnapshot(sub.subscriptionId, order.snapshot);
+    console.log(`[webhook] Re-Check ausgeliefert: sub=${sub.subscriptionId} -> ${sub.email}`);
+  } catch (err) {
+    await sendAlert(
+      `Re-Check fehlgeschlagen: ${sub.email}`,
+      `Subscription: ${sub.subscriptionId}\nURL: ${sub.url}\nFehler: ${err.message}`
+    );
+    console.error('[webhook] RE-CHECK FEHLGESCHLAGEN', sub.subscriptionId, err.message);
+  }
+}
+
+async function handleSubscriptionDeleted(event) {
+  const sub = event.data.object;
+  const local = await markCancelled(sub.id);
+  if (local && local.email) {
+    try {
+      await sendCancellationConfirmation({ to: local.email, company: local.company });
+    } catch (err) {
+      console.error('[webhook] Cancellation-Mail Fehler:', err.message);
+    }
+  }
+  console.log(`[webhook] Subscription gekündigt: ${sub.id}`);
+}
 
 app.use(express.json({ limit: '16kb' }));
 
@@ -160,20 +264,26 @@ app.post('/api/checkout', rateLimit({ windowMs: 60_000, max: 10 }), async (req, 
 
   try {
     const recurring = p.mode === 'subscription' ? { recurring: { interval: p.interval } } : {};
+    const baseMeta = {
+      url: safe.url,
+      pkg,
+      company: String(company).slice(0, 120),
+      customerType,
+      consent: consent ? 'ja' : 'nein',
+      consentTs: new Date().toISOString()
+    };
+    // Subscription-Metadata: damit invoice.paid die Bestellung wiederfindet.
+    const subscription_data = p.mode === 'subscription'
+      ? { metadata: { url: safe.url, pkg, company: baseMeta.company, email: email || '' } }
+      : undefined;
     const session = await stripe.checkout.sessions.create({
       mode: p.mode,
       line_items: [
         { price_data: { currency: 'eur', product_data: { name: p.name }, unit_amount: p.amount, ...recurring }, quantity: 1 }
       ],
       customer_email: email || undefined,
-      metadata: {
-        url: safe.url,
-        pkg,
-        company: String(company).slice(0, 120),
-        customerType,
-        consent: consent ? 'ja' : 'nein',
-        consentTs: new Date().toISOString()
-      },
+      metadata: baseMeta,
+      subscription_data,
       submit_type: p.mode === 'payment' ? 'pay' : undefined,
       success_url: `${PUBLIC_URL}/danke.html?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${PUBLIC_URL}/?abbruch=1`
