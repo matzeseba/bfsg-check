@@ -10,7 +10,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { assertPublicHttpUrl } from './url-guard.js';
 
 export async function scanUrl(url, { timeout = 45000 } = {}) {
-  const browser = await chromium.launch({ args: ['--no-sandbox'] });
+  const browser = await chromium.launch({ args: ['--no-sandbox', '--disable-dev-shm-usage'] });
   const context = await browser.newContext({
     locale: 'de-DE',
     // Produktion: TLS-Fehler NICHT ignorieren (echte Kundenseiten haben gültiges TLS).
@@ -69,7 +69,7 @@ export async function scanSite(startUrl, { maxPages = 5, perPageTimeout = 30000 
   const origin = new URL(startUrl).origin;
   maxPages = Math.max(1, Math.min(50, Number(maxPages) || 5));
 
-  const browser = await chromium.launch({ args: ['--no-sandbox'] });
+  const browser = await chromium.launch({ args: ['--no-sandbox', '--disable-dev-shm-usage'] });
   const context = await browser.newContext({
     locale: 'de-DE',
     ignoreHTTPSErrors: process.env.SCAN_IGNORE_HTTPS === 'true',

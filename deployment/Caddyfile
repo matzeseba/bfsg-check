@@ -1,0 +1,44 @@
+# Caddyfile — Reverse-Proxy mit automatischem Let's-Encrypt-SSL.
+# Caddy holt + erneuert die Zertifikate von allein, sobald DNS auf den Server zeigt.
+
+# === Haupt-Domain ===
+bfsg-fix.de, www.bfsg-fix.de {
+    reverse_proxy app:8080
+
+    encode gzip
+
+    # Ergänzende Sicherheits-Header (zusätzlich zu denen in app.js)
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        Permissions-Policy "geolocation=(), microphone=(), camera=()"
+        -Server
+    }
+
+    # Stripe-Webhook braucht den rohen Body — kein Buffering durch Caddy.
+    @webhook path /webhook
+    handle @webhook {
+        reverse_proxy app:8080 {
+            flush_interval -1
+        }
+    }
+
+    log {
+        output stdout
+        format console
+        level INFO
+    }
+}
+
+# === Alias-Domains: 301-Redirect auf Haupt-Domain ===
+# (Behalten ihren Wert für SEO/Direktaufruf, leiten aber sauber weiter.)
+bfsg-barrierecheck.de, www.bfsg-barrierecheck.de {
+    redir https://bfsg-fix.de{uri} permanent
+}
+
+bfsg-sofortcheck.de, www.bfsg-sofortcheck.de {
+    redir https://bfsg-fix.de{uri} permanent
+}
+
+barrierefrei-pruefen.de, www.barrierefrei-pruefen.de {
+    redir https://bfsg-fix.de{uri} permanent
+}

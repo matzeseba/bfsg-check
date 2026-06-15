@@ -72,7 +72,7 @@ async function main() {
 
   if (args.pdf) {
     const { chromium } = await import('playwright');
-    const browser = await chromium.launch({ args: ['--no-sandbox'] });
+    const browser = await chromium.launch({ args: ['--no-sandbox', '--disable-dev-shm-usage'] });
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'networkidle' });
     const pdfPath = path.join(outDir, `${slug}-report.pdf`);
