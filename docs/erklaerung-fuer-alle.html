@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Wie unsere Webseiten-Check-Maschine funktioniert</title>
+<style>
+  :root{--ink:#1f2937;--mut:#6b7280;--blue:#2563eb;--green:#16a34a;--yellow:#f59e0b;--pink:#db2777;--bg:#f9fafb}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--ink);line-height:1.6;font-size:15px}
+  .page{max-width:760px;margin:0 auto;padding:40px 44px}
+  h1{font-size:30px;line-height:1.2;margin-bottom:6px;color:var(--blue)}
+  .sub{color:var(--mut);font-size:15px;margin-bottom:26px}
+  h2{font-size:21px;margin:30px 0 10px;display:flex;align-items:center;gap:10px}
+  .emoji{font-size:26px}
+  p{margin:8px 0}
+  .big{font-size:16px}
+  .card{background:var(--bg);border:1px solid #e5e7eb;border-radius:14px;padding:18px 20px;margin:14px 0}
+  .card.blue{border-left:6px solid var(--blue)}
+  .card.green{border-left:6px solid var(--green)}
+  .card.yellow{border-left:6px solid var(--yellow)}
+  .card.pink{border-left:6px solid var(--pink)}
+  .card h3{font-size:17px;margin-bottom:4px}
+  .steps{counter-reset:s;margin:12px 0}
+  .step{position:relative;padding:12px 12px 12px 56px;margin:10px 0;background:#fff;border:1px solid #e5e7eb;border-radius:12px}
+  .step:before{counter-increment:s;content:counter(s);position:absolute;left:14px;top:50%;transform:translateY(-50%);width:30px;height:30px;background:var(--blue);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800}
+  .helpers{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+  .helper{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:14px}
+  .helper .face{font-size:30px}
+  .helper b{display:block;margin:4px 0 2px}
+  .helper span{color:var(--mut);font-size:14px}
+  .money{background:linear-gradient(135deg,#ecfdf5,#d1fae5);border:1px solid #a7f3d0;border-radius:14px;padding:18px 20px;margin:14px 0}
+  .arrow{text-align:center;color:var(--mut);font-size:22px;margin:2px 0}
+  .todo li{margin:6px 0}
+  .footer{margin-top:34px;padding-top:16px;border-top:2px solid #e5e7eb;color:var(--mut);font-size:13px}
+  ul{margin-left:20px}
+  @media print{.page{padding:24px}}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>🤖 Unsere Webseiten-Check-Maschine</h1>
+  <div class="sub">Ganz einfach erklärt — so, dass es jeder versteht.</div>
+
+  <h2><span class="emoji">🏪</span> Worum geht es?</h2>
+  <p class="big">Stell dir vor, eine Webseite ist wie ein <b>Laden</b>. Manche Läden
+  haben Stufen vor der Tür, winzige Schilder oder Lichtschalter, die man nicht findet.
+  Dann können <b>nicht alle Menschen</b> rein — zum Beispiel jemand im Rollstuhl oder
+  jemand, der schlecht sieht.</p>
+  <p class="big">In Deutschland gibt es jetzt eine <b>Regel</b>: Webseiten müssen für
+  <b>alle</b> gut benutzbar sein. Wer sich nicht daran hält, muss <b>Strafe zahlen</b>
+  — manchmal sehr viel Geld.</p>
+
+  <div class="card yellow">
+    <h3>😱 Das ist das Problem der Ladenbesitzer</h3>
+    <p>Viele wissen gar nicht, dass ihr „Laden" (ihre Webseite) kaputte Türen hat.
+    Und sie haben Angst vor der Strafe. <b>Genau da helfen wir.</b></p>
+  </div>
+
+  <h2><span class="emoji">🔍</span> Was macht unsere Maschine?</h2>
+  <p class="big">Unsere Maschine ist wie ein <b>fleißiger Roboter</b>, der sich eine
+  Webseite ganz genau anschaut und aufschreibt, was kaputt ist.</p>
+
+  <div class="steps">
+    <div class="step">Der Roboter <b>besucht die Webseite</b> — so wie du in einen Laden gehst.</div>
+    <div class="step">Er <b>prüft jede Tür, jedes Schild, jeden Knopf</b>: Kann das auch jemand benutzen, der nicht so gut sieht?</div>
+    <div class="step">Er <b>schreibt eine Liste</b>: Das hier ist kaputt, und so kann man es reparieren.</div>
+    <div class="step">Er macht aus der Liste ein schönes <b>PDF-Heft</b> (den „Report").</div>
+  </div>
+
+  <h2><span class="emoji">👷</span> Die kleinen Helfer in der Maschine</h2>
+  <p>Die Maschine hat mehrere Helfer. Jeder kann eine Sache richtig gut:</p>
+  <div class="helpers">
+    <div class="helper"><span class="face">🔎</span><b>Der Sucher</b><span>Schaut sich die Webseite an und findet alle kaputten Stellen.</span></div>
+    <div class="helper"><span class="face">📝</span><b>Der Schreiber</b><span>Macht aus den Fehlern ein hübsches Heft mit Noten (wie in der Schule).</span></div>
+    <div class="helper"><span class="face">📄</span><b>Der Zettel-Macher</b><span>Schreibt den Pflicht-Zettel, den jeder Laden aufhängen muss.</span></div>
+    <div class="helper"><span class="face">💌</span><b>Der Briefträger</b><span>Schreibt nette Briefe an Ladenbesitzer: „Hallo, ich habe Fehler gefunden!"</span></div>
+    <div class="helper"><span class="face">🪧</span><b>Das Schaufenster</b><span>Eine Seite, wo man kostenlos kurz testen kann — wie eine Gratis-Probe.</span></div>
+    <div class="helper"><span class="face">🤝</span><b>Der Kassierer</b><span>(kommt noch) Nimmt das Geld und schickt das Heft automatisch.</span></div>
+  </div>
+
+  <h2><span class="emoji">💶</span> Wie verdienen wir damit Geld?</h2>
+  <p class="big">Ganz einfach — in drei Schritten:</p>
+
+  <div class="money">
+    <p><b>1. Gratis-Probe 🎁</b> — Der Ladenbesitzer darf kurz kostenlos testen.
+    Er sieht: „Oh nein, ich habe 17 Fehler!" Jetzt will er die ganze Liste.</p>
+    <div class="arrow">⬇️</div>
+    <p><b>2. Das ganze Heft 📘</b> — Die komplette Liste mit allen Lösungen kostet
+    <b>199 bis 499 Euro</b>. Der Roboter macht fast die ganze Arbeit — also bleibt
+    fast alles als Verdienst übrig.</p>
+    <div class="arrow">⬇️</div>
+    <p><b>3. Jeden Monat aufpassen 🔁</b> — Für <b>49 Euro im Monat</b> schaut der
+    Roboter immer wieder nach. Das bringt <b>jeden Monat</b> Geld, ohne neue Arbeit.</p>
+  </div>
+
+  <p class="big">👉 Wenn nur <b>5 bis 10 Läden pro Monat</b> das Heft kaufen, sind das
+  schon <b>1.000 bis 3.000 Euro</b>. Und das Beste: Du musst <b>niemanden treffen</b>
+  und <b>dein Gesicht nicht zeigen</b>.</p>
+
+  <h2><span class="emoji">🚶</span> Eine kleine Geschichte</h2>
+  <div class="card blue">
+    <p>🪧 Ein Ladenbesitzer findet unser <b>Schaufenster</b> bei Google.</p>
+    <p>🔎 Er klickt „kostenlos testen". Der <b>Sucher</b> findet 17 Fehler.</p>
+    <p>😨 Er erschrickt und kauft das ganze <b>Heft</b> für 199 Euro.</p>
+    <p>📝 Der <b>Schreiber</b> macht das Heft, der <b>Zettel-Macher</b> den Pflicht-Zettel.</p>
+    <p>😀 Der Ladenbesitzer ist froh — und bleibt für 49 Euro im Monat dabei.</p>
+    <p>💶 Wir haben Geld verdient, fast ohne Arbeit.</p>
+  </div>
+
+  <h2><span class="emoji">✅</span> Was der Computer NICHT allein kann</h2>
+  <p>Ein paar Sachen muss ein <b>Mensch</b> einmal erledigen (das kann ein Roboter nicht):</p>
+  <ul class="todo">
+    <li>🏛️ Das Geschäft beim Amt <b>anmelden</b>.</li>
+    <li>🌐 Eine <b>Internet-Adresse kaufen</b> (z. B. bfsg-check.de).</li>
+    <li>💳 Einen <b>Bezahl-Knopf</b> einbauen, damit Leute bezahlen können.</li>
+    <li>⚖️ Einen <b>Anwalt einmal kurz fragen</b>, ob alles erlaubt ist.</li>
+  </ul>
+
+  <div class="card green">
+    <h3>🎉 Das Wichtigste in einem Satz</h3>
+    <p class="big">Unser Roboter prüft Webseiten auf Fehler, macht daraus ein Heft zum
+    Verkaufen — und wir verdienen Geld, ohne jemanden treffen zu müssen.</p>
+  </div>
+
+  <div class="footer">
+    Webseiten-Check-Maschine (BFSG-Audit) · Einfach-Erklärung ·
+    Mehr Details für Erwachsene: <b>bfsg-audit/README.md</b> und der Business-Plan im Projekt.
+  </div>
+
+</div>
+</body>
+</html>

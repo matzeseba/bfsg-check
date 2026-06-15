@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Was du HEUTE tun musst, damit morgen alles live ist</title>
+<style>
+  :root{--ink:#0f172a;--mut:#64748b;--blue:#1d4ed8;--green:#16a34a;--amber:#d97706;--bg:#f8fafc}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--ink);line-height:1.6;font-size:15px}
+  .page{max-width:780px;margin:0 auto;padding:40px 44px}
+  h1{font-size:28px;color:var(--blue);margin-bottom:4px}
+  .sub{color:var(--mut);margin-bottom:22px}
+  h2{font-size:18px;margin:26px 0 6px}
+  .intro{background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:16px 18px;margin:16px 0}
+  .step{position:relative;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px 18px 16px 64px;margin:14px 0}
+  .step .n{position:absolute;left:16px;top:16px;width:34px;height:34px;background:var(--blue);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px}
+  .step h3{font-size:16px;margin-bottom:4px}
+  .step .kid{color:var(--mut);font-style:italic;margin:4px 0}
+  .step .do{margin-top:6px}
+  .step .do b{color:var(--green)}
+  .time{display:inline-block;background:var(--bg);border:1px solid #e2e8f0;border-radius:20px;padding:2px 10px;font-size:12px;color:var(--mut);margin-left:6px}
+  .tom{background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:16px 18px;margin:18px 0}
+  code{background:#f1f5f9;padding:1px 6px;border-radius:5px;font-size:13px}
+  .foot{margin-top:28px;padding-top:14px;border-top:2px solid #e2e8f0;color:var(--mut);font-size:12px}
+  ul{margin:6px 0 6px 20px}
+  @media print{.page{padding:24px}}
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>🚀 Heute tun → morgen live</h1>
+  <div class="sub">Ganz einfach erklärt. 8 kleine Schritte. Zusammen ca. 2–3 Stunden.</div>
+
+  <div class="intro">
+    <b>Stell dir vor:</b> Wir haben einen <b>Roboter-Laden</b> fertig gebaut (das macht
+    die Maschine, die ich programmiert habe). Jetzt müssen wir den Laden nur noch
+    <b>aufstellen, anschließen und das Türschild dranschrauben</b>. Das sind deine
+    8 Aufgaben für heute. Ich habe alles vorbereitet — du musst nur klicken und einfügen.
+  </div>
+
+  <div class="step"><div class="n">1</div>
+    <h3>Ein Türschild kaufen (Internet-Adresse) <span class="time">10 Min</span></h3>
+    <div class="kid">🪧 Damit Leute deinen Laden finden, braucht er einen Namen mit Schild.</div>
+    <div class="do"><b>Tu das:</b> Bei einem Anbieter (z. B. IONOS, Namecheap) eine Adresse kaufen, z. B. <code>bfsg-check.de</code>. Kostet ca. 1 €/Monat.</div>
+  </div>
+
+  <div class="step"><div class="n">2</div>
+    <h3>Die Spielzeugkiste online stellen (Code hochladen) <span class="time">15 Min</span></h3>
+    <div class="kid">📦 Unser ganzer Roboter steckt in einer Kiste (dem ZIP, das du bekommen hast).</div>
+    <div class="do"><b>Tu das:</b> Auf <code>github.com</code> ein neues, leeres Repo anlegen (privat). Dann die Kiste auspacken und das mitgelieferte Script ausführen: <code>bash setup-new-repo.sh DEINE-REPO-URL</code>. Fertig — der Code ist online.</div>
+  </div>
+
+  <div class="step"><div class="n">3</div>
+    <h3>Den Laden an den Strom stecken (deployen) <span class="time">20 Min</span></h3>
+    <div class="kid">🔌 Jetzt muss der Roboter laufen, damit Besucher reinkommen.</div>
+    <div class="do"><b>Tu das:</b> Bei <b>Render.com</b> (oder Railway) anmelden → „New Web Service" → dein GitHub-Repo verbinden. Es findet die <code>Dockerfile</code> von allein und startet den Laden. Adresse aus Schritt 1 dort verbinden.</div>
+  </div>
+
+  <div class="step"><div class="n">4</div>
+    <h3>Einen Briefkasten zum Verschicken holen (E-Mail) <span class="time">15 Min</span></h3>
+    <div class="kid">💌 Der Roboter muss die Hefte (Reports) per Post verschicken können.</div>
+    <div class="do"><b>Tu das:</b> Bei <b>Brevo</b> (kostenlos, 300 Mails/Tag) anmelden → SMTP-Zugangsdaten holen.</div>
+  </div>
+
+  <div class="step"><div class="n">5</div>
+    <h3>Dem Roboter die Schlüssel geben (Keys eintragen) <span class="time">15 Min</span></h3>
+    <div class="kid">🔑 Der Roboter braucht Schlüssel für die Kasse (Stripe) und den Briefkasten.</div>
+    <div class="do"><b>Tu das:</b> In Render unter „Environment" die Werte aus <code>.env.example</code> eintragen: <code>STRIPE_SECRET_KEY</code>, deine SMTP-Daten, <code>PUBLIC_URL</code> (deine Adresse). <b>Niemals in einen Chat schreiben!</b></div>
+  </div>
+
+  <div class="step"><div class="n">6</div>
+    <h3>Der Kasse sagen, wann sie klingeln soll (Stripe-Webhook) <span class="time">10 Min</span></h3>
+    <div class="kid">🔔 Wenn jemand bezahlt, muss die Kasse dem Roboter Bescheid geben.</div>
+    <div class="do"><b>Tu das:</b> Im Stripe-Dashboard → Entwickler → Webhooks → neuer Endpoint: <code>https://deine-adresse.de/webhook</code>, Ereignis <code>checkout.session.completed</code>. Das Geheimnis (<code>whsec_…</code>) auch in die Keys eintragen (Schritt 5).</div>
+  </div>
+
+  <div class="step"><div class="n">7</div>
+    <h3>Deinen Namen an die Tür schreiben (Recht) <span class="time">30 Min</span></h3>
+    <div class="kid">🏷️ Jeder echte Laden braucht ein Schild mit Namen und Adresse.</div>
+    <div class="do"><b>Tu das:</b> In <code>landingpage/index.html</code> die Platzhalter für Impressum, Datenschutz und AGB ausfüllen (echter Name + Adresse). Siehe <code>RECHTSSICHERHEIT.md</code>. Wichtig: einen <b>Anwalt kurz drüberschauen</b> lassen.</div>
+  </div>
+
+  <div class="step"><div class="n">8</div>
+    <h3>Einmal selbst Kunde spielen (Test) <span class="time">10 Min</span></h3>
+    <div class="kid">🧪 Bevor echte Leute kommen, testen wir, ob alles klappt.</div>
+    <div class="do"><b>Tu das:</b> Mit Stripe im Test-Modus einen Kauf durchklicken → schauen, ob das Report-PDF automatisch in deinem Postfach landet. Klappt es? Dann auf „Live" stellen.</div>
+  </div>
+
+  <div class="tom">
+    <h2>🌅 Und morgen?</h2>
+    <p>Wenn die 8 Schritte sitzen, ist dein Laden <b>live und verkaufsbereit</b>. Morgen
+    drehen wir den Wasserhahn für Besucher auf:</p>
+    <ul>
+      <li>🟢 <b>Google-Werbung</b> anschalten (Texte liegen fertig in <code>marketing/google-ads.md</code>).</li>
+      <li>🟢 Oder erste <b>Akquise-Mails</b> verschicken (der Roboter schreibt sie aus echten Fehlern: <code>node outreach.js</code>).</li>
+    </ul>
+    <p>Dann kommen die ersten Besucher — und der Roboter verkauft & verschickt von allein.</p>
+  </div>
+
+  <div class="foot">
+    Wichtig: „Live gehen" heißt verkaufsbereit — die ersten Euros kommen erfahrungsgemäß
+    einige Tage nach dem Werbe-Start, nicht in der ersten Stunde. Aber ab morgen <b>kann</b>
+    Geld reinkommen, ohne dass du dabei sein musst.
+  </div>
+</div>
+</body>
+</html>

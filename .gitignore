@@ -1,0 +1,10 @@
+node_modules/
+scanner/node_modules/
+.env
+scanner/.env
+*.env
+out/
+scanner/out/
+*.pdf
+.DS_Store
+*.log

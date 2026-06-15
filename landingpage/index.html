@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BFSG-Check — Ist Ihre Website abmahnsicher? | Kostenlose Sofort-Pruefung</title>
+<meta name="description" content="Pruefen Sie in 60 Sekunden, ob Ihre Website das Barrierefreiheitsstaerkungsgesetz (BFSG) erfuellt. Kostenloser Sofort-Check, ausfuehrlicher Report auf Wunsch.">
+<style>
+  :root{--ink:#0f172a;--mut:#475569;--line:#e2e8f0;--accent:#1d4ed8;--accent2:#1e40af;--ok:#16a34a;--warn:#dc2626;--bg:#f8fafc}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--ink);line-height:1.6}
+  .wrap{max-width:780px;margin:0 auto;padding:0 20px}
+  header{background:linear-gradient(160deg,#1e3a8a,#1d4ed8);color:#fff;padding:64px 0 72px;text-align:center}
+  header .pill{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);padding:6px 14px;border-radius:30px;font-size:13px;font-weight:600;margin-bottom:20px}
+  header h1{font-size:34px;line-height:1.2;margin-bottom:16px}
+  header p{font-size:18px;opacity:.92;max-width:560px;margin:0 auto}
+  .hero-img{max-width:600px;width:100%;margin:26px auto 6px;display:block;border-radius:18px;box-shadow:0 24px 60px rgba(15,23,42,.28)}
+  .badges{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin-top:16px;color:rgba(255,255,255,.85);font-size:13px}
+  .scanbox{background:#fff;border-radius:16px;box-shadow:0 20px 50px rgba(15,23,42,.18);padding:28px;margin:-44px auto 0;max-width:620px}
+  .scanbox h2{font-size:20px;margin-bottom:6px;text-align:center}
+  .scanbox .hint{color:var(--mut);font-size:14px;text-align:center;margin-bottom:18px}
+  .form{display:flex;gap:10px}
+  .form input{flex:1;padding:14px 16px;border:2px solid var(--line);border-radius:10px;font-size:16px}
+  .form input:focus{outline:none;border-color:var(--accent)}
+  .btn{background:var(--accent);color:#fff;border:none;padding:14px 22px;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;white-space:nowrap}
+  .btn:hover{background:var(--accent2)}
+  .trust{display:flex;justify-content:center;gap:24px;color:var(--mut);font-size:13px;margin-top:16px;flex-wrap:wrap}
+  section{padding:48px 0}
+  .alert{background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:22px;margin:32px auto;max-width:620px}
+  .alert h3{color:var(--warn);margin-bottom:8px;font-size:18px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:24px}
+  .card{border:1px solid var(--line);border-radius:12px;padding:22px}
+  .card .num{font-size:13px;font-weight:700;color:var(--accent);margin-bottom:6px}
+  .card h4{font-size:17px;margin-bottom:6px}
+  .card p{color:var(--mut);font-size:14px}
+  h2.center{text-align:center;font-size:26px;margin-bottom:8px}
+  p.center{text-align:center;color:var(--mut);max-width:560px;margin:0 auto}
+  .pricing{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:28px}
+  .price{border:1px solid var(--line);border-radius:14px;padding:26px;display:flex;flex-direction:column}
+  .price.featured{border:2px solid var(--accent);box-shadow:0 10px 30px rgba(29,78,216,.12)}
+  .price .tag{font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.5px}
+  .price .amount{font-size:34px;font-weight:800;margin:8px 0}
+  .price ul{list-style:none;margin:14px 0;flex:1}
+  .price li{padding:6px 0 6px 24px;position:relative;font-size:14px;color:var(--mut)}
+  .price li:before{content:"\2713";color:var(--ok);position:absolute;left:0;font-weight:700}
+  .faq{margin-top:24px}
+  .faq details{border-bottom:1px solid var(--line);padding:16px 0}
+  .faq summary{font-weight:600;cursor:pointer}
+  .faq p{margin-top:10px;color:var(--mut);font-size:15px}
+  footer{background:var(--bg);padding:32px 0;text-align:center;color:var(--mut);font-size:13px}
+  #result{margin-top:20px;display:none}
+  .resultcard{border:1px solid var(--line);border-radius:12px;padding:20px;text-align:center}
+  .scorebig{font-size:48px;font-weight:800}
+  @media(max-width:560px){.form{flex-direction:column}header h1{font-size:27px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <span class="pill">Barrierefreiheitsstaerkungsgesetz (BFSG) seit 28.06.2025 in Kraft</span>
+    <h1>Erfuellt Ihre Website das BFSG?</h1>
+    <p>Pruefen Sie in 60 Sekunden automatisiert, wie barrierefrei Ihre Seite nach WCAG 2.1 ist — mit konkretem, menschlich geprueftem Fix-Plan zum Abarbeiten.</p>
+    <img class="hero-img" src="/assets/hero.png" alt="Illustration einer automatisierten Website-Barrierefreiheits-Pruefung">
+    <div class="badges"><span>&#9889; Ergebnis in 60 Sek.</span><span>&#129302; KI-gestuetzt + menschlich geprueft</span><span>&#128221; WCAG 2.1 / EN 301 549</span></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="scanbox">
+    <h2>Kostenloser Sofort-Check</h2>
+    <p class="hint">URL eingeben &middot; keine Anmeldung &middot; Ergebnis sofort</p>
+    <form class="form" id="scanForm" onsubmit="return startScan(event)">
+      <input type="url" id="url" placeholder="https://ihre-website.de" required>
+      <button class="btn" type="submit">Jetzt pruefen</button>
+    </form>
+    <div class="trust">
+      <span>&#128274; SSL-verschluesselt</span>
+      <span>&#9889; Ergebnis in unter 60&nbsp;Sek.</span>
+      <span>&#128172; Pruefnorm WCAG 2.1 AA</span>
+    </div>
+    <div id="result">
+      <div class="resultcard">
+        <div class="scorebig" id="rScore">–</div>
+        <p id="rVerdict"></p>
+        <p style="margin-top:10px"><strong id="rIssues"></strong></p>
+        <a class="btn" href="#preise" style="display:inline-block;margin-top:14px;text-decoration:none">Vollstaendigen Report sichern &rarr;</a>
+        <p class="hint" style="margin-top:10px">Der kostenlose Check zeigt die Anzahl der Probleme. Der bezahlte Report nennt jeden Mangel mit konkreter Loesung + fertige Barrierefreiheitserklaerung.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert">
+    <h3>&#8505;&#65039; Worum es beim BFSG geht</h3>
+    <p>Das BFSG verlangt von vielen Online-Anbietern barrierefreie Websites. Bussgelder sind gestaffelt (bis 10.000&nbsp;Euro, in schweren Faellen bis 100.000&nbsp;Euro) und greifen i.&nbsp;d.&nbsp;R. erst nach behoerdlicher Aufforderung. <strong>Kleinstunternehmen</strong> (unter 10 Mitarbeitende und unter 2&nbsp;Mio.&nbsp;Euro Umsatz) sind bei Dienstleistungen teils ausgenommen. Die haeufigsten Maengel (Alternativtexte, Kontraste, Formular-Labels) sind technisch schnell behebbar — wenn man sie kennt. Dieser Check ist eine <strong>automatisierte technische Erstpruefung, keine Rechtsberatung</strong>.</p>
+  </div>
+
+  <section>
+    <h2 class="center">In 3 Schritten zur Rechtssicherheit</h2>
+    <div class="grid">
+      <div class="card"><div class="num">SCHRITT 1</div><h4>URL pruefen</h4><p>Sie geben Ihre Website-Adresse ein, unser System scannt automatisch gegen die WCAG-2.1-Kriterien.</p></div>
+      <div class="card"><div class="num">SCHRITT 2</div><h4>Report erhalten</h4><p>Sie bekommen einen priorisierten PDF-Report: jeder Mangel mit Geschaeftsrisiko und konkreter Loesung.</p></div>
+      <div class="card"><div class="num">SCHRITT 3</div><h4>Absichern</h4><p>Inklusive Entwurf Ihrer gesetzlich vorgeschriebenen Barrierefreiheitserklaerung. Optional: Re-Check-Abo.</p></div>
+    </div>
+  </section>
+
+  <section id="preise">
+    <h2 class="center">Pakete</h2>
+    <p class="center">Einmalig pruefen oder dauerhaft absichern.</p>
+    <div class="pricing">
+      <div class="price">
+        <span class="tag">Basis</span>
+        <div class="amount">199&nbsp;&euro;</div>
+        <p style="color:var(--mut);font-size:14px">Einmaliger Vollreport</p>
+        <ul>
+          <li>Vollstaendiger WCAG-2.1-Report (PDF)</li>
+          <li>Alle Maengel priorisiert + Loesung</li>
+          <li>Entwurf Barrierefreiheitserklaerung</li>
+          <li>Bis zu 5 Unterseiten</li>
+        </ul>
+        <button class="btn" type="button" onclick="checkout('basis')" style="border:none;cursor:pointer">Auswaehlen</button>
+      </div>
+      <div class="price featured">
+        <span class="tag">Beliebt &middot; Profi</span>
+        <div class="amount">499&nbsp;&euro;</div>
+        <p style="color:var(--mut);font-size:14px">Report + Umsetzungsplan</p>
+        <ul>
+          <li>Alles aus Basis</li>
+          <li>Bis zu 25 Unterseiten</li>
+          <li>Konkreter Umsetzungs-Fahrplan</li>
+          <li>Entwickler-Checkliste (Copy-Paste)</li>
+          <li>30 Tage E-Mail-Support</li>
+        </ul>
+        <button class="btn" type="button" onclick="checkout('profi')" style="border:none;cursor:pointer">Auswaehlen</button>
+      </div>
+      <div class="price">
+        <span class="tag">Abo</span>
+        <div class="amount">49&nbsp;&euro;<span style="font-size:15px;font-weight:500">/Monat</span></div>
+        <p style="color:var(--mut);font-size:14px">Dauerhafte Ueberwachung</p>
+        <ul>
+          <li>Monatlicher Re-Check</li>
+          <li>Alarm bei neuen Maengeln</li>
+          <li>Aktualisierte Erklaerung</li>
+          <li>Jederzeit kuendbar</li>
+        </ul>
+        <button class="btn" type="button" onclick="checkout('abo')" style="border:none;cursor:pointer">Auswaehlen</button>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="center">Haeufige Fragen</h2>
+    <div class="faq">
+      <details><summary>Betrifft mich das BFSG ueberhaupt?</summary><p>Betroffen sind insbesondere Online-Shops und Dienstleister im elektronischen Geschaeftsverkehr. Kleinstunternehmen (unter 10 Mitarbeitende und unter 2 Mio. Euro Jahresumsatz) sind bei reinen Dienstleistungen teils ausgenommen — der kostenlose Check gibt eine erste Einordnung.</p></details>
+      <details><summary>Ersetzt der Report eine Rechtsberatung?</summary><p>Nein. Der Report ist eine technische Vorpruefung nach WCAG 2.1 und deckt einen Grossteil der haeufigen Maengel ab. Fuer eine rechtsverbindliche Bewertung konsultieren Sie bitte einen Fachanwalt.</p></details>
+      <details><summary>Wie schnell bekomme ich den Report?</summary><p>Der kostenlose Sofort-Check liefert in unter einer Minute. Den vollstaendigen Report erhalten Sie nach Bestellung automatisch per E-Mail.</p></details>
+      <details><summary>Was kostet die Behebung der Maengel?</summary><p>Viele Punkte (Alternativtexte, Kontraste, Labels) sind in wenigen Stunden behebbar. Der Profi-Report liefert eine Copy-Paste-Checkliste fuer Ihre Entwickler.</p></details>
+    </div>
+  </section>
+</div>
+
+<!-- Rechtskonformer Bestell-Dialog -->
+<div id="co-modal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:50;align-items:center;justify-content:center;padding:16px">
+  <div style="background:#fff;border-radius:14px;max-width:520px;width:100%;padding:26px;max-height:90vh;overflow:auto">
+    <h3 style="margin-bottom:6px">Bestellung abschliessen</h3>
+    <p class="hint" style="text-align:left;margin-bottom:14px">Sie erhalten nach Zahlung automatisch Ihren KI-gestuetzten, menschlich geprueften Fix-Plan (PDF) + Vorlage der Barrierefreiheitserklaerung per E-Mail.</p>
+    <input type="hidden" id="co-url">
+    <label style="display:block;font-size:14px;margin-bottom:8px">E-Mail fuer die Zustellung
+      <input type="email" id="co-email" required style="width:100%;padding:10px;border:2px solid var(--line);border-radius:8px;margin-top:4px">
+    </label>
+    <fieldset style="border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:12px 0;font-size:14px">
+      <legend style="font-size:12px;color:var(--mut)">Ich bestelle als</legend>
+      <label style="display:block;margin:4px 0"><input type="radio" name="co-type" id="co-consumer" onchange="toggleConsent()"> Verbraucher (privat)</label>
+      <label style="display:block;margin:4px 0"><input type="radio" name="co-type" id="co-business" onchange="toggleConsent()"> Unternehmer (gewerblich)</label>
+    </fieldset>
+    <div id="co-consent-row" style="display:none;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:13px">
+      <label style="display:flex;gap:8px;align-items:flex-start">
+        <input type="checkbox" id="co-consent" style="margin-top:3px">
+        <span>Ich verlange ausdruecklich, dass mit der Erstellung des Fix-Plans sofort, vor Ablauf der 14-taegigen Widerrufsfrist, begonnen wird. Mir ist bekannt, dass mein Widerrufsrecht mit vollstaendiger Vertragserfuellung erlischt.</span>
+      </label>
+    </div>
+    <button id="co-submit" class="btn" type="button" onclick="submitCheckout()" style="width:100%;border:none;cursor:pointer">Zahlungspflichtig bestellen</button>
+    <button type="button" onclick="closeCheckout()" style="width:100%;background:none;border:none;color:var(--mut);margin-top:8px;cursor:pointer">Abbrechen</button>
+    <p class="hint" style="text-align:left;margin-top:10px;font-size:12px">Mit der Bestellung akzeptieren Sie die <a href="/agb.html">AGB</a> und die <a href="/widerrufsbelehrung.html">Widerrufsbelehrung</a>. Datenverarbeitung gemaess <a href="/datenschutz.html">Datenschutzerklaerung</a>.</p>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    BFSG-Check &middot; Automatisierte Barrierefreiheits-Pruefung nach WCAG 2.1 / EN 301 549<br>
+    <a href="/impressum.html">Impressum</a> &middot; <a href="/datenschutz.html">Datenschutz</a> &middot; <a href="/agb.html">AGB</a> &middot; <a href="/widerrufsbelehrung.html">Widerruf</a> &middot; <a href="/widerruf.html">Vertrag widerrufen</a> &middot; <a href="/kuendigen.html">Vertrag kuendigen</a><br>
+    <span style="font-size:12px">Hinweis: Automatisierte, KI-gestuetzte Erstpruefung mit menschlicher Pruefung &mdash; keine Rechtsberatung, keine Konformitaetsgarantie. Ergebnisse ersetzen keine vollstaendige manuelle Pruefung.</span>
+  </div>
+</footer>
+
+<script>
+// Demo-Frontend. Bindet im Live-Betrieb an den /teaser-Endpoint (siehe scanner/server-Beispiel in README).
+async function startScan(e){
+  e.preventDefault();
+  var url=document.getElementById('url').value;
+  var res=document.getElementById('result');
+  var btn=document.querySelector('.btn');
+  btn.textContent='Pruefe...';btn.disabled=true;
+  try{
+    var data;
+    try{
+      // Live-Betrieb: spricht den Teaser-Endpoint von scanner/server.js an.
+      var r=await fetch('/api/scan?url='+encodeURIComponent(url));
+      if(!r.ok) throw new Error('api');
+      data=await r.json();
+    }catch(_){
+      // Demo-Fallback ohne Backend.
+      await new Promise(r=>setTimeout(r,1000));
+      data={score:Math.floor(40+Math.random()*45),totalIssues:Math.floor(5+Math.random()*30)};
+    }
+    document.getElementById('rScore').textContent=data.score+'/100';
+    document.getElementById('rVerdict').textContent=data.score>=75?'Solide Basis, aber Handlungsbedarf.':'Deutliche Maengel — erhoehtes Abmahnrisiko.';
+    document.getElementById('rIssues').textContent=data.totalIssues+' potenzielle Barrieren gefunden';
+    res.style.display='block';
+    res.scrollIntoView({behavior:'smooth',block:'center'});
+  }finally{btn.textContent='Jetzt pruefen';btn.disabled=false;}
+  return false;
+}
+
+// Oeffnet den rechtskonformen Bestell-Dialog fuer das gewaehlte Paket.
+var SELECTED_PKG='basis';
+function checkout(pkg){
+  SELECTED_PKG=pkg;
+  var url=document.getElementById('url').value;
+  if(!url){ url=prompt('Bitte geben Sie die zu pruefende Website-Adresse ein:','https://'); }
+  if(!url) return;
+  document.getElementById('co-url').value=url;
+  document.getElementById('co-modal').style.display='flex';
+  toggleConsent();
+}
+function closeCheckout(){ document.getElementById('co-modal').style.display='none'; }
+function toggleConsent(){
+  // Widerrufs-Verzicht nur fuer Verbraucher erforderlich (B2B kein Widerrufsrecht).
+  var isConsumer=document.getElementById('co-consumer').checked;
+  document.getElementById('co-consent-row').style.display=isConsumer?'block':'none';
+}
+async function submitCheckout(){
+  var btn=document.getElementById('co-submit');
+  var isConsumer=document.getElementById('co-consumer').checked;
+  var isBusiness=document.getElementById('co-business').checked;
+  if(!isConsumer && !isBusiness){ alert('Bitte waehlen: Verbraucher oder Unternehmer.'); return; }
+  var consent=document.getElementById('co-consent').checked;
+  if(isConsumer && !consent){ alert('Bitte bestaetigen Sie die Zustimmung zur sofortigen Ausfuehrung (Widerruf erlischt).'); return; }
+  var email=document.getElementById('co-email').value;
+  if(!email){ alert('Bitte E-Mail-Adresse angeben.'); return; }
+  btn.textContent='Weiterleitung...';btn.disabled=true;
+  try{
+    var r=await fetch('/api/checkout',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({url:document.getElementById('co-url').value,pkg:SELECTED_PKG,email:email,
+        customerType:isConsumer?'consumer':'business',consent:consent})
+    });
+    var data=await r.json();
+    if(data.url){ window.location.href=data.url; }
+    else { alert(data.error||'Bezahlung derzeit nicht moeglich.'); btn.textContent='Zahlungspflichtig bestellen';btn.disabled=false; }
+  }catch(_){ alert('Verbindung fehlgeschlagen.'); btn.textContent='Zahlungspflichtig bestellen';btn.disabled=false; }
+}
+</script>
+</body>
+</html>

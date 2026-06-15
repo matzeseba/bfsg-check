@@ -1,0 +1,27 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Vertrag kündigen</title>
+<style>body{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:560px;margin:0 auto;padding:40px 20px;color:#0f172a;line-height:1.6}label{display:block;margin:10px 0 4px;font-size:14px}input{width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px}.btn{background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:12px 20px;font-weight:700;cursor:pointer;margin-top:16px;width:100%}a{color:#1d4ed8}.ok{background:#ecfdf5;border:1px solid #a7f3d0;border-radius:8px;padding:14px;margin-top:14px}</style>
+</head><body>
+<h1>Verträge hier kündigen</h1>
+<p>Kündigung des Re-Check-Abos (§ 312k BGB). Kein Login nötig. Bestätigung auf der nächsten Stufe.</p>
+<div id="step1">
+  <label>Name<input id="k-name"></label>
+  <label>E-Mail (wie im Abo)<input id="k-email" type="email"></label>
+  <label>Vertrag/Kundennummer (optional)<input id="k-vertrag"></label>
+  <button class="btn" type="button" onclick="document.getElementById('step1').style.display='none';document.getElementById('step2').style.display='block'">Weiter</button>
+</div>
+<div id="step2" style="display:none">
+  <p>Bitte bestätigen Sie die Kündigung verbindlich.</p>
+  <button class="btn" type="button" onclick="sendK()">Jetzt kündigen</button>
+</div>
+<div id="done" class="ok" style="display:none">Ihre Kündigung ist eingegangen. Sie erhalten eine Bestätigung per E-Mail.</div>
+<p style="margin-top:20px"><a href="/">&larr; Zurück</a></p>
+<script>
+async function sendK(){
+  var b={name:k_name.value,email:k_email.value,vertrag:k_vertrag.value};
+  try{var r=await fetch('/api/kuendigung',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});
+    if(r.ok){document.getElementById('step2').style.display='none';document.getElementById('done').style.display='block';}
+    else{alert('Bitte Name und E-Mail angeben.');}}catch(_){alert('Verbindung fehlgeschlagen.');}
+}
+</script>
+</body></html>
