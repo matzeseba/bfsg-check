@@ -29,9 +29,10 @@
 | Produkt | Status | Datei |
 |---|---|---|
 | **BFSG-Fix-Plan** (199/499 €) — Report + Checkliste + Erklärung-Vorlage | ✅ getestet | `scan.js` + `report.js` |
-| **Cookie/Consent-Scan** (49–79 €, § 25 TDDDG) — misst Tracker vor Consent | ✅ getestet | `scan-cookie.js` + `audit-cookie.js` |
-| **Re-Check-Abo** (49 €/Mon, MRR) | ⏳ Konzept, per `ENABLE_ABO` aktivierbar | `app.js` |
-| Multi-Page-Premium, White-Label, Widget | ⏳ Roadmap | `EXPANSION-ROADMAP.md` |
+| **Multi-Page-Crawl** (Basis 5 Seiten / Profi 25 Seiten, same-origin BFS) | ✅ Welle 2 | `scan.js#scanSite` + `fulfill.js#PKG_CONFIG` |
+| **Cookie/Consent-Scan** (49 / 79 €, § 25 TDDDG) — eigener Checkout + Landing-Sektion | ✅ Welle 2 | `scan-cookie.js` + Pakete `cookie-basis`/`cookie-profi` |
+| **Re-Check-Abo** (49 €/Mon, MRR) — `invoice.paid`→Re-Scan+Diff, `customer.subscription.deleted`→Bestätigung | ✅ Welle 2 (per `ENABLE_ABO=true` scharfgeschaltet) | `subscriptions.js` + `diff.js` + `app.js` |
+| White-Label-/Agentur-Reseller, Embeddable Widget | ⏳ Welle 3 | `EXPANSION-ROADMAP.md` |
 
 ## Sicherheit & Recht (Code-Seite ✅)
 SSRF-Guard · Rate-Limit · Concurrency-Cap · Webhook-Idempotenz · Bestell-Persistenz + Alarm · Fail-fast · Checkout-Compliance (Button/Widerruf-Consent/B2C-B2B) · Widerruf-/Kündigungs-Seiten · Rechtstext-Vorlagen · ehrliches Framing (keine Konformitätsgarantie) · Cold-Mail gesperrt.
