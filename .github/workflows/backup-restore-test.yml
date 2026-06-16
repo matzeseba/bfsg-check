@@ -1,0 +1,76 @@
+name: Backup Restore Test
+
+# Monatlicher Synthetic-Round-Trip-Test: verifiziert dass backup.sh + restore.sh
+# syntaktisch sauber sind und ein GPG-Verschlüsselungs-Roundtrip funktioniert.
+# Bei Fehler: E-Mail-Alert via Brevo SMTP an matze.seba@outlook.de.
+
+on:
+  schedule:
+    # 1. d. Monats um 04:00 UTC (eine Stunde nach Live-Backup)
+    - cron: '0 4 1 * *'
+  workflow_dispatch:  # manueller Trigger zum Testen
+
+jobs:
+  restore-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Syntax-Check backup.sh + restore.sh
+        run: |
+          bash -n deployment/backup.sh
+          bash -n deployment/restore.sh
+
+      - name: Synthetic Round-Trip (symmetric GPG für CI ohne Pubkey)
+        run: |
+          mkdir -p /tmp/src
+          echo '{"sessionId":"cs_test","email":"a@b.de","status":"MAILED"}' > /tmp/src/orders.jsonl
+          echo '{"subscriptionId":"sub_test","status":"ACTIVE"}' > /tmp/src/subscriptions.jsonl
+          mkdir -p /tmp/src/invoices && echo "PDF stub" > /tmp/src/invoices/RE-2026-0001.pdf
+
+          # Symmetric encrypt für CI (ohne dedizierten Pubkey)
+          tar -C /tmp/src -czf - . | \
+            gpg --batch --yes --passphrase 'ci-test-passphrase' \
+                --symmetric --cipher-algo AES256 \
+                --output /tmp/test-backup.tar.gz.gpg
+
+          # Round-trip: entschlüsseln + extrahieren
+          mkdir -p /tmp/restored
+          gpg --batch --yes --passphrase 'ci-test-passphrase' \
+              --decrypt /tmp/test-backup.tar.gz.gpg | tar -C /tmp/restored -xzf -
+
+          # Verifikation: Inhalte intakt?
+          diff /tmp/src/orders.jsonl /tmp/restored/orders.jsonl
+          diff /tmp/src/subscriptions.jsonl /tmp/restored/subscriptions.jsonl
+          diff /tmp/src/invoices/RE-2026-0001.pdf /tmp/restored/invoices/RE-2026-0001.pdf
+          echo '[OK] Synthetic backup round-trip works'
+
+      - name: Verifikation der rclone-Config-Vorlage in Docs
+        run: |
+          # Stelle sicher, dass BACKUP.md die rclone-Schritte enthält
+          grep -q "rclone config" docs/BACKUP.md
+          grep -q "BACKUP_GPG_RECIPIENT" docs/BACKUP.md
+          grep -q "BACKUP_TARGET" docs/BACKUP.md
+          echo '[OK] docs/BACKUP.md enthält erwartete Setup-Schritte'
+
+      - name: Alert via Brevo SMTP bei Fehler
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp-relay.brevo.com
+          server_port: 587
+          username: ${{ secrets.SMTP_USER }}
+          password: ${{ secrets.SMTP_PASS }}
+          subject: "[BFSG-ALERT] Backup-Restore-Test FAILED"
+          body: |
+            Monatlicher Backup-Restore-Test ist fehlgeschlagen.
+
+            Workflow-Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Bitte prüfen:
+            1. deployment/backup.sh + restore.sh Syntax
+            2. docs/BACKUP.md Setup-Schritte
+            3. Live-Server: läuft cron @ /etc/cron.d/bfsg-backup?
+          to: matze.seba@outlook.de
+          from: BFSG-Check Monitoring <no-reply@bfsg-fix.de>
