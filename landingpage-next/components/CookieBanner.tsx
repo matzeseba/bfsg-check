@@ -1,0 +1,183 @@
+"use client";
+
+import * as React from "react";
+
+import { Button } from "@/components/ui/button";
+
+// Eigenbau-Port aus landingpage/index.html — § 25 TDDDG opt-in vor jedem
+// nicht-essenziellen Tracker. Marketing-/Analytics-Tags laden ausschließlich
+// nach Consent über window.bfsgLoadTrackers.
+
+const STORAGE_KEY = "bfsg-consent-v1";
+const RESET_EVENT = "bfsg:consent-reset";
+const CHANGE_EVENT = "bfsg:consent-change";
+
+export type BfsgConsent = {
+  marketing: boolean;
+  ts: string;
+  v: 1;
+};
+
+declare global {
+  interface Window {
+    bfsgConsent?: Partial<BfsgConsent>;
+    bfsgLoadTrackers?: () => void;
+    bfsgConsentReset?: () => void;
+  }
+}
+
+function readConsent(): Partial<BfsgConsent> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return {};
+    return JSON.parse(raw) as BfsgConsent;
+  } catch {
+    return {};
+  }
+}
+
+function writeConsent(value: BfsgConsent) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
+  } catch {
+    // Privacy-Mode: localStorage gesperrt — leise fortfahren.
+  }
+  window.bfsgConsent = value;
+  window.dispatchEvent(new CustomEvent(CHANGE_EVENT));
+}
+
+export function resetConsent() {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // ignore
+  }
+  window.bfsgConsent = {};
+  window.dispatchEvent(new CustomEvent(RESET_EVENT));
+}
+
+// useSyncExternalStore-Subscribe für Reset-/Change-Events.
+function subscribe(callback: () => void) {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener(RESET_EVENT, callback);
+  window.addEventListener(CHANGE_EVENT, callback);
+  window.addEventListener("storage", callback);
+  return () => {
+    window.removeEventListener(RESET_EVENT, callback);
+    window.removeEventListener(CHANGE_EVENT, callback);
+    window.removeEventListener("storage", callback);
+  };
+}
+
+// Stabile Snapshot-Referenz, damit useSyncExternalStore nicht in einer Schleife läuft.
+let cachedConsent: Partial<BfsgConsent> | null = null;
+let cachedConsentRaw: string | null = null;
+
+function getSnapshot(): Partial<BfsgConsent> {
+  if (typeof window === "undefined") return {};
+  let raw: string | null = null;
+  try {
+    raw = window.localStorage.getItem(STORAGE_KEY);
+  } catch {
+    raw = null;
+  }
+  if (raw !== cachedConsentRaw || cachedConsent === null) {
+    cachedConsentRaw = raw;
+    cachedConsent = readConsent();
+  }
+  return cachedConsent;
+}
+
+function getServerSnapshot(): Partial<BfsgConsent> {
+  return {};
+}
+
+// Hydration-Marker: Server liefert false, Client true — verhindert
+// SSR-Mismatch des Banners ohne setState in useEffect.
+function subscribeMount() {
+  return () => {};
+}
+function getMountedSnapshot() {
+  return true;
+}
+function getMountedServerSnapshot() {
+  return false;
+}
+
+export function CookieBanner() {
+  const consent = React.useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot,
+  );
+  const mounted = React.useSyncExternalStore(
+    subscribeMount,
+    getMountedSnapshot,
+    getMountedServerSnapshot,
+  );
+
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.bfsgConsent = consent;
+    if (
+      consent.marketing &&
+      typeof window.bfsgLoadTrackers === "function"
+    ) {
+      window.bfsgLoadTrackers();
+    }
+  }, [consent]);
+
+  if (!mounted) return null;
+  if (consent.ts) return null;
+
+  function setConsent(marketing: boolean) {
+    writeConsent({
+      marketing,
+      ts: new Date().toISOString(),
+      v: 1,
+    });
+  }
+
+  return (
+    <div
+      role="dialog"
+      aria-label="Cookie-Hinweis"
+      aria-modal="false"
+      className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-3xl rounded-xl border border-border bg-popover p-5 shadow-xl ring-1 ring-foreground/10"
+    >
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex-1">
+          <p className="font-semibold">Cookies &amp; Tracking</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Wir verwenden ausschließlich technisch notwendige Cookies
+            (Session/Sicherheit). Marketing- und Analytics-Tools laden wir erst
+            nach Ihrer Einwilligung. Mehr in der{" "}
+            <a
+              href="/datenschutz"
+              className="underline underline-offset-2 hover:text-foreground"
+            >
+              Datenschutzerklärung
+            </a>
+            .
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2 sm:flex-nowrap">
+          <Button
+            type="button"
+            variant="outline"
+            size="lg"
+            onClick={() => setConsent(false)}
+          >
+            Nur notwendige
+          </Button>
+          <Button type="button" size="lg" onClick={() => setConsent(true)}>
+            Alle akzeptieren
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
