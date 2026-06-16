@@ -1,0 +1,50 @@
+name: Server-Diagnose
+
+# Manuell-triggerbarer Workflow zum Server-Status-Check über SSH.
+# Holt docker compose ps, logs, .env-Existenz, disk/mem.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: SSH Diagnose
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: root
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          port: 22
+          script_stop: false
+          script: |
+            echo "===== UPTIME ====="
+            uptime
+            echo
+            echo "===== MEMORY ====="
+            free -h
+            echo
+            echo "===== DISK ====="
+            df -h /
+            echo
+            echo "===== CLOUD-INIT-LOG (letzte 30) ====="
+            tail -30 /var/log/bfsg-bootstrap.log 2>/dev/null || echo "(noch nicht da)"
+            echo
+            echo "===== REPO-STAND ====="
+            cd /opt/bfsg-check && git log --oneline -3 && git rev-parse HEAD
+            echo
+            echo "===== .ENV EXISTS? (Werte werden NICHT geprinted) ====="
+            test -f /opt/bfsg-check/deployment/.env && echo ".env DA" || echo ".env FEHLT"
+            grep -c "^STRIPE_SECRET_KEY=" /opt/bfsg-check/deployment/.env 2>/dev/null | xargs -I{} echo "STRIPE_SECRET_KEY-Zeilen: {}"
+            grep -c "^SMTP_PASS=" /opt/bfsg-check/deployment/.env 2>/dev/null | xargs -I{} echo "SMTP_PASS-Zeilen: {}"
+            echo
+            echo "===== DOCKER COMPOSE PS ====="
+            cd /opt/bfsg-check/deployment && docker compose ps
+            echo
+            echo "===== APP-CONTAINER LOGS (letzte 80) ====="
+            docker compose logs --tail=80 app 2>&1 | tail -100
+            echo
+            echo "===== CADDY-CONTAINER LOGS (letzte 30) ====="
+            docker compose logs --tail=30 caddy 2>&1 | tail -40
