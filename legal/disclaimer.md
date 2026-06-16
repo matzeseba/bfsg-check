@@ -1,57 +1,44 @@
-# Recht & Compliance — BFSG-Audit (⚠️ keine Rechtsberatung)
+# Disclaimer — BFSG-Check (Single Source of Truth)
 
-> Diese Notiz fasst die wichtigsten rechtlichen Pflichten zusammen. Sie ersetzt
-> keine anwaltliche Beratung. Vor dem Live-Gang einen Fachanwalt / Steuerberater
-> konsultieren.
+> **Single-Source-Wortlaut.** Dieser Block wird auf Landingpage, in Reports, AGB § 2,
+> Footer und E-Mail-Signaturen wörtlich verwendet. Änderungen nur hier — danach
+> überall ausrollen.
 
-## 1. Haftung für die Audit-Reports (kritisch)
+## Wörtlicher Disclaimer (DE)
 
-Der Report ist eine **automatisierte technische Vorprüfung**. Automatisierte Tests
-erkennen nur ~30–50 % aller Barrieren. Deshalb **zwingend** in jedem Report + auf der
-Landingpage:
+> **BFSG-Check liefert eine automatisierte technische Erstprüfung. Wir geben keine
+> Konformitätsgarantie und ersetzen keine Rechtsberatung. Bei rechtlichen Fragen
+> konsultieren Sie einen Fachanwalt für IT-/Wettbewerbsrecht.**
 
-- Klare Kennzeichnung: „automatisierte Vorprüfung, keine vollständige manuelle
-  Prüfung, keine Rechtsberatung". (Bereits im Report-Template + Landingpage-Footer.)
-- Keine Garantie auf „100 % BFSG-konform" oder „abmahnsicher" geben — nur
-  „Reduzierung des Risikos / Identifikation häufiger Mängel".
+### Kurzform (≤ 200 Zeichen, für Ads-/Footer-Slots)
 
-## 2. Eigenes Business — Pflichten
+> Automatisierte technische Erstprüfung. Keine Konformitätsgarantie, keine Rechtsberatung. Bei rechtlichen Fragen Fachanwalt für IT-/Wettbewerbsrecht.
 
-- **Gewerbe anmelden** (Tätigkeit ist gewerblich). Einzelunternehmen genügt.
-- **Kleinunternehmer §19 UStG** (Grenzen 2026: 25.000 € Vorjahr / 100.000 € lfd. Jahr)
-  → keine USt ausweisen.
-- **Impressum (§5 DDG)** mit echtem Namen + ladungsfähiger Adresse (c/o-Adresse
-  möglich). **Anonym geht nicht**, sobald monetarisiert.
-- **Datenschutzerklärung + AGB** für die Landingpage (Report-Verkauf = Fernabsatz;
-  Widerrufsrecht bei digitalen Dienstleistungen über Vorab-Zustimmung ausschließbar).
-- **Zahlung:** Merchant of Record (Lemon Squeezy/Paddle) übernimmt EU-USt → kein
-  eigenes USt-Registrieren in anderen Ländern.
+### Einsatzorte (Pflicht)
 
-## 3. Cold-E-Mail (B2B) — Risiko
+| Ort | Variante | Status |
+|---|---|---|
+| `landingpage/index.html` Footer | Wörtlicher Disclaimer | TODO Eigentümer |
+| `landingpage/agb.html` § 2 | Wörtlicher Disclaimer (bereits sinngemäß enthalten) | OK |
+| Report-PDF (`scanner/lib/report.js`) Cover + Footer | Wörtlicher Disclaimer | Prüfen |
+| Ads-Landingpage above-the-fold | Kurzform | TODO Eigentümer |
+| E-Mail-Versand Bestell-/Report-Mail | Kurzform unter Signatur | TODO Eigentümer |
 
-- UWG §7: B2B-Werbe-Mail ohne Einwilligung ist grundsätzlich problematisch.
-  „Mutmaßliches Interesse" wird eng ausgelegt. Ein konkreter, individueller Bezug
-  (du hast die spezifische Seite geprüft) stärkt das berechtigte Interesse, ist aber
-  **kein Freibrief** — Einzelfallrisiko bleibt.
-- Pflicht: einfache Abmeldung, Impressum, kein Massen-Spam.
-- **Risikoärmere Alternative:** Google-Ads auf Such-Intent (siehe `google-ads.md`) —
-  dort kommt der Kunde zu dir.
+## Hintergrund (kein Veröffentlichungstext)
 
-## 4. Datenschutz beim Scannen
+- Automatisierte Tests (axe-core / Playwright) erfassen erfahrungsgemäß **30–50 %**
+  der WCAG-Verstöße — komplexe Kriterien (z. B. Fokus-Reihenfolge, sinnvolle
+  Alt-Texte, Tastaturbedienbarkeit, Screenreader-Semantik) erfordern manuelle
+  Prüfung.
+- „Konformitätsgarantie" wäre **§ 5 UWG**-relevant (irreführende Werbung mit
+  Spitzenstellung) und würde die eigene Haftung deutlich vergrößern.
+- „Rechtsberatung" wäre **RDG-Verstoß** (Rechtsdienstleistungsgesetz) — ohne
+  Anwaltszulassung unzulässig.
+- Verweis auf **Fachanwalt für IT-Recht** ist die rechtssichere Entlastung —
+  schiebt rechtliche Restfragen ausdrücklich an die zuständige Profession ab.
 
-- Scanne nur öffentlich erreichbare Seiten. Keine Logins/personenbezogenen Bereiche.
-- Speichere keine personenbezogenen Daten aus gescannten Seiten.
-- Eigene Tracking-Tags (Ads/Analytics) nur mit TCF-2.2-Consent (CMP).
+## Änderungsprotokoll
 
-## 5. EU AI Act (ab 02.08.2026)
-
-- Falls später ein KI-Chatbot/Voice-Agent auf der Seite läuft: muss sich als KI
-  offenbaren (Art. 50).
-- KI-generierte Marketing-Bilder/Videos kennzeichnen.
-
-## 6. Die 3 wichtigsten Stolperfallen
-
-1. **„Abmahnsicher"-Garantie geben** → du wirst selbst haftbar/abmahnbar. Nie
-   versprechen, nur Risiko reduzieren.
-2. **Cold-Mail im Massen-Blindflug** → UWG-Abmahnung. Lieber Ads/Such-Intent.
-3. **Impressum/Disclaimer vergessen** → Abmahnung gegen das eigene Business.
+| Datum | Änderung | Auslöser |
+|---|---|---|
+| 2026-06-16 | Initialer Single-Source-Disclaimer eingeführt | Pre-Launch-Sprint, UWG-Sanitize |
