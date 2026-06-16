@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>BFSG-Check — Was wir gebaut haben (Übersicht für Erwachsene & 5-Jährige)</title>
+<style>
+  :root{
+    --ink:#0f172a;--mut:#475569;--line:#e2e8f0;
+    --accent:#1d4ed8;--accent2:#1e40af;
+    --ok:#16a34a;--warn:#dc2626;--bg:#f8fafc;
+    --soft:#eff6ff;--softline:#bfdbfe;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--ink);line-height:1.5;font-size:14px}
+  .page{padding:28px 36px;max-width:780px;margin:0 auto;page-break-after:always}
+  .page:last-child{page-break-after:auto}
+
+  h1{font-size:26px;margin-bottom:6px;color:var(--accent)}
+  h2{font-size:18px;margin:18px 0 10px;border-left:4px solid var(--accent);padding-left:10px}
+  h3{font-size:15px;margin:14px 0 6px}
+  p{margin-bottom:8px;color:var(--ink)}
+  .mut{color:var(--mut);font-size:13px}
+
+  .cover{display:flex;flex-direction:column;justify-content:center;min-height:580px;padding:60px 36px}
+  .cover .pill{display:inline-block;background:var(--soft);color:var(--accent);border:1px solid var(--softline);padding:4px 12px;border-radius:30px;font-size:12px;font-weight:600;margin-bottom:18px;align-self:flex-start}
+  .cover h1{font-size:34px;line-height:1.2;margin-bottom:10px}
+  .cover p.lead{font-size:16px;color:var(--mut);max-width:560px;margin-bottom:30px}
+  .cover .meta{font-size:12px;color:var(--mut);margin-top:auto;border-top:1px solid var(--line);padding-top:16px}
+
+  .child{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:14px 16px;margin:10px 0;font-size:14px}
+  .child b{color:#92400e}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0}
+  .card{border:1px solid var(--line);border-radius:10px;padding:14px}
+  .card h3{margin-top:0;font-size:14px}
+  .card .price{display:inline-block;background:var(--soft);color:var(--accent);font-weight:700;padding:2px 8px;border-radius:6px;font-size:12px;margin-bottom:6px}
+  .card p{font-size:13px;color:var(--mut);margin:0}
+
+  .arch{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:14px;font-family:Menlo,Consolas,monospace;font-size:11.5px;line-height:1.55;white-space:pre;overflow:hidden;color:var(--ink)}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0}
+  th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+  th{background:var(--bg);font-weight:700}
+  .ok{color:var(--ok);font-weight:700}
+  .todo{color:var(--warn);font-weight:700}
+  .opt{color:var(--mut);font-weight:600}
+
+  ol.steps{padding-left:18px;margin:8px 0}
+  ol.steps li{margin:6px 0}
+  ul.bul{padding-left:18px;margin:6px 0}
+  ul.bul li{margin:4px 0}
+
+  .footer{font-size:11px;color:var(--mut);border-top:1px solid var(--line);padding-top:10px;margin-top:18px;text-align:center}
+  .badge{display:inline-block;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:700}
+  .b-ok{background:#dcfce7;color:#166534}
+  .b-todo{background:#fee2e2;color:#991b1b}
+  .b-opt{background:#e2e8f0;color:#334155}
+
+  .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
+  .kpi .k{border:1px solid var(--line);border-radius:8px;padding:10px;text-align:center}
+  .kpi b{display:block;font-size:18px;color:var(--accent)}
+  .kpi span{font-size:11px;color:var(--mut)}
+</style>
+</head>
+<body>
+
+<!-- ========== COVER ========== -->
+<section class="page cover">
+  <span class="pill">Interne Übersicht · Stand 15.06.2026</span>
+  <h1>BFSG-Check</h1>
+  <p class="lead">Was wir gebaut haben, wie es zusammenspielt — und was wir noch brauchen, um Geld zu verdienen. Kurz, ehrlich, mit Bildern.</p>
+
+  <div class="child">
+    <b>Für 5-Jährige in einem Satz:</b><br>
+    Wir haben einen Roboter gebaut, der Websites prüft, ob sie für alle Menschen gut bedienbar sind — und ein Geschäft drumherum, das automatisch Geld verdient, wenn jemand bestellt.
+  </div>
+
+  <div class="kpi">
+    <div class="k"><b>2</b><span>Produkte</span></div>
+    <div class="k"><b>1</b><span>Engine</span></div>
+    <div class="k"><b>MRR</b><span>via Abo (Welle 2)</span></div>
+    <div class="k"><b>DACH</b><span>Markt</span></div>
+  </div>
+
+  <p class="mut" style="margin-top:14px">
+    <b>Mission:</b> Pflicht-Compliance für DACH-Websites automatisieren —
+    rechtlich ehrlich, KI-gestützt, menschlich geprüft, ohne Cold-Mail.
+  </p>
+
+  <div class="meta">
+    BFSG-Check · 2026 · matze.seba@outlook.de · Branch: main (PR #1 gemerged)
+  </div>
+</section>
+
+<!-- ========== SEITE 1: GESCHÄFTSMODELL ========== -->
+<section class="page">
+  <h1>1 · Das Geschäft in 60 Sekunden</h1>
+
+  <div class="child">
+    <b>Stell dir vor:</b> Jedes Haus in Deutschland muss eine Rampe haben, damit auch Menschen mit Rollstuhl reinkönnen. Aber viele Hausbesitzer wissen nicht, ob ihre Rampe richtig ist. Wir sind die Roboter-Firma, die das prüft — und einen Plan schickt, wie man es repariert.
+  </div>
+
+  <h2>Was wir verkaufen</h2>
+  <div class="grid">
+    <div class="card">
+      <span class="price">199 / 499 €</span>
+      <h3>BFSG-Fix-Plan</h3>
+      <p>Roboter scannt Website, findet Barrieren (z. B. fehlende Alternativ-Texte, zu wenig Kontrast). Wir liefern PDF mit Mängeln, Lösungen und einer Vorlage der „Erklärung zur Barrierefreiheit".</p>
+    </div>
+    <div class="card">
+      <span class="price">49 / 79 €</span>
+      <h3>Cookie- & Consent-Check</h3>
+      <p>Roboter misst, ob die Website Tracker lädt, bevor der Besucher zugestimmt hat (verboten nach § 25 TDDDG). Liefert ehrlichen Bericht — keine Schwarzmalerei.</p>
+    </div>
+    <div class="card">
+      <span class="price">49 €/Monat</span>
+      <h3>Re-Check-Abo (MRR)</h3>
+      <p>Jeden Monat neuer Scan. Der Bericht zeigt: Was wurde behoben? Was ist neu? Was hat sich verschlechtert? Plant­bar wiederkehrender Umsatz.</p>
+    </div>
+    <div class="card">
+      <span class="price">Gratis</span>
+      <h3>Sofort-Check (Lead-Magnet)</h3>
+      <p>Kostenloser Mini-Scan auf der Landingpage. Zeigt nur Score + Anzahl Probleme. Lockt zum bezahlten Voll-Report.</p>
+    </div>
+  </div>
+
+  <h2>Warum das funktionieren kann</h2>
+  <ul class="bul">
+    <li><b>Echte Pflicht:</b> BFSG ist seit 28.06.2025 in Kraft. Cookie-Regel (§25 TDDDG) gilt für jede Website mit Tracking.</li>
+    <li><b>Eine Engine, zwei Märkte:</b> Derselbe Headless-Browser misst BFSG <i>und</i> Cookies — Aufwand halbiert.</li>
+    <li><b>Faceless / automatisch:</b> Vom Klick bis zur PDF-Mail läuft alles ohne Mensch.</li>
+    <li><b>Ehrlich = haftungsarm:</b> Wir versprechen keine „Abmahnsicherheit" (das wäre selbst abmahnbar) — nur technische Erstprüfung.</li>
+  </ul>
+
+  <div class="footer">Seite 1 / 5</div>
+</section>
+
+<!-- ========== SEITE 2: ARCHITEKTUR ========== -->
+<section class="page">
+  <h1>2 · Wie alles zusammenspielt</h1>
+
+  <div class="child">
+    <b>Wie eine Geschichte:</b> Jemand kommt auf die Webseite → tippt seine Adresse ein → Roboter schaut nach → Person sagt „ich kauf das ganze Heft" → Stripe nimmt das Geld → Roboter schickt das Heft per Post.
+  </div>
+
+  <div class="arch">
+   Besucher
+       │
+       ▼
+   ┌────────────────────────────────────────────┐
+   │  Landingpage  (index.html)                  │
+   │  • Hero, FAQ, 5 Pakete                      │
+   │  • Bestell-Dialog (B2C/B2B + Widerrufs-Box) │
+   └─────────┬───────────────────┬────────────────┘
+             │                   │
+       Gratis-Check         „Kaufen"-Klick
+             │                   │
+             ▼                   ▼
+   GET /api/scan         POST /api/checkout
+   (Teaser, 60 Sek)             │
+             │                   ▼
+             │            Stripe Checkout
+             │                   │
+             │           (Kunde zahlt)
+             │                   │
+             │                   ▼
+             │     POST /webhook  (Stripe signiert)
+             │                   │
+             │  ┌────────────────┴───────────────┐
+             │  │ checkout.session.completed     │ → Erst-Scan + PDF + Mail
+             │  │ invoice.paid (subscr. cycle)   │ → Re-Scan + Diff + Mail
+             │  │ customer.subscription.deleted  │ → Kündigungs-Bestätigung
+             │  └────────────────┬───────────────┘
+             │                   ▼
+             ▼          ┌──────────────────┐
+        Engine ─────────│ fulfill.js       │
+        (Playwright +   │ • Scan starten   │
+         axe-core)      │ • PDF rendern    │
+                        │ • SMTP versenden │
+                        └────────┬─────────┘
+                                 ▼
+                          Kunde bekommt
+                          PDF per E-Mail
+  </div>
+
+  <h2>Die Zutaten (Module)</h2>
+  <table>
+    <tr><th style="width:32%">Datei</th><th>Was sie tut (für 5-Jährige)</th></tr>
+    <tr><td><code>landingpage/index.html</code></td><td>Die Schaufenster-Seite. Hier klickt der Kunde.</td></tr>
+    <tr><td><code>scanner/app.js</code></td><td>Der Empfangs-Mensch. Nimmt Bestellungen an, reicht sie weiter, schickt Reports raus.</td></tr>
+    <tr><td><code>scanner/lib/scan.js</code></td><td>Der Roboter-Inspektor. Schaut sich die Website mit echten Augen (Headless-Browser) an.</td></tr>
+    <tr><td><code>scanner/lib/scan-cookie.js</code></td><td>Der Spion. Beobachtet, welche Tracker heimlich vor Einwilligung feuern.</td></tr>
+    <tr><td><code>scanner/lib/fulfill.js</code></td><td>Der Bäcker. Macht aus den Roh-Daten ein schönes PDF.</td></tr>
+    <tr><td><code>scanner/lib/diff.js</code></td><td>Der Detektiv. Vergleicht: was hat sich seit letztem Monat geändert?</td></tr>
+    <tr><td><code>scanner/lib/mailer.js</code></td><td>Der Postbote. Verschickt die PDFs.</td></tr>
+    <tr><td><code>scanner/lib/url-guard.js</code></td><td>Der Türsteher. Lässt nur echte, öffentliche Websites rein (SSRF-Schutz).</td></tr>
+    <tr><td><code>scanner/lib/limits.js</code></td><td>Der Pförtner. Zu viele Anfragen? → 429. Zu viele Browser? → Warteschlange.</td></tr>
+    <tr><td><code>scanner/lib/orders.js</code> + <code>subscriptions.js</code></td><td>Das Kassenbuch. Niemals geht eine Bestellung verloren.</td></tr>
+  </table>
+
+  <div class="footer">Seite 2 / 5</div>
+</section>
+
+<!-- ========== SEITE 3: FEATURES IM DETAIL ========== -->
+<section class="page">
+  <h1>3 · Alle Features auf einen Blick</h1>
+
+  <h2>Verkauf & Erfüllung</h2>
+  <table>
+    <tr><th style="width:38%">Feature</th><th>Status</th><th>Wo</th></tr>
+    <tr><td>5 Pakete (Basis, Profi, Cookie-Basis, Cookie-Profi, Abo)</td><td><span class="badge b-ok">live</span></td><td>app.js · PACKAGES</td></tr>
+    <tr><td>Stripe Checkout (Einmal + Abo)</td><td><span class="badge b-ok">live</span></td><td>/api/checkout</td></tr>
+    <tr><td>Webhook mit Signatur-Prüfung + Idempotenz</td><td><span class="badge b-ok">live</span></td><td>/webhook</td></tr>
+    <tr><td>Auto-PDF + Auto-Mail nach Zahlung</td><td><span class="badge b-ok">live</span></td><td>fulfill + mailer</td></tr>
+    <tr><td>Multi-Page-Crawl (Basis 5 / Profi 25 Seiten)</td><td><span class="badge b-ok">Welle 2</span></td><td>scan.js#scanSite</td></tr>
+    <tr><td>Re-Check-Abo: monatlicher Re-Scan + Diff-Report</td><td><span class="badge b-ok">Welle 2</span></td><td>subscriptions + diff</td></tr>
+    <tr><td>Cookie-Scan als eigenes Verkaufsprodukt</td><td><span class="badge b-ok">Welle 2</span></td><td>cookie-basis/profi</td></tr>
+    <tr><td>Kündigungs-Bestätigung bei Abo-Ende</td><td><span class="badge b-ok">Welle 2</span></td><td>sendCancellationConfirmation</td></tr>
+  </table>
+
+  <h2>Sicherheit & Betrieb</h2>
+  <table>
+    <tr><td>SSRF-Guard (blockt interne IPs, Cloud-Metadaten)</td><td><span class="badge b-ok">live</span></td><td>url-guard.js</td></tr>
+    <tr><td>Rate-Limit (5/min Scan, 10/min Checkout)</td><td><span class="badge b-ok">live</span></td><td>limits.js</td></tr>
+    <tr><td>Concurrency-Gate (max 2 Browser parallel)</td><td><span class="badge b-ok">live</span></td><td>limits.js</td></tr>
+    <tr><td>Persistente Bestell- & Subscription-Logs (JSONL)</td><td><span class="badge b-ok">live</span></td><td>orders/subscriptions.js</td></tr>
+    <tr><td>Fail-fast: kein Live-Stripe ohne SMTP</td><td><span class="badge b-ok">live</span></td><td>mailer.js</td></tr>
+    <tr><td>Betreiber-Alarm bei „bezahlt, aber Erfüllung kaputt"</td><td><span class="badge b-ok">live</span></td><td>sendAlert</td></tr>
+  </table>
+
+  <h2>Recht (Code-Seite)</h2>
+  <table>
+    <tr><td>Verbraucher/Unternehmer-Auswahl im Checkout</td><td><span class="badge b-ok">live</span></td><td>index.html</td></tr>
+    <tr><td>Widerrufs-Verzicht-Consent (§356 IV/V BGB)</td><td><span class="badge b-ok">live</span></td><td>index.html</td></tr>
+    <tr><td>„Zahlungspflichtig bestellen"-Button (§312j BGB)</td><td><span class="badge b-ok">live</span></td><td>index.html</td></tr>
+    <tr><td>Impressum / Datenschutz / AGB / Widerruf / Kündigen-Seiten</td><td><span class="badge b-ok">Vorlage</span></td><td>landingpage/*.html</td></tr>
+    <tr><td>Cold-Mail-Modul gesperrt (UWG §7)</td><td><span class="badge b-ok">live</span></td><td>outreach.js</td></tr>
+    <tr><td>Kein „abmahnsicher / garantiert"-Marketing</td><td><span class="badge b-ok">live</span></td><td>überall</td></tr>
+  </table>
+
+  <h2>Tests</h2>
+  <ul class="bul">
+    <li><code>npm test</code> · 8 Offline-Unit-Tests für Diff, Snapshot, Subscriptions, Report-Render — grün.</li>
+    <li>SSRF-Guard, Webhook-Idempotenz, Scan→PDF→Mail-Pipeline manuell verifiziert.</li>
+  </ul>
+
+  <div class="footer">Seite 3 / 5</div>
+</section>
+
+<!-- ========== SEITE 4: WAS FEHLT ========== -->
+<section class="page">
+  <h1>4 · Was fehlt zum Geldverdienen</h1>
+
+  <div class="child">
+    <b>5-Jährige-Version:</b> Das Auto ist gebaut. Aber es fehlen noch: Sprit (Stripe-Schlüssel), eine Adresse (Domain), ein Schlüssel zum Postkasten (SMTP) — und ein bisschen Erwachsenen-Papierkram (Anwalt).
+  </div>
+
+  <h2>Kann nur ein Mensch / Anwalt</h2>
+  <table>
+    <tr><th style="width:38%">Aufgabe</th><th>Was</th><th>Aufwand</th></tr>
+    <tr><td>Domain registrieren + DNS</td><td>bfsg-check.de o. ä. bei Hetzner/Inwx</td><td>30 Min</td></tr>
+    <tr><td>Hosting deployen</td><td>Render oder Railway (Dockerfile liegt bei) — NICHT Vercel-Serverless (braucht Chromium)</td><td>1 h</td></tr>
+    <tr><td>Stripe-Keys + Webhook-Endpoint</td><td>STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET. Events: checkout.session.completed + invoice.paid + customer.subscription.deleted</td><td>30 Min</td></tr>
+    <tr><td>SMTP-Provider (Brevo / Postmark)</td><td>SPF + DKIM + DMARC einrichten, mail-tester ≥ 9/10</td><td>1 h</td></tr>
+    <tr><td>Impressum/Datenschutz/AGB ausfüllen</td><td>Echter Name + c/o-Adresse (kein Wohnsitz öffentlich)</td><td>1 h</td></tr>
+    <tr><td>Anwalts-Kurzcheck (30–60 Min)</td><td>Reports-Disclaimer + AGB-Vorlagen abnicken lassen</td><td>1 Termin</td></tr>
+    <tr><td>Cookie-Consent-Tool (CMP) auf eigener Seite</td><td>Bevor Ads laufen — eigene Medizin schlucken</td><td>30 Min</td></tr>
+    <tr><td>Vermögensschaden-Haftpflicht</td><td>Hiscox o. ä., 30–60 €/Monat</td><td>1 h</td></tr>
+    <tr><td>ENABLE_ABO=true erst NACH Abo-Webhook-Test (Stripe-CLI)</td><td>stripe trigger invoice.payment_succeeded → Diff-Mail kommt?</td><td>30 Min</td></tr>
+  </table>
+
+  <h2>Erste Kunden (warm, kein Cold-Mail)</h2>
+  <ul class="bul">
+    <li><b>Google Ads</b> auf „BFSG prüfen", „barrierefreie Website" (Budget 30–50 €/Tag zum Testen).</li>
+    <li><b>Steuerberater/Anwalt-Partner</b> als Empfehlungsgeber (1 Partner = 10–50 Kunden).</li>
+    <li><b>LinkedIn-Posts</b> aus eigener Person (kein Spam, eigene Reichweite).</li>
+    <li><b>Bestehende Kontakte</b> direkt anschreiben (B2B-Mail an bekannten Kontakt = ok).</li>
+  </ul>
+
+  <h2>Bewusst NICHT (noch nicht)</h2>
+  <ul class="bul">
+    <li>White-Label / Agentur-Reseller — erst wenn 10+ Kunden stabil sind.</li>
+    <li>Embeddable Widget — erst wenn Kernverkauf 1 Woche läuft.</li>
+    <li>„Abmahnsicher"-Sprache — niemals (FTC-Strafe accessiBe: 1 Mio $).</li>
+    <li>Cold-Mail — UWG §7, abmahnbar.</li>
+  </ul>
+
+  <div class="footer">Seite 4 / 5</div>
+</section>
+
+<!-- ========== SEITE 5: GO-LIVE-PLAN ========== -->
+<section class="page">
+  <h1>5 · Schneller Go-Live-Plan (48–72 h)</h1>
+
+  <div class="child">
+    <b>5-Jährige-Version:</b> 3 Tage volle Konzentration. Tag 1: Auto putzen. Tag 2: Sprit holen + Schlüssel fertig. Tag 3: Losfahren.
+  </div>
+
+  <h2>Tag 1 — Technik (ca. 4 h)</h2>
+  <ol class="steps">
+    <li>Domain registrieren · DNS auf Hosting zeigen.</li>
+    <li>Render/Railway-Projekt anlegen · Dockerfile deployen · <code>PUBLIC_URL</code> setzen.</li>
+    <li>Persistente Volume für <code>scanner/out/</code> mounten (sonst gehen Snapshots beim Redeploy verloren).</li>
+    <li>Smoke-Test: <code>/health</code> antwortet, <code>/api/scan?url=example.de</code> liefert Teaser.</li>
+  </ol>
+
+  <h2>Tag 2 — Zahlung & Versand (ca. 4 h)</h2>
+  <ol class="steps">
+    <li>Stripe-Konto verifizieren · Produkt-IDs nicht nötig (price_data inline).</li>
+    <li>Webhook-Endpoint <code>/webhook</code> in Stripe anlegen, Events: <code>checkout.session.completed</code>, <code>invoice.payment_succeeded</code>, <code>customer.subscription.deleted</code>.</li>
+    <li>SMTP-Provider verifizieren · SPF/DKIM/DMARC setzen · mail-tester ≥ 9/10.</li>
+    <li>End-to-End-Test mit Stripe-Testkarte: 1 × Basis, 1 × Cookie-Basis, 1 × Abo (Test-Modus).</li>
+    <li><code>ENABLE_ABO=true</code> erst NACH erfolgreichem Abo-Lifecycle-Test scharfschalten.</li>
+  </ol>
+
+  <h2>Tag 3 — Recht & Marketing (ca. 4 h)</h2>
+  <ol class="steps">
+    <li>Impressum + Datenschutz + AGB ausgefüllt · Anwalts-Kurzcheck eingeholt.</li>
+    <li>Eigenes Cookie-Tool auf bfsg-check.de (Usercentrics Free o. ä.).</li>
+    <li>Vermögensschaden-Haftpflicht abgeschlossen.</li>
+    <li>Google-Ads-Kampagne nach <code>marketing/google-ads.md</code> starten · 30 €/Tag.</li>
+    <li>2–3 Steuerberater/Anwälte aus dem warmen Netzwerk fragen, ob sie Kunden empfehlen.</li>
+  </ol>
+
+  <h2>Erfolgskriterien Woche 1</h2>
+  <div class="kpi">
+    <div class="k"><b>≥ 100</b><span>Klicks Landing</span></div>
+    <div class="k"><b>≥ 20</b><span>Gratis-Scans</span></div>
+    <div class="k"><b>≥ 1</b><span>bezahlter Report</span></div>
+    <div class="k"><b>0</b><span>fehlerhafte Erfüllungen</span></div>
+  </div>
+
+  <h2>Wenn Woche 1 stabil läuft → Welle 3</h2>
+  <ul class="bul">
+    <li><b>Agentur-White-Label</b> (Logo-Slot im PDF, Bulk-Bestellung)</li>
+    <li><b>Embeddable Widget</b> (faceless Lead-Quelle, KEIN Overlay)</li>
+    <li><b>Steuerberater/Anwalt-Partnerprogramm</b> (Revenue-Share)</li>
+  </ul>
+
+  <div class="footer">Seite 5 / 5 · BFSG-Check · matze.seba@outlook.de</div>
+</section>
+
+</body>
+</html>

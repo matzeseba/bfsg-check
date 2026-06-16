@@ -39,7 +39,7 @@ function hostInList(host, list) {
 export async function scanCookie(url, { timeout = 45000 } = {}) {
   if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
   const siteReg = regDomain(reqHost(url));
-  const browser = await chromium.launch({ args: ['--no-sandbox'] });
+  const browser = await chromium.launch({ args: ['--no-sandbox', '--disable-dev-shm-usage'] });
   const context = await browser.newContext({
     locale: 'de-DE',
     ignoreHTTPSErrors: process.env.SCAN_IGNORE_HTTPS === 'true'

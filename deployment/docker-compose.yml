@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ../scanner
+      dockerfile: Dockerfile
+    container_name: bfsg-app
+    restart: unless-stopped
+    expose:
+      - "8080"
+    environment:
+      - NODE_ENV=production
+      - PORT=8080
+      - PUBLIC_URL=${PUBLIC_URL}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - FROM_EMAIL=${FROM_EMAIL}
+      - FROM_NAME=${FROM_NAME}
+      - REPLY_TO=${REPLY_TO}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ENABLE_ABO=${ENABLE_ABO:-false}
+      - MAX_CONCURRENT_SCANS=${MAX_CONCURRENT_SCANS:-2}
+    volumes:
+      - bfsg_data:/app/out
+    # Zusätzliches /dev/shm für Chromium (komplementär zu --disable-dev-shm-usage in scan*.js).
+    shm_size: 1gb
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:8080/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: bfsg-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+
+volumes:
+  bfsg_data:    # /app/out — orders.jsonl + subscriptions.jsonl + generierte PDFs
+  caddy_data:   # Let's-Encrypt-Zertifikate
+  caddy_config:

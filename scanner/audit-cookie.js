@@ -54,7 +54,7 @@ async function main() {
 
   if (args.pdf) {
     const { chromium } = await import('playwright');
-    const b = await chromium.launch({ args: ['--no-sandbox'] });
+    const b = await chromium.launch({ args: ['--no-sandbox', '--disable-dev-shm-usage'] });
     const p = await b.newPage();
     await p.setContent(html, { waitUntil: 'networkidle' });
     await p.pdf({ path: path.join(outDir, `${s}-cookie-report.pdf`), format: 'A4', printBackground: true, margin: { top: '12mm', bottom: '12mm', left: '10mm', right: '10mm' } });

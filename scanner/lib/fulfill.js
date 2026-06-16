@@ -98,7 +98,7 @@ export async function fulfillOrder({ url, company = '', email = '', pkg = 'basis
   }
 
   // PDF rendern
-  const browser = await chromium.launch({ args: ['--no-sandbox'] });
+  const browser = await chromium.launch({ args: ['--no-sandbox', '--disable-dev-shm-usage'] });
   let pdfPath;
   try {
     const page = await browser.newPage();
