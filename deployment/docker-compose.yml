@@ -27,6 +27,8 @@ services:
       - MAX_CONCURRENT_SCANS=${MAX_CONCURRENT_SCANS:-2}
     volumes:
       - bfsg_data:/app/out
+      # Statische Landing-Page als Read-Only-Mount (app.js liest ../landingpage relativ zu /app).
+      - ../landingpage:/landingpage:ro
     # Zusätzliches /dev/shm für Chromium (komplementär zu --disable-dev-shm-usage in scan*.js).
     shm_size: 1gb
     healthcheck:
