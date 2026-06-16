@@ -1,7 +1,8 @@
 #cloud-config
-# BFSG-Check Tag-1-Bootstrap. Macht beim ersten Boot komplett alles:
-# SSH-Key, Firewall, Docker, Repo, Phase-1-Config (HTTP-only), App+Caddy hoch.
-# Phase 2 (Brevo/Stripe + Let's Encrypt) deployen wir später per Push/GitHub Actions.
+# BFSG-Check Server-Bootstrap (Hetzner Cloud, Ubuntu 24.04).
+# Vollautomatisch beim ersten Boot — kein SSH nötig.
+# Schreibt nur SERVER-spezifische Files (.env, override) — der Code
+# kommt aus git und wird per GitHub-Actions-Deploy aktualisiert.
 
 hostname: bfsg-fix
 
@@ -10,76 +11,69 @@ users:
     ssh_authorized_keys:
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINWLfkNJJv0x1V/bKfIvJv3fg+J5OwSCDcT/tRTF5fdx claude-bfsg-deploy@bfsg-fix.de
 
-package_update: true
-packages:
-  - docker.io
-  - docker-compose-v2
-  - git
-  - curl
-  - ufw
-
 write_files:
-  - path: /opt/bfsg-check-bootstrap.sh
+  - path: /opt/bfsg-bootstrap.sh
     permissions: '0755'
     content: |
       #!/bin/bash
-      set -e
-      exec > >(tee -a /var/log/bfsg-bootstrap.log) 2>&1
-      echo "=== BFSG-Check Bootstrap gestartet $(date -u) ==="
+      set -x
+      exec > /var/log/bfsg-bootstrap.log 2>&1
 
-      # Firewall
+      # --- Packages ---
+      apt-get update -q
+      apt-get install -y -q curl ca-certificates git ufw
+
+      # --- Docker (offizieller Installer, bringt Docker Engine + Compose-Plugin) ---
+      curl -fsSL https://get.docker.com -o /tmp/get-docker.sh
+      sh /tmp/get-docker.sh
+
+      # --- Firewall ---
       ufw allow OpenSSH || true
       ufw allow 80/tcp
       ufw allow 443/tcp
       ufw --force enable
 
-      # Docker enable
-      systemctl enable docker
-      systemctl start docker
-
-      # Repo klonen (public)
-      if [ ! -d /opt/bfsg-check ]; then
-        git clone https://github.com/matzeseba/bfsg-check.git /opt/bfsg-check
-      fi
+      # --- Repo clonen ---
+      git clone https://github.com/matzeseba/bfsg-check.git /opt/bfsg-check
       cd /opt/bfsg-check
-      git fetch origin
-      git checkout main
-      git pull
 
-      # Phase-1 .env (ohne Stripe/SMTP — App startet im DRY-RUN-Mailer)
-      cat > /opt/bfsg-check/deployment/.env <<'EOF'
-      PUBLIC_URL=http://178.105.83.0
+      # --- .env (server-spezifisch, NICHT im Repo) ---
+      # ACHTUNG: PLACEHOLDER ersetzen vor Server-Create im Hetzner-API-Call!
+      cat > /opt/bfsg-check/deployment/.env <<'ENV'
+      PUBLIC_URL=https://bfsg-fix.de
       PORT=8080
       ENABLE_ABO=false
       MAX_CONCURRENT_SCANS=2
-      EOF
+      SMTP_HOST=smtp-relay.brevo.com
+      SMTP_PORT=587
+      SMTP_USER=matthiasseba92@gmail.com
+      SMTP_PASS=PLACEHOLDER_BREVO_KEY
+      FROM_EMAIL=no-reply@bfsg-fix.de
+      FROM_NAME=BFSG-Check
+      REPLY_TO=matthiasseba92@gmail.com
+      ADMIN_EMAIL=matthiasseba92@gmail.com
+      ENV
 
-      # Phase-1 Caddyfile: HTTP-only, kein TLS bis DNS gesetzt
-      cat > /opt/bfsg-check/deployment/Caddyfile <<'EOF'
-      :80 {
-          reverse_proxy app:8080
-          encode gzip
-          header {
-              X-Robots-Tag "noindex, nofollow"
-          }
-      }
-      EOF
-
-      # Phase-1 docker-compose Override: nur Port 80 binden, kein 443
-      cat > /opt/bfsg-check/deployment/docker-compose.override.yml <<'EOF'
+      # --- Phase-1-Override: Caddyfile.phase1 statt Caddyfile, nur Port 80 ---
+      # Sobald DNS auf Server zeigt: dieses File löschen + `docker compose up -d`
+      # → Phase 2 mit Let's-Encrypt-SSL und 301-Redirects der Alias-Domains.
+      cat > /opt/bfsg-check/deployment/docker-compose.override.yml <<'OVR'
       services:
         caddy:
           ports: !override
             - "80:80"
-      EOF
+          volumes: !override
+            - ./Caddyfile.phase1:/etc/caddy/Caddyfile:ro
+            - caddy_data:/data
+            - caddy_config:/config
+      OVR
 
+      # --- Up ---
       cd /opt/bfsg-check/deployment
-      docker compose pull || true
       docker compose up -d --build
 
-      sleep 20
+      sleep 15
       docker compose ps
-      echo "=== Bootstrap fertig $(date -u) ==="
 
 runcmd:
-  - /opt/bfsg-check-bootstrap.sh
+  - bash /opt/bfsg-bootstrap.sh

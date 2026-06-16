@@ -8,3 +8,6 @@ scanner/out/
 *.pdf
 .DS_Store
 *.log
+# Server-spezifische Phase-1-Configs (von cloud-init geschrieben, NICHT ins Repo)
+deployment/docker-compose.override.yml
+deployment/.env

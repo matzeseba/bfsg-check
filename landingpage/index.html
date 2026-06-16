@@ -219,10 +219,50 @@
 <footer>
   <div class="wrap">
     BFSG-Check &middot; Automatisierte Barrierefreiheits-Pruefung nach WCAG 2.1 / EN 301 549<br>
-    <a href="/impressum.html">Impressum</a> &middot; <a href="/datenschutz.html">Datenschutz</a> &middot; <a href="/agb.html">AGB</a> &middot; <a href="/widerrufsbelehrung.html">Widerruf</a> &middot; <a href="/widerruf.html">Vertrag widerrufen</a> &middot; <a href="/kuendigen.html">Vertrag kuendigen</a><br>
+    <a href="/impressum.html">Impressum</a> &middot; <a href="/datenschutz.html">Datenschutz</a> &middot; <a href="/agb.html">AGB</a> &middot; <a href="/widerrufsbelehrung.html">Widerruf</a> &middot; <a href="/widerruf.html">Vertrag widerrufen</a> &middot; <a href="/kuendigen.html">Vertrag kuendigen</a> &middot; <a href="#" onclick="bfsgConsentReset();return false">Cookie-Einstellungen</a><br>
     <span style="font-size:12px">Hinweis: Automatisierte, KI-gestuetzte Erstpruefung mit menschlicher Pruefung &mdash; keine Rechtsberatung, keine Konformitaetsgarantie. Ergebnisse ersetzen keine vollstaendige manuelle Pruefung.</span>
   </div>
 </footer>
+
+<!-- Cookie-/Consent-Banner (§ 25 TDDDG) — minimal, opt-in vor jedem nicht-essenziellen Tracker.
+     Aktuell laden wir keine Tracker. Sobald Google Ads/Analytics aktiv werden, prüfen wir
+     window.bfsgConsent.marketing === true bevor wir Tags injizieren. -->
+<div id="bfsg-cb" role="dialog" aria-label="Cookie-Hinweis" aria-modal="false" style="display:none;position:fixed;left:16px;right:16px;bottom:16px;z-index:60;background:#fff;border:1px solid #cbd5e1;border-radius:14px;box-shadow:0 18px 50px rgba(15,23,42,.22);padding:18px 20px;max-width:760px;margin:0 auto;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.55;color:#0f172a">
+  <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;justify-content:space-between">
+    <div style="flex:1;min-width:240px">
+      <strong style="display:block;margin-bottom:4px">Cookies &amp; Tracking</strong>
+      <span>Wir verwenden ausschliesslich technisch notwendige Cookies (Session/Sicherheit). Marketing-/Analytics-Tools laden wir erst NACH deiner Einwilligung. Mehr in der <a href="/datenschutz.html" style="color:#1d4ed8">Datenschutzerklaerung</a>.</span>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button type="button" onclick="bfsgConsentSet(false)" style="background:none;border:1px solid #cbd5e1;color:#0f172a;padding:9px 16px;border-radius:8px;font-weight:600;cursor:pointer">Nur notwendige</button>
+      <button type="button" onclick="bfsgConsentSet(true)" style="background:#1d4ed8;border:none;color:#fff;padding:9px 16px;border-radius:8px;font-weight:700;cursor:pointer">Alle akzeptieren</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Consent-Speicher (§ 25 TDDDG): granulares Opt-in fuer Marketing-Tags.
+(function(){
+  var KEY='bfsg-consent-v1';
+  function load(){try{return JSON.parse(localStorage.getItem(KEY))}catch(_){return null}}
+  function save(v){try{localStorage.setItem(KEY,JSON.stringify(v))}catch(_){}}
+  window.bfsgConsent=load()||{};
+  window.bfsgConsentSet=function(marketing){
+    var c={marketing:!!marketing,ts:new Date().toISOString(),v:1};
+    save(c);window.bfsgConsent=c;
+    document.getElementById('bfsg-cb').style.display='none';
+    if(marketing&&typeof window.bfsgLoadTrackers==='function'){window.bfsgLoadTrackers()}
+  };
+  window.bfsgConsentReset=function(){
+    try{localStorage.removeItem(KEY)}catch(_){}
+    document.getElementById('bfsg-cb').style.display='block';
+  };
+  // Banner zeigen, falls noch kein Consent gespeichert
+  if(!window.bfsgConsent.ts){document.getElementById('bfsg-cb').style.display='block'}
+  // Bereits zugestimmt → Marketing-Loader (falls definiert)
+  else if(window.bfsgConsent.marketing&&typeof window.bfsgLoadTrackers==='function'){window.bfsgLoadTrackers()}
+})();
+</script>
 
 <script>
 // Demo-Frontend. Bindet im Live-Betrieb an den /teaser-Endpoint (siehe scanner/server-Beispiel in README).

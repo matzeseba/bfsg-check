@@ -1,0 +1,14 @@
+# Caddyfile — Phase 1 (HTTP-only, vor DNS-Switch)
+# Caddy lauscht auf :80 ohne TLS, da DNS noch nicht auf den Server zeigt.
+# Sobald DNS umgestellt ist: docker-compose.override.yml löschen,
+# docker compose up -d → das Standard-Caddyfile (Phase 2) wird aktiv,
+# Let's Encrypt holt automatisch Zertifikate.
+
+:80 {
+    reverse_proxy app:8080
+    encode gzip
+
+    header {
+        X-Robots-Tag "noindex, nofollow"
+    }
+}
