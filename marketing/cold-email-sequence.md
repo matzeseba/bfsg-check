@@ -73,8 +73,8 @@ oder Gratis-Check starten". Personalisierung = höchster Öffnungs-/Antwort-Hebe
 > ich möchte nicht aufdringlich sein — das ist meine letzte Mail dazu.
 >
 > Falls Barrierefreiheit gerade kein Thema ist, kein Problem. Sollten Sie später
-> doch prüfen wollen, ob [Domain] abmahnsicher ist, finden Sie den kostenlosen
-> Sofort-Check jederzeit hier: [Landingpage-URL].
+> doch prüfen wollen, wo [Domain] beim BFSG-Auto-Scan steht, finden Sie den
+> kostenlosen Sofort-Check jederzeit hier: [Landingpage-URL].
 >
 > Alles Gute
 > [Absender]

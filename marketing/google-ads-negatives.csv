@@ -1,0 +1,34 @@
+keyword,match_type,reason
+job,BROAD,Jobsuche statt Service-Kauf
+jobs,BROAD,Jobsuche statt Service-Kauf
+stellenangebot,BROAD,Recruiting-Suche
+karriere,BROAD,Recruiting-Suche
+studium,BROAD,Bildungs-Suche
+"bfsg studium",PHRASE,Hochschul-Suche
+ausbildung,BROAD,Berufs-Bildung statt B2B-Service
+weiterbildung,BROAD,Schulung statt Audit
+"schulung kostenlos",PHRASE,Sucht Lern-Inhalte
+schule,BROAD,Schulbedarf
+hausarbeit,BROAD,akademische Arbeit
+bachelorarbeit,BROAD,akademische Arbeit
+masterarbeit,BROAD,akademische Arbeit
+seminar,BROAD,Bildungs-Veranstaltung
+"definition bfsg",PHRASE,Reine Recherche kein Kauf-Intent
+"was ist bfsg",PHRASE,Wissens-Suche
+"was bedeutet barrierefreiheit",PHRASE,Wissens-Suche
+"bfsg wikipedia",PHRASE,Wissens-Suche
+"bfsg zusammenfassung",PHRASE,Wissens-Suche
+"barrierefreiheit zuhause",PHRASE,Wohnungs-Umbau
+"barrierefreies bad",PHRASE,Sanitär-Branche
+"barrierefreie wohnung",PHRASE,Immobilien-Suche
+behindertenausweis,PHRASE,Sozialleistung
+behindertenparkplatz,PHRASE,Verkehr/Sozial
+gratis,BROAD,Geringer Kaufintent (Gratis-Scan reicht)
+free,BROAD,Geringer Kaufintent
+"kostenlos lernen",PHRASE,Bildungs-Suche
+"selbst machen",PHRASE,DIY statt Service-Kauf
+diy,BROAD,DIY statt Service-Kauf
+"plugin kostenlos",PHRASE,Sucht nur Tool kein Audit
+"chrome extension",PHRASE,Browser-Tool-Suche
+"open source",PHRASE,Eigenbau-Suche
+"github bfsg",PHRASE,Entwickler-Recherche
