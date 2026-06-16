@@ -7,9 +7,11 @@
 
 import { chromium } from 'playwright';
 import AxeBuilder from '@axe-core/playwright';
-import { assertPublicHttpUrl } from './url-guard.js';
+import { assertPublicHttpUrl, verifyNoDnsRebinding } from './url-guard.js';
 
 export async function scanUrl(url, { timeout = 45000 } = {}) {
+  // SSRF-Schutz + Rebinding-Pin: erst Adressen auflösen + verifizieren.
+  const safe = await assertPublicHttpUrl(/^https?:\/\//i.test(url) ? url : 'https://' + url);
   const browser = await chromium.launch({ args: ['--no-sandbox', '--disable-dev-shm-usage'] });
   const context = await browser.newContext({
     locale: 'de-DE',
@@ -22,7 +24,9 @@ export async function scanUrl(url, { timeout = 45000 } = {}) {
   const page = await context.newPage();
 
   try {
-    await page.goto(url, { waitUntil: 'networkidle', timeout });
+    // Direkt vor dem Browser-Goto noch einmal DNS prüfen → Rebinding-Detection.
+    await verifyNoDnsRebinding(safe.url, safe.addresses);
+    await page.goto(safe.url, { waitUntil: 'networkidle', timeout });
 
     // axe-core nach WCAG 2.1 A + AA und Best-Practices laufen lassen.
     const results = await new AxeBuilder({ page })
@@ -67,6 +71,10 @@ export async function scanUrl(url, { timeout = 45000 } = {}) {
 export async function scanSite(startUrl, { maxPages = 5, perPageTimeout = 30000 } = {}) {
   if (!/^https?:\/\//i.test(startUrl)) startUrl = 'https://' + startUrl;
   const origin = new URL(startUrl).origin;
+  // Adress-Cache pro Hostname für DNS-Rebinding-Pin im Crawl-Loop (Erstauflösung).
+  const addrCache = new Map();
+  const safeRoot = await assertPublicHttpUrl(startUrl);
+  addrCache.set(new URL(safeRoot.url).hostname, safeRoot.addresses);
   maxPages = Math.max(1, Math.min(50, Number(maxPages) || 5));
 
   const browser = await chromium.launch({ args: ['--no-sandbox', '--disable-dev-shm-usage'] });
@@ -88,8 +96,10 @@ export async function scanSite(startUrl, { maxPages = 5, perPageTimeout = 30000 
       visited.add(target);
 
       // SSRF-Schutz auch für entdeckte Links (DNS-Auflösung jeder URL).
+      let safeTarget;
       try {
-        await assertPublicHttpUrl(target);
+        safeTarget = await assertPublicHttpUrl(target);
+        addrCache.set(new URL(safeTarget.url).hostname, safeTarget.addresses);
       } catch (e) {
         errors.push({ url: target, error: 'url-guard: ' + e.message });
         continue;
@@ -97,7 +107,9 @@ export async function scanSite(startUrl, { maxPages = 5, perPageTimeout = 30000 
 
       const page = await context.newPage();
       try {
-        await page.goto(target, { waitUntil: 'networkidle', timeout: perPageTimeout });
+        // DNS-Rebinding-Pin: vor jedem Goto erneut auflösen + vergleichen.
+        await verifyNoDnsRebinding(safeTarget.url, safeTarget.addresses);
+        await page.goto(safeTarget.url, { waitUntil: 'networkidle', timeout: perPageTimeout });
         const results = await new AxeBuilder({ page })
           .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'best-practice'])
           .analyze();

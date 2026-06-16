@@ -42,6 +42,36 @@ function isBlockedIp(ip) {
   return true; // unbekannt = blockieren
 }
 
+// DNS-Rebinding-Schutz: vor jedem page.goto() erneut DNS auflösen und mit
+// der ursprünglich verifizierten Adressliste vergleichen. Bei Drift → throw.
+// Override per env DNS_PIN_STRICT=false (Notbremse, falls Multi-A-Hosts wie
+// Cloudflare/CDN-Pools legitime Rotation machen). Default: strict.
+export async function verifyNoDnsRebinding(urlString, expectedAddresses) {
+  if (process.env.DNS_PIN_STRICT === 'false') return; // explizite Notbremse
+  if (!Array.isArray(expectedAddresses) || expectedAddresses.length === 0) return;
+  let host;
+  try { host = new URL(urlString).hostname; } catch { return; }
+  if (net.isIP(host)) return; // direkte IP, kein DNS
+  let records;
+  try {
+    records = await dns.lookup(host, { all: true });
+  } catch {
+    throw new Error('DNS-Rebinding-Check: zweite Auflösung fehlgeschlagen');
+  }
+  const current = new Set(records.map((r) => r.address));
+  // Wir verlangen NUR, dass mindestens eine der erwarteten Adressen noch dabei ist.
+  // Strikter wäre: exakte Set-Gleichheit. CDN-Hosts (Cloudflare) rotieren aber
+  // legitim — exakte Gleichheit würde False-Positives erzeugen.
+  const intersect = expectedAddresses.some((a) => current.has(a));
+  if (!intersect) {
+    throw new Error('DNS-Rebinding erkannt: Host ' + host + ' hat zwischen Check und Load die IP geändert');
+  }
+  // Außerdem: jede aktuelle Adresse muss public sein (sonst Angreifer-IP)
+  for (const r of records) {
+    if (isBlockedIp(r.address)) throw new Error('DNS-Rebinding-Check: private Adresse in 2. Auflösung');
+  }
+}
+
 // Wirft bei unsicheren URLs. Gibt bei Erfolg { url, addresses } zurück.
 export async function assertPublicHttpUrl(raw) {
   let u;

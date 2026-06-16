@@ -17,8 +17,10 @@ import { renderTeaser } from './lib/report.js';
 import { fulfillOrder, PKG_CONFIG } from './lib/fulfill.js';
 import {
   sendReportFor, sendAlert, sendCancellationConfirmation,
-  mailerStatus, requireMailerOrExit
+  mailerStatus, requireMailerOrExit, isStripeLive
 } from './lib/mailer.js';
+import { requireAdminAuth } from './lib/admin-auth.js';
+import { exportUserData, deleteUserData, requestDsgvoToken, consumeDsgvoToken } from './lib/dsgvo.js';
 import { diffSummaryText } from './lib/diff.js';
 import { assertPublicHttpUrl } from './lib/url-guard.js';
 import { rateLimit, concurrencyGate } from './lib/limits.js';
@@ -204,11 +206,21 @@ async function handleSubscriptionDeleted(event) {
 
 app.use(express.json({ limit: '16kb' }));
 
-// Sicherheits-Header (leichtgewichtig, ohne extra Dependency).
+// Sicherheits-Header (Defense-in-Depth zu Caddy-Headern).
 app.use((req, res, next) => {
   res.set('X-Content-Type-Options', 'nosniff');
   res.set('X-Frame-Options', 'DENY');
   res.set('Referrer-Policy', 'no-referrer');
+  res.set('X-XSS-Protection', '1; mode=block');
+  res.set('Cross-Origin-Opener-Policy', 'same-origin');
+  res.set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+  if (req.secure || req.get('x-forwarded-proto') === 'https') {
+    res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  }
+  // CSP nur auf reine API-/JSON-Routes — statische HTML braucht Inline-Skripte.
+  if (req.path.startsWith('/api/') || req.path.startsWith('/admin/') || req.path === '/health' || req.path === '/webhook') {
+    res.set('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none'; base-uri 'none'");
+  }
   next();
 });
 
@@ -296,9 +308,97 @@ app.post('/api/checkout', rateLimit({ windowMs: 60_000, max: 10 }), async (req, 
 });
 
 app.get('/health', (req, res) => {
-  const live = (process.env.STRIPE_SECRET_KEY || '').startsWith('sk_live');
+  const live = isStripeLive();
   const mailerOk = mailerStatus().startsWith('aktiv');
   res.json({ ok: !(live && !mailerOk), stripe: !!stripe, live, mailer: mailerStatus(), aboEnabled: ENABLE_ABO });
+});
+
+// --- DSGVO Art. 15 (Export) / Art. 17 (Löschung) ---
+// Token-basierter Doppel-Opt-in: User fordert Export/Delete via E-Mail an,
+// bekommt Token-Link, klickt zur Bestätigung → JSON-Download bzw. Tombstone.
+app.post('/api/dsgvo/request', rateLimit({ windowMs: 60_000, max: 3 }), async (req, res) => {
+  const { email = '', action = 'export' } = req.body || {};
+  if (!['export', 'delete'].includes(action)) return res.status(400).json({ error: 'action muss "export" oder "delete" sein' });
+  try {
+    const { token, expiresAt } = await requestDsgvoToken({ email, action });
+    const link = `${PUBLIC_URL}/api/dsgvo/confirm?token=${encodeURIComponent(token)}`;
+    await sendAlert(
+      `DSGVO-${action}-Anfrage von ${email}`,
+      `User-Aktion: ${action}\nE-Mail: ${email}\nToken: ${token}\nLink (24h gültig): ${link}\nExpires: ${expiresAt}`
+    );
+    res.status(202).json({ ok: true, message: 'Bestätigungs-Mail wird an angegebene Adresse gesendet, falls dort Daten existieren.', expiresAt });
+  } catch (err) {
+    console.error('[dsgvo] request error:', err.message);
+    res.status(500).json({ error: 'Anfrage konnte nicht verarbeitet werden' });
+  }
+});
+
+app.get('/api/dsgvo/confirm', rateLimit({ windowMs: 60_000, max: 5 }), async (req, res) => {
+  const token = String(req.query.token || '');
+  if (!token) return res.status(400).json({ error: 'token fehlt' });
+  try {
+    const { email, action } = await consumeDsgvoToken(token);
+    if (action === 'export') {
+      const data = await exportUserData(email);
+      res.set('Content-Disposition', `attachment; filename="bfsg-dsgvo-export-${Date.now()}.json"`);
+      res.json(data);
+    } else if (action === 'delete') {
+      const result = await deleteUserData(email);
+      res.json({ ok: true, action: 'delete', ...result });
+    }
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// --- Admin-Endpoints (Bearer-Token via ADMIN_TOKEN env) ---
+app.get('/admin/orders', requireAdminAuth, async (req, res) => {
+  try {
+    const { listOrders } = await import('./lib/orders.js');
+    const limit = Math.min(Number(req.query.limit) || 100, 1000);
+    const orders = await listOrders({ limit });
+    res.json({ count: orders.length, orders });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/admin/subscriptions', requireAdminAuth, async (req, res) => {
+  try {
+    const { listSubscriptions } = await import('./lib/subscriptions.js');
+    const subs = await listSubscriptions();
+    res.json({ count: subs.length, subscriptions: subs });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Resend-Endpoint: bei Fulfillment-Fehler Report nochmal ausliefern.
+app.post('/api/resend/:sessionId', requireAdminAuth, async (req, res) => {
+  const { sessionId } = req.params;
+  try {
+    const { getOrder, markStatus } = await import('./lib/orders.js');
+    const order = await getOrder(sessionId);
+    if (!order) return res.status(404).json({ error: 'Session nicht gefunden' });
+    if (order.status === 'MAILED' || order.status === 'RESENT') {
+      return res.status(409).json({ error: `Order Status ${order.status} — bereits ausgeliefert. Nutze ?force=true.` });
+    }
+    await markStatus(sessionId, 'RESENDING');
+    const result = await scanGate(() =>
+      fulfillOrder({ url: order.url, company: order.company || '', email: order.email, pkg: order.pkg || 'basis' })
+    );
+    await sendReportFor({
+      to: order.email, company: order.company || '',
+      pdfPath: result.pdfPath, stmtPath: result.stmtPath,
+      emailKind: result.emailKind || 'bfsg',
+      diffText: diffSummaryText(result.diff)
+    });
+    await markStatus(sessionId, 'RESENT', { pdfPath: result.pdfPath });
+    res.json({ ok: true, sessionId, email: order.email, status: 'RESENT' });
+  } catch (err) {
+    console.error('[resend] Fehler:', err.message);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Widerrufs-Funktion (§ 356e BGB, Pflicht ab 19.06.2026) — leitet die Erklärung an den Betreiber.
