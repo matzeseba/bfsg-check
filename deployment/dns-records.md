@@ -1,47 +1,68 @@
 # DNS-Records — Copy-Paste-Vorlage für INWX
 
-> So trägst du die DNS-Records bei INWX ein, sobald wir die Hetzner-Server-IP
-> kennen. Setzen unter **„Mein Konto → Nameserver → DNS"** für jede Domain.
+> So trägst du die DNS-Records bei INWX ein. Setzen unter **„Mein Konto → Nameserver → DNS"** für jede Domain einzeln.
 
-**Platzhalter:** `<HETZNER_IP>` ersetze ich, sobald der Server provisioniert ist.
-**Brevo-DKIM-Wert** bekommen wir beim Verifizieren der Domain in Brevo.
+**Server-IP (Hetzner):** `178.105.83.0` (IPv4) · `2a01:4f8:1c18:d890::1` (IPv6 — erste Adresse aus dem /64-Subnetz)
+**Stand:** 16.06.2026 — Server läuft, Brevo SMTP aktiv.
 
 ---
 
-## 1. bfsg-fix.de (Haupt-Domain)
+## 1. `bfsg-fix.de` (Haupt-Domain)
 
 | Typ | Host / Name | Wert | TTL |
 |---|---|---|---|
-| A | @ | `<HETZNER_IP>` | 3600 |
-| A | www | `<HETZNER_IP>` | 3600 |
-| TXT | @ | `v=spf1 include:spf.brevo.com ~all` | 3600 |
-| TXT | `mail._domainkey` | (Wert kommt von Brevo nach Verifizierung) | 3600 |
-| TXT | `_dmarc` | `v=DMARC1; p=none; rua=mailto:dmarc@bfsg-fix.de` | 3600 |
+| A | `@` | `178.105.83.0` | 3600 |
+| A | `www` | `178.105.83.0` | 3600 |
+| AAAA | `@` | `2a01:4f8:1c18:d890::1` | 3600 |
+| AAAA | `www` | `2a01:4f8:1c18:d890::1` | 3600 |
+| TXT | `@` | `v=spf1 include:spf.brevo.com ~all` | 3600 |
+| TXT | `_dmarc` | `v=DMARC1; p=none; rua=mailto:matthiasseba92@gmail.com` | 3600 |
+| TXT | `mail._domainkey` | *(kommt von Brevo nach Domain-Verifizierung)* | 3600 |
 
-**Brevo-Verifizierung:** Zusätzlich verlangt Brevo einen einmaligen Verifizierungs-TXT-Record (Form `brevo-code:xxxxxxxx`). Den setzt du, sobald du die Domain in Brevo hinzufügst — Brevo zeigt dir den exakten String.
+### Brevo Domain-Verifizierung
+1. https://app.brevo.com → **Senders, Domains & dedicated IPs → Domains → Domain hinzufügen** → `bfsg-fix.de`
+2. Brevo zeigt einen einmaligen Verifizierungs-TXT-Record (z. B. `brevo-code:abc123...`) — als TXT auf `@` setzen.
+3. Brevo zeigt den DKIM-Wert — als TXT auf `mail._domainkey` setzen.
+4. In Brevo „Verifizieren" klicken → grüner Haken nach DNS-Propagation (5 Min – 4 h).
 
 ---
 
-## 2. Die 3 Alias-Domains (bfsg-barrierecheck.de, bfsg-sofortcheck.de, barrierefrei-pruefen.de)
+## 2. Alias-Domains: nur A/AAAA-Records, Caddy macht 301 zur Haupt-Domain
 
-Bei **jeder** Alias-Domain nur diese 2 Records:
+Für **jede** dieser drei Domains:
+- `bfsg-barrierecheck.de`
+- `bfsg-sofortcheck.de`
+- `barrierefrei-pruefen.de`
 
 | Typ | Host / Name | Wert | TTL |
 |---|---|---|---|
-| A | @ | `<HETZNER_IP>` | 3600 |
-| A | www | `<HETZNER_IP>` | 3600 |
+| A | `@` | `178.105.83.0` | 3600 |
+| A | `www` | `178.105.83.0` | 3600 |
+| AAAA | `@` | `2a01:4f8:1c18:d890::1` | 3600 |
+| AAAA | `www` | `2a01:4f8:1c18:d890::1` | 3600 |
 
-Caddy übernimmt den 301-Redirect auf bfsg-fix.de automatisch.
+Diese 301en automatisch auf `https://bfsg-fix.de` weiter (Caddyfile-Konfiguration).
 
 ---
 
-## Propagation
-DNS-Änderungen brauchen 5 Min bis 4 h, bis sie weltweit aktiv sind. Prüfen kannst du sie über:
-- https://dnschecker.org
-- `dig bfsg-fix.de` auf der Kommandozeile
+## Was nach DNS-Switch passiert
 
-## Brevo-DKIM-Setup-Flow
-1. Domain in Brevo hinzufügen (app.brevo.com → Senders, Domains & dedicated IPs → Domains)
-2. Brevo zeigt dir den DKIM-Wert + Verifizierungs-TXT
-3. Beide TXT-Records bei INWX eintragen
-4. In Brevo „Verifizieren" klicken → grüner Haken
+1. **5 Min – 4 h:** DNS propagiert.
+2. **Sobald DNS auf Server zeigt:** Caddy fordert automatisch Let's-Encrypt-Zertifikate an (alle 4 Domains).
+3. **Cutover Phase-1 → Phase-2:** Aktuell läuft Phase-1 (HTTP-only). Sobald DNS umgestellt ist, deaktivieren wir das Phase-1-Override und nutzen das normale Caddyfile mit HTTPS. Ein Push auf main mit der Deaktivierung reicht — GitHub Actions deployed automatisch.
+
+## Propagation prüfen
+
+```bash
+dig bfsg-fix.de +short            # erwartete Ausgabe: 178.105.83.0
+dig www.bfsg-fix.de +short        # erwartete Ausgabe: 178.105.83.0
+```
+
+Oder im Browser: https://dnschecker.org → `bfsg-fix.de` eingeben.
+
+## Test nach SSL
+
+```bash
+curl -I https://bfsg-fix.de/health           # erwartet: HTTP 200 + JSON-Body
+curl -I https://bfsg-barrierecheck.de/       # erwartet: HTTP 301 → bfsg-fix.de
+```

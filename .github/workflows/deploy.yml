@@ -1,0 +1,61 @@
+name: Deploy to Hetzner
+
+# Auto-Deploy bei jedem Push auf main: SSH zum Hetzner-Server,
+# git pull, docker compose up. Kein Image-Rebuild nötig wenn nur
+# landingpage/ oder Config geändert wurde (Volume-Mounts).
+# Image-Rebuild erfolgt, wenn scanner/ geändert wurde.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scanner/**'
+      - 'landingpage/**'
+      - 'deployment/**'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:  # Manueller Trigger via "Run workflow"
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: SSH Deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: root
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          port: 22
+          script_stop: true
+          script: |
+            set -e
+            cd /opt/bfsg-check
+            echo "=== git pull ==="
+            git fetch origin main
+            CHANGED=$(git diff --name-only HEAD origin/main)
+            git reset --hard origin/main
+            echo "=== Changed files: ==="
+            echo "$CHANGED"
+
+            cd /opt/bfsg-check/deployment
+
+            # Build NUR wenn scanner/ oder Dockerfile geändert
+            if echo "$CHANGED" | grep -qE '^(scanner/|deployment/docker-compose)'; then
+              echo "=== docker compose up (mit Build) ==="
+              docker compose up -d --build
+            else
+              echo "=== docker compose up (kein Build nötig — nur Restart für Config/Landing-Updates) ==="
+              docker compose up -d
+            fi
+
+            echo "=== Health-Check ==="
+            sleep 8
+            curl -sS --max-time 5 http://localhost/health || (docker compose logs --tail=50 && exit 1)
+
+            echo "=== Status ==="
+            docker compose ps
