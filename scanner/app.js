@@ -296,7 +296,7 @@ app.post('/api/checkout', rateLimit({ windowMs: 60_000, max: 10 }), async (req, 
 });
 
 app.get('/health', (req, res) => {
-  const live = (process.env.STRIPE_SECRET_KEY || '').startsWith('sk_live');
+  const live = /^(sk|rk)_live/.test(process.env.STRIPE_SECRET_KEY || '');
   const mailerOk = mailerStatus().startsWith('aktiv');
   res.json({ ok: !(live && !mailerOk), stripe: !!stripe, live, mailer: mailerStatus(), aboEnabled: ENABLE_ABO });
 });
