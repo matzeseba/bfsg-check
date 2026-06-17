@@ -32,8 +32,14 @@ jobs:
           key: ${{ secrets.HETZNER_SSH_KEY }}
           port: 22
           script_stop: true
+          request_pty: true
+          # Hotfix: cloud-init setzt initial chage -d 0 root → bei jedem SSH-Login fragt
+          # PAM nach Password-Change. Bei non-TTY (was ssh-action war) bricht das ab.
+          # request_pty löst das Sofort-Symptom, chage löst es dauerhaft (idempotent).
           script: |
             set -e
+            chage -d $(date +%Y-%m-%d) root || true
+            chage -E -1 -m 0 -M 99999 root || true
             cd /opt/bfsg-check
             echo "=== git pull ==="
             git fetch origin main
