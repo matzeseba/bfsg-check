@@ -1,0 +1,68 @@
+name: Notion Dashboard Sync
+
+# Alle 15 Min: ruft /admin/orders + /admin/subscriptions auf bfsg-fix.de ab
+# und pusht Deltas in 2 Notion-DBs. Idempotent via Session-/Subscription-ID.
+#
+# Setup-Anleitung: docs/DASHBOARD-NOTION-SETUP.md
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: notion-sync
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verifiziere Secrets
+        run: |
+          [ -n "${{ secrets.NOTION_TOKEN }}" ] || { echo "::error::NOTION_TOKEN fehlt — siehe docs/DASHBOARD-NOTION-SETUP.md"; exit 1; }
+          [ -n "${{ secrets.NOTION_DB_ORDERS }}" ] || { echo "::error::NOTION_DB_ORDERS fehlt"; exit 1; }
+          [ -n "${{ secrets.NOTION_DB_SUBSCRIPTIONS }}" ] || { echo "::error::NOTION_DB_SUBSCRIPTIONS fehlt"; exit 1; }
+          [ -n "${{ secrets.ADMIN_TOKEN }}" ] || { echo "::error::ADMIN_TOKEN fehlt"; exit 1; }
+          echo "[OK] alle Secrets gesetzt"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install minimal deps
+        run: npm install --no-save @notionhq/client@2.2.15
+
+      - name: Sync Orders + Subscriptions
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DB_ORDERS: ${{ secrets.NOTION_DB_ORDERS }}
+          NOTION_DB_SUBSCRIPTIONS: ${{ secrets.NOTION_DB_SUBSCRIPTIONS }}
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+        run: node .github/workflows/scripts/notion-sync.mjs
+
+      - name: Brevo-Mail bei Fehler
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp-relay.brevo.com
+          server_port: 587
+          username: ${{ secrets.SMTP_USER }}
+          password: ${{ secrets.SMTP_PASS }}
+          subject: "[BFSG-ALERT] Notion-Sync failed"
+          body: |
+            Notion-Dashboard-Sync schlug fehl.
+
+            Workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Mögliche Ursachen:
+            - bfsg-fix.de down (siehe uptime-watch.yml-Alert?)
+            - ADMIN_TOKEN rotiert ohne Secret-Update
+            - Notion-API-Rate-Limit
+            - NOTION_DB_*-IDs falsch
+          to: matze.seba@outlook.de
+          from: BFSG-Check Monitoring <no-reply@bfsg-fix.de>
