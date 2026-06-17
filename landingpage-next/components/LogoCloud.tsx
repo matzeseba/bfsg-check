@@ -13,11 +13,11 @@ export function LogoCloud() {
         >
           {LOGO_CLOUD.kicker}
         </p>
-        <ul className="mt-7 flex flex-wrap items-center justify-center gap-x-10 gap-y-6 opacity-70 grayscale">
+        <ul className="mt-7 flex flex-wrap items-center justify-center gap-x-10 gap-y-6 grayscale">
           {LOGO_CLOUD.logos.map((logo) => (
             <li
               key={logo.name}
-              className="font-display text-base font-semibold tracking-tight text-muted-foreground sm:text-lg"
+              className="font-display text-base font-semibold tracking-tight text-foreground/80 sm:text-lg"
               style={{ minWidth: logo.width }}
             >
               {logo.name}

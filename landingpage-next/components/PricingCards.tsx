@@ -83,7 +83,7 @@ export function PricingCards({
                 )}
               >
                 Jährlich
-                <span className="rounded-full bg-brand-mint/20 px-1.5 py-0.5 text-[10px] font-semibold text-brand-mint">
+                <span className="rounded-full bg-brand-mint px-1.5 py-0.5 text-[10px] font-semibold text-brand-deep">
                   −2 Monate
                 </span>
               </button>

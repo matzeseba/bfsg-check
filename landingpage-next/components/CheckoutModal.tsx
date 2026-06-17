@@ -209,7 +209,10 @@ export function CheckoutModal() {
               AGB
             </a>{" "}
             und die{" "}
-            <a href="/widerruf" className="underline underline-offset-2">
+            <a
+              href="/widerrufsbelehrung"
+              className="underline underline-offset-2"
+            >
               Widerrufsbelehrung
             </a>
             . Datenverarbeitung gemäß{" "}

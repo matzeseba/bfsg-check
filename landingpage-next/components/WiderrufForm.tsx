@@ -15,6 +15,7 @@ export function WiderrufForm() {
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [orderId, setOrderId] = React.useState("");
+  const [orderDate, setOrderDate] = React.useState("");
   const [reason, setReason] = React.useState("");
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -24,7 +25,15 @@ export function WiderrufForm() {
       const response = await fetch("/api/widerruf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, orderId, reason }),
+        // Backend (scanner/app.js) erwartet { name, email, vertrag, datum }.
+        // vertrag = Bestell-/Rechnungsnummer, datum = Bestelldatum.
+        body: JSON.stringify({
+          name,
+          email,
+          vertrag: orderId,
+          datum: orderDate,
+          reason,
+        }),
       });
       if (!response.ok) throw new Error("api");
       setStatus("success");
@@ -81,6 +90,15 @@ export function WiderrufForm() {
           placeholder="z. B. cs_test_…"
           value={orderId}
           onChange={(event) => setOrderId(event.target.value)}
+        />
+      </div>
+      <div className="grid gap-1.5">
+        <Label htmlFor="wd-date">Bestelldatum</Label>
+        <Input
+          id="wd-date"
+          type="date"
+          value={orderDate}
+          onChange={(event) => setOrderDate(event.target.value)}
         />
       </div>
       <div className="grid gap-1.5">

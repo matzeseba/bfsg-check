@@ -40,11 +40,13 @@ export const BRAND = {
   scansValue: "5.247",
 } as const;
 
+// Root-relative Anchor-Links (/#id) — funktionieren auch von Unterseiten
+// (/agb, /impressum, …) aus, von wo eine reine #id-Navigation ins Leere liefe.
 export const NAV_LINKS = [
-  { href: "#pakete", label: "Pakete" },
-  { href: "#ablauf", label: "Wie es funktioniert" },
-  { href: "#cookie", label: "Cookie-Check" },
-  { href: "#faq", label: "FAQ" },
+  { href: "/#pakete", label: "Pakete" },
+  { href: "/#ablauf", label: "Wie es funktioniert" },
+  { href: "/#cookie", label: "Cookie-Check" },
+  { href: "/#faq", label: "FAQ" },
 ] as const;
 
 export const HERO = {
