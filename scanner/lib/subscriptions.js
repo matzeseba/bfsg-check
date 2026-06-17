@@ -74,3 +74,10 @@ export async function markCancelled(subscriptionId, info = {}) {
   await write(rec);
   return rec;
 }
+
+// Liefert alle Subscriptions (letzter Status pro ID) — für Admin-Dashboard.
+export async function listSubscriptions({ status = null } = {}) {
+  await ensureLoaded();
+  const all = [...subs.values()].reverse();
+  return status ? all.filter((s) => s.status === status) : all;
+}

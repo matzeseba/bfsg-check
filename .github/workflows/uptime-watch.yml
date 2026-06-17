@@ -1,0 +1,77 @@
+name: Uptime Watch
+
+# Alle 5 Minuten /health curlen. Bei Fehler: GitHub-Issue erstellen + Brevo-Mail-Alert.
+# Free-Alternative zu UptimeRobot/Better-Stack — voll auf GitHub-Aktion + Brevo.
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # alle 5 Min
+  workflow_dispatch:
+
+concurrency:
+  group: uptime-watch
+  cancel-in-progress: true
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Health-Check
+        id: health
+        run: |
+          set +e
+          RESPONSE=$(curl -sS --max-time 15 -w "\nHTTP_STATUS=%{http_code}\nTIME_TOTAL=%{time_total}\n" https://bfsg-fix.de/health 2>&1)
+          EXIT=$?
+          set -e
+          echo "$RESPONSE"
+
+          HTTP_STATUS=$(echo "$RESPONSE" | grep "^HTTP_STATUS=" | cut -d= -f2)
+          TIME_TOTAL=$(echo "$RESPONSE" | grep "^TIME_TOTAL=" | cut -d= -f2)
+
+          # Failure-Bedingungen
+          if [ "$EXIT" != "0" ] || [ "$HTTP_STATUS" != "200" ]; then
+            echo "::error::Health-Check FAIL: exit=$EXIT http=$HTTP_STATUS"
+            echo "fail_reason=HTTP $HTTP_STATUS, exit $EXIT" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+          # JSON-Felder prüfen
+          if ! echo "$RESPONSE" | grep -q '"ok":true'; then
+            echo "::error::Health zeigt ok:false"
+            echo "fail_reason=Health zeigt ok:false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          if ! echo "$RESPONSE" | grep -q '"mailer":"aktiv'; then
+            echo "::warning::Mailer nicht aktiv"
+            # Kein Fail — Warning reicht
+          fi
+          if echo "$RESPONSE" | grep -q '"live":false' && echo "$RESPONSE" | grep -q '"stripe":true'; then
+            echo "::warning::Stripe konfiguriert, aber live:false — Key-Detection prüfen"
+          fi
+
+          echo "✅ Health OK (response_time=${TIME_TOTAL}s)"
+
+      - name: Alert via Brevo bei Fehler
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp-relay.brevo.com
+          server_port: 587
+          username: ${{ secrets.SMTP_USER }}
+          password: ${{ secrets.SMTP_PASS }}
+          subject: "[BFSG-ALERT] bfsg-fix.de DOWN"
+          body: |
+            Health-Check für https://bfsg-fix.de/health fehlgeschlagen.
+
+            Reason: ${{ steps.health.outputs.fail_reason }}
+            Workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            Zeit: ${{ github.event.repository.updated_at }}
+
+            Sofortige Schritte:
+            1. SSH zum Server: docker compose -f /opt/bfsg-check/deployment/docker-compose.yml ps
+            2. Logs: docker compose logs --tail=100 app caddy
+            3. Restart: docker compose restart app
+            4. Falls dauerhaft kaputt: GitHub-Actions deploy.yml manuell triggern (Rebuild)
+          to: matze.seba@outlook.de
+          from: BFSG-Check Uptime <no-reply@bfsg-fix.de>

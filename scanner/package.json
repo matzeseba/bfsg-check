@@ -1,6 +1,6 @@
 {
   "name": "bfsg-audit-scanner",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "Automatisierter BFSG-/WCAG-Barrierefreiheits-Scanner mit deutschem Klartext-Report, Stripe-Verkauf und automatischem Report-Versand.",
   "type": "module",
@@ -11,14 +11,19 @@
     "start": "node app.js",
     "audit": "node audit.js",
     "server": "node server.js",
-    "test": "node --test ./test/diff.test.js",
+    "test": "node --test ./test/diff.test.js ./test/security.test.js ./test/dsgvo.test.js ./test/webhook.e2e.test.js",
+    "test:audit": "npm audit --omit=dev",
     "postinstall": "playwright install chromium"
   },
   "dependencies": {
     "@axe-core/playwright": "4.10.1",
-    "express": "4.21.2",
-    "nodemailer": "6.9.16",
-    "playwright": "1.49.1",
+    "express": "4.22.2",
+    "nodemailer": "6.10.1",
+    "playwright": "1.55.1",
     "stripe": "17.5.0"
+  },
+  "overrides": {
+    "path-to-regexp": "0.1.13",
+    "qs": "6.15.2"
   }
 }

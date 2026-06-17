@@ -65,3 +65,12 @@ export async function getOrder(sessionId) {
   await ensureLoaded();
   return orders.get(sessionId) || null;
 }
+
+// Liefert alle Orders (letzter Status pro Session) — für Admin-Dashboard.
+// Neueste zuerst (Map-Iteration-Order ist Insertion-Order in JS).
+export async function listOrders({ limit = 100, status = null } = {}) {
+  await ensureLoaded();
+  const all = [...orders.values()].reverse();
+  const filtered = status ? all.filter((o) => o.status === status) : all;
+  return filtered.slice(0, limit);
+}

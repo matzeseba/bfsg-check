@@ -19,9 +19,9 @@ write_files:
       set -x
       exec > /var/log/bfsg-bootstrap.log 2>&1
 
-      # --- Packages ---
+      # --- Packages (inkl. Backup-Tools: gnupg + rclone) ---
       apt-get update -q
-      apt-get install -y -q curl ca-certificates git ufw
+      apt-get install -y -q curl ca-certificates git ufw gnupg rclone
 
       # --- Docker (offizieller Installer, bringt Docker Engine + Compose-Plugin) ---
       curl -fsSL https://get.docker.com -o /tmp/get-docker.sh
@@ -74,6 +74,17 @@ write_files:
 
       sleep 15
       docker compose ps
+
+      # --- Backup-Cron (täglich 03:00 UTC) ---
+      # Erwartet: Eigentümer fügt BACKUP_GPG_RECIPIENT + BACKUP_TARGET in .env hinzu,
+      # sowie GPG-Pubkey-Import + rclone.conf in /root/.config/rclone/.
+      # Ohne diese Configs läuft Backup nur lokal in /var/backups/bfsg/ (Retention 14 Tage).
+      cat > /etc/cron.d/bfsg-backup <<'CRON'
+      0 3 * * * root /opt/bfsg-check/deployment/backup.sh >> /var/log/bfsg-backup.log 2>&1
+      CRON
+      chmod 644 /etc/cron.d/bfsg-backup
+      mkdir -p /var/backups/bfsg /root/.config/rclone
+      echo "[bootstrap] Backup-Cron eingerichtet — siehe docs/BACKUP.md für BACKUP_GPG_RECIPIENT + rclone-Setup"
 
 runcmd:
   - bash /opt/bfsg-bootstrap.sh
