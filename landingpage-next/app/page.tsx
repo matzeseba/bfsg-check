@@ -5,18 +5,22 @@ import { Hero } from "@/components/Hero";
 import { HowItWorks } from "@/components/HowItWorks";
 import { LogoCloud } from "@/components/LogoCloud";
 import { PricingCards } from "@/components/PricingCards";
+import { RiskBand } from "@/components/RiskBand";
 import { StatsBar } from "@/components/StatsBar";
 import { Testimonials } from "@/components/Testimonials";
+import { TrustSection } from "@/components/TrustSection";
 
 export default function Home() {
   return (
     <>
       <Hero />
       <LogoCloud />
+      <RiskBand />
       <HowItWorks />
       <StatsBar />
-      <PricingCards />
       <Testimonials />
+      <PricingCards />
+      <TrustSection />
       <CookieSection />
       <FAQAccordion />
       <CtaSection />

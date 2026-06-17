@@ -43,12 +43,12 @@ export function PricingCards({
     >
       <div className="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-24">
         <div className="mx-auto max-w-2xl text-center">
-          <p className="text-xs font-medium tracking-[0.18em] text-brand-indigo uppercase">
+          <p className="font-mono text-xs font-medium tracking-[0.2em] text-brand-indigo uppercase dark:text-brand-mint">
             {kicker}
           </p>
           <h2
             id={`${id}-heading`}
-            className="mt-3 font-display text-3xl font-bold tracking-tight text-balance sm:text-4xl"
+            className="mt-3 font-display text-3xl font-semibold tracking-tight text-balance sm:text-[2.75rem] sm:leading-[1.05]"
           >
             {title}
           </h2>
@@ -98,15 +98,8 @@ export function PricingCards({
               initial={{ opacity: 0, y: 22 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
-              transition={{
-                duration: 0.55,
-                delay: i * 0.08,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              className={cn(
-                "relative",
-                pkg.featured && "md:-my-4",
-              )}
+              transition={{ duration: 0.55, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+              className={cn("relative", pkg.featured && "md:-my-4")}
             >
               <PricingCard
                 pkg={pkg}
@@ -152,17 +145,21 @@ function PricingCard({
   return (
     <div
       className={cn(
-        "group/card relative flex h-full flex-col overflow-hidden rounded-3xl border bg-card/90 p-7 backdrop-blur transition-all duration-300",
+        "group/card relative flex h-full flex-col overflow-hidden rounded-3xl p-7 backdrop-blur transition-all duration-300",
         pkg.featured
-          ? "border-brand-mint/60 shadow-card-hover ring-1 ring-brand-mint/40 md:scale-[1.03]"
-          : "border-border/70 shadow-card-soft hover:-translate-y-1 hover:shadow-card-hover",
+          ? "border-gradient bg-card shadow-card-hover md:scale-[1.03]"
+          : "border border-border/70 bg-card/85 shadow-card-soft hover:-translate-y-1.5 hover:shadow-card-hover",
       )}
     >
       {pkg.featured && (
         <>
           <div
             aria-hidden
-            className="pointer-events-none absolute -top-20 -right-20 size-60 rounded-full bg-brand-mint/25 blur-3xl"
+            className="pointer-events-none absolute -top-24 -right-24 size-64 rounded-full bg-brand-mint/20 blur-[70px]"
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-mint/60 to-transparent"
           />
           <Badge
             className="absolute -top-3 left-1/2 -translate-x-1/2 gap-1 bg-brand-mint px-3 py-1 text-[11px] font-bold tracking-wide text-brand-deep uppercase shadow-glow-mint"
@@ -175,7 +172,7 @@ function PricingCard({
       )}
 
       <div className="relative">
-        <p className="text-xs font-semibold tracking-[0.18em] text-brand-indigo uppercase">
+        <p className="font-mono text-xs font-semibold tracking-[0.18em] text-brand-indigo uppercase dark:text-brand-mint">
           {pkg.tag}
         </p>
         <h3 className="mt-2 font-display text-xl font-semibold tracking-tight">
@@ -199,7 +196,9 @@ function PricingCard({
           </p>
         )}
         {!isSub && (
-          <p className="mt-1 text-xs text-muted-foreground">einmalig, inkl. USt.</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            einmalig, inkl. USt.
+          </p>
         )}
       </div>
 
@@ -212,7 +211,7 @@ function PricingCard({
                 "mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full",
                 pkg.featured
                   ? "bg-brand-mint/20 text-brand-mint"
-                  : "bg-brand-indigo/10 text-brand-indigo",
+                  : "bg-brand-indigo/10 text-brand-indigo dark:bg-brand-mint/15 dark:text-brand-mint",
               )}
             >
               <CheckIcon className="size-3" strokeWidth={3} />
@@ -249,8 +248,8 @@ function PricingCard({
           </Button>
         )}
         {pkg.moneyBack && (
-          <p className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-            <ShieldCheckIcon className="size-3.5 text-brand-mint" />
+          <p className="inline-flex items-center gap-1.5 rounded-lg bg-brand-mint/8 px-2.5 py-1.5 text-xs text-muted-foreground">
+            <ShieldCheckIcon className="size-3.5 shrink-0 text-brand-mint" />
             {pkg.moneyBack}
           </p>
         )}

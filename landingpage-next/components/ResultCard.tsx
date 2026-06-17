@@ -79,7 +79,7 @@ export function ResultCard({ result }: { result: ScanResult }) {
             ? "bg-brand-mint/10"
             : tone === "warn"
               ? "bg-brand-amber/10"
-              : "bg-destructive/8",
+              : "bg-brand-rose/8",
         )}
       >
         <span
@@ -88,7 +88,7 @@ export function ResultCard({ result }: { result: ScanResult }) {
             "inline-flex size-10 items-center justify-center rounded-xl",
             positive
               ? "bg-brand-mint/20 text-brand-mint"
-              : "bg-destructive/15 text-destructive",
+              : "bg-brand-rose/15 text-brand-rose",
           )}
         >
           {positive ? (
@@ -99,7 +99,8 @@ export function ResultCard({ result }: { result: ScanResult }) {
         </span>
         <div className="flex-1">
           <p className="font-display text-lg font-semibold tracking-tight">
-            {score}/100 · Note {grade}
+            <span className="font-mono tabular-nums">{score}/100</span> · Note{" "}
+            {grade}
           </p>
           <p className="text-xs text-muted-foreground">{verdict}</p>
         </div>
@@ -125,7 +126,7 @@ export function ResultCard({ result }: { result: ScanResult }) {
               <li key={issue} className="flex items-start gap-2">
                 <span
                   aria-hidden
-                  className="mt-1.5 inline-block size-1.5 shrink-0 rounded-full bg-destructive"
+                  className="mt-1.5 inline-block size-1.5 shrink-0 rounded-full bg-brand-rose"
                 />
                 <span>{issue}</span>
               </li>

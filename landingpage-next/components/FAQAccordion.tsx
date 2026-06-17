@@ -32,12 +32,12 @@ export function FAQAccordion() {
     >
       <div className="mx-auto max-w-3xl px-5 py-20 sm:px-6 sm:py-24">
         <div className="text-center">
-          <p className="text-xs font-medium tracking-[0.18em] text-brand-indigo uppercase">
+          <p className="font-mono text-xs font-medium tracking-[0.2em] text-brand-indigo uppercase dark:text-brand-mint">
             FAQ
           </p>
           <h2
             id="faq-heading"
-            className="mt-3 font-display text-3xl font-bold tracking-tight text-balance sm:text-4xl"
+            className="mt-3 font-display text-3xl font-semibold tracking-tight text-balance sm:text-[2.75rem] sm:leading-[1.05]"
           >
             Häufige Fragen — ehrlich beantwortet.
           </h2>

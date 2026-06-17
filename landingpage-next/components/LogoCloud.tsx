@@ -9,7 +9,7 @@ export function LogoCloud() {
       <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-12">
         <p
           id="logocloud-heading"
-          className="text-center text-xs font-medium tracking-[0.18em] text-muted-foreground uppercase"
+          className="text-center font-mono text-xs font-medium tracking-[0.2em] text-muted-foreground uppercase"
         >
           {LOGO_CLOUD.kicker}
         </p>
@@ -17,7 +17,7 @@ export function LogoCloud() {
           {LOGO_CLOUD.logos.map((logo) => (
             <li
               key={logo.name}
-              className="font-display text-base font-semibold tracking-tight text-foreground/80 sm:text-lg"
+              className="font-display text-base font-semibold tracking-tight text-foreground/80 transition-colors hover:text-foreground sm:text-lg"
               style={{ minWidth: logo.width }}
             >
               {logo.name}

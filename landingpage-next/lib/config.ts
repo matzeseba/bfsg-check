@@ -76,6 +76,37 @@ export const HERO = {
   ],
 } as const;
 
+// Daten fuer das Hero-Audit-Report-Visual (rein illustrativ, kein echter Scan).
+export const HERO_VISUAL = {
+  reportPath: "report/4f2a",
+  score: 62,
+  grade: "C",
+  totalFindings: 17,
+  criticalCount: 4,
+  findings: [
+    { severity: "Kritisch", title: "8 Bilder ohne Alt-Text", tone: "high" },
+    { severity: "Kritisch", title: "Kontrast 1.9:1 auf CTA-Buttons", tone: "high" },
+    { severity: "Mittel", title: "Formularfeld ohne sichtbares Label", tone: "mid" },
+    { severity: "Hinweis", title: "Heading-Hierarchie überspringt H3", tone: "low" },
+  ],
+  contrast: {
+    before: { ratio: "1.9:1", label: "vorher" },
+    after: { ratio: "7.4:1", label: "nachher" },
+  },
+} as const;
+
+// Risiko-/Urgency-Band: faktenbasiert, kein UWG-Versprechen.
+export const RISK_BAND = {
+  kicker: "Seit 28.06.2025 in Kraft",
+  title: "Das BFSG ist keine Zukunftsmusik mehr — die Frist ist verstrichen.",
+  desc: "Betroffene Unternehmen müssen ihre digitalen Angebote barrierefrei anbieten. Wettbewerber, Verbände und abmahnende Kanzleien dürfen Verstöße verfolgen. Wer jetzt prüft, behebt Mängel in Ruhe — statt unter Abmahn-Druck.",
+  points: [
+    { value: "28.06.2025", label: "Stichtag bereits überschritten" },
+    { value: "WCAG 2.1 AA", label: "geforderter Mindeststandard" },
+    { value: "Verbände", label: "klagebefugt nach §15 BFSG" },
+  ],
+} as const;
+
 export const HOW_IT_WORKS = [
   {
     step: "01",
@@ -97,11 +128,29 @@ export const HOW_IT_WORKS = [
   },
 ] as const;
 
+// num/prefix/suffix/decimals steuern den Count-up in StatsBar; bei null wird
+// `value` statisch angezeigt (z. B. "EN 301 549").
 export const STATS = [
-  { value: "60 Sek.", label: "bis zum ersten Ergebnis" },
-  { value: "WCAG 2.1", label: "AA-konform geprüft" },
-  { value: "EN 301 549", label: "Audit-Methodik" },
-  { value: "100 %", label: "Hosting in Deutschland" },
+  {
+    value: "60 Sek.",
+    num: 60,
+    suffix: " Sek.",
+    label: "bis zum ersten Ergebnis",
+  },
+  {
+    value: "WCAG 2.1",
+    num: 2.1,
+    prefix: "WCAG ",
+    decimals: 1,
+    label: "AA-konform geprüft",
+  },
+  { value: "EN 301 549", num: null, label: "Audit-Methodik" },
+  {
+    value: "100 %",
+    num: 100,
+    suffix: " %",
+    label: "Hosting in Deutschland",
+  },
 ] as const;
 
 export const LOGO_CLOUD = {
