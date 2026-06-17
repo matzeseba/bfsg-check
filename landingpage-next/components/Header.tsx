@@ -2,15 +2,26 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { AccessibilityIcon, ArrowRightIcon, MenuIcon, XIcon } from "lucide-react";
+import {
+  AccessibilityIcon,
+  ArrowRightIcon,
+  MenuIcon,
+  XIcon,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { NAV_LINKS, SITE } from "@/lib/config";
 import { cn } from "@/lib/utils";
 
+import { ThemeToggle } from "./ThemeToggle";
+
+// Section-IDs fuer den Scroll-Spy (aus NAV_LINKS /#id abgeleitet).
+const SPY_IDS = NAV_LINKS.map((l) => l.href.replace("/#", ""));
+
 export function Header() {
   const [scrolled, setScrolled] = React.useState(false);
   const [open, setOpen] = React.useState(false);
+  const [active, setActive] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     function onScroll() {
@@ -19,6 +30,25 @@ export function Header() {
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Scroll-Spy: markiert den aktuell sichtbaren Abschnitt in der Nav.
+  React.useEffect(() => {
+    const targets = SPY_IDS.map((id) => document.getElementById(id)).filter(
+      (el): el is HTMLElement => el !== null,
+    );
+    if (targets.length === 0) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (visible[0]) setActive(visible[0].target.id);
+      },
+      { rootMargin: "-45% 0px -50% 0px", threshold: [0, 0.25, 0.5] },
+    );
+    targets.forEach((t) => observer.observe(t));
+    return () => observer.disconnect();
   }, []);
 
   // Schliessen bei Routenwechsel via Hash
@@ -42,7 +72,7 @@ export function Header() {
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-6 px-5 sm:px-6">
         <Link
           href="/"
-          className="group/logo flex items-center gap-2.5 font-display text-base font-bold tracking-tight"
+          className="group/logo flex items-center gap-2.5 font-display text-lg font-semibold tracking-tight"
           aria-label={`${SITE.name} Startseite`}
         >
           <span
@@ -63,18 +93,36 @@ export function Header() {
           aria-label="Hauptnavigation"
           className="ml-2 hidden flex-1 items-center gap-1 md:flex"
         >
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="relative rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              {link.label}
-            </Link>
-          ))}
+          {NAV_LINKS.map((link) => {
+            const id = link.href.replace("/#", "");
+            const isActive = active === id;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={isActive ? "true" : undefined}
+                className={cn(
+                  "relative rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+                  isActive
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {link.label}
+                <span
+                  aria-hidden
+                  className={cn(
+                    "absolute inset-x-3 -bottom-px h-px origin-left bg-brand-mint transition-transform duration-300",
+                    isActive ? "scale-x-100" : "scale-x-0",
+                  )}
+                />
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="ml-auto hidden items-center gap-2 md:flex">
+          <ThemeToggle />
           <Button variant="ghost" size="lg" render={<a href="/kuendigen" />}>
             Konto
           </Button>
@@ -88,15 +136,18 @@ export function Header() {
           </Button>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          aria-label={open ? "Menü schließen" : "Menü öffnen"}
-          aria-expanded={open}
-          className="ml-auto inline-flex size-10 items-center justify-center rounded-lg border border-border/60 bg-background/60 text-foreground backdrop-blur md:hidden"
-        >
-          {open ? <XIcon className="size-5" /> : <MenuIcon className="size-5" />}
-        </button>
+        <div className="ml-auto flex items-center gap-2 md:hidden">
+          <ThemeToggle />
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? "Menü schließen" : "Menü öffnen"}
+            aria-expanded={open}
+            className="inline-flex size-10 items-center justify-center rounded-lg border border-border/60 bg-background/60 text-foreground backdrop-blur"
+          >
+            {open ? <XIcon className="size-5" /> : <MenuIcon className="size-5" />}
+          </button>
+        </div>
       </div>
 
       {open && (
@@ -119,9 +170,7 @@ export function Header() {
               <Button
                 variant="outline"
                 size="lg"
-                render={
-                  <a href="/kuendigen" onClick={() => setOpen(false)} />
-                }
+                render={<a href="/kuendigen" onClick={() => setOpen(false)} />}
               >
                 Konto verwalten
               </Button>

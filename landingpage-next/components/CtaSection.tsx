@@ -17,36 +17,42 @@ export function CtaSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="relative overflow-hidden rounded-3xl border border-border/60 bg-brand-deep px-6 py-14 text-center text-primary-foreground shadow-card-hover sm:px-10 sm:py-20"
+          className="border-gradient relative overflow-hidden rounded-[2rem] bg-brand-deeper px-6 py-14 text-center text-[oklch(0.97_0.004_95)] shadow-elevated sm:px-10 sm:py-20"
         >
-          {/* Aurora-Spots */}
+          {/* Aurora-Spots + Blueprint-Grid + Scanlines-Detail */}
           <div
             aria-hidden
-            className="pointer-events-none absolute -left-10 top-0 size-72 rounded-full bg-brand-mint/30 blur-3xl"
+            className="pointer-events-none absolute -left-10 top-0 size-72 rounded-full bg-brand-mint/25 blur-[90px]"
           />
           <div
             aria-hidden
-            className="pointer-events-none absolute -right-10 bottom-0 size-80 rounded-full bg-brand-indigo/40 blur-3xl"
+            className="pointer-events-none absolute -right-10 bottom-0 size-80 rounded-full bg-brand-violet/35 blur-[90px]"
           />
           <div
             aria-hidden
             className="absolute inset-0 grid-bg-dark opacity-30 mask-radial"
           />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-0 h-24 scanlines opacity-40 mask-fade-b"
+          />
 
           <div className="relative">
-            <span className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/20 bg-primary-foreground/5 px-3 py-1 text-xs font-medium text-primary-foreground/80 backdrop-blur">
+            <span className="inline-flex items-center gap-2 rounded-full border border-[oklch(0.97_0.004_95)]/20 bg-[oklch(0.97_0.004_95)]/5 px-3 py-1 font-mono text-xs font-medium text-[oklch(0.97_0.004_95)]/80 backdrop-blur">
               <SparklesIcon className="size-3.5 text-brand-mint" />
               60 Sekunden bis zum ersten Befund
             </span>
 
             <h2
               id="cta-heading"
-              className="mx-auto mt-6 max-w-3xl font-display text-3xl font-bold tracking-tight text-balance sm:text-5xl"
+              className="mx-auto mt-6 max-w-3xl font-display text-3xl font-semibold tracking-tight text-balance sm:text-[3.25rem] sm:leading-[1.04]"
             >
               Bereit, Mängel zu finden{" "}
-              <span className="text-brand-mint">bevor andere es tun?</span>
+              <span className="italic text-brand-mint">
+                bevor andere es tun?
+              </span>
             </h2>
-            <p className="mx-auto mt-5 max-w-2xl text-base text-primary-foreground/75 text-pretty sm:text-lg">
+            <p className="mx-auto mt-5 max-w-2xl text-base text-[oklch(0.97_0.004_95)]/75 text-pretty sm:text-lg">
               Kostenloser Sofort-Check. Vollreport bei Bedarf. Keine
               Verpflichtung, keine Anmeldung — und kein generischer
               Lighthouse-Dump.
@@ -64,14 +70,14 @@ export function CtaSection() {
               <Button
                 size="lg"
                 variant="ghost"
-                className="h-12 gap-1.5 rounded-xl bg-primary-foreground/0 px-5 text-base font-medium text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                className="h-12 gap-1.5 rounded-xl bg-[oklch(0.97_0.004_95)]/0 px-5 text-base font-medium text-[oklch(0.97_0.004_95)] hover:bg-[oklch(0.97_0.004_95)]/10 hover:text-[oklch(0.97_0.004_95)]"
                 render={<a href="#pakete" />}
               >
                 Pakete ansehen
               </Button>
             </div>
 
-            <p className="mt-6 inline-flex items-center gap-1.5 text-xs text-primary-foreground/60">
+            <p className="mt-6 inline-flex items-center gap-1.5 text-xs text-[oklch(0.97_0.004_95)]/60">
               <ShieldCheckIcon className="size-3.5 text-brand-mint" />
               30 Tage Geld-zurück bei berechtigter Reklamation
             </p>

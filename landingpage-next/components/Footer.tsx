@@ -66,7 +66,7 @@ export function Footer() {
           <div>
             <Link
               href="/"
-              className="inline-flex items-center gap-2.5 font-display text-base font-bold tracking-tight"
+              className="inline-flex items-center gap-2.5 font-display text-lg font-semibold tracking-tight"
             >
               <span
                 aria-hidden
@@ -128,7 +128,7 @@ export function Footer() {
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
             {COLUMNS.map((col) => (
               <div key={col.title}>
-                <p className="text-xs font-semibold tracking-[0.18em] text-foreground uppercase">
+                <p className="font-mono text-xs font-semibold tracking-[0.18em] text-foreground uppercase">
                   {col.title}
                 </p>
                 <ul className="mt-4 grid gap-2 text-sm">
