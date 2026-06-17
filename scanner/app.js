@@ -17,7 +17,7 @@ import { scanUrl } from './lib/scan.js';
 import { renderTeaser } from './lib/report.js';
 import { fulfillOrder, PKG_CONFIG } from './lib/fulfill.js';
 import {
-  sendReportFor, sendAlert, sendCancellationConfirmation,
+  sendReportFor, sendAlert, sendCancellationConfirmation, sendDsgvoToken,
   mailerStatus, requireMailerOrExit, isStripeLive
 } from './lib/mailer.js';
 import { requireAdminAuth } from './lib/admin-auth.js';
@@ -26,7 +26,7 @@ import { diffSummaryText } from './lib/diff.js';
 import { generateInvoicePdf } from './lib/invoice.js';
 import { assertPublicHttpUrl } from './lib/url-guard.js';
 import { rateLimit, concurrencyGate } from './lib/limits.js';
-import { alreadyProcessed, recordPaid, markStatus } from './lib/orders.js';
+import { claimEvent, recordPaid, markStatus } from './lib/orders.js';
 import {
   recordSubscription, saveSnapshot, getSubscription, markCancelled, markSubscriptionStatus
 } from './lib/subscriptions.js';
@@ -77,7 +77,8 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
   }
 
   // Idempotenz für alle Event-Typen (gilt auch für invoice.paid Duplikate).
-  if (await alreadyProcessed(event.id)) {
+  // Atomarer Claim schließt die Race zwischen parallelen Stripe-Retries (F1).
+  if (!(await claimEvent(event.id))) {
     return res.json({ received: true, duplicate: true });
   }
 
@@ -377,9 +378,12 @@ app.post('/api/dsgvo/request', rateLimit({ windowMs: 60_000, max: 3 }), async (r
   try {
     const { token, expiresAt } = await requestDsgvoToken({ email, action });
     const link = `${PUBLIC_URL}/api/dsgvo/confirm?token=${encodeURIComponent(token)}`;
+    // Token-Link an den ANTRAGSTELLER (Double-Opt-in, F3). Operator bekommt nur
+    // eine token-freie Notiz für den Audit-Trail.
+    await sendDsgvoToken({ to: email, action, link, expiresAt });
     await sendAlert(
       `DSGVO-${action}-Anfrage von ${email}`,
-      `User-Aktion: ${action}\nE-Mail: ${email}\nToken: ${token}\nLink (24h gültig): ${link}\nExpires: ${expiresAt}`
+      `User-Aktion: ${action}\nE-Mail: ${email}\nBestätigungs-Mail mit Token wurde an den Antragsteller gesendet.\nExpires: ${expiresAt}`
     );
     res.status(202).json({ ok: true, message: 'Bestätigungs-Mail wird an angegebene Adresse gesendet, falls dort Daten existieren.', expiresAt });
   } catch (err) {

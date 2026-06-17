@@ -42,6 +42,19 @@ export async function alreadyProcessed(eventId) {
   return processedEvents.has(eventId);
 }
 
+// Atomarer Claim gegen nebenläufige Webhook-Duplikate (Code-Review F1):
+// check-then-act in EINEM synchronen Block (kein await dazwischen) ist im
+// Single-Thread-Eventloop atomar → zwei gleichzeitige Stripe-Retries desselben
+// event.id können nicht beide true bekommen. Gibt true zurück, wenn DIESER
+// Aufruf das Event erstmalig beansprucht hat.
+export async function claimEvent(eventId) {
+  await ensureLoaded();
+  if (!eventId) return true; // ohne ID kein Dedup möglich → durchlassen
+  if (processedEvents.has(eventId)) return false;
+  processedEvents.add(eventId);
+  return true;
+}
+
 // Zahlung festhalten (Status PAID), bevor irgendetwas erzeugt wird.
 // customerId (Stripe) wird mitgespeichert, falls vorhanden — für Kundenverwaltung,
 // Doppelkauf-Erkennung und spätere Customer-Portal-Anbindung.

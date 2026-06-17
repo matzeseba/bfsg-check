@@ -138,6 +138,8 @@ function PricingCard({
 }) {
   // Annual-Toggle ist nur fuer Subscriptions relevant — kosmetischer Rabatt.
   const isSub = pkg.mode === "subscription";
+  // available === false → beworben, aber noch nicht kaufbar (z.B. Abo-Gate Backend).
+  const comingSoon = pkg.available === false;
   const monthly = pkg.amountCents / 100;
   const yearly = Math.round(monthly * 10);
   const displayedPrice = isSub && annual ? `${yearly} €` : pkg.price;
@@ -221,19 +223,31 @@ function PricingCard({
       </ul>
 
       <div className="relative mt-8 grid gap-3">
-        <Button
-          onClick={onSelect}
-          size="lg"
-          className={cn(
-            "h-11 w-full gap-1.5 rounded-xl text-sm font-semibold transition-transform hover:scale-[1.015]",
-            pkg.featured
-              ? "bg-brand-mint text-brand-deep hover:bg-brand-mint/85"
-              : "bg-brand-deep text-primary-foreground hover:bg-brand-indigo",
-          )}
-        >
-          {isSub ? "Abo starten" : "Paket wählen"}
-          <ArrowRightIcon className="size-4" />
-        </Button>
+        {comingSoon ? (
+          <Button
+            type="button"
+            disabled
+            size="lg"
+            aria-label={`${pkg.name} — bald verfügbar`}
+            className="h-11 w-full cursor-not-allowed gap-1.5 rounded-xl border border-border/70 bg-muted text-sm font-semibold text-muted-foreground opacity-90"
+          >
+            Bald verfügbar
+          </Button>
+        ) : (
+          <Button
+            onClick={onSelect}
+            size="lg"
+            className={cn(
+              "h-11 w-full gap-1.5 rounded-xl text-sm font-semibold transition-transform hover:scale-[1.015]",
+              pkg.featured
+                ? "bg-brand-mint text-brand-deep hover:bg-brand-mint/85"
+                : "bg-brand-deep text-primary-foreground hover:bg-brand-indigo",
+            )}
+          >
+            {isSub ? "Abo starten" : "Paket wählen"}
+            <ArrowRightIcon className="size-4" />
+          </Button>
+        )}
         {pkg.moneyBack && (
           <p className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
             <ShieldCheckIcon className="size-3.5 text-brand-mint" />
