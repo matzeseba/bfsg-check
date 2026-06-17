@@ -38,30 +38,23 @@ jobs:
           # request_pty löst das Sofort-Symptom, chage löst es dauerhaft (idempotent).
           script: |
             set -e
+            # Idempotenter Password-Expiry-Reset (cloud-init/Image-Default setzt sonst chage -d 0).
             chage -d $(date +%Y-%m-%d) root || true
-            chage -E -1 -m 0 -M 99999 root || true
+            chage -M 99999 root || true
             cd /opt/bfsg-check
             echo "=== git pull ==="
             git fetch origin main
-            CHANGED=$(git diff --name-only HEAD origin/main)
             git reset --hard origin/main
-            echo "=== Changed files: ==="
-            echo "$CHANGED"
 
             cd /opt/bfsg-check/deployment
 
-            # Build NUR wenn scanner/ oder Dockerfile geändert
-            if echo "$CHANGED" | grep -qE '^(scanner/|deployment/docker-compose)'; then
-              echo "=== docker compose up (mit Build) ==="
-              docker compose up -d --build
-            else
-              echo "=== docker compose up (kein Build nötig — nur Restart für Config/Landing-Updates) ==="
-              docker compose up -d
-            fi
+            # Immer bauen (Docker-Layer-Cache macht unveränderte Images schnell).
+            echo "=== docker compose up -d --build ==="
+            docker compose up -d --build
 
-            echo "=== Caddy-Reload (Bind-Mount-Config wird sonst nicht übernommen) ==="
-            # Caddy-Container wird bei reinen Caddyfile-Änderungen NICHT recreated
-            # (Bind-Mount triggert kein Recreate). Graceful Reload, Fallback force-recreate.
+            # Caddy nutzt Bind-Mount-Config → kein Auto-Recreate bei Caddyfile-Änderung.
+            # Graceful Reload, Fallback force-recreate.
+            echo "=== Caddy-Reload ==="
             docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile \
               || docker compose up -d --force-recreate caddy
 
