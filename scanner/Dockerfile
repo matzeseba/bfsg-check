@@ -3,7 +3,9 @@
 # Hinweis: Vercel-Serverless eignet sich NICHT (Playwright/Chromium zu schwer) —
 # nutze einen Container-/VPS-Host.
 
-FROM mcr.microsoft.com/playwright:v1.49.1-jammy
+# Base-Image-Version MUSS zu playwright in package.json passen (sonst Chromium-Revision-Mismatch
+# → "Executable doesn't exist", weil --ignore-scripts den postinstall-Browser-Download überspringt).
+FROM mcr.microsoft.com/playwright:v1.55.1-jammy
 
 WORKDIR /app
 
