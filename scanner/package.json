@@ -11,7 +11,7 @@
     "start": "node app.js",
     "audit": "node audit.js",
     "server": "node server.js",
-    "test": "node --test ./test/diff.test.js ./test/security.test.js ./test/dsgvo.test.js ./test/webhook.e2e.test.js",
+    "test": "node --test ./test/diff.test.js ./test/security.test.js ./test/dsgvo.test.js ./test/webhook.e2e.test.js ./test/invoice.test.js ./test/mailer.test.js ./test/report.test.js",
     "test:audit": "npm audit --omit=dev",
     "postinstall": "playwright install chromium"
   },

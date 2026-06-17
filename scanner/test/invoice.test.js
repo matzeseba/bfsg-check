@@ -93,3 +93,27 @@ test('renderInvoiceHtml: Umlaute im Output korrekt (UTF-8)', () => {
   assert.match(html, /Müller Söhne/);
   assert.match(html, /BFSG-Prüfung für große Schriften/);
 });
+
+test('renderInvoiceHtml: § 14 UStG — Rechnungs- UND Leistungsdatum ausgewiesen', () => {
+  const html = renderInvoiceHtml({
+    invoiceNumber: 'RE-2026-0001',
+    date: '2026-06-16T12:00:00Z',
+    customer: { email: 'a@b.de' },
+    items: [{ description: 'Basis', amount: 19900 }],
+    vatMode: 'kleinunternehmer'
+  });
+  assert.match(html, /Rechnungsdatum:/);
+  assert.match(html, /Leistungsdatum:/);
+});
+
+test('nextInvoiceNumber: parallele Aufrufe vergeben eindeutige, lückenlose Nummern', async () => {
+  // Race-Test: 20 gleichzeitige Allokationen dürfen NIE eine Nummer doppelt vergeben.
+  const nums = await Promise.all(Array.from({ length: 20 }, () => nextInvoiceNumber()));
+  const unique = new Set(nums);
+  assert.equal(unique.size, nums.length, 'Alle Rechnungsnummern müssen eindeutig sein');
+  // Sequenz lückenlos: numerischer Teil bildet einen zusammenhängenden Block.
+  const seqs = nums.map((n) => Number(n.split('-')[2])).sort((a, b) => a - b);
+  for (let i = 1; i < seqs.length; i++) {
+    assert.equal(seqs[i], seqs[i - 1] + 1, 'Sequenz muss lückenlos sein');
+  }
+});

@@ -8,6 +8,7 @@
 //          customer.subscription.deleted → Bestätigung),
 //          Cookie-Scan-Produkt, Multi-Page-Crawl.
 
+import './lib/sentry.js'; // Sentry früh initialisieren (no-op ohne SENTRY_DSN).
 import express from 'express';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -22,12 +23,15 @@ import {
 import { requireAdminAuth } from './lib/admin-auth.js';
 import { exportUserData, deleteUserData, requestDsgvoToken, consumeDsgvoToken } from './lib/dsgvo.js';
 import { diffSummaryText } from './lib/diff.js';
+import { generateInvoicePdf } from './lib/invoice.js';
 import { assertPublicHttpUrl } from './lib/url-guard.js';
 import { rateLimit, concurrencyGate } from './lib/limits.js';
 import { alreadyProcessed, recordPaid, markStatus } from './lib/orders.js';
 import {
-  recordSubscription, saveSnapshot, getSubscription, markCancelled
+  recordSubscription, saveSnapshot, getSubscription, markCancelled, markSubscriptionStatus
 } from './lib/subscriptions.js';
+import logger, { httpLog } from './lib/logger.js';
+import sentry from './lib/sentry.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 8080;
@@ -55,6 +59,7 @@ const scanGate = concurrencyGate(Number(process.env.MAX_CONCURRENT_SCANS || 2));
 const app = express();
 app.set('trust proxy', 1);
 app.disable('x-powered-by');
+app.use(httpLog()); // Structured Request-Logs (Pino, no-op-Fallback ohne pino-http).
 
 // --- Stripe-Webhook: roher Body VOR express.json ---
 app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
@@ -67,7 +72,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
       process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (err) {
-    console.error('[webhook] Signatur ungültig:', err.message);
+    logger.error({ err: err.message }, 'webhook Signatur ungültig');
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
@@ -84,11 +89,14 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
       await handleCheckoutCompleted(event);
     } else if (event.type === 'invoice.paid' || event.type === 'invoice.payment_succeeded') {
       await handleInvoicePaid(event);
+    } else if (event.type === 'customer.subscription.updated') {
+      await handleSubscriptionUpdated(event);
     } else if (event.type === 'customer.subscription.deleted') {
       await handleSubscriptionDeleted(event);
     }
   } catch (err) {
-    console.error('[webhook] Event-Handling Fehler:', event.type, err.message);
+    logger.error({ eventType: event.type, err: err.message }, 'webhook Event-Handling Fehler');
+    sentry.captureException(err, { webhook_event: event.type });
   }
 });
 
@@ -104,7 +112,8 @@ async function handleCheckoutCompleted(event) {
   const isSub = s.mode === 'subscription' && !!s.subscription;
 
   // Zahlung SOFORT persistieren — bevor irgendetwas erzeugt wird.
-  await recordPaid({ eventId: event.id, sessionId: s.id, email, url: meta.url, pkg, amount: s.amount_total });
+  // Stripe-Customer-ID mitspeichern (Kundenverwaltung / Doppelkauf / Portal).
+  await recordPaid({ eventId: event.id, sessionId: s.id, email, url: meta.url, pkg, amount: s.amount_total, customerId: s.customer || null });
 
   // Bei Subscription: Subscription-Eintrag anlegen (Snapshot kommt nach Erstausführung).
   if (isSub) {
@@ -124,26 +133,48 @@ async function handleCheckoutCompleted(event) {
     const order = await scanGate(() =>
       fulfillOrder({ url: meta.url, company: meta.company || '', email: email || '', pkg })
     );
+    // Eigene Rechnung (§ 14 UStG) erzeugen — Fallback zur Stripe-Receipt-Mail.
+    // Schlägt sie fehl, darf das die Report-Auslieferung NICHT blockieren.
+    const invoice = await safeGenerateInvoice({ orderId: s.id, email, company: meta.company || '', pkg, amount: s.amount_total });
     // Subject/Anschreiben passend zum Paket (BFSG / Cookie / Re-Check).
     const emailKind = isSub ? PKG_CONFIG[pkg]?.emailKind || 'bfsg' : order.emailKind;
     await sendReportFor({
       to: email, company: meta.company || '',
       pdfPath: order.pdfPath, stmtPath: order.stmtPath,
       emailKind,
-      diffText: diffSummaryText(order.diff)
+      diffText: diffSummaryText(order.diff),
+      invoicePdfPath: invoice?.pdfPath || null,
+      invoiceNumber: invoice?.invoiceNumber || null
     });
     if (isSub) {
       await saveSnapshot(s.subscription, order.snapshot);
     }
-    await markStatus(s.id, 'MAILED', { pdfPath: order.pdfPath });
-    console.log(`[webhook] Report ausgeliefert: ${s.id} -> ${email}`);
+    await markStatus(s.id, 'MAILED', { pdfPath: order.pdfPath, invoiceNumber: invoice?.invoiceNumber || null });
+    logger.info({ sessionId: s.id, pkg, amount: s.amount_total, invoiceNumber: invoice?.invoiceNumber || null }, 'Report ausgeliefert');
   } catch (err) {
     await markStatus(s.id, 'FAILED', { error: err.message });
     await sendAlert(
       `Bezahlt, aber Erfüllung fehlgeschlagen: ${email}`,
       `Session: ${s.id}\nURL: ${meta.url}\nPaket: ${pkg}\nFehler: ${err.message}\n\nManuell nachliefern: node resend.js ${s.id}`
     );
-    console.error('[webhook] ERFÜLLUNG FEHLGESCHLAGEN', s.id, err.message);
+    sentry.captureException(err, { webhook_event: 'checkout.session.completed', session_id: s.id });
+    logger.error({ sessionId: s.id, err: err.message }, 'ERFÜLLUNG FEHLGESCHLAGEN');
+  }
+}
+
+// Rechnungs-Generierung gekapselt: Fehler werden geloggt + gemeldet, aber
+// niemals propagiert — die Report-Auslieferung (das bezahlte Produkt) hat Vorrang.
+async function safeGenerateInvoice({ orderId, email, company, pkg, amount }) {
+  try {
+    return await generateInvoicePdf({ orderId, email, company, pkg, amount });
+  } catch (err) {
+    logger.error({ orderId, err: err.message }, 'Rechnungs-Generierung fehlgeschlagen (Report wird trotzdem zugestellt)');
+    sentry.captureException(err, { stage: 'invoice', order_id: orderId });
+    await sendAlert(
+      `Rechnung konnte nicht erzeugt werden: ${email}`,
+      `Order: ${orderId}\nPaket: ${pkg}\nBetrag: ${amount}\nFehler: ${err.message}\n\nRechnung manuell nachreichen (Stripe-Receipt bleibt gültig).`
+    );
+    return null;
   }
 }
 
@@ -174,20 +205,44 @@ async function handleInvoicePaid(event) {
         prevSnapshot: sub.lastSnapshot || null
       })
     );
+    // Monatsrechnung fürs Abo (§ 14 UStG) — Betrag aus der Stripe-Invoice.
+    const cycleAmount = inv.amount_paid ?? inv.total ?? 0;
+    const invoice = await safeGenerateInvoice({ orderId: inv.id || sub.subscriptionId, email: sub.email, company: sub.company || '', pkg: sub.pkg || 'abo', amount: cycleAmount });
     await sendReportFor({
       to: sub.email, company: sub.company || '',
       pdfPath: order.pdfPath,
       emailKind: 'recheck',
-      diffText: diffSummaryText(order.diff)
+      diffText: diffSummaryText(order.diff),
+      invoicePdfPath: invoice?.pdfPath || null,
+      invoiceNumber: invoice?.invoiceNumber || null
     });
     await saveSnapshot(sub.subscriptionId, order.snapshot);
-    console.log(`[webhook] Re-Check ausgeliefert: sub=${sub.subscriptionId} -> ${sub.email}`);
+    logger.info({ subscriptionId: sub.subscriptionId, invoiceNumber: invoice?.invoiceNumber || null }, 'Re-Check ausgeliefert');
   } catch (err) {
     await sendAlert(
       `Re-Check fehlgeschlagen: ${sub.email}`,
       `Subscription: ${sub.subscriptionId}\nURL: ${sub.url}\nFehler: ${err.message}`
     );
-    console.error('[webhook] RE-CHECK FEHLGESCHLAGEN', sub.subscriptionId, err.message);
+    sentry.captureException(err, { webhook_event: 'invoice.paid', subscription_id: sub.subscriptionId });
+    logger.error({ subscriptionId: sub.subscriptionId, err: err.message }, 'RE-CHECK FEHLGESCHLAGEN');
+  }
+}
+
+// Zahlungsausfall-Resilienz: Stripe meldet Status-Wechsel (active -> past_due ->
+// unpaid) via customer.subscription.updated. Wir spiegeln den Status lokal; nur
+// ACTIVE-Subscriptions lösen Re-Checks aus (siehe handleInvoicePaid), past_due
+// pausiert damit automatisch, ACTIVE-Recovery nimmt den Betrieb wieder auf.
+async function handleSubscriptionUpdated(event) {
+  const sub = event.data.object;
+  const updated = await markSubscriptionStatus(sub.id, sub.status);
+  if (updated && updated.status === 'PAST_DUE') {
+    await sendAlert(
+      `Abo-Zahlung ausstehend (past_due/unpaid): ${updated.email || sub.id}`,
+      `Subscription: ${sub.id}\nStripe-Status: ${sub.status}\nRe-Checks pausiert bis Zahlung wieder eingeht.`
+    );
+    logger.warn({ subscriptionId: sub.id, stripeStatus: sub.status }, 'Abo past_due — Re-Checks pausiert');
+  } else if (updated && updated.status === 'ACTIVE') {
+    logger.info({ subscriptionId: sub.id }, 'Abo wieder aktiv');
   }
 }
 
@@ -387,16 +442,23 @@ app.post('/api/resend/:sessionId', requireAdminAuth, async (req, res) => {
     const result = await scanGate(() =>
       fulfillOrder({ url: order.url, company: order.company || '', email: order.email, pkg: order.pkg || 'basis' })
     );
+    // Rechnung nachreichen, falls bei der fehlgeschlagenen Erst-Auslieferung noch keine erzeugt wurde.
+    const invoice = order.invoiceNumber
+      ? null
+      : await safeGenerateInvoice({ orderId: sessionId, email: order.email, company: order.company || '', pkg: order.pkg || 'basis', amount: order.amount });
     await sendReportFor({
       to: order.email, company: order.company || '',
       pdfPath: result.pdfPath, stmtPath: result.stmtPath,
       emailKind: result.emailKind || 'bfsg',
-      diffText: diffSummaryText(result.diff)
+      diffText: diffSummaryText(result.diff),
+      invoicePdfPath: invoice?.pdfPath || null,
+      invoiceNumber: invoice?.invoiceNumber || null
     });
-    await markStatus(sessionId, 'RESENT', { pdfPath: result.pdfPath });
+    await markStatus(sessionId, 'RESENT', { pdfPath: result.pdfPath, invoiceNumber: invoice?.invoiceNumber || order.invoiceNumber || null });
     res.json({ ok: true, sessionId, email: order.email, status: 'RESENT' });
   } catch (err) {
-    console.error('[resend] Fehler:', err.message);
+    logger.error({ sessionId, err: err.message }, 'resend Fehler');
+    sentry.captureException(err, { stage: 'resend', session_id: sessionId });
     res.status(500).json({ error: err.message });
   }
 });
@@ -426,12 +488,19 @@ app.post('/api/kuendigung', rateLimit({ windowMs: 60_000, max: 5 }), async (req,
 app.use(express.static(path.join(__dirname, '..', 'landingpage')));
 
 // Globale Fehler-Handler + Graceful Shutdown.
-process.on('unhandledRejection', (e) => console.error('[unhandledRejection]', e));
-process.on('uncaughtException', (e) => console.error('[uncaughtException]', e));
+process.on('unhandledRejection', (e) => {
+  logger.error({ err: e?.message || e }, 'unhandledRejection');
+  sentry.captureException(e instanceof Error ? e : new Error(String(e)), { source: 'unhandledRejection' });
+});
+process.on('uncaughtException', (e) => {
+  logger.error({ err: e?.message || e }, 'uncaughtException');
+  sentry.captureException(e instanceof Error ? e : new Error(String(e)), { source: 'uncaughtException' });
+});
 
 const server = app.listen(PORT, () => {
-  console.log(`BFSG-Audit-Server auf ${PUBLIC_URL}`);
-  console.log(`  Stripe:  ${stripe ? 'konfiguriert' : 'NICHT konfiguriert'} | Abo: ${ENABLE_ABO ? 'an' : 'aus'}`);
-  console.log(`  Mailer:  ${mailerStatus()}`);
+  logger.info(
+    { publicUrl: PUBLIC_URL, stripe: !!stripe, abo: ENABLE_ABO, mailer: mailerStatus() },
+    `BFSG-Audit-Server auf ${PUBLIC_URL}`
+  );
 });
 process.on('SIGTERM', () => server.close(() => process.exit(0)));

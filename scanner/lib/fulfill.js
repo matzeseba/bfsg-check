@@ -35,9 +35,9 @@ const COOKIE_REPORT_OPTS = {
   pruefnorm: '§ 25 TDDDG / DSGVO (technische Messung)',
   introTitle: 'Worum es geht',
   introHtml:
-    '<p>Nach § 25 TDDDG duerfen nicht technisch notwendige Cookies und Tracking-/Werbe-Dienste erst NACH einer aktiven Einwilligung des Besuchers geladen werden. Dieser Report misst automatisiert, welche Dienste bereits VOR einer Einwilligung feuern. Es handelt sich um eine technische Messung, keine Rechtsberatung.</p>',
+    '<p>Nach § 25 TDDDG dürfen nicht technisch notwendige Cookies und Tracking-/Werbe-Dienste erst NACH einer aktiven Einwilligung des Besuchers geladen werden. Dieser Report misst automatisiert, welche Dienste bereits VOR einer Einwilligung feuern. Es handelt sich um eine technische Messung, keine Rechtsberatung.</p>',
   legalHtml:
-    '<strong>Wichtiger Hinweis:</strong> Dies ist eine automatisierte technische Einzelmessung (§ 25 TDDDG / DSGVO) OHNE Banner-Interaktion zu einem Zeitpunkt. Sie erfasst interaktions-/scroll-getriggerte Tags nicht garantiert vollstaendig. Beobachtete Tracker-Requests koennen bei korrektem Consent Mode v2 cookielos und zulaessig sein — bitte manuell verifizieren. <strong>Keine Rechtsberatung, keine Konformitaetsgarantie.</strong>'
+    '<strong>Wichtiger Hinweis:</strong> Dies ist eine automatisierte technische Einzelmessung (§ 25 TDDDG / DSGVO) OHNE Banner-Interaktion zu einem Zeitpunkt. Sie erfasst interaktions-/scroll-getriggerte Tags nicht garantiert vollständig. Beobachtete Tracker-Requests können bei korrektem Consent Mode v2 cookielos und zulässig sein — bitte manuell verifizieren. <strong>Keine Rechtsberatung, keine Konformitätsgarantie.</strong>'
 };
 
 function slugify(url) {

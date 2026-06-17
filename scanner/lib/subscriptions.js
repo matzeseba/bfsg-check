@@ -75,6 +75,33 @@ export async function markCancelled(subscriptionId, info = {}) {
   return rec;
 }
 
+// Spiegelt einen Stripe-Subscription-Status (active/past_due/unpaid/...) in den
+// lokalen Status. Nur ACTIVE-Subscriptions lösen Re-Checks aus (siehe app.js),
+// past_due/unpaid pausiert damit automatisch, bis die Zahlung wieder klappt.
+// Stripe-Status -> lokaler Status.
+const STRIPE_STATUS_MAP = {
+  active: 'ACTIVE',
+  trialing: 'ACTIVE',
+  past_due: 'PAST_DUE',
+  unpaid: 'PAST_DUE',
+  paused: 'PAST_DUE',
+  canceled: 'CANCELLED',
+  incomplete: 'PAST_DUE',
+  incomplete_expired: 'CANCELLED'
+};
+
+export async function markSubscriptionStatus(subscriptionId, stripeStatus) {
+  await ensureLoaded();
+  const prev = subs.get(subscriptionId);
+  if (!prev) return null;
+  const mapped = STRIPE_STATUS_MAP[stripeStatus] || prev.status;
+  if (mapped === prev.status) return prev; // kein Wechsel → kein Log-Spam
+  const rec = { ...prev, status: mapped, stripeStatus, statusChangedAt: new Date().toISOString() };
+  subs.set(subscriptionId, rec);
+  await write(rec);
+  return rec;
+}
+
 // Liefert alle Subscriptions (letzter Status pro ID) — für Admin-Dashboard.
 export async function listSubscriptions({ status = null } = {}) {
   await ensureLoaded();

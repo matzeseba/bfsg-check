@@ -12,7 +12,7 @@ process.env.ORDERS_FILE = path.join(tmp, 'orders.jsonl');
 process.env.SUBS_FILE = path.join(tmp, 'subs.jsonl');
 
 const { alreadyProcessed, recordPaid, markStatus, getOrder } = await import('../lib/orders.js');
-const { recordSubscription, getSubscription, markCancelled } = await import('../lib/subscriptions.js');
+const { recordSubscription, getSubscription, markCancelled, markSubscriptionStatus } = await import('../lib/subscriptions.js');
 
 // --- Hilfsfunktion: synthetisches Stripe-Event nachstellen ---
 function mockCheckoutSessionEvent(overrides = {}) {
@@ -123,6 +123,38 @@ test('Subscription-Lifecycle: record → markCancelled', async () => {
   await markCancelled(subId);
   sub = await getSubscription(subId);
   assert.equal(sub.status, 'CANCELLED');
+});
+
+test('Zahlungsausfall: markSubscriptionStatus past_due → PAST_DUE, recovery → ACTIVE', async () => {
+  const subId = `sub_pastdue_${Date.now()}`;
+  await recordSubscription({
+    subscriptionId: subId, customerId: 'cus_pd', email: 'pd@test.de',
+    url: 'https://pd.example.com', company: 'PD GmbH', pkg: 'abo'
+  });
+  // active -> past_due
+  let sub = await markSubscriptionStatus(subId, 'past_due');
+  assert.equal(sub.status, 'PAST_DUE');
+  assert.equal(sub.stripeStatus, 'past_due');
+  // unpaid bleibt PAST_DUE (gleicher lokaler Status → kein Wechsel, prev zurück)
+  sub = await markSubscriptionStatus(subId, 'unpaid');
+  assert.equal(sub.status, 'PAST_DUE');
+  // recovery: past_due -> active
+  sub = await markSubscriptionStatus(subId, 'active');
+  assert.equal(sub.status, 'ACTIVE');
+  // canceled -> CANCELLED
+  sub = await markSubscriptionStatus(subId, 'canceled');
+  assert.equal(sub.status, 'CANCELLED');
+});
+
+test('recordPaid persistiert Stripe-customerId (Kundenverwaltung)', async () => {
+  const evt = mockCheckoutSessionEvent({ sessionId: 'cs_custid_test' });
+  await recordPaid({
+    eventId: evt.id, sessionId: evt.data.object.id,
+    email: 'cust@test.de', url: 'https://x.de', pkg: 'basis', amount: 19900,
+    customerId: 'cus_ABC123'
+  });
+  const order = await getOrder(evt.data.object.id);
+  assert.equal(order.customerId, 'cus_ABC123');
 });
 
 test('Order-Persistenz übersteht Modul-Neuladen (JSONL ist die Source of Truth)', async () => {
