@@ -49,7 +49,7 @@ const PACKAGES = {
   'cookie-basis': { name: 'Cookie-Check (§25 TDDDG)',  amount:  4900, mode: 'payment' },
   'cookie-profi': { name: 'Cookie-Check Profi',        amount:  7900, mode: 'payment' },
   ...(ENABLE_ABO
-    ? { abo: { name: 'BFSG Re-Check Abo', amount: 4900, mode: 'subscription', interval: 'month' } }
+    ? { abo: { name: 'BFSG Re-Check Abo', amount: 3900, mode: 'subscription', interval: 'month' } }
     : {})
 };
 
