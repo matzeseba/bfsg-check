@@ -1,0 +1,57 @@
+keyword,match_type,monthly_search_volume_est,suggested_bid_eur,ad_group,negative
+bfsg check,EXACT,720,2.40,Brand,false
+bfsg fix,EXACT,140,1.80,Brand,false
+bfsg-check.de,EXACT,90,0.80,Brand,false
+bfsg website prüfen,PHRASE,480,3.10,Intent-High,false
+"bfsg konform machen",PHRASE,390,3.40,Intent-High,false
+"bfsg abmahnung",PHRASE,260,3.80,Intent-High,false
+"bfsg abmahnung vermeiden",PHRASE,170,4.20,Intent-High,false
+"website auf barrierefreiheit prüfen",PHRASE,1300,2.90,Intent-High,false
+"website barrierefrei machen lassen",PHRASE,720,3.70,Intent-High,false
+"barrierefreiheitsstärkungsgesetz prüfen",PHRASE,210,3.20,Intent-High,false
+"barrierefreiheitserklärung erstellen",PHRASE,880,2.80,Intent-High,false
+"barrierefreiheitserklärung muster",PHRASE,1100,1.90,Intent-High,false
+"barrierefreiheitserklärung vorlage",PHRASE,520,2.10,Intent-High,false
+"bfsg pflicht 2025",PHRASE,260,2.20,Intent-High,false
+"bfsg pflicht 2026",PHRASE,330,2.40,Intent-High,false
+"bfsg betroffen",PHRASE,170,2.00,Intent-High,false
+"bfsg kleinunternehmer",PHRASE,210,1.80,Intent-High,false
+"bfsg ausnahmen",PHRASE,140,1.70,Intent-High,false
+"barrierefreiheit website test",BROAD,1900,1.60,Intent-Mid,false
+"a11y check deutsch",BROAD,90,1.40,Intent-Mid,false
+"wcag 2.1 prüfung",PHRASE,260,2.30,Intent-Mid,false
+"wcag 2.2 test",PHRASE,170,2.40,Intent-Mid,false
+"wcag test tool deutsch",PHRASE,140,1.90,Intent-Mid,false
+"accessibility audit deutschland",PHRASE,210,3.10,Intent-Mid,false
+"accessibility check deutsch",PHRASE,170,1.70,Intent-Mid,false
+"barrierefreiheit prüfen kostenlos",PHRASE,720,1.20,Intent-Mid,false
+"kontrast prüfer website",BROAD,390,0.90,Intent-Mid,false
+"alt text prüfen tool",BROAD,210,0.80,Intent-Mid,false
+"screenreader test website",BROAD,170,1.30,Intent-Mid,false
+"axe core deutsch",BROAD,90,1.10,Intent-Mid,false
+"lighthouse accessibility deutsch",BROAD,170,1.40,Intent-Mid,false
+"online shop barrierefrei bfsg",PHRASE,260,3.90,Intent-High,false
+"shop barrierefreiheit prüfen",PHRASE,390,3.60,Intent-High,false
+"shopify barrierefrei machen",PHRASE,170,3.20,Intent-High,false
+"woocommerce barrierefrei",PHRASE,140,2.80,Intent-High,false
+"shopware barrierefrei",PHRASE,110,2.60,Intent-High,false
+"magento barrierefrei",PHRASE,70,2.40,Intent-High,false
+"jtl shop bfsg",PHRASE,50,2.50,Intent-High,false
+"e-commerce barrierefreiheit dsgvo",PHRASE,90,2.10,Intent-Mid,false
+"cookie banner dsgvo prüfen",PHRASE,1100,2.70,Cookie-Compliance,false
+"cookie consent tcf 2.2",PHRASE,170,2.20,Cookie-Compliance,false
+"cookie banner abmahnung",PHRASE,520,3.40,Cookie-Compliance,false
+"cookie banner check",PHRASE,720,1.90,Cookie-Compliance,false
+"cookie banner test tool",BROAD,390,1.50,Cookie-Compliance,false
+"tddg cookie",PHRASE,90,1.80,Cookie-Compliance,false
+"google consent mode v2 deutsch",PHRASE,210,2.30,Cookie-Compliance,false
+"cookie banner ohne reject button",PHRASE,170,2.40,Cookie-Compliance,false
+"website monitoring barrierefreiheit",PHRASE,90,2.60,Re-Check,false
+"a11y monitoring abo",BROAD,40,2.10,Re-Check,false
+"barrierefreiheit dauerhaft überwachen",PHRASE,50,2.30,Re-Check,false
+"wcag re audit",BROAD,30,2.00,Re-Check,false
+"bfsg jahres check",PHRASE,40,2.40,Re-Check,false
+"a11y monitoring tool",BROAD,90,1.80,Re-Check,false
+"barrierefreiheit ihk",BROAD,260,1.40,Intent-Mid,false
+"bfsg pdf barrierefrei",PHRASE,140,1.80,Intent-Mid,false
+"barrierefreiheit gesetz erklärung",PHRASE,390,1.20,Intent-Mid,false
