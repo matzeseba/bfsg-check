@@ -63,7 +63,7 @@ export function PricingCards({
                 onClick={() => setAnnual(false)}
                 aria-pressed={!annual}
                 className={cn(
-                  "rounded-full px-4 py-1.5 text-xs font-medium transition-colors",
+                  "inline-flex min-h-11 items-center rounded-full px-5 text-xs font-medium transition-colors",
                   !annual
                     ? "bg-brand-deep text-primary-foreground"
                     : "text-muted-foreground hover:text-foreground",
@@ -76,7 +76,7 @@ export function PricingCards({
                 onClick={() => setAnnual(true)}
                 aria-pressed={annual}
                 className={cn(
-                  "inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium transition-colors",
+                  "inline-flex min-h-11 items-center gap-1.5 rounded-full px-5 text-xs font-medium transition-colors",
                   annual
                     ? "bg-brand-deep text-primary-foreground"
                     : "text-muted-foreground hover:text-foreground",
