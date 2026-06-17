@@ -19,6 +19,7 @@ export type PackageConfig = {
   featured?: boolean;
   mode: "payment" | "subscription";
   amountCents: number;
+  moneyBack?: string;
 };
 
 export const SITE = {
@@ -30,17 +31,82 @@ export const SITE = {
   email: "hallo@bfsg-fix.de",
 } as const;
 
+export const BRAND = {
+  tagline: "BFSG- & WCAG-Audit für mittelständische Website-Betreiber",
+  productKicker: "Compliance-Scan-Plattform",
+  promise: "Premium-Audit ohne Kanzlei-Honorar",
+  hostingNote: "Gehostet in Deutschland · DSGVO-konform",
+  scansLabel: "Websites geprüft",
+  scansValue: "5.247",
+} as const;
+
+export const NAV_LINKS = [
+  { href: "#pakete", label: "Pakete" },
+  { href: "#ablauf", label: "Wie es funktioniert" },
+  { href: "#cookie", label: "Cookie-Check" },
+  { href: "#faq", label: "FAQ" },
+] as const;
+
 export const HERO = {
-  pill: "Barrierefreiheitsstärkungsgesetz (BFSG) seit 28.06.2025 in Kraft",
-  headline: "Ist Ihre Website BFSG-konform? Prüfen Sie es kostenlos.",
+  pillFlag: "DE",
+  pill: "BFSG seit 28.06.2025 in Kraft · Erste Abmahnungen rollen an",
+  headlineLead: "Ist Ihre Website",
+  headlineEmph: "BFSG-konform?",
+  headlineTail: "In 60 Sekunden wissen Sie es.",
   subline:
-    "Automatisierter Sofort-Check nach WCAG 2.1 / EN 301 549 — mit konkretem, menschlich geprüftem Fix-Plan zum Abarbeiten. Ergebnis in unter 60 Sekunden.",
-  cta: "Jetzt prüfen",
+    "Automatisierter Sofort-Check nach WCAG 2.1 / EN 301 549 — mit konkretem, menschlich geprüftem Fix-Plan zum Abarbeiten. Premium-Audit ohne Kanzlei-Honorar.",
+  cta: "Jetzt kostenlos prüfen",
+  ctaSecondary: "Pakete ansehen",
   placeholder: "https://ihre-website.de",
   badges: [
     "Ergebnis in 60 Sek.",
     "KI-gestützt + menschlich geprüft",
     "WCAG 2.1 / EN 301 549",
+  ],
+  trust: [
+    { label: BRAND.scansValue, sub: BRAND.scansLabel },
+    { label: "DSGVO", sub: "konform" },
+    { label: "DE", sub: "Hosting" },
+    { label: "60 Sek.", sub: "bis Ergebnis" },
+  ],
+} as const;
+
+export const HOW_IT_WORKS = [
+  {
+    step: "01",
+    title: "Website-URL eingeben",
+    desc: "Adresse einfügen, Branche optional angeben — wir bereiten Crawler & Audit-Regeln vor.",
+    icon: "globe",
+  },
+  {
+    step: "02",
+    title: "Automatisierter WCAG-Scan",
+    desc: "Kontraste, Alt-Texte, Tastatur-Fokus, Labels, Strukturen — über 80 Regeln nach EN 301 549.",
+    icon: "scan",
+  },
+  {
+    step: "03",
+    title: "Fix-Plan vom Experten kuratiert",
+    desc: "Priorisiert, mit Copy-Paste-Snippets und Entwurf der Barrierefreiheitserklärung — keine Rohdaten-Wüste.",
+    icon: "check",
+  },
+] as const;
+
+export const STATS = [
+  { value: "60 Sek.", label: "bis zum ersten Ergebnis" },
+  { value: "WCAG 2.1", label: "AA-konform geprüft" },
+  { value: "EN 301 549", label: "Audit-Methodik" },
+  { value: "100 %", label: "Hosting in Deutschland" },
+] as const;
+
+export const LOGO_CLOUD = {
+  kicker: "Bald berichtet in",
+  logos: [
+    { name: "TechCrunch DE", width: 132 },
+    { name: "t3n", width: 56 },
+    { name: "OMR", width: 64 },
+    { name: "heise online", width: 124 },
+    { name: "Computerwoche", width: 156 },
   ],
 } as const;
 
@@ -53,6 +119,7 @@ export const PACKAGES: PackageConfig[] = [
     description: "Einmaliger Vollreport",
     mode: "payment",
     amountCents: 19900,
+    moneyBack: "30 Tage Geld-zurück bei berechtigter Reklamation",
     features: [
       "Vollständiger WCAG-2.1-Report (PDF)",
       "Alle Mängel priorisiert + Lösung",
@@ -69,6 +136,7 @@ export const PACKAGES: PackageConfig[] = [
     mode: "payment",
     amountCents: 49900,
     featured: true,
+    moneyBack: "30 Tage Geld-zurück bei berechtigter Reklamation",
     features: [
       "Alles aus Basis",
       "Bis zu 25 Unterseiten",
@@ -86,6 +154,7 @@ export const PACKAGES: PackageConfig[] = [
     description: "Dauerhafte Überwachung",
     mode: "subscription",
     amountCents: 4900,
+    moneyBack: "Jederzeit zum Monatsende kündbar",
     features: [
       "Monatlicher Re-Check",
       "Alarm bei neuen Mängeln",
@@ -104,6 +173,7 @@ export const COOKIE_PACKAGES: PackageConfig[] = [
     description: "Einmalige technische Messung",
     mode: "payment",
     amountCents: 4900,
+    moneyBack: "30 Tage Geld-zurück bei berechtigter Reklamation",
     features: [
       "Welche Tracker feuern vor Consent?",
       "Welche Cookies werden vor Consent gesetzt?",
@@ -120,6 +190,7 @@ export const COOKIE_PACKAGES: PackageConfig[] = [
     mode: "payment",
     amountCents: 7900,
     featured: true,
+    moneyBack: "30 Tage Geld-zurück bei berechtigter Reklamation",
     features: [
       "Alles aus Cookie Basis",
       "Erweiterte Tracker-Liste (TCF-Hinweise)",
@@ -129,10 +200,32 @@ export const COOKIE_PACKAGES: PackageConfig[] = [
   },
 ];
 
+export const DIFFERENTIATORS = [
+  {
+    kicker: "Schneller als die Kanzlei",
+    title: "Audit in Stunden, nicht in Wochen",
+    desc: "Während andere noch Termine koordinieren, haben Sie schon den Fix-Plan auf dem Tisch. Stripe-Checkout, sofortiger Scan-Start, Lieferung typischerweise binnen weniger Stunden.",
+  },
+  {
+    kicker: "Tiefer als Gratis-Tools",
+    title: "Menschliche Sichtung vor Auslieferung",
+    desc: "Automatische Tests finden 30–50 % der Mängel. Bei uns liest ein Mensch jeden Report quer, bevor er rausgeht — keine False Positives, keine generischen Empfehlungen.",
+  },
+  {
+    kicker: "Günstiger als Beratung",
+    title: "Pauschalpreis statt Stundensatz",
+    desc: "Sie zahlen einmalig 199 € oder 499 € — kein Tagessatz, kein Beratungsmonster. Genug Tiefe für die Pflicht, ohne Overengineering.",
+  },
+] as const;
+
 export const FAQ_ITEMS = [
   {
     q: "Betrifft mich das BFSG überhaupt?",
     a: "Betroffen sind insbesondere Online-Shops und Dienstleister im elektronischen Geschäftsverkehr. Kleinstunternehmen (unter 10 Mitarbeitende und unter 2 Mio. Euro Jahresumsatz) sind bei reinen Dienstleistungen teils ausgenommen. Der kostenlose Check gibt eine erste Einordnung.",
+  },
+  {
+    q: "Wie unterscheidet sich BFSG-Check von Gratis-Tools wie WAVE oder Lighthouse?",
+    a: "Gratis-Tools liefern Rohdaten — hunderte Findings ohne Priorisierung, ohne Lösungs-Snippet, ohne Kontext. Wir kuratieren: jeder Mangel bekommt eine Priorität, einen konkreten Fix und landet im Umsetzungs-Fahrplan. Plus: Entwurf der Barrierefreiheitserklärung, fertig zum Veröffentlichen.",
   },
   {
     q: "Ersetzt der Report eine Rechtsberatung?",
@@ -141,6 +234,10 @@ export const FAQ_ITEMS = [
   {
     q: "Wie genau ist die KI-gestützte Prüfung?",
     a: "Automatisierte Tests finden erfahrungsgemäß rund 30–50 % aller Mängel zuverlässig (Kontraste, Alt-Texte, Labels, Tastatur-Fokus). Komplexe Punkte wie Bedienlogik oder semantische Korrektheit ergänzen wir durch eine menschliche Sichtung vor Auslieferung.",
+  },
+  {
+    q: "Ist BFSG-Check DSGVO-konform?",
+    a: "Ja. Wir hosten ausschließlich in Deutschland, übermitteln keine Daten in Drittländer, speichern nur das, was zur Vertragsabwicklung nötig ist (E-Mail, Rechnungsadresse, gescannte URL) und nutzen nur technisch notwendige Cookies ohne Consent. Details in der Datenschutzerklärung.",
   },
   {
     q: "Was passiert nach dem Kauf?",
