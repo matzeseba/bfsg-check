@@ -59,6 +59,12 @@ jobs:
               docker compose up -d
             fi
 
+            echo "=== Caddy-Reload (Bind-Mount-Config wird sonst nicht übernommen) ==="
+            # Caddy-Container wird bei reinen Caddyfile-Änderungen NICHT recreated
+            # (Bind-Mount triggert kein Recreate). Graceful Reload, Fallback force-recreate.
+            docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile \
+              || docker compose up -d --force-recreate caddy
+
             echo "=== Health-Check ==="
             sleep 8
             curl -sS --max-time 5 http://localhost/health || (docker compose logs --tail=50 && exit 1)
