@@ -34,7 +34,21 @@ function esc(s) {
   );
 }
 
+// In-Process-Mutex: serialisiert die read-modify-write-Sequenz des Zählers, damit
+// parallele Webhook-Aufrufe (bis MAX_CONCURRENT_SCANS) im selben Node-Prozess NIE
+// dieselbe Nummer vergeben. Eliminiert das Race innerhalb einer Instanz.
+// Mehr-Instanz-Betrieb (horizontale Skalierung) braucht zusätzlich einen externen
+// Lock (SQLite/Redis) — siehe docs/INVOICE-COMPLIANCE.md.
+let counterLock = Promise.resolve();
+
 async function nextInvoiceNumber() {
+  const run = counterLock.then(() => allocateInvoiceNumber());
+  // Lock-Kette darf nicht durch einen Fehler "vergiftet" werden.
+  counterLock = run.then(() => {}, () => {});
+  return run;
+}
+
+async function allocateInvoiceNumber() {
   const year = new Date().getUTCFullYear();
   await mkdir(path.dirname(COUNTER_FILE), { recursive: true });
   let counter = { year, seq: 0 };
@@ -45,11 +59,8 @@ async function nextInvoiceNumber() {
     } catch { /* corrupt file → reset */ }
   }
   counter.seq += 1;
-  // Race-Condition-Risiko bei parallelen Aufrufen: lockless-best-effort.
-  // Bei high-concurrency: SQLite + INSERT-OR-IGNORE als Welle 5.
   await writeFile(COUNTER_FILE, JSON.stringify(counter, null, 2));
-  const num = `RE-${counter.year}-${String(counter.seq).padStart(4, '0')}`;
-  return num;
+  return `RE-${counter.year}-${String(counter.seq).padStart(4, '0')}`;
 }
 
 export function renderInvoiceHtml({ invoiceNumber, date, customer, items, vatMode = VAT_MODE }) {
@@ -95,7 +106,8 @@ export function renderInvoiceHtml({ invoiceNumber, date, customer, items, vatMod
   <div style="text-align:right">
     <strong style="font-size:14px">Rechnung</strong><br>
     Nr.: ${esc(invoiceNumber)}<br>
-    Datum: ${esc(dateStr)}
+    Rechnungsdatum: ${esc(dateStr)}<br>
+    Leistungsdatum: ${esc(dateStr)}
   </div>
 </header>
 

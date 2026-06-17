@@ -43,10 +43,12 @@ export async function alreadyProcessed(eventId) {
 }
 
 // Zahlung festhalten (Status PAID), bevor irgendetwas erzeugt wird.
-export async function recordPaid({ eventId, sessionId, email, url, pkg, amount }) {
+// customerId (Stripe) wird mitgespeichert, falls vorhanden — für Kundenverwaltung,
+// Doppelkauf-Erkennung und spätere Customer-Portal-Anbindung.
+export async function recordPaid({ eventId, sessionId, email, url, pkg, amount, customerId = null }) {
   await ensureLoaded();
   processedEvents.add(eventId);
-  const rec = { eventId, sessionId, email, url, pkg, amount, status: 'PAID' };
+  const rec = { eventId, sessionId, email, customerId, url, pkg, amount, status: 'PAID' };
   orders.set(sessionId, rec);
   await write(rec);
   return rec;

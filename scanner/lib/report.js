@@ -15,16 +15,16 @@ export function computeScore(violations) {
   let grade, verdict;
   if (score >= 90) {
     grade = 'A';
-    verdict = 'Weitgehend konform — nur Feinschliff noetig.';
+    verdict = 'Weitgehend konform — nur Feinschliff nötig.';
   } else if (score >= 75) {
     grade = 'B';
-    verdict = 'Solide Basis, aber relevante Luecken mit Handlungsbedarf.';
+    verdict = 'Solide Basis, aber relevante Lücken mit Handlungsbedarf.';
   } else if (score >= 50) {
     grade = 'C';
-    verdict = 'Deutliche Maengel — Handlungsbedarf.';
+    verdict = 'Deutliche Mängel — Handlungsbedarf.';
   } else {
     grade = 'D';
-    verdict = 'Kritisch — viele Maengel, dringender Handlungsbedarf.';
+    verdict = 'Kritisch — viele Mängel, dringender Handlungsbedarf.';
   }
   return { score, grade, verdict };
 }
@@ -51,9 +51,9 @@ export function renderReport(
     logo = '',
     reportTitle = 'BFSG-Fix-Plan & Barrierefreiheits-Report',
     pruefnorm = 'WCAG 2.1 A/AA (EN 301 549)',
-    introTitle = 'Was das BFSG fuer Sie bedeutet',
-    introHtml = '<p>Das Barrierefreiheitsstaerkungsgesetz (BFSG) ist seit dem 28.06.2025 in Kraft. Betroffene Unternehmen muessen ihre Websites und Online-Shops barrierefrei gestalten. Dieser Fix-Plan zeigt die konkreten technischen Maengel Ihrer Seite, nach Dringlichkeit priorisiert.</p>',
-    legalHtml = '<strong>Wichtiger Hinweis:</strong> Dieser Fix-Plan ist eine automatisierte technische Erstpruefung auf Basis von axe-core (WCAG 2.1), KI-gestuetzt erstellt und vor Auslieferung menschlich geprueft. Er ist <strong>keine Rechtsberatung</strong> und keine Garantie fuer BFSG-Konformitaet. Automatisierte Tests erkennen erfahrungsgemaess rund 30&ndash;50&nbsp;% aller Barrieren; Aspekte wie Tastaturbedienung im Detail, Vorlese-Logik und Verstaendlichkeit erfordern eine manuelle Ergaenzung. Fuer eine rechtsverbindliche Bewertung ziehen Sie bitte fachkundige Beratung hinzu.',
+    introTitle = 'Was das BFSG für Sie bedeutet',
+    introHtml = '<p>Das Barrierefreiheitsstärkungsgesetz (BFSG) ist seit dem 28.06.2025 in Kraft. Betroffene Unternehmen müssen ihre Websites und Online-Shops barrierefrei gestalten. Dieser Fix-Plan zeigt die konkreten technischen Mängel Ihrer Seite, nach Dringlichkeit priorisiert.</p>',
+    legalHtml = '<strong>Wichtiger Hinweis:</strong> Dieser Fix-Plan ist eine automatisierte technische Erstprüfung auf Basis von axe-core (WCAG 2.1), KI-gestützt erstellt und vor Auslieferung menschlich geprüft. Er ist <strong>keine Rechtsberatung</strong> und keine Garantie für BFSG-Konformität. Automatisierte Tests erkennen erfahrungsgemäß rund 30&ndash;50&nbsp;% aller Barrieren; Aspekte wie Tastaturbedienung im Detail, Vorlese-Logik und Verständlichkeit erfordern eine manuelle Ergänzung. Für eine rechtsverbindliche Bewertung ziehen Sie bitte fachkundige Beratung hinzu.',
     diff = null,
     pagesScanned = null
   } = {}
@@ -81,7 +81,7 @@ export function renderReport(
           <span class="count">${v.nodes.length}&times; betroffen</span>
         </div>
         <p class="why"><strong>Warum kritisch:</strong> ${esc(info.why)}</p>
-        <p class="fix"><strong>Loesung:</strong> ${esc(info.fix)}</p>
+        <p class="fix"><strong>Lösung:</strong> ${esc(info.fix)}</p>
         <details><summary>Betroffene Stellen (Beispiele)</summary>${examples}</details>
       </div>`;
     })
@@ -177,7 +177,7 @@ export function renderReport(
     <div>
       <h1>${esc(reportTitle)}</h1>
       <div class="sub">${company ? '<strong>' + esc(company) + '</strong> &middot; ' : ''}${esc(scan.url)}</div>
-      <div class="sub">Erstellt am ${today} &middot; Pruefnorm: ${esc(pruefnorm)}</div>
+      <div class="sub">Erstellt am ${today} &middot; Prüfnorm: ${esc(pruefnorm)}</div>
       ${pagesHtml}
     </div>
     ${logo ? `<img src="${esc(logo)}" alt="" style="max-height:48px">` : ''}
@@ -188,7 +188,7 @@ export function renderReport(
   <div class="scorecard">
     <div class="grade ${grade}">${grade}</div>
     <div class="scoremeta">
-      <h2>Konformitaets-Score: ${score}/100</h2>
+      <h2>Konformitäts-Score: ${score}/100</h2>
       <p>${esc(verdict)}</p>
     </div>
   </div>
@@ -198,17 +198,17 @@ export function renderReport(
     <div class="kpi serious"><b>${counts.serious}</b><span>Schwerwiegend</span></div>
     <div class="kpi moderate"><b>${counts.moderate}</b><span>Mittel</span></div>
     <div class="kpi minor"><b>${counts.minor}</b><span>Gering</span></div>
-    <div class="kpi"><b>${scan.passes}</b><span>Bestandene Pruefungen</span></div>
+    <div class="kpi"><b>${scan.passes}</b><span>Bestandene Prüfungen</span></div>
   </div>
 
   <h2 class="section">${esc(introTitle)}</h2>
   ${introHtml}
 
   <h2 class="section">Befunde nach Dringlichkeit (${scan.violations.length})</h2>
-  ${findings || '<p>Keine automatisiert erkennbaren Verstoesse gefunden. Eine manuelle Pruefung wird dennoch empfohlen.</p>'}
+  ${findings || '<p>Keine automatisiert erkennbaren Verstöße gefunden. Eine manuelle Prüfung wird dennoch empfohlen.</p>'}
 
   <h2 class="section">Umsetzungs-Checkliste (zum Abarbeiten)</h2>
-  <p>Diese Punkte koennen Ihre Entwickler direkt abarbeiten — nach Dringlichkeit sortiert.</p>
+  <p>Diese Punkte können Ihre Entwickler direkt abarbeiten — nach Dringlichkeit sortiert.</p>
   <ul class="checklist">
   ${
     sorted.length
@@ -218,15 +218,15 @@ export function renderReport(
             return `<li><span class="box">&#9744;</span><span><strong>${esc(info.title)}</strong> (${v.nodes.length}&times;, ${IMPACT_DE[v.impact] || v.impact}) &mdash; ${esc(info.fix)}</span></li>`;
           })
           .join('\n')
-      : '<li>Keine automatisiert erkannten Punkte. Manuelle Pruefung empfohlen.</li>'
+      : '<li>Keine automatisiert erkannten Punkte. Manuelle Prüfung empfohlen.</li>'
   }
   </ul>
 
   <div class="legalbox">${legalHtml}</div>
 
   <footer>
-    BFSG-Audit &middot; Automatisierte Barrierefreiheits-Pruefung &middot;
-    Bestandene Pruefungen: ${scan.passes} &middot; Unklare Punkte (manuell pruefen): ${scan.incomplete}
+    BFSG-Audit &middot; Automatisierte Barrierefreiheits-Prüfung &middot;
+    Bestandene Prüfungen: ${scan.passes} &middot; Unklare Punkte (manuell prüfen): ${scan.incomplete}
   </footer>
 </div>
 </body>

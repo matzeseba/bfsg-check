@@ -57,26 +57,35 @@ const oneLine = (s = '') => String(s).replace(/[\r\n]+/g, ' ').slice(0, 120);
 // TLD min 2 Chars max 63. Fängt häufige Tippfehler ab.
 export const isEmail = (s = '') => /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,63}$/.test(String(s).trim());
 
-// Sendet die passende Variante (BFSG-Erstreport / Cookie-Report / Re-Check mit Diff)
-// auf Basis von emailKind aus PKG_CONFIG.
-export async function sendReportFor({ to, company = '', pdfPath, stmtPath, emailKind = 'bfsg', diffText = '' }) {
-  if (emailKind === 'cookie') {
-    return sendCookieReport({ to, company, pdfPath });
-  }
-  if (emailKind === 'recheck') {
-    return sendRecheckReport({ to, company, pdfPath, diffText });
-  }
-  return sendReport({ to, company, pdfPath, stmtPath });
+// Hängt die selbst erzeugte Rechnungs-PDF (§ 14 UStG) als zusätzlichen Anhang an.
+// Filename trägt die fortlaufende Rechnungsnummer (RE-YYYY-NNNN.pdf), falls bekannt.
+async function pushInvoiceAttachment(attachments, invoicePdfPath, invoiceNumber) {
+  if (!invoicePdfPath) return;
+  const filename = invoiceNumber ? `Rechnung-${invoiceNumber}.pdf` : 'Rechnung.pdf';
+  attachments.push({ filename, content: await readFile(invoicePdfPath) });
 }
 
-export async function sendReport({ to, company = '', pdfPath, stmtPath }) {
+// Sendet die passende Variante (BFSG-Erstreport / Cookie-Report / Re-Check mit Diff)
+// auf Basis von emailKind aus PKG_CONFIG. invoicePdfPath (optional) wird als
+// zusätzlicher Rechnungs-Anhang mitgesendet.
+export async function sendReportFor({ to, company = '', pdfPath, stmtPath, emailKind = 'bfsg', diffText = '', invoicePdfPath = null, invoiceNumber = null }) {
+  if (emailKind === 'cookie') {
+    return sendCookieReport({ to, company, pdfPath, invoicePdfPath, invoiceNumber });
+  }
+  if (emailKind === 'recheck') {
+    return sendRecheckReport({ to, company, pdfPath, diffText, invoicePdfPath, invoiceNumber });
+  }
+  return sendReport({ to, company, pdfPath, stmtPath, invoicePdfPath, invoiceNumber });
+}
+
+export async function sendReport({ to, company = '', pdfPath, stmtPath, invoicePdfPath = null, invoiceNumber = null }) {
   if (!isEmail(to)) throw new Error('Ungültige Empfängeradresse: ' + to);
   const subject = `Ihr BFSG-Barrierefreiheits-Report${company ? ' — ' + oneLine(company) : ''}`;
   const text = `Vielen Dank für Ihre Bestellung.
 
 Im Anhang finden Sie:
 1. Ihren BFSG-Barrierefreiheits-Report (PDF) mit den automatisiert erkannten Mängeln und Lösungshinweisen.
-2. Einen Entwurf Ihrer Erklärung zur Barrierefreiheit (Vorlage zur eigenen Prüfung).
+2. Einen Entwurf Ihrer Erklärung zur Barrierefreiheit (Vorlage zur eigenen Prüfung).${invoicePdfPath ? '\n3. Ihre Rechnung (PDF).' : ''}
 
 Dieser Report ist eine automatisierte technische Erstprüfung nach WCAG 2.1 und
 ersetzt keine vollständige manuelle Prüfung und keine Rechtsberatung.
@@ -94,18 +103,19 @@ ${FROM_NAME}`;
       filename: 'Barrierefreiheitserklaerung.txt',
       content: await readFile(stmtPath)
     });
+  await pushInvoiceAttachment(attachments, invoicePdfPath, invoiceNumber);
 
   return deliver({ to, subject, text, attachments });
 }
 
-export async function sendCookieReport({ to, company = '', pdfPath }) {
+export async function sendCookieReport({ to, company = '', pdfPath, invoicePdfPath = null, invoiceNumber = null }) {
   if (!isEmail(to)) throw new Error('Ungültige Empfängeradresse: ' + to);
   const subject = `Ihr Cookie- & Consent-Report (§ 25 TDDDG)${company ? ' — ' + oneLine(company) : ''}`;
   const text = `Vielen Dank für Ihre Bestellung.
 
 Im Anhang finden Sie Ihren Cookie- & Consent-Report (PDF): welche Tracker und
 Cookies VOR einer Einwilligung auf Ihrer Seite feuern (§ 25 TDDDG / DSGVO),
-mit konkretem Handlungsvorschlag pro Fund.
+mit konkretem Handlungsvorschlag pro Fund.${invoicePdfPath ? '\nZusätzlich liegt Ihre Rechnung (PDF) bei.' : ''}
 
 Dieser Report ist eine automatisierte technische Einzelmessung ohne
 Banner-Interaktion. Er ersetzt keine vollständige manuelle Prüfung und keine
@@ -118,10 +128,11 @@ ${FROM_NAME}`;
 
   const attachments = [];
   if (pdfPath) attachments.push({ filename: 'Cookie-Report.pdf', content: await readFile(pdfPath) });
+  await pushInvoiceAttachment(attachments, invoicePdfPath, invoiceNumber);
   return deliver({ to, subject, text, attachments });
 }
 
-export async function sendRecheckReport({ to, company = '', pdfPath, diffText = '' }) {
+export async function sendRecheckReport({ to, company = '', pdfPath, diffText = '', invoicePdfPath = null, invoiceNumber = null }) {
   if (!isEmail(to)) throw new Error('Ungültige Empfängeradresse: ' + to);
   const subject = `Ihr monatlicher BFSG-Re-Check${company ? ' — ' + oneLine(company) : ''}`;
   const text = `Hier ist Ihr aktueller Re-Check.
@@ -130,7 +141,7 @@ VERÄNDERUNGEN SEIT LETZTEM SCAN
 ${diffText || 'Keine Veränderungen erkannt.'}
 
 Den vollständigen Report mit allen aktuellen Befunden und Lösungshinweisen
-finden Sie im Anhang.
+finden Sie im Anhang.${invoicePdfPath ? ' Ihre Rechnung liegt ebenfalls bei.' : ''}
 
 Sie können Ihr Abo jederzeit über /kuendigen.html beenden.
 
@@ -139,6 +150,7 @@ ${FROM_NAME}`;
 
   const attachments = [];
   if (pdfPath) attachments.push({ filename: 'BFSG-Recheck.pdf', content: await readFile(pdfPath) });
+  await pushInvoiceAttachment(attachments, invoicePdfPath, invoiceNumber);
   return deliver({ to, subject, text, attachments });
 }
 

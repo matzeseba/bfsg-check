@@ -1,6 +1,6 @@
-// Generiert einen Entwurf der gesetzlich geforderten "Erklaerung zur
+// Generiert einen Entwurf der gesetzlich geforderten "Erklärung zur
 // Barrierefreiheit" (Pflichtbestandteil nach BFSG / BITV). Liefert ein
-// vorausgefuelltes Geruest, das der Seitenbetreiber finalisieren muss.
+// vorausgefülltes Gerüst, das der Seitenbetreiber finalisieren muss.
 
 import { computeScore } from './report.js';
 
@@ -14,48 +14,48 @@ export function renderStatement(scan, { company = '[Unternehmen]', email = '[E-M
         : 'nicht konform';
   const today = new Date().toLocaleDateString('de-DE');
 
-  return `# Erklaerung zur Barrierefreiheit
+  return `# Erklärung zur Barrierefreiheit
 
-**${company}** ist bemueht, die Website ${scan.url} im Einklang mit dem
-Barrierefreiheitsstaerkungsgesetz (BFSG) und der Barrierefreie-Informationstechnik-
-Verordnung (BITV 2.0) barrierefrei zugaenglich zu machen.
+**${company}** ist bemüht, die Website ${scan.url} im Einklang mit dem
+Barrierefreiheitsstärkungsgesetz (BFSG) und der Barrierefreie-Informationstechnik-
+Verordnung (BITV 2.0) barrierefrei zugänglich zu machen.
 
 ## Stand der Vereinbarkeit mit den Anforderungen
 
 Diese Website ist mit den Anforderungen der WCAG 2.1 auf Stufe AA **${status}**.
 
-Grundlage dieser Einschaetzung ist eine automatisierte Pruefung vom ${today}
-(Konformitaets-Score: ${score}/100), ergaenzungsbeduerftig durch eine manuelle
+Grundlage dieser Einschätzung ist eine automatisierte Prüfung vom ${today}
+(Konformitäts-Score: ${score}/100), ergänzungsbedürftig durch eine manuelle
 Bewertung.
 
 ## Nicht barrierefreie Inhalte
 
-Die nachstehenden Inhalte sind aus folgenden Gruenden noch nicht barrierefrei:
+Die nachstehenden Inhalte sind aus folgenden Gründen noch nicht barrierefrei:
 
 ${scan.violations.length === 0
-  ? '- Es wurden in der automatisierten Pruefung keine Verstoesse festgestellt. Eine manuelle Pruefung steht aus.'
+  ? '- Es wurden in der automatisierten Prüfung keine Verstöße festgestellt. Eine manuelle Prüfung steht aus.'
   : scan.violations
       .slice(0, 12)
       .map((v) => `- ${v.help} (WCAG-Bezug: ${(v.tags || []).filter((t) => t.startsWith('wcag')).join(', ') || 'n/a'})`)
       .join('\n')}
 
-## Erstellung dieser Erklaerung
+## Erstellung dieser Erklärung
 
-Diese Erklaerung wurde am ${today} erstellt. Die Bewertung beruht auf einer
-automatisierten Selbstpruefung.
+Diese Erklärung wurde am ${today} erstellt. Die Bewertung beruht auf einer
+automatisierten Selbstprüfung.
 
 ## Feedback und Kontakt
 
-Sind Ihnen Maengel beim barrierefreien Zugang aufgefallen? Kontaktieren Sie uns:
+Sind Ihnen Mängel beim barrierefreien Zugang aufgefallen? Kontaktieren Sie uns:
 **${email}**
 
 ## Durchsetzungsverfahren
 
-Sollten wir auf Ihre Meldung nicht zufriedenstellend reagieren, koennen Sie sich
-an die zustaendige Schlichtungs- bzw. Marktueberwachungsstelle wenden.
+Sollten wir auf Ihre Meldung nicht zufriedenstellend reagieren, können Sie sich
+an die zuständige Schlichtungs- bzw. Marktüberwachungsstelle wenden.
 
 ---
-*Entwurf, erstellt durch automatisierte Vorpruefung. Vor Veroeffentlichung durch
-den Seitenbetreiber zu pruefen und zu vervollstaendigen. Keine Rechtsberatung.*
+*Entwurf, erstellt durch automatisierte Vorprüfung. Vor Veröffentlichung durch
+den Seitenbetreiber zu prüfen und zu vervollständigen. Keine Rechtsberatung.*
 `;
 }
