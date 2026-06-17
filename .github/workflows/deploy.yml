@@ -52,11 +52,22 @@ jobs:
             echo "=== docker compose up -d --build ==="
             docker compose up -d --build
 
-            # Caddy nutzt Bind-Mount-Config → kein Auto-Recreate bei Caddyfile-Änderung.
-            # Graceful Reload, Fallback force-recreate.
-            echo "=== Caddy-Reload ==="
-            docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile \
-              || docker compose up -d --force-recreate caddy
+            # Override aus Phase-1-Ära entfernen falls vorhanden (würde Caddy-Mount kapern).
+            echo "=== Override-Check ==="
+            ls -la docker-compose.override.yml 2>/dev/null && rm -f docker-compose.override.yml && echo "override entfernt" || echo "kein override"
+
+            # Caddy IMMER force-recreate (Bind-Mount-Config wird sonst nicht übernommen).
+            echo "=== Caddy force-recreate ==="
+            docker compose up -d --force-recreate caddy
+
+            echo "=== DIAGNOSE: Welches Caddyfile sieht der Container? ==="
+            docker compose exec -T caddy sh -c 'sed -n "1,55p" /etc/caddy/Caddyfile' || echo "(exec failed)"
+            echo "=== DIAGNOSE: Was liefert landing-next intern? ==="
+            docker compose exec -T caddy sh -c 'wget -qO- --timeout=5 http://landing-next:3000/ | head -c 300' || echo "(landing-next unreachable from caddy)"
+            echo ""
+            echo "=== DIAGNOSE: Was liefert / via Caddy lokal? ==="
+            curl -sS --max-time 5 -H "Host: bfsg-fix.de" http://localhost/ | head -c 300 || true
+            echo ""
 
             echo "=== Health-Check ==="
             sleep 8
