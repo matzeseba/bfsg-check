@@ -35,10 +35,17 @@ export function mailerStatus() {
   return enabled ? 'aktiv (SMTP konfiguriert)' : 'DRY-RUN (kein SMTP — es wird nichts versendet)';
 }
 
+// Live-Modus für Stripe-Keys: erkennt sowohl Secret-Keys (sk_live) als auch
+// Restricted-Keys (rk_live). Vorher wurden rk_live-Keys fälschlich als Test-Modus
+// gewertet, sodass /health live:false zeigte und Fail-Fast übersprungen wurde.
+export function isStripeLive() {
+  const k = process.env.STRIPE_SECRET_KEY || '';
+  return k.startsWith('sk_live') || k.startsWith('rk_live');
+}
+
 // Fail-fast: im Live-Betrieb ohne SMTP nicht starten.
 export function requireMailerOrExit() {
-  const live = (process.env.STRIPE_SECRET_KEY || '').startsWith('sk_live');
-  if (live && !enabled) {
+  if (isStripeLive() && !enabled) {
     console.error('[FATAL] Stripe ist LIVE, aber SMTP ist nicht konfiguriert. ' +
       'Bezahlte Reports könnten nicht versendet werden. Start abgebrochen.');
     process.exit(1);
@@ -46,7 +53,9 @@ export function requireMailerOrExit() {
 }
 
 const oneLine = (s = '') => String(s).replace(/[\r\n]+/g, ' ').slice(0, 120);
-const isEmail = (s = '') => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+// Schärfere E-Mail-Validierung als RFC-light: erlaubt nur sinnvolle Zeichen,
+// TLD min 2 Chars max 63. Fängt häufige Tippfehler ab.
+export const isEmail = (s = '') => /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,63}$/.test(String(s).trim());
 
 // Sendet die passende Variante (BFSG-Erstreport / Cookie-Report / Re-Check mit Diff)
 // auf Basis von emailKind aus PKG_CONFIG.
