@@ -10,10 +10,12 @@ on:
     branches: [main]
     paths:
       - 'scanner/**'
-      - 'landingpage/**'
+      - 'landingpage/**'        # alte statische HTML (Volume-Mount-Fallback für /danke.html)
+      - 'landingpage-next/**'   # Next.js Premium-Landing
+      - 'admin-next/**'         # Admin-Dashboard
       - 'deployment/**'
       - '.github/workflows/deploy.yml'
-  workflow_dispatch:  # Manueller Trigger via "Run workflow"
+  workflow_dispatch:
 
 concurrency:
   group: deploy-production
