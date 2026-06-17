@@ -25,11 +25,18 @@ services:
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - ENABLE_ABO=${ENABLE_ABO:-false}
       - MAX_CONCURRENT_SCANS=${MAX_CONCURRENT_SCANS:-2}
+      - ADMIN_TOKEN=${ADMIN_TOKEN:-}
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      - VAT_MODE=${VAT_MODE:-kleinunternehmer}
+      - INVOICE_FROM_NAME=${INVOICE_FROM_NAME:-}
+      - INVOICE_FROM_ADDRESS=${INVOICE_FROM_ADDRESS:-}
+      - INVOICE_USTID=${INVOICE_USTID:-}
+      - INVOICE_TAX_NUMBER=${INVOICE_TAX_NUMBER:-}
+      - INVOICE_IBAN=${INVOICE_IBAN:-}
     volumes:
       - bfsg_data:/app/out
-      # Statische Landing-Page als Read-Only-Mount (app.js liest ../landingpage relativ zu /app).
+      # Statische Landing-Page (Fallback für /danke.html + Backward-Compat).
       - ../landingpage:/landingpage:ro
-    # Zusätzliches /dev/shm für Chromium (komplementär zu --disable-dev-shm-usage in scan*.js).
     shm_size: 1gb
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://localhost:8080/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
@@ -37,6 +44,52 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+
+  # Next.js-Landingpage (löst alte statische HTML ab, Caddy routet bfsg-fix.de hierhin).
+  landing-next:
+    build:
+      context: ../landingpage-next
+      dockerfile: Dockerfile
+    container_name: bfsg-landing-next
+    restart: unless-stopped
+    expose:
+      - "3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      - app
+
+  # Admin-Dashboard (admin.bfsg-fix.de, Auth-Layer in Welle 5).
+  admin-next:
+    build:
+      context: ../admin-next
+      dockerfile: Dockerfile
+    container_name: bfsg-admin-next
+    restart: unless-stopped
+    expose:
+      - "3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - HOSTNAME=0.0.0.0
+      - ADMIN_TOKEN=${ADMIN_TOKEN:-}
+      - BFSG_API_URL=http://app:8080
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3001/').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      - app
 
   caddy:
     image: caddy:2-alpine
@@ -52,8 +105,10 @@ services:
       - caddy_config:/config
     depends_on:
       - app
+      - landing-next
+      - admin-next
 
 volumes:
-  bfsg_data:    # /app/out — orders.jsonl + subscriptions.jsonl + generierte PDFs
+  bfsg_data:    # /app/out — orders.jsonl + subscriptions.jsonl + invoices/ + dsgvo-tokens.jsonl
   caddy_data:   # Let's-Encrypt-Zertifikate
   caddy_config:
