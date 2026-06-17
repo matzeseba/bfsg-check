@@ -154,11 +154,11 @@ export const PACKAGES: PackageConfig[] = [
     id: "abo",
     name: "BFSG Re-Check Abo",
     tag: "Abo",
-    price: "49 €",
+    price: "39 €",
     priceSuffix: "/Monat",
     description: "Dauerhafte Überwachung",
     mode: "subscription",
-    amountCents: 4900,
+    amountCents: 3900,
     available: false, // Backend ENABLE_ABO=false → noch nicht kaufbar. Auf true, sobald Abo live.
     moneyBack: "Jederzeit zum Monatsende kündbar",
     features: [
