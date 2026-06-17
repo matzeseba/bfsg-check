@@ -66,7 +66,7 @@ export function Footer() {
           <div>
             <Link
               href="/"
-              className="inline-flex items-center gap-2.5 font-display text-lg font-semibold tracking-tight"
+              className="inline-flex min-h-11 items-center gap-2.5 py-2 font-display text-lg font-semibold tracking-tight"
             >
               <span
                 aria-hidden
@@ -157,14 +157,14 @@ export function Footer() {
             <button
               type="button"
               onClick={resetConsent}
-              className="rounded-md px-2 py-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+              className="inline-flex min-h-11 items-center rounded-md px-3 text-muted-foreground hover:bg-muted hover:text-foreground"
             >
               Cookie-Einstellungen
             </button>
             <a
               href="https://www.linkedin.com/company/bfsg-check"
               aria-label="BFSG-Check auf LinkedIn"
-              className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+              className="inline-flex size-11 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
             >
               <svg
                 viewBox="0 0 24 24"
@@ -178,7 +178,7 @@ export function Footer() {
             <a
               href="https://x.com/bfsgcheck"
               aria-label="BFSG-Check auf X"
-              className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+              className="inline-flex size-11 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
             >
               <svg
                 viewBox="0 0 24 24"

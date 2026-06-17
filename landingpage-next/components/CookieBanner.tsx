@@ -169,11 +169,17 @@ export function CookieBanner() {
             type="button"
             variant="outline"
             size="lg"
+            className="min-h-11"
             onClick={() => setConsent(false)}
           >
             Nur notwendige
           </Button>
-          <Button type="button" size="lg" onClick={() => setConsent(true)}>
+          <Button
+            type="button"
+            size="lg"
+            className="min-h-11"
+            onClick={() => setConsent(true)}
+          >
             Alle akzeptieren
           </Button>
         </div>
