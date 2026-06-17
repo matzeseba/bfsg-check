@@ -1,6 +1,15 @@
 # Pricing-Experimente — 5 A/B-Tests (Q3/Q4 2026)
 
 > **Ziel:** Preis-Elastizität, Bundle-Wirkung und Payment-Mix mit echten Kunden empirisch klären, nicht nur raten.
+>
+> **Test-Priorisierung (nach Wettbewerbsanalyse, siehe `docs/PRICING-STRATEGY.md` §6):**
+> 1. **Exp. 4 — Abo 49 € vs. 39 €** (größter strategischer Hebel: Abo ist gegen BFSGuard 19,99 €/Mo am schwächsten; Variante B angepasst → Jahresoption statt Setup-Fee)
+> 2. **Exp. 3 — Bundle BFSG+Cookie 229 €** (umsetzungsreifer AOV-Hebel, niedriges Risiko)
+> 3. **Exp. 1 — Basis 199 € vs. 249 €** (Margen-Hebel auf Volumen-Produkt)
+> 4. **Exp. 2 — Profi 499 € vs. 599 €** (niedriges Volumen → später)
+> 5. **Exp. 5 — Payment-Mix** (preisunabhängig, jederzeit parallel)
+> Plus neu: **Exp. 6 (Anchoring-Tier)** und **Exp. 7 (Jahresrabatt-Frame)** — siehe unten.
+>
 > **Globale Regeln:**
 > - Max. 2 Tests parallel (sonst zerfasern die Cohorts).
 > - Min. Laufzeit pro Test: 4 Wochen oder bis 95 % statistische Signifikanz erreicht (was zuerst eintritt).
@@ -67,19 +76,22 @@
 
 ---
 
-## Experiment 4 — Abo: 49 €/Mo vs. 39 €/Mo + 5 € Setup
+## Experiment 4 — Abo: 49 €/Mo vs. 39 €/Mo (+ Jahresoption 390 €/Jahr) ⭐ PRIO 1
 
-- **Hypothese:** „Der niedrigere Monatspreis senkt psychologische Eintrittsschwelle. Setup-Fee deckt Bonitäts-/Onboarding-Risiko ab. Brutto-Abo-Conversion steigt um > 30 %, ohne dass LTV-pro-Kunde sinkt."
-- **Variante A (Kontrolle):** 49 €/Mo, kein Setup-Fee.
-- **Variante B (Test):** 39 €/Mo + 5 € einmaliges Setup-Fee.
+> **Angepasst (06/2026, `docs/PRICING-STRATEGY.md` §3.3):** Setup-Fee verworfen (erhöht Reibung). Stattdessen Preis-Senkung + Jahres-Lock-in. Begründung: Abo ist im Wettbewerb (BFSGuard Starter 19,99 €/Mo für 3 Sites, inkl. Auto-Fix + Monitoring) am schwächsten positioniert; das Abo ist zugleich der MRR-Motor.
+
+- **Hypothese:** „Der niedrigere Monatspreis (39 €) senkt die psychologische Eintrittsschwelle und erhöht die Report→Abo-Überführungsrate um > 30 %, ohne dass der 6-Monats-LTV sinkt. Die Jahresoption sichert Cashflow + LTV."
+- **Variante A (Kontrolle):** 49 €/Mo, keine Jahresoption.
+- **Variante B (Test):** 39 €/Mo **+ Jahresoption 390 €/Jahr** („2 Monate gratis").
 - **Erfolgs-Kriterium:**
-  - Sign-up-Rate (B) > 1,3 × A bei 95 % Konfidenz.
-  - 6-Monats-LTV (B) ≥ 0,95 × A (Variante B darf maximal 5 % LTV-Reduktion bringen).
+  - Sign-up-/Überführungs-Rate (B) > 1,3 × A bei 95 % Konfidenz.
+  - 6-Monats-LTV (B) ≥ 0,95 × A (max. 5 % LTV-Reduktion; Jahresabschlüsse zählen anteilig).
+  - Sekundär: Jahresplan-Anteil ≥ 20 % der B-Abschlüsse (Cashflow-Effekt).
 - **Tooling:**
   - Posthog Flag `abo.pricing = 'A'|'B'`.
-  - Stripe Subscription mit zwei Plänen + One-time Item für Setup.
-  - LTV-Modell: Stripe-Revenue/Kunde über 6 Mo, gewichtet nach Cohort.
-- **Tracking-Setup:** Events `abo_view`, `abo_signed`, monatliches Snapshot der Cohort-Retention.
+  - Stripe Subscription: Plan 4900/Mo (A) bzw. 3900/Mo + 39000/Jahr (B).
+  - LTV-Modell: Stripe-Revenue/Kunde über 6 Mo, gewichtet nach Cohort, Jahresumsatz auf 12 Mo verteilt.
+- **Tracking-Setup:** Events `abo_view`, `abo_signed` (mit `plan: monthly|yearly`), monatliches Snapshot der Cohort-Retention.
 - **Laufzeit:** 12 Wochen (Subscription braucht Zeit für LTV-Aussage).
 - **Roll-back-Plan:** Wenn Churn nach Monat 2 in Variante B > Variante A + 5 pp → Sofort-Stop.
 
@@ -100,6 +112,42 @@
 - **Tracking-Setup:** Events `checkout_started`, `checkout_method_selected` (mit `method`), `purchase_completed` (mit `method` + `fee_eur`).
 - **Laufzeit:** 4 Wochen.
 - **Roll-back-Plan:** Wenn Klarna-Rückbuchungsquote > 3 % → Klarna allein deaktivieren, PayPal behalten.
+
+---
+
+## Experiment 6 — Anchoring: Pakete-Grid mit vs. ohne Agentur-Tier
+
+> **Neu (06/2026, `docs/PRICING-STRATEGY.md` §3.4 + §6).** Testet, ob ein sichtbarer High-Anchor („Agentur ab 990 €") den Produkt-Mix Richtung Profi verschiebt.
+
+- **Hypothese:** „Ein sichtbares Agentur-Tier (ab 990 €) im/über dem Pakete-Grid wirkt als Preis-Anker und erhöht den Profi-Anteil (Mix-Shift Basis→Profi), sodass der AOV um ≥ 8 % steigt — ohne die Gesamt-Conversion zu senken."
+- **Variante A (Kontrolle):** Pakete-Grid nur Basis/Profi/Abo (Agentur nur auf separater `/agentur`-Seite).
+- **Variante B (Test):** Zusätzlich „Agentur ab 990 €"-Karte als vierter, optisch abgesetzter Anker im Grid.
+- **Erfolgs-Kriterium:**
+  - AOV (B) > 1,08 × A bei 95 % Konfidenz.
+  - Gesamt-Conversion (B) ≥ 0,97 × A (Anker darf KMU nicht abschrecken).
+  - Sekundär: Profi-Anteil an allen Report-Käufen (B) > A.
+- **Tooling:** Posthog Flag `grid.anchor = 'off'|'on'`; Pakete-Component rendert vierte Karte je nach Flag.
+- **Tracking-Setup:** Events `pricing_view` (mit `variant`), `package_selected` (mit `package`), `purchase_completed` (mit `package` + `amount`).
+- **Laufzeit:** 4 Wochen.
+- **Roll-back-Plan:** Wenn Gesamt-Conversion (B) > 5 % unter A → Anker raus aus Grid (zurück auf separate Seite).
+
+---
+
+## Experiment 7 — Abo-Jahresrabatt: „2 Monate gratis" vs. „20 % Rabatt"
+
+> **Neu (06/2026, `docs/PRICING-STRATEGY.md` §6).** Frame-Test bei (nahezu) gleichem effektivem Rabatt.
+
+- **Hypothese:** „Der Frame ‚2 Monate gratis' (390 €/Jahr) konvertiert besser als ‚20 % Rabatt' (374 €/Jahr) — trotz minimal höherem Preis, weil ‚gratis' stärker zieht als ein Prozent-Rabatt."
+- **Variante A:** Jahresplan beworben als „20 % sparen" → 374 €/Jahr.
+- **Variante B:** Jahresplan beworben als „2 Monate gratis" → 390 €/Jahr.
+- **Erfolgs-Kriterium:**
+  - Jahresplan-Take-Rate (B) ≥ A bei 95 % Konfidenz (B gewinnt schon bei Gleichstand, da höherer Preis = mehr Umsatz/Abschluss).
+  - Net-Revenue pro Abo-Abschluss (B) > A.
+- **Tooling:** Posthog Flag `abo.annual_frame = 'percent'|'free_months'`; Stripe-Price 37400 (A) vs. 39000 (B) für Jahresplan.
+- **Tracking-Setup:** Events `abo_view`, `abo_signed` (mit `plan` + `frame` + `amount`).
+- **Laufzeit:** 8 Wochen (Jahresabschlüsse sind seltener → längere Sample-Zeit).
+- **Roll-back-Plan:** Wenn Jahres-Take-Rate in beiden Varianten < 10 % → Jahresplan-Bewerbung überdenken (nicht der Frame, sondern das Angebot ist das Problem).
+- **Abhängigkeit:** Erst starten, wenn Exp. 4 die Jahresoption grundsätzlich validiert hat.
 
 ---
 
