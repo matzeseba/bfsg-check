@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Loader2Icon, SearchIcon } from "lucide-react";
+import { ArrowRightIcon, Loader2Icon, ScanLineIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -62,53 +62,63 @@ export function ScanForm({ initialUrl = "", variant = "hero" }: ScanFormProps) {
     }
   }
 
+  const inputWrapper =
+    variant === "hero"
+      ? "flex flex-col gap-1.5 sm:flex-row sm:items-center"
+      : "flex flex-col gap-1.5 sm:flex-row sm:items-center";
+
   return (
     <div className="flex w-full flex-col gap-4">
       <form
         onSubmit={onSubmit}
-        className={
-          variant === "hero"
-            ? "flex flex-col gap-3 sm:flex-row"
-            : "flex flex-col gap-2 sm:flex-row"
-        }
+        className="group/scan relative rounded-2xl border border-border/70 bg-card/85 p-1.5 shadow-card-soft backdrop-blur transition-all focus-within:border-brand-mint/60 focus-within:shadow-glow-mint"
         noValidate
       >
-        <div className="flex-1">
-          <Label htmlFor="scan-url" className="sr-only">
-            Website-Adresse
-          </Label>
-          <Input
-            id="scan-url"
-            name="url"
-            type="url"
-            inputMode="url"
-            required
-            placeholder={HERO.placeholder}
-            value={url}
-            onChange={(event) => setUrl(event.target.value)}
-            className="h-12 text-base"
-            autoComplete="url"
-          />
+        <div className={inputWrapper}>
+          <div className="flex flex-1 items-center gap-2 px-3">
+            <ScanLineIcon
+              className="size-4 shrink-0 text-muted-foreground"
+              aria-hidden
+            />
+            <Label htmlFor="scan-url" className="sr-only">
+              Website-Adresse
+            </Label>
+            <Input
+              id="scan-url"
+              name="url"
+              type="url"
+              inputMode="url"
+              required
+              placeholder={HERO.placeholder}
+              value={url}
+              onChange={(event) => setUrl(event.target.value)}
+              className="h-12 flex-1 border-0 bg-transparent px-0 text-base shadow-none focus-visible:ring-0"
+              autoComplete="url"
+            />
+          </div>
+          <Button
+            type="submit"
+            size="lg"
+            disabled={loading || !url}
+            className="h-12 shrink-0 gap-1.5 rounded-xl bg-brand-mint px-5 text-base font-semibold text-brand-deep transition-transform hover:bg-brand-mint/85 hover:scale-[1.015] disabled:opacity-60"
+          >
+            {loading ? (
+              <>
+                <Loader2Icon className="animate-spin" />
+                <span>Prüfe…</span>
+              </>
+            ) : (
+              <>
+                <span>{HERO.cta}</span>
+                <ArrowRightIcon className="size-4" />
+              </>
+            )}
+          </Button>
         </div>
-        <Button
-          type="submit"
-          size="lg"
-          disabled={loading || !url}
-          className="h-12 px-6 text-base"
-        >
-          {loading ? (
-            <>
-              <Loader2Icon className="animate-spin" />
-              Prüfe...
-            </>
-          ) : (
-            <>
-              <SearchIcon />
-              {HERO.cta}
-            </>
-          )}
-        </Button>
       </form>
+      <p className="px-1 text-xs text-muted-foreground">
+        Kostenlos · ohne Anmeldung · ohne Tracker. Bei Bestellung Stripe-Checkout.
+      </p>
       {error && (
         <p className="text-xs text-muted-foreground" role="status">
           {error}
