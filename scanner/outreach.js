@@ -11,8 +11,18 @@
 // Regeln (UWG/DSGVO). Vor Versand pruefen: berechtigtes Interesse, klarer
 // Bezug, einfache Abmeldung, Impressum. Siehe ../legal/disclaimer.md.
 
-import { scanUrl } from './lib/scan.js';
-import { renderTeaser } from './lib/report.js';
+// HARD-STOP (UWG §7) — zwingender ENV-Gate VOR jedem Import/Side-Effect.
+// Verhindert, dass auch nur Module geladen werden, wenn der Opt-in nicht
+// dokumentiert ist. Greift fuer ESM mit top-level statements vor `import`-
+// Auswertung NICHT — deshalb zusaetzlich am Anfang von main() abgesichert.
+if (process.env.OUTREACH_OPTIN_CONFIRMED !== 'true') {
+  console.error('[outreach] DEAKTIVIERT — UWG §7 verbietet B2B-Cold-Mails in DE ohne Einwilligung.');
+  console.error('[outreach] Setze OUTREACH_OPTIN_CONFIRMED=true NUR wenn dokumentierte Opt-ins vorliegen.');
+  process.exit(2);
+}
+
+const { scanUrl } = await import('./lib/scan.js');
+const { renderTeaser } = await import('./lib/report.js');
 
 function emailFrom(teaser, company) {
   const name = company || teaser.url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
@@ -88,6 +98,13 @@ zur internen Analyse. Versand auf eigenes Rechtsrisiko.
 `;
 
 async function main() {
+  // HARD-STOP (UWG §7) — zwingender ENV-Gate vor jeder weiteren Verarbeitung.
+  if (process.env.OUTREACH_OPTIN_CONFIRMED !== 'true') {
+    console.error('[outreach] DEAKTIVIERT — UWG §7 verbietet B2B-Cold-Mails in DE ohne Einwilligung.');
+    console.error('[outreach] Setze OUTREACH_OPTIN_CONFIRMED=true NUR wenn dokumentierte Opt-ins vorliegen.');
+    process.exit(2);
+  }
+
   const argv = process.argv.slice(2);
   if (!argv.includes('--einwilligung-liegt-vor')) {
     console.error(RECHTS_WARNUNG);
