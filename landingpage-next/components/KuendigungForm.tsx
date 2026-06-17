@@ -26,7 +26,14 @@ export function KuendigungForm() {
       const response = await fetch("/api/kuendigung", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, subscriptionId, effective }),
+        // Backend (scanner/app.js) erwartet { name, email, vertrag }.
+        // vertrag = Abo-/Vertragsreferenz; effective ergaenzt den Wunschzeitpunkt.
+        body: JSON.stringify({
+          name,
+          email,
+          vertrag: subscriptionId,
+          effective,
+        }),
       });
       if (!response.ok) throw new Error("api");
       setStatus("success");

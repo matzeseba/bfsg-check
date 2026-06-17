@@ -79,7 +79,7 @@ const products: ProductInput[] = [
   {
     name: "BFSG-Re-Check-Abo",
     description:
-      "Wöchentliches Re-Audit Ihrer Website mit Veränderungs-Report. Sofortige Warnung, wenn neue Inhalte Sie aus der Compliance werfen.",
+      "Monatliches Re-Audit Ihrer Website mit Veränderungs-Report. Sofortige Warnung, wenn neue Inhalte Sie aus der Compliance werfen.",
     price: "49.00",
     priceSpecification: {
       "@type": "UnitPriceSpecification",
@@ -165,7 +165,7 @@ const faqs: Array<{ question: string; answer: string }> = [
   {
     question: "Brauche ich nach einem Fix einen erneuten Scan?",
     answer:
-      "Ja — Barrierefreiheit ist kein einmaliger Zustand, sondern ein Prozess. Neue Inhalte, Theme-Updates oder Drittanbieter-Scripts können bestehende Compliance kippen. Das Re-Check-Abo prüft Ihre Website wöchentlich automatisch.",
+      "Ja — Barrierefreiheit ist kein einmaliger Zustand, sondern ein Prozess. Neue Inhalte, Theme-Updates oder Drittanbieter-Scripts können bestehende Compliance kippen. Das Re-Check-Abo prüft Ihre Website monatlich automatisch.",
   },
   {
     question: "Können Sie meine Fixes auch direkt umsetzen?",

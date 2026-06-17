@@ -49,7 +49,11 @@ export default function AgbPage() {
         Verbraucherinnen und Verbraucher haben ein 14-tägiges Widerrufsrecht.
         Bei digitalen Inhalten erlischt dieses mit ausdrücklicher Zustimmung
         zur sofortigen Ausführung und vollständiger Vertragserfüllung. Details
-        in der Widerrufsbelehrung; Erklärung über{" "}
+        in der{" "}
+        <a href="/widerrufsbelehrung" className="underline">
+          Widerrufsbelehrung
+        </a>
+        ; Erklärung über{" "}
         <a href="/widerruf" className="underline">/widerruf</a>.
       </p>
 

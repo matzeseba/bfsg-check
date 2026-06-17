@@ -64,13 +64,13 @@ export function Header() {
           className="ml-2 hidden flex-1 items-center gap-1 md:flex"
         >
           {NAV_LINKS.map((link) => (
-            <a
+            <Link
               key={link.href}
               href={link.href}
               className="relative rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -81,7 +81,7 @@ export function Header() {
           <Button
             size="lg"
             className="bg-brand-mint text-brand-deep hover:bg-brand-mint/85"
-            render={<a href="#scan" />}
+            render={<Link href="/#scan" />}
           >
             Gratis prüfen
             <ArrowRightIcon className="ml-0.5 size-4" />
@@ -106,14 +106,14 @@ export function Header() {
             className="mx-auto flex max-w-6xl flex-col gap-1 px-5 py-4"
           >
             {NAV_LINKS.map((link) => (
-              <a
+              <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setOpen(false)}
                 className="rounded-lg px-3 py-2.5 text-base font-medium text-foreground hover:bg-muted"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
             <div className="mt-3 flex flex-col gap-2 border-t border-border/60 pt-3">
               <Button
@@ -128,7 +128,7 @@ export function Header() {
               <Button
                 size="lg"
                 className="bg-brand-mint text-brand-deep hover:bg-brand-mint/85"
-                render={<a href="#scan" onClick={() => setOpen(false)} />}
+                render={<Link href="/#scan" onClick={() => setOpen(false)} />}
               >
                 Gratis prüfen
                 <ArrowRightIcon className="ml-0.5 size-4" />

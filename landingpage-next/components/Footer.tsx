@@ -18,10 +18,10 @@ const COLUMNS = [
   {
     title: "Produkt",
     links: [
-      { href: "#pakete", label: "BFSG-Pakete" },
-      { href: "#cookie", label: "Cookie-Check" },
-      { href: "#ablauf", label: "Wie es funktioniert" },
-      { href: "#faq", label: "FAQ" },
+      { href: "/#pakete", label: "BFSG-Pakete" },
+      { href: "/#cookie", label: "Cookie-Check" },
+      { href: "/#ablauf", label: "Wie es funktioniert" },
+      { href: "/#faq", label: "FAQ" },
     ],
   },
   {
@@ -31,13 +31,14 @@ const COLUMNS = [
       { href: "/datenschutz", label: "Datenschutz" },
       { href: "/agb", label: "AGB" },
       { href: "/widerruf", label: "Widerruf" },
+      { href: "/widerrufsbelehrung", label: "Widerrufsbelehrung" },
     ],
   },
   {
     title: "Konto",
     links: [
       { href: "/kuendigen", label: "Vertrag kündigen" },
-      { href: "/datenschutz", label: "Datenauskunft" },
+      { href: "/datenschutz/anfrage", label: "Datenauskunft" },
     ],
   },
 ] as const;
