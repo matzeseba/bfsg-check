@@ -20,12 +20,15 @@ export type PackageConfig = {
   mode: "payment" | "subscription";
   amountCents: number;
   moneyBack?: string;
+  // false = Paket beworben, aber noch nicht kaufbar (Backend-Gate, z.B. ENABLE_ABO=false).
+  // CTA zeigt dann "Bald verfügbar" statt einen 400-Checkout auszulösen.
+  available?: boolean;
 };
 
 export const SITE = {
   url: "https://bfsg-fix.de",
   name: "BFSG-Check",
-  title: "BFSG-Check — Ist Ihre Website abmahnsicher? | Kostenlose Sofort-Prüfung",
+  title: "BFSG-Check — Ist Ihre Website BFSG-konform? | Kostenlose Sofort-Prüfung",
   description:
     "Prüfen Sie in 60 Sekunden, ob Ihre Website das Barrierefreiheitsstärkungsgesetz (BFSG) erfüllt. Kostenloser Sofort-Check, ausführlicher Report auf Wunsch.",
   email: "hallo@bfsg-fix.de",
@@ -156,6 +159,7 @@ export const PACKAGES: PackageConfig[] = [
     description: "Dauerhafte Überwachung",
     mode: "subscription",
     amountCents: 4900,
+    available: false, // Backend ENABLE_ABO=false → noch nicht kaufbar. Auf true, sobald Abo live.
     moneyBack: "Jederzeit zum Monatsende kündbar",
     features: [
       "Monatlicher Re-Check",

@@ -168,6 +168,27 @@ ${FROM_NAME}`;
   return deliver({ to, subject, text, attachments: [] });
 }
 
+// DSGVO-Bestätigungs-Mail an den ANTRAGSTELLER (Code-Review F3).
+// Der Token-Link MUSS an die angefragte Adresse gehen — das ist der Double-Opt-in,
+// der Eigentum der E-Mail nachweist. Vorher ging der Token nur an den Betreiber.
+export async function sendDsgvoToken({ to, action, link, expiresAt }) {
+  if (!isEmail(to)) return { dryRun: true, skipped: 'invalid-recipient' };
+  const aktion = action === 'delete' ? 'Löschung' : 'Auskunft';
+  const subject = `Ihre DSGVO-Anfrage (${aktion}) — Bestätigung erforderlich`;
+  const text = `Sie haben eine ${aktion} Ihrer bei BFSG-Check gespeicherten Daten angefragt.
+
+Bitte bestätigen Sie die Anfrage über folgenden Link (gültig bis ${expiresAt}):
+
+${link}
+
+Wenn Sie diese Anfrage nicht gestellt haben, ignorieren Sie diese E-Mail —
+ohne Bestätigung passiert nichts.
+
+Mit freundlichen Grüßen
+${FROM_NAME}`;
+  return deliver({ to, subject, text, attachments: [] });
+}
+
 async function deliver({ to, subject, text, attachments = [] }) {
   if (!enabled) {
     console.log(`[mailer DRY-RUN] An ${to} | ${subject} | Anhänge: ${attachments.map((a) => a.filename).join(', ') || '—'}`);

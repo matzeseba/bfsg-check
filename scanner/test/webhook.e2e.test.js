@@ -11,8 +11,20 @@ const tmp = mkdtempSync(path.join(os.tmpdir(), 'bfsg-webhook-e2e-'));
 process.env.ORDERS_FILE = path.join(tmp, 'orders.jsonl');
 process.env.SUBS_FILE = path.join(tmp, 'subs.jsonl');
 
-const { alreadyProcessed, recordPaid, markStatus, getOrder } = await import('../lib/orders.js');
+const { alreadyProcessed, claimEvent, recordPaid, markStatus, getOrder } = await import('../lib/orders.js');
 const { recordSubscription, getSubscription, markCancelled, markSubscriptionStatus } = await import('../lib/subscriptions.js');
+
+test('claimEvent: nur EIN paralleler Claim gewinnt (F1 Race-Schutz)', async () => {
+  const eventId = `evt_race_${Date.now()}`;
+  // 10 gleichzeitige Claims desselben Events — genau einer darf true sein.
+  const results = await Promise.all(Array.from({ length: 10 }, () => claimEvent(eventId)));
+  const wins = results.filter((r) => r === true).length;
+  assert.equal(wins, 1, 'Exakt ein Claim darf das Event beanspruchen');
+  // Folge-Claim ebenfalls false (bereits beansprucht).
+  assert.equal(await claimEvent(eventId), false);
+  // alreadyProcessed sieht das Event jetzt.
+  assert.equal(await alreadyProcessed(eventId), true);
+});
 
 // --- Hilfsfunktion: synthetisches Stripe-Event nachstellen ---
 function mockCheckoutSessionEvent(overrides = {}) {

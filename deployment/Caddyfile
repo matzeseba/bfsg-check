@@ -82,14 +82,19 @@ preview.bfsg-fix.de {
     }
 }
 
-# === Admin-Dashboard (admin-next, Welle 5 mit Auth) ===
-admin.bfsg-fix.de {
-    reverse_proxy admin-next:3001
-    encode gzip
-    header Strict-Transport-Security "max-age=31536000; includeSubDomains"
-    log {
-        output stdout
-        format console
-        level INFO
-    }
-}
+# === Admin-Dashboard (admin-next) — DEAKTIVIERT bis Auth-Layer steht ===
+# Code-Review F7: admin-next hat noch KEINEN Auth-Layer. Ein öffentlich
+# erreichbarer admin.bfsg-fix.de wäre ein unauthentifizierter Proxy auf alle
+# Bestell-/Abo-PII. Block bleibt auskommentiert, bis admin-next entweder
+# next-auth (Magic-Link, Allowlist) ODER Caddy basicauth davor hat.
+# Reaktivieren in Welle 5 — dann z.B. mit:
+#   admin.bfsg-fix.de {
+#       basicauth { matze $2a$14$<bcrypt-hash> }
+#       reverse_proxy admin-next:3001
+#       header Strict-Transport-Security "max-age=31536000; includeSubDomains"
+#   }
+# admin.bfsg-fix.de {
+#     reverse_proxy admin-next:3001
+#     encode gzip
+#     header Strict-Transport-Security "max-age=31536000; includeSubDomains"
+# }
