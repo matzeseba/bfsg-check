@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { JsonLd } from "@/components/JsonLd";
 import "./globals.css";
 
 const inter = Inter({
@@ -22,6 +23,9 @@ export const metadata: Metadata = {
   description: siteDescription,
   applicationName: "BFSG-Check",
   authors: [{ name: "BFSG-Check" }],
+  creator: "BFSG-Check",
+  publisher: "BFSG-Check",
+  category: "Compliance",
   keywords: [
     "BFSG",
     "Barrierefreiheit",
@@ -46,10 +50,24 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: siteTitle,
     description: siteDescription,
+    creator: "@bfsgcheck",
+    site: "@bfsgcheck",
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
   },
 };
 
@@ -60,7 +78,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="de" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="min-h-full flex flex-col font-sans">
+        {children}
+        <JsonLd />
+      </body>
     </html>
   );
 }
