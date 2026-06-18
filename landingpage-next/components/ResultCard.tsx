@@ -140,15 +140,24 @@ export function ResultCard({ result }: { result: ScanResult }) {
       </div>
       <div className="flex flex-col items-stretch gap-3 border-t border-border/60 bg-muted/40 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs text-muted-foreground">
-          Vollreport mit jedem Mangel + fertiger Erklärung
+          Vollreport mit jedem Mangel + fertiger Erklärung. Paket im Checkout
+          wählbar.
         </p>
-        <Button
-          onClick={() => openCheckout("profi")}
-          className="h-10 gap-1.5 rounded-xl bg-brand-mint text-sm font-semibold text-brand-deep hover:bg-brand-mint/85"
-        >
-          Vollreport sichern
-          <ArrowRightIcon className="size-4" />
-        </Button>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <a
+            href="#pakete"
+            className="inline-flex min-h-11 items-center justify-center rounded-xl px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            Alle Pakete vergleichen
+          </a>
+          <Button
+            onClick={() => openCheckout("profi")}
+            className="h-10 min-h-11 gap-1.5 rounded-xl bg-brand-mint text-sm font-semibold text-brand-deep hover:bg-brand-mint/85 sm:min-h-10"
+          >
+            Vollreport sichern
+            <ArrowRightIcon className="size-4" />
+          </Button>
+        </div>
       </div>
     </motion.div>
   );
