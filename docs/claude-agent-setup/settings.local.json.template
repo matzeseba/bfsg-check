@@ -1,0 +1,84 @@
+{
+  "_comment": "TEMPLATE — ersetzt den Inhalt von .claude/settings.local.json wenn du dem Vorschlag vertraust (siehe docs/CLAUDE-AGENT-SETUP.md, Schritt 5). Backup vorher: cp .claude/settings.local.json .claude/settings.local.json.bak",
+  "permissions": {
+    "allow": [
+      "Bash(openssl rand:*)",
+      "Bash(ssh bfsg:*)",
+      "Bash(ssh -i ~/.ssh/bfsg_claude*)",
+      "Bash(scp:*)",
+      "Bash(rclone config:*)",
+      "Bash(rclone mkdir:*)",
+      "Bash(rclone lsd:*)",
+      "Bash(rclone ls:*)",
+      "Bash(gpg --batch:*)",
+      "Bash(gpg --import:*)",
+      "Bash(gpg --import-ownertrust)",
+      "Bash(gpg --list-keys:*)",
+      "Bash(gpg --armor --export:*)",
+      "Bash(bw login:*)",
+      "Bash(bw unlock:*)",
+      "Bash(bw get:*)",
+      "Bash(bw list:*)",
+      "Bash(bw create:*)",
+      "Bash(bw edit:*)",
+      "Bash(bw status)",
+      "Bash(curl -fSs:*)",
+      "Bash(curl -X POST https://bfsg-fix.de/*)",
+      "Bash(curl https://api.domrobot.com/*)",
+      "Bash(docker compose -f deployment/*)",
+      "Bash(docker compose ps)",
+      "Bash(docker compose logs:*)",
+      "Bash(docker compose restart app)",
+      "Bash(./deployment/backup.sh)",
+      "Bash(/opt/bfsg-check/deployment/backup.sh)",
+      "Bash(./scripts/bw-inject-env.sh:*)",
+      "mcp__playwright__*",
+      "mcp__bitwarden__*",
+      "mcp__Notion__*",
+      "mcp__github__*"
+    ],
+    "deny": [
+      "Bash(rm -rf /*)",
+      "Bash(rm -rf ~/*)",
+      "Bash(sudo:*)",
+      "Bash(su:*)",
+      "Bash(chmod -R 777:*)",
+      "Bash(bw delete:*)",
+      "Bash(bw logout)",
+      "Bash(gh secret delete:*)",
+      "Bash(gh repo delete:*)",
+      "Bash(ssh root@*)",
+      "Bash(ssh -i*root@*)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(gpg --delete-secret-keys:*)",
+      "Bash(gpg --export-secret-keys:*)",
+      "Bash(cat *.key)",
+      "Bash(cat *id_rsa*)",
+      "Bash(cat *id_ed25519)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "mcp__playwright__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $CLAUDE_PROJECT_DIR/.claude/hooks/pretool-pause-on-money.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $CLAUDE_PROJECT_DIR/.claude/hooks/pretool-pause-on-money.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
