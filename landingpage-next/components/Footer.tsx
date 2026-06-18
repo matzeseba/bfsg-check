@@ -61,9 +61,9 @@ export function Footer() {
       />
 
       <div className="mx-auto max-w-6xl px-5 py-14 sm:px-6">
-        <div className="grid gap-10 lg:grid-cols-[1.2fr_2fr]">
+        <div className="grid gap-10 text-center lg:grid-cols-[1.2fr_2fr] lg:text-left">
           {/* Brand + Newsletter */}
-          <div>
+          <div className="flex flex-col items-center lg:items-start">
             <Link
               href="/"
               className="inline-flex min-h-11 items-center gap-2.5 py-2 font-display text-lg font-semibold tracking-tight"
@@ -127,7 +127,7 @@ export function Footer() {
           {/* Link-Spalten */}
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
             {COLUMNS.map((col) => (
-              <div key={col.title}>
+              <div key={col.title} className="text-center sm:text-left">
                 <p className="font-mono text-xs font-semibold tracking-[0.18em] text-foreground uppercase">
                   {col.title}
                 </p>

@@ -53,7 +53,7 @@ export function StatsBar() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.5, delay: i * 0.07 }}
-              className="border-l border-[oklch(0.97_0.004_95)]/15 pl-5"
+              className="text-center md:border-l md:border-[oklch(0.97_0.004_95)]/15 md:pl-5 md:text-left"
             >
               <dt className="font-display text-4xl font-bold tracking-tight tabular-nums text-brand-mint sm:text-5xl">
                 {stat.num === null ? (
