@@ -67,9 +67,9 @@ export function HowItWorks() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-60px" }}
                   transition={{ duration: 0.5, delay: i * 0.1, ease: EASE }}
-                  className="group/step relative flex flex-col rounded-3xl border border-border/70 bg-card/85 p-6 shadow-card-soft backdrop-blur transition-all duration-300 hover:-translate-y-1.5 hover:shadow-card-hover"
+                  className="group/step relative flex flex-col items-center rounded-3xl border border-border/70 bg-card/85 p-6 text-center shadow-card-soft backdrop-blur transition-all duration-300 hover:-translate-y-1.5 hover:shadow-card-hover md:items-start md:text-left"
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex w-full items-center justify-center md:justify-between">
                     <span
                       aria-hidden
                       className="font-mono text-xs font-bold tracking-[0.2em] text-brand-mint"
@@ -78,7 +78,7 @@ export function HowItWorks() {
                     </span>
                     <span
                       aria-hidden
-                      className="h-px flex-1 mx-3 bg-gradient-to-r from-brand-mint/40 to-transparent"
+                      className="hidden h-px flex-1 mx-3 bg-gradient-to-r from-brand-mint/40 to-transparent md:block"
                     />
                   </div>
                   <div className="relative mt-5 flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-indigo to-brand-deep text-primary-foreground shadow-glow-mint transition-transform duration-300 group-hover/step:scale-110">

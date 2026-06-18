@@ -47,7 +47,7 @@ export function Testimonials() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.55, delay: i * 0.08, ease: EASE }}
-                className="group/diff relative overflow-hidden rounded-3xl border border-border/70 bg-card/85 p-7 shadow-card-soft backdrop-blur transition-all duration-300 hover:-translate-y-1.5 hover:border-brand-mint/40 hover:shadow-card-hover"
+                className="group/diff relative flex flex-col items-center overflow-hidden rounded-3xl border border-border/70 bg-card/85 p-7 text-center shadow-card-soft backdrop-blur transition-all duration-300 hover:-translate-y-1.5 hover:border-brand-mint/40 hover:shadow-card-hover md:items-start md:text-left"
               >
                 {/* Spotlight-Glow beim Hover. */}
                 <div
