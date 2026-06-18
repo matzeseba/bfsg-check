@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+# TEMPLATE — kopiere zu .claude/hooks/pretool-pause-on-money.sh
+# Dann: chmod +x .claude/hooks/pretool-pause-on-money.sh
+#
+# Pausiert Claude bei Aktionen mit Geld-, Veroeffentlichungs- oder Schluessel-Rotation-Risiko.
+# Wird via .claude/settings.local.json als PreToolUse-Hook bei Bash + Playwright-MCP gefeuert.
+#
+# Input: JSON via stdin (Tool-Name + Tool-Args).
+# Output:
+#   - exit 0 + leerer stdout              -> erlaubt
+#   - exit 0 + JSON permissionDecision    -> User muss bestaetigen
+#   - exit 2 + stderr-Begruendung         -> blockiert
+#
+# Quelle der Regeln: docs/CLAUDE-AGENT-SETUP.md (Sektion Security)
+
+set -euo pipefail
+
+PAYLOAD="$(cat || true)"
+
+matches() {
+  local pattern="$1"
+  echo "$PAYLOAD" | grep -qiE "$pattern"
+}
+
+ask_user() {
+  local reason="$1"
+  printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"%s"}}' \
+    "$reason"
+  exit 0
+}
+
+# 1. Stripe Live-Mode: Refund, Key-Rotation, Webhook-Edit
+if matches 'dashboard\.stripe\.com/.*/(payments|refunds|charges)/.*(refund|capture)'; then
+  ask_user "Stripe-Refund-Aktion erkannt — bestaetige bitte."
+fi
+if matches 'dashboard\.stripe\.com/.*/apikeys'; then
+  ask_user "Stripe-API-Key-Aenderung erkannt — bestaetige bitte."
+fi
+if matches 'dashboard\.stripe\.com/.*/webhooks/.*\b(delete|disable)\b'; then
+  ask_user "Stripe-Webhook-Aenderung erkannt — bestaetige bitte."
+fi
+
+# 2. Hetzner: Bestellung, Server-Loeschung
+if matches 'console\.hetzner\.cloud/.*/(servers?|firewalls?)/.*\b(delete|destroy)\b'; then
+  ask_user "Hetzner-Server-Loeschung erkannt — bestaetige bitte."
+fi
+if matches 'accounts\.hetzner\.com/.*order'; then
+  ask_user "Hetzner-Bestellung mit Zahlung erkannt — bestaetige bitte."
+fi
+if matches 'robot\.hetzner\.com/.*order'; then
+  ask_user "Hetzner-Robot-Bestellung erkannt — bestaetige bitte."
+fi
+
+# 3. Google Ads: Kampagne aktivieren / Budget hochziehen
+if matches 'ads\.google\.com/.*\b(activate|enable|launch)\b'; then
+  ask_user "Google-Ads-Aktivierung erkannt — Kampagne MUSS pausiert bleiben fuer Mensch-Review."
+fi
+if matches 'ads\.google\.com/.*budget.*update'; then
+  ask_user "Google-Ads-Budget-Aenderung erkannt — bestaetige bitte."
+fi
+
+# 4. LinkedIn: Veroeffentlichung
+if matches 'linkedin\.com/.*/post.*\b(publish|share|submit)\b'; then
+  ask_user "LinkedIn-Post-Veroeffentlichung erkannt — bestaetige bitte (Draft ist ok, Publish nicht)."
+fi
+if matches 'linkedin\.com/.*messag(e|ing)'; then
+  ask_user "LinkedIn-DM-Versand erkannt — bestaetige pro DM."
+fi
+
+# 5. DNS-Aenderungen mit Hard-Impact
+if matches 'inwx\.de/.*\b(delete|remove)\b.*record'; then
+  ask_user "DNS-Record-Loeschung bei INWX erkannt — bestaetige bitte (kann Site-Outage verursachen)."
+fi
+
+# 6. GitHub: Repo / Branch / Workflow-Loeschung
+if matches 'github\.com/.*/(settings/branches|settings/actions/.*\bdelete\b)'; then
+  ask_user "GitHub-Repo-Setting-Aenderung erkannt — bestaetige bitte."
+fi
+
+# 7. Bash: gefaehrliche SSH-Targets
+if matches '"command".*ssh[^"]*@(?!bfsg-fix\.de|bfsg)\b'; then
+  ask_user "SSH-Verbindung zu nicht-bfsg-Host erkannt — bestaetige bitte."
+fi
+
+# 8. Bash: docker compose down/stop in production
+if matches '"command".*docker compose (down|stop|kill)'; then
+  ask_user "docker compose down/stop erkannt — kann Live-Server stoppen, bestaetige bitte."
+fi
+
+# 9. Bash: Brevo SMTP-Key-Rotation
+if matches 'app\.brevo\.com/.*\b(revoke|delete|regenerate)\b'; then
+  ask_user "Brevo-Key-Aktion erkannt — bestaetige bitte."
+fi
+
+# 10. Defensive: jede URL mit /confirm-payment | /checkout-Strings
+if matches 'confirm[-_]?payment|checkout/sessions/cs_live|/billing/.*\bupdate\b'; then
+  ask_user "Bezahl- oder Billing-Endpoint erkannt — bestaetige bitte."
+fi
+
+# Default: erlauben
+exit 0
