@@ -15,12 +15,6 @@ export default function WiderrufsbelehrungPage() {
         Widerrufsbelehrung
       </h1>
 
-      <p className="mt-3 rounded-md border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
-        Platzhalter-Inhalt. Vor Live-Schaltung durch anwaltlich geprüfte
-        Fassung ersetzen (siehe docs/LEGAL-PLACEHOLDERS.md). Diese Seite ist
-        keine Rechtsberatung.
-      </p>
-
       <h2 className="mt-10 text-xl font-semibold">Widerrufsrecht</h2>
       <p className="mt-2 text-muted-foreground">
         Sie haben das Recht, binnen vierzehn Tagen ohne Angabe von Gründen
@@ -28,14 +22,11 @@ export default function WiderrufsbelehrungPage() {
         ab dem Tag des Vertragsabschlusses.
       </p>
       <p className="mt-2 text-muted-foreground">
-        Um Ihr Widerrufsrecht auszuüben, müssen Sie uns (BFSG-Check, Kontakt
-        siehe{" "}
-        <Link href="/impressum" className="underline">
-          Impressum
-        </Link>
-        ) mittels einer eindeutigen Erklärung (z. B. ein mit der Post versandter
-        Brief oder eine E-Mail an widerruf@bfsg-fix.de) über Ihren Entschluss,
-        diesen Vertrag zu widerrufen, informieren. Sie können dafür das{" "}
+        Um Ihr Widerrufsrecht auszuüben, müssen Sie uns (Matthias Seba,
+        Lange Straße 20, 27449 Kutenholz, E-Mail: info@matthias-seba.de)
+        mittels einer eindeutigen Erklärung (z. B. ein mit der Post versandter
+        Brief oder eine E-Mail) über Ihren Entschluss, diesen Vertrag zu
+        widerrufen, informieren. Sie können dafür das{" "}
         <Link href="/widerruf" className="underline">
           Online-Widerrufsformular
         </Link>{" "}
@@ -77,7 +68,7 @@ export default function WiderrufsbelehrungPage() {
         Formular aus und senden Sie es zurück.)
       </p>
       <p className="mt-3 whitespace-pre-line rounded-md border border-border bg-muted/40 p-4 text-muted-foreground">
-        {`An: BFSG-Check, widerruf@bfsg-fix.de
+        {`An: Matthias Seba, Lange Straße 20, 27449 Kutenholz, info@matthias-seba.de
 
 Hiermit widerrufe(n) ich/wir (*) den von mir/uns (*) abgeschlossenen Vertrag über die Erbringung der folgenden Dienstleistung (*):
 

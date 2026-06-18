@@ -12,39 +12,32 @@ export default function ImpressumPage() {
         Impressum
       </h1>
 
-      <p className="mt-3 rounded-md border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
-        Platzhalter-Inhalt. Vor Live-Schaltung durch ladungsfähige
-        Anbieter-Angaben ersetzen (siehe docs/LEGAL-PLACEHOLDERS.md).
-      </p>
-
-      <h2 className="mt-10 text-xl font-semibold">
-        Angaben gemäß § 5 DDG
-      </h2>
+      <h2 className="mt-10 text-xl font-semibold">Angaben gemäß § 5 DDG</h2>
       <p className="mt-2 whitespace-pre-line text-muted-foreground">
-        {`Inhaber: [vollständiger Name]
-Adresse: [ladungsfähige Anschrift, c/o erlaubt]
-PLZ Ort: [PLZ und Ort]
+        {`Matthias Seba
+Lange Straße 20
+27449 Kutenholz
 Deutschland`}
       </p>
 
       <h2 className="mt-8 text-xl font-semibold">Kontakt</h2>
       <p className="mt-2 whitespace-pre-line text-muted-foreground">
-        {`E-Mail: hallo@bfsg-fix.de
-Telefon: [optional]`}
+        {`E-Mail: info@matthias-seba.de`}
       </p>
 
       <h2 className="mt-8 text-xl font-semibold">Umsatzsteuer</h2>
       <p className="mt-2 text-muted-foreground">
-        USt-ID gemäß § 27 a UStG: [USt-ID oder Kleinunternehmer-Hinweis nach
-        § 19 UStG].
+        Gemäß § 19 UStG (Kleinunternehmer-Regelung) wird keine Umsatzsteuer
+        ausgewiesen.
       </p>
 
       <h2 className="mt-8 text-xl font-semibold">
         Redaktionell verantwortlich (§ 18 Abs. 2 MStV)
       </h2>
       <p className="mt-2 whitespace-pre-line text-muted-foreground">
-        {`[Name]
-[Anschrift]`}
+        {`Matthias Seba
+Lange Straße 20
+27449 Kutenholz`}
       </p>
 
       <h2 className="mt-8 text-xl font-semibold">EU-Streitschlichtung</h2>
@@ -59,6 +52,14 @@ Telefon: [optional]`}
         </a>
         . Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren
         vor einer Verbraucherschlichtungsstelle teilzunehmen.
+      </p>
+
+      <h2 className="mt-8 text-xl font-semibold">Haftungs-Disclaimer</h2>
+      <p className="mt-2 text-muted-foreground">
+        BFSG-Check liefert eine automatisierte technische Erstprüfung. Wir
+        geben keine Konformitätsgarantie und ersetzen keine Rechtsberatung. Bei
+        rechtlichen Fragen konsultieren Sie einen Fachanwalt für IT- und
+        Wettbewerbsrecht.
       </p>
     </section>
   );

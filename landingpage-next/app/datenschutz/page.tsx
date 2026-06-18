@@ -14,10 +14,9 @@ export default function DatenschutzPage() {
         Datenschutzerklärung
       </h1>
 
-      <p className="mt-3 rounded-md border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
-        Platzhalter-Inhalt. Vor Live-Schaltung durch anwaltlich geprüfte
-        Fassung ersetzen (siehe docs/LEGAL-PLACEHOLDERS.md). Diese Seite ist
-        keine Rechtsberatung.
+      <p className="mt-3 text-xs text-muted-foreground">
+        Stand: {new Date().toLocaleDateString("de-DE")} · Diese Seite ist
+        keine Rechtsberatung. Bei Fragen wenden Sie sich an einen Fachanwalt.
       </p>
 
       <h2 className="mt-10 text-xl font-semibold">1. Verantwortlicher</h2>
