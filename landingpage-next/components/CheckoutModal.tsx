@@ -18,18 +18,41 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { PACKAGES, COOKIE_PACKAGES, type PackageId } from "@/lib/config";
 import { useCheckout } from "@/lib/checkout-context";
+import { cn } from "@/lib/utils";
 
 type CustomerType = "consumer" | "business";
 
+// Reihenfolge im Selector: Hauptangebot zuerst, dann Cookie, dann Abo.
+// Abo zeigt "Bald verfuegbar" + ist disabled (Backend ENABLE_ABO=false).
 const ALL_PACKAGES = [...PACKAGES, ...COOKIE_PACKAGES];
 
 function packageFor(id: PackageId | null) {
   return ALL_PACKAGES.find((p) => p.id === id) ?? null;
 }
 
+// Sinnvollster Default, wenn der Aufrufer kein Paket vorgibt (z.B. Hero-CTA ohne Kontext).
+const DEFAULT_PKG: PackageId = "profi";
+
 export function CheckoutModal() {
   const { state, closeCheckout, setUrl: pushUrl } = useCheckout();
-  const pkg = packageFor(state.pkg);
+
+  // Lokale Auswahl im Modal: wird beim Open mit dem vom Aufrufer gewuenschten
+  // Paket seeded (oder DEFAULT_PKG), kann aber im Modal frei gewechselt werden.
+  // setState-during-render-Pattern (dokumentiert in React 19,
+  // https://react.dev/reference/react/useState#storing-information-from-previous-renders),
+  // weil Next 16 setState in useEffect verbietet und ref-write im Render ebenfalls.
+  const [selectedPkgId, setSelectedPkgId] = React.useState<PackageId>(
+    state.pkg ?? DEFAULT_PKG,
+  );
+  const [lastOpen, setLastOpen] = React.useState(state.open);
+  if (state.open !== lastOpen) {
+    setLastOpen(state.open);
+    if (state.open) {
+      setSelectedPkgId(state.pkg ?? DEFAULT_PKG);
+    }
+  }
+
+  const pkg = packageFor(selectedPkgId);
 
   const [email, setEmail] = React.useState("");
   const [customerType, setCustomerType] = React.useState<CustomerType | null>(
@@ -45,6 +68,10 @@ export function CheckoutModal() {
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!pkg) return;
+    if (pkg.available === false) {
+      toast.error(`${pkg.name} ist noch nicht buchbar — wir informieren Sie zum Start.`);
+      return;
+    }
     if (!url) {
       toast.error("Bitte Website-Adresse angeben.");
       return;
@@ -100,19 +127,79 @@ export function CheckoutModal() {
         if (!open) closeCheckout();
       }}
     >
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Bestellung abschließen</DialogTitle>
           <DialogDescription>
-            {pkg
-              ? `${pkg.name} — ${pkg.price}${pkg.priceSuffix ?? ""}`
-              : "Paket auswählen"}
-            . Sie erhalten nach Zahlung automatisch Ihren menschlich geprüften
-            Fix-Plan (PDF) + Vorlage der Barrierefreiheitserklärung per E-Mail.
+            Wählen Sie Ihr Paket. Sie erhalten nach Zahlung automatisch Ihren
+            menschlich geprüften Fix-Plan (PDF) per E-Mail.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={onSubmit} className="grid gap-4" noValidate>
+          {/* Plan-Selector — alle Pakete im Modal wechselbar, sinnvollster vorausgewaehlt */}
+          <fieldset className="grid gap-2">
+            <legend className="mb-1.5 text-sm font-medium">Paket</legend>
+            <RadioGroup
+              value={selectedPkgId}
+              onValueChange={(value) => setSelectedPkgId(value as PackageId)}
+              className="grid gap-2"
+            >
+              {ALL_PACKAGES.map((p) => {
+                const isSelected = p.id === selectedPkgId;
+                const isDisabled = p.available === false;
+                return (
+                  <Label
+                    key={p.id}
+                    htmlFor={`pkg-${p.id}`}
+                    className={cn(
+                      "flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors",
+                      isSelected
+                        ? "border-brand-mint/60 bg-brand-mint/5"
+                        : "border-border hover:border-border/80 hover:bg-muted/40",
+                      isDisabled && "cursor-not-allowed opacity-60",
+                    )}
+                  >
+                    <RadioGroupItem
+                      id={`pkg-${p.id}`}
+                      value={p.id}
+                      disabled={isDisabled}
+                      className="mt-0.5"
+                    />
+                    <div className="flex flex-1 items-center justify-between gap-2">
+                      <div className="grid gap-0.5">
+                        <span className="text-sm font-medium leading-tight">
+                          {p.name}
+                          {p.featured && !isDisabled && (
+                            <span className="ml-1.5 text-[10px] font-semibold uppercase tracking-wide text-brand-mint">
+                              · Empfohlen
+                            </span>
+                          )}
+                          {isDisabled && (
+                            <span className="ml-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                              · Bald verfügbar
+                            </span>
+                          )}
+                        </span>
+                        <span className="text-xs text-muted-foreground leading-snug">
+                          {p.description}
+                        </span>
+                      </div>
+                      <span className="shrink-0 font-mono text-sm font-semibold tabular-nums">
+                        {p.price}
+                        {p.priceSuffix && (
+                          <span className="text-xs font-normal text-muted-foreground">
+                            {p.priceSuffix}
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  </Label>
+                );
+              })}
+            </RadioGroup>
+          </fieldset>
+
           <div className="grid gap-1.5">
             <Label htmlFor="co-url">Zu prüfende Website-Adresse</Label>
             <Input
@@ -190,16 +277,18 @@ export function CheckoutModal() {
           <Button
             type="submit"
             size="lg"
-            className="w-full"
-            disabled={submitting}
+            className="w-full min-h-11"
+            disabled={submitting || pkg?.available === false}
           >
             {submitting ? (
               <>
                 <Loader2Icon className="animate-spin" />
                 Weiterleitung...
               </>
+            ) : pkg?.available === false ? (
+              "Bald verfügbar"
             ) : (
-              "Zahlungspflichtig bestellen"
+              `Zahlungspflichtig bestellen · ${pkg?.price ?? ""}${pkg?.priceSuffix ?? ""}`
             )}
           </Button>
 

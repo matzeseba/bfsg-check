@@ -40,8 +40,9 @@ export function Hero() {
       />
 
       <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-5 pt-14 pb-20 sm:px-6 sm:pt-20 sm:pb-28 lg:grid-cols-[1.04fr_0.96fr] lg:gap-12">
-        {/* Linke Spalte: Text + Scan-Form */}
-        <div className="relative">
+        {/* Linke Spalte: Text + Scan-Form. Mobile zentriert (eigenstaendige Saeule),
+            Desktop links (Teil der 2-Spalten-Komposition mit Hero-Visual). */}
+        <div className="relative flex flex-col items-center text-center lg:items-start lg:text-left">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -93,7 +94,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, delay: 0.25 }}
-            className="mt-8 max-w-xl"
+            className="mt-8 w-full max-w-xl"
           >
             <ScanForm variant="hero" />
           </motion.div>
@@ -105,7 +106,7 @@ export function Hero() {
               hidden: {},
               show: { transition: { staggerChildren: 0.08, delayChildren: 0.4 } },
             }}
-            className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground"
+            className="mt-7 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-muted-foreground lg:justify-start"
           >
             {HERO.badges.map((badge) => (
               <motion.li
@@ -130,10 +131,10 @@ export function Hero() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, delay: 0.55 }}
-            className="mt-9 grid grid-cols-2 gap-4 border-t border-border/60 pt-6 sm:grid-cols-4"
+            className="mt-9 grid w-full grid-cols-2 gap-4 border-t border-border/60 pt-6 sm:grid-cols-4"
           >
             {HERO.trust.map((item) => (
-              <div key={item.label}>
+              <div key={item.label} className="text-center lg:text-left">
                 <p className="font-mono text-xl font-bold tracking-tight tabular-nums text-foreground">
                   {item.label}
                 </p>
