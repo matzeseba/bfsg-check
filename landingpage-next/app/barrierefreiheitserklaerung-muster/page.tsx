@@ -241,9 +241,9 @@ export default function BarrierefreiheitserklaerungMusterPage() {
 
           <h3 className="mt-6 text-lg font-semibold">Fehler 1: Falsche Konformitäts-Aussage</h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            Viele Erklärungen behaupten „vollständig konform", obwohl ein automatisierter Scan oder eine manuelle
+            Viele Erklärungen behaupten „vollständig konform“, obwohl ein automatisierter Scan oder eine manuelle
             Prüfung noch Mängel zeigt. Das ist nicht nur formal falsch, sondern birgt Abmahnrisiken. „Teilweise
-            konform" mit ehrlicher Mängelliste ist rechtlich sicherer als ein aufgeblasener Status.
+            konform“ mit ehrlicher Mängelliste ist rechtlich sicherer als ein aufgeblasener Status.
           </p>
 
           <h3 className="mt-6 text-lg font-semibold">Fehler 2: Fehlender oder unerreichbarer Feedback-Mechanismus</h3>

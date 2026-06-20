@@ -34,7 +34,7 @@ const CHECK_ITEMS = [
   { nr: 14, kategorie: "Struktur", pruefpunkt: "Landmarks verwendet (header, main, nav, footer, aside)", wcag: "1.3.1", prio: "Mittel" },
   { nr: 15, kategorie: "Navigation", pruefpunkt: "Skip-Link zum Hauptinhalt vorhanden und funktional", wcag: "2.4.1", prio: "Hoch" },
   { nr: 16, kategorie: "Navigation", pruefpunkt: "Seitentitel eindeutig und beschreibend", wcag: "2.4.2", prio: "Hoch" },
-  { nr: 17, kategorie: "Navigation", pruefpunkt: 'Linktexte beschreiben das Ziel (kein „hier klicken")', wcag: "2.4.4", prio: "Hoch" },
+  { nr: 17, kategorie: "Navigation", pruefpunkt: 'Linktexte beschreiben das Ziel (kein „hier klicken“)', wcag: "2.4.4", prio: "Hoch" },
   { nr: 18, kategorie: "Multimedia", pruefpunkt: "Videos haben Untertitel oder Transkripte", wcag: "1.2.2 / 1.2.3", prio: "Hoch" },
   { nr: 19, kategorie: "Responsivität", pruefpunkt: "Inhalt bei 400 % Zoom nicht abgeschnitten oder horizontal scrollbar", wcag: "1.4.4 / 1.4.10", prio: "Hoch" },
   { nr: 20, kategorie: "Responsivität", pruefpunkt: "Touch-Targets mind. 24×24 CSS-Pixel (empfohlen: 44×44 px)", wcag: "2.5.8", prio: "Mittel" },

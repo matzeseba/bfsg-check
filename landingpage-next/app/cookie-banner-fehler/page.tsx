@@ -20,16 +20,16 @@ export const metadata: Metadata = {
 const FEHLER = [
   {
     nr: 1,
-    titel: "Kein gleichwertiger „Ablehnen"-Button auf der ersten Ebene",
+    titel: "Kein gleichwertiger „Ablehnen“-Button auf der ersten Ebene",
     beschreibung:
-      'Seit dem EuGH-Urteil Planet49 (C-673/17) und der DSGVO-Praxis der Datenschutzbehörden muss ein „Ablehnen"-Button ebenso prominent sein wie der „Akzeptieren"-Button — auf derselben ersten Ebene, gleiche Schriftgröße, kein verstecktes Kleingedrucktes. Wer Ablehnen in einem zweiten Dialog versteckt, riskiert Abmahnungen durch Verbraucherverbände.',
+      'Seit dem EuGH-Urteil Planet49 (C-673/17) und der DSGVO-Praxis der Datenschutzbehörden muss ein „Ablehnen“-Button ebenso prominent sein wie der „Akzeptieren“-Button — auf derselben ersten Ebene, gleiche Schriftgröße, kein verstecktes Kleingedrucktes. Wer Ablehnen in einem zweiten Dialog versteckt, riskiert Abmahnungen durch Verbraucherverbände.',
     risiko: "hoch",
   },
   {
     nr: 2,
     titel: "Vorab angekreuzte Checkboxen (Pre-Checked Consent)",
     beschreibung:
-      "Vorausgewählte Zustimmungen sind nach Art. 4 Nr. 11 DSGVO keine wirksame Einwilligung. Der Nutzer muss aktiv handeln, um Einwilligung zu geben — eine vorausgewählte Option macht das Gegenteil. Das gilt auch für „alle auswählen" als Standardzustand.",
+      "Vorausgewählte Zustimmungen sind nach Art. 4 Nr. 11 DSGVO keine wirksame Einwilligung. Der Nutzer muss aktiv handeln, um Einwilligung zu geben — eine vorausgewählte Option macht das Gegenteil. Das gilt auch für „alle auswählen“ als Standardzustand.",
     risiko: "hoch",
   },
   {
@@ -50,7 +50,7 @@ const FEHLER = [
     nr: 5,
     titel: "Keine oder falsche Zweckangaben im Banner",
     beschreibung:
-      "Ein gültiger Consent erfordert, dass Nutzer vor der Einwilligung verstehen, für welche Zwecke ihre Daten verarbeitet werden. Vage Formulierungen wie „Wir nutzen Cookies für ein besseres Erlebnis" ohne Auflistung der konkreten Dienste erfüllen die Transparenzanforderungen von Art. 13 DSGVO nicht.",
+      "Ein gültiger Consent erfordert, dass Nutzer vor der Einwilligung verstehen, für welche Zwecke ihre Daten verarbeitet werden. Vage Formulierungen wie „Wir nutzen Cookies für ein besseres Erlebnis“ ohne Auflistung der konkreten Dienste erfüllen die Transparenzanforderungen von Art. 13 DSGVO nicht.",
     risiko: "mittel",
   },
   {

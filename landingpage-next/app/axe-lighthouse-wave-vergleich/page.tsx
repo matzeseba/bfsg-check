@@ -105,7 +105,7 @@ export default function AxeLighthouseWaveVergleichPage() {
           <h3 className="mt-8 text-xl font-semibold">axe DevTools (Deque Systems)</h3>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
             axe-core ist die zugrunde liegende Open-Source-Engine, die auch viele andere Tools (Lighthouse,
-            Pa11y, IBM Equal Access Checker) verwenden. Die Browser-Extension „axe DevTools" ist für Chrome und
+            Pa11y, IBM Equal Access Checker) verwenden. Die Browser-Extension „axe DevTools“ ist für Chrome und
             Firefox verfügbar. Bekannt für niedrige False-Positive-Rate und gute WCAG-2.2-Abdeckung in der
             aktuellen Version (axe-core 4.x). Besonders stark bei Formular-Labeling, ARIA-Attribute und
             Fokus-Management.
@@ -188,7 +188,7 @@ export default function AxeLighthouseWaveVergleichPage() {
             Was automatisierte Tools <strong>nicht</strong> zuverlässig erkennen:
           </p>
           <ul className="mt-2 list-disc space-y-2 pl-5 text-sm text-muted-foreground">
-            <li>Ob ein Alt-Text den Bildinhalt tatsächlich beschreibt (z. B. „Bild" vs. „Produktfoto Herrenjacke blau Größe M")</li>
+            <li>Ob ein Alt-Text den Bildinhalt tatsächlich beschreibt (z. B. „Bild“ vs. „Produktfoto Herrenjacke blau Größe M“)</li>
             <li>Ob die Tastatur-Reihenfolge logisch und sinnvoll ist</li>
             <li>Ob komplexe Interaktionen (mehrstufiger Checkout, Akkordeon-Navigation) von Screenreadern nutzbar sind</li>
             <li>Kognitive Belastung, Zeitlimits oder Animation (WCAG 2.3, 2.5)</li>
