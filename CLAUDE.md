@@ -44,7 +44,7 @@ scripts/          PDF-Generator + Helper-Scripts
 ### Pakete (alle live, Stripe Live-Mode)
 - **Basis** 199 € (einmalig, Auto-Scan + PDF-Report)
 - **Profi** 499 € (einmalig, Multi-Page + Umsetzungsplan + 30 Tage Support)
-- **Cookie-Basis** 99 € · **Cookie-Profi** 249 €
+- **Cookie-Basis** 49 € · **Cookie-Profi** 79 €
 - **Re-Check-Abo** 39 €/Monat (`ENABLE_ABO=false` aktuell, Webhook nicht load-getestet)
 
 ---

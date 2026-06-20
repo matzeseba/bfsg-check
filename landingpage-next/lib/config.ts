@@ -39,8 +39,6 @@ export const BRAND = {
   productKicker: "Compliance-Scan-Plattform",
   promise: "Premium-Audit ohne Kanzlei-Honorar",
   hostingNote: "Gehostet in Deutschland · DSGVO-konform",
-  scansLabel: "Websites geprüft",
-  scansValue: "5.247",
 } as const;
 
 // Root-relative Anchor-Links (/#id) — funktionieren auch von Unterseiten
@@ -69,7 +67,7 @@ export const HERO = {
     "WCAG 2.1 / EN 301 549",
   ],
   trust: [
-    { label: BRAND.scansValue, sub: BRAND.scansLabel },
+    { label: "80+", sub: "Prüfregeln (EN 301 549)" },
     { label: "DSGVO", sub: "konform" },
     { label: "DE", sub: "Hosting" },
     { label: "60 Sek.", sub: "bis Ergebnis" },
