@@ -5,7 +5,7 @@
 > Bußgeldsummen betreiben (§ 5, § 5a UWG — irreführende geschäftliche Handlung).
 > Headlines/Descriptions müssen faktentreu und überprüfbar sein. Sanitize-Stand: 2026-06-16.
 
-Der sauberste, rechtssicherste Akquisekanal: Menschen suchen aktiv nach dem Problem
+Der sauberste Akquisekanal mit dem niedrigsten Rechtsrisiko: Menschen suchen aktiv nach dem Problem
 → du fängst den Intent ab. Kein DSGVO-Cold-Mail-Risiko.
 
 ## Kampagnenstruktur
@@ -52,11 +52,11 @@ Keywords (Phrase/Exact):
 7. WCAG 2.1 AA Erstprüfung in 60 Sek.
 8. Sofort-Report für Ihre Website
 
-**Descriptions (4) — sanitiert:**
-1. Automatisierte WCAG-2.1-Erstprüfung mit konkretem Fix-Plan. Vorlage Barrierefreiheitserklärung inklusive.
-2. Das BFSG gilt seit 28.06.2025. Prüfen Sie kostenlos, welche technischen Mängel Ihre Seite zeigt — Ergebnis sofort.
-3. Klarer Fix-Plan pro Mangel. Keine Anmeldung für den Sofort-Check. Vollständiger Report optional ab 199 €.
-4. Kostenloser Sofort-Check, vollständiger Report auf Wunsch. Automatisierte Erstprüfung, ersetzt keine Rechtsberatung.
+**Descriptions (4) — sanitiert, ≤90 Zeichen (Google-Limit):**
+1. `WCAG-2.1-Analyse mit konkretem Fix-Plan. Barrierefreiheitserklärung-Vorlage inklusive.`
+2. `BFSG seit 28.06.2025 Pflicht. Kostenlos prüfen, wo Ihre Seite steht — sofort.`
+3. `Fix-Plan pro Mangel. Keine Anmeldung nötig. Vollständiger Report optional ab 199 €.`
+4. `Kostenloser Sofort-Check, Vollreport optional. Technische Erstprüfung, kein Rechtsrat.`
 
 ### Was wurde entfernt (UWG-Sanitize, 2026-06-16)
 

@@ -78,10 +78,11 @@ sozialgesetz
 15. `Re-Check 39 €/Monat möglich`
 
 ### Descriptions (90 Zeichen Max)
-1. `Automatischer BFSG/WCAG-Scan mit Vollreport als PDF. Konkrete Findings, kein Abo, deutsche Sprache.`
-2. `Score in 60 Sekunden gratis. Vollreport mit Umsetzungsplan ab 199 €. Hosting in Deutschland.`
-3. `BFSG ist Pflicht für deutsche Shops seit 28.06.2025. Wir liefern Findings + Fix-Plan ab 199 €.`
-4. `Cookie-Banner-Check + WCAG-Audit + Umsetzungsplan in einem PDF. Auto-Scan plus manueller Review.`
+<!-- GEPRÜFT: alle ≤90 Zeichen (Google-Limit) -->
+1. `BFSG/WCAG-Scan mit Vollreport als PDF. Konkrete Findings, kein Abo, auf Deutsch.`
+2. `Score gratis in 60 Sek. Vollreport mit Umsetzungsplan ab 199 €. Made in Germany.`
+3. `BFSG-Pflicht seit 28.06.2025. Findings + Fix-Plan ab 199 €. Sofort als PDF.`
+4. `Cookie-Check + WCAG-Audit in einem PDF. Kein Abo, automatischer Scan, sofort.`
 
 ### Pinned Headlines
 - Headline 1 (immer pinnen): `BFSG-Check in 60 Sekunden`

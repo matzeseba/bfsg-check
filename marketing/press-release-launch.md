@@ -42,7 +42,7 @@ liefert:
 - Vollreport (Basis 199 €): WCAG-2.1-AA-Findings als PDF
 - Profi-Paket (499 €): Multi-Page-Crawl bis 50 Seiten, Umsetzungsplan, 
   30 Tage E-Mail-Support
-- Cookie-Compliance-Check nach TDDDG (99 €/249 €)
+- Cookie-Compliance-Check nach TDDDG (49 €/79 €)
 - Monatliches Re-Check-Abo (39 €/Monat)
 
 Technisch basiert der Scanner auf den Open-Source-Engines axe-core und 
@@ -87,42 +87,51 @@ E-Mail: info@matthias-seba.de
 
 > **Wann:** Sende am 28.06.2026 06:00 Uhr (für 07:00 Uhr Verteilung)
 > **Warum:** Der echte News-Hook. Jubiläum + Bilanz + Daten = Journalisten lieben das
+>
+> **⚠️ BELEG-PFLICHT:** Diese Version enthält Statistiken, die ERST nach
+> tatsächlichen Scan-Daten aus dem Betrieb eingetragen werden dürfen.
+> ALLE mit [BELEG NÖTIG] markierten Zahlen sind PLATZHALTER — vor Versand
+> durch echte Auswertungen aus dem eigenen Scan-Dataset ersetzen.
+> Eine PM mit erfundenen Statistiken wäre Pressebetrug (§ 263 StGB bei
+> Schaden) und vernichtet die Medien-Reputation dauerhaft.
 
 ---
 
 **Headline:**
 ```
-Ein Jahr BFSG: 9 von 10 deutschen Online-Shops nicht-konform — Bilanz und 
-Forecast aus 50.000 automatisierten Scans
+[BELEG NÖTIG: Zahl und Prozentwert erst eintragen wenn real gemessen]
+Ein Jahr BFSG: X von 10 deutschen Online-Shops zeigen Findings — Bilanz 
+aus [N] automatisierten Scans
 ```
 
 **Lead:**
 ```
 Genau ein Jahr nach Inkrafttreten des Barrierefreiheitsstärkungsgesetzes 
-(BFSG) am 28. Juni 2025 zieht BFSG-Check (bfsg-fix.de) eine Daten-Bilanz: 
-89 Prozent der untersuchten deutschen Online-Shops verfehlen die WCAG-2.1-
-AA-Schwelle bei Kontrast, 76 Prozent bei Alt-Attributen.
+(BFSG) am 28. Juni 2025 zieht BFSG-Check (bfsg-fix.de) eine Daten-Bilanz 
+aus [N] durchgeführten automatisierten Scans [BELEG NÖTIG: tatsächliche 
+Scan-Anzahl aus System eintragen] deutscher Online-Shops.
 ```
 
 **Body:**
 ```
-Auf Basis von 50.000 automatisierten Scans deutscher Websites in den 
-letzten 12 Monaten zeigt sich ein klares Bild: 
+Auf Basis von [N] automatisierten Scans [BELEG NÖTIG] deutscher Websites 
+in den letzten 12 Monaten zeigt sich:
 
-Die häufigsten Findings:
-1. Kontrast unter WCAG-Schwelle (4.5:1) → 89 % der Shops
-2. Fehlende Alt-Attribute bei Bildern → 76 %
-3. Keine Skip-Links für Tastatur-Nutzer → 71 %
-4. Form-Inputs ohne Labels → 64 %
-5. Cookie-Banner ohne Opt-Out auf erster Ebene → 58 %
+Die häufigsten Findings [ALLE PROZENTZAHLEN = BELEG NÖTIG — aus echten
+Scan-Daten berechnen, NICHT schätzen]:
+1. Kontrast unter WCAG-Schwelle (4.5:1) → [X]% der untersuchten Sites
+2. Fehlende Alt-Attribute bei Bildern → [X]%
+3. Keine Skip-Links für Tastatur-Nutzer → [X]%
+4. Form-Inputs ohne Labels → [X]%
+5. Cookie-Banner ohne Opt-Out auf erster Ebene → [X]%
 
-Durchschnittlicher BFSG-Score: 47/100. Best-Practice-Beispiele erreichen 
-88/100 (1 % der Shops). Schlechtester Score: 12/100.
+Durchschnittlicher Score: [X]/100. [BELEG NÖTIG — Mittelwert aus Dataset]
 
-Konzentration der Abmahn-Welle: Seit August 2025 mahnen Kanzleien wie 
+Zur Abmahn-Welle: Seit August 2025 mahnen Kanzleien wie 
 CLAIM Rechtsanwälte und Kanzlei MK in Welle ab — Forderungen zwischen 
-600 € und 2.700 € pro Verstoß. Insgesamt haben deutsche Anwälte schätzungs-
-weise über 5.000 BFSG-Abmahnungen verschickt im ersten Jahr.
+600 € und 2.700 € pro Verstoß (Quellen: WBS Legal, Heise.de).
+[BELEG NÖTIG: Gesamtzahl 5.000+ Abmahnungen ist eine Schätzung —
+nur verwenden wenn durch Medienberichte belegbar, sonst weglassen.]
 
 "Die meisten Shop-Betreiber wissen nicht einmal, dass sie betroffen sind", 
 sagt Matthias Seba, Gründer von BFSG-Check. "Der Test-Aufwand wäre 60 
@@ -130,15 +139,13 @@ Sekunden — aber Compliance ist zur Top-Priorität geworden, sobald die
 erste Abmahnung kommt."
 
 Forecast für Jahr 2 (Juni 2026 – Juni 2027):
-- Verschärfung der Erfolgshaftung gemäß BFSG § 26 erwartet
 - Erste Abmahn-Urteile von Oberlandesgerichten antizipiert
 - WordPress-Plugin-Markt reagiert mit BFSG-Compliance-Features
 - BFSG-Check launcht im Q3 2026 eine Chrome-Extension und ein WordPress-
   Plugin zur frühzeitigen Identifikation
 
-Datensatz auf Anfrage verfügbar — Journalisten und Branchen-Beobachter 
-können den anonymisierten Aggregat-Datensatz unter info@matthias-seba.de 
-anfordern.
+[WENN Dataset public:] Anonymisierter Aggregat-Datensatz auf Anfrage 
+verfügbar — Journalisten können ihn unter info@matthias-seba.de anfordern.
 ```
 
 **Boilerplate + Pressekontakt:** wie Version 1.
@@ -154,21 +161,24 @@ anfordern.
 **E-Mail-Vorlage:**
 
 ```
+[ERST VERWENDEN WENN DATASET REAL EXISTIERT — alle Zahlen durch echte
+Scan-Auswertungen ersetzen, sonst Pressebetrug-Risiko]
+
 Subject: Embargo-Vorab: Daten-Bilanz "1 Jahr BFSG" zum 28.06.2026
 
 Sehr geehrte/r [Redaktion + Titel],
 
 Zum 1. Jahrestag des BFSG am 28.06.2026 erscheint unsere Pressemitteilung 
-mit aggregierten Daten aus 50.000 BFSG-Compliance-Scans deutscher Online-
-Shops. Highlights:
+mit aggregierten Daten aus [N — BELEG NÖTIG] BFSG-Compliance-Scans 
+deutscher Online-Shops. Highlights:
 
-- 89% der Shops fallen beim Kontrast durch
-- Durchschnitts-Score 47/100
-- Erste Abmahn-Welle: 5.000+ Abmahnungen geschätzt
+- [X]% der untersuchten Sites zeigen Kontrast-Findings [BELEG NÖTIG]
+- Durchschnitts-Score [X]/100 [BELEG NÖTIG — aus echten Daten]
+- Abmahn-Welle läuft seit August 2025 (Quellen: WBS Legal, Heise.de)
 
-Ich biete Ihnen den **Datensatz vor Veröffentlichung** und einen 
-**24-Stunden-Embargo** zur Vorbereitung eines Artikels. Bei Interesse 
-melden Sie sich bis 27.06.2026 12:00 Uhr.
+Ich biete Ihnen den **anonymisierten Aggregat-Datensatz vor Veröffentlichung** 
+und einen **24-Stunden-Embargo** zur Vorbereitung eines Artikels. 
+Bei Interesse melden Sie sich bis 27.06.2026 12:00 Uhr.
 
 PM-Text + Datensatz auf Anfrage.
 
