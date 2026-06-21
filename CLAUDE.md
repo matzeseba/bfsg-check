@@ -125,8 +125,34 @@ scripts/          PDF-Generator + Helper-Scripts
 3. Bei Marketing-Tasks: `marketing/` + `docs/SALES-DAY-1-V2.md`
 4. Bei Code-Änderungen: TypeScript-Strikt-Mode, ESLint-No-ASCII-Umlaute-Rule (echte ä/ö/ü/ß!)
 5. Bei Deploy: nur via PR-Merge auf main (Auto-Deploy via GitHub Actions)
-6. Multi-Agent-Sprints: nutze Explore + Plan + general-purpose Agents parallel
+6. Multi-Agent-Sprints: nutze die **Agency-Agents** (siehe unten) + Explore + Plan parallel
 7. **Computer Use ist aktiviert** (seit 20.06.2026) — Claude Code kann Browser nativ steuern
+
+---
+
+## 🤖 Agency-Agents (FESTE REGEL — dauerhaft installiert seit 21.06.2026)
+
+**Wir nutzen das Agency-Agents-Set (`msitarzewski/agency-agents`, MIT, 114k★) als Standard-Werkzeug für jede Spezial-Aufgabe.**
+
+- **Installiert unter:** `.claude/agents/agency/` — **217 spezialisierte Agenten** in 16 Divisionen (engineering, security, design, marketing, sales, product, testing, support, paid-media, project-management, finance, academic, gis, game-development, spatial-computing, specialized). Hinweis: `.claude/` ist gitignored → die Agenten leben lokal auf Disk (nicht im Repo), Regel + Audits sind aber versioniert.
+- **Quelle/Update:** kanonisches Original `msitarzewski/agency-agents` (native Claude-Code-`.md`+YAML-Agenten, kein fremder Hook-Code). Update via `git -C /tmp/agency-agents pull` + Re-Copy der 16 Divisionen.
+- **Registrierung:** Agenten stehen ab dem **nächsten Session-Start** als native `subagent_type` zur Verfügung. In der Install-Session: Persona-Datei lesen und in einen `general-purpose`/`Explore`/`Plan`-Agenten injizieren.
+
+**Wann welche Division (Auswahl für unser Business):**
+| Aufgabe | Agenten (Beispiele) |
+|---|---|
+| Code-Review / Architektur | `engineering-code-reviewer`, `engineering-software-architect`, `engineering-senior-developer`, `engineering-minimal-change-engineer` |
+| Sicherheit / Pentest | `security-appsec-engineer`, `security-penetration-tester`, `security-architect`, `security-compliance-auditor` |
+| Landingpage / UX / Conversion | `design-ux-architect`, `design-ux-researcher`, `marketing-growth-hacker` |
+| Accessibility (eigenes Dogfood) | `testing-accessibility-auditor`, `testing-reality-checker` |
+| Marketing / SEO / Ads | Division `marketing` + `paid-media` |
+| Reliability / Deploy | `engineering-sre`, `engineering-devops-automator` |
+
+**Regel:** Bei jeder substanziellen Spezial-Aufgabe zuerst prüfen, ob ein Agency-Agent fachlich passt, und ihn nutzen — statt generisch zu arbeiten. Mehrere Agenten parallel starten, wenn die Teilaufgaben unabhängig sind.
+
+**Erster Einsatz (21.06.2026):** 6 parallele Teams haben einen Pre-Launch-Audit gefahren → `docs/agency-audits/2026-06-21-MASTER-SUMMARY.md` (Security/Code/A11y/Legal/Conversion/SRE).
+
+**Hinweis Kontext:** 217 Agenten erhöhen den Agent-Typen-Listing-Overhead pro Session. Falls zu schwer → unrelevante Divisionen (academic, gis, game-development, spatial-computing) aus `.claude/agents/agency/` entfernen.
 
 ---
 

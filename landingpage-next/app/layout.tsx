@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Geist, Geist_Mono } from "next/font/google";
+import { MotionConfig } from "motion/react";
 
 import { CheckoutModal } from "@/components/CheckoutModal";
 import { CookieBanner } from "@/components/CookieBanner";
@@ -121,25 +122,30 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col font-sans">
         <ThemeProvider>
-          <a
-            href="#main"
-            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-brand-deep focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-primary-foreground focus:shadow-card-hover"
-          >
-            Zum Hauptinhalt springen
-          </a>
-          <CheckoutProvider>
-            <Header />
-            <main
-              id="main"
-              className="relative z-[2] flex flex-1 flex-col bg-background text-foreground"
+          {/* reducedMotion="user" laesst ALLE motion-Komponenten prefers-reduced-motion
+              respektieren (WCAG 2.3.3/2.2.2) — die CSS-@media-Regel deckt nur CSS-Keyframes,
+              nicht die JS-Animationen. Ein Provider statt 35 Einzel-Guards. */}
+          <MotionConfig reducedMotion="user">
+            <a
+              href="#main"
+              className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-brand-deep focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-primary-foreground focus:shadow-card-hover"
             >
-              {children}
-            </main>
-            <Footer />
-            <CheckoutModal />
-            <CookieBanner />
-            <Toaster />
-          </CheckoutProvider>
+              Zum Hauptinhalt springen
+            </a>
+            <CheckoutProvider>
+              <Header />
+              <main
+                id="main"
+                className="relative z-[2] flex flex-1 flex-col bg-background text-foreground"
+              >
+                {children}
+              </main>
+              <Footer />
+              <CheckoutModal />
+              <CookieBanner />
+              <Toaster />
+            </CheckoutProvider>
+          </MotionConfig>
         </ThemeProvider>
         <JsonLd />
       </body>
