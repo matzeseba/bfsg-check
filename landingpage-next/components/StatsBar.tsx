@@ -36,7 +36,7 @@ export function StatsBar() {
             id="stats-heading"
             className="mt-3 font-display text-3xl font-semibold tracking-tight text-balance sm:text-[2.75rem] sm:leading-[1.05]"
           >
-            Audit-Methodik, die vor Gericht standhält.
+            Dieselben Normen wie Behörden und Kanzleien.
           </h2>
           <p className="mt-4 text-base text-[oklch(0.97_0.004_95)]/70 text-pretty">
             Wir scannen nach den gleichen Normen, auf die sich Aufsichtsbehörden

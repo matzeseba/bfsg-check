@@ -16,13 +16,13 @@ const ITEMS = [
   },
   {
     icon: ShieldCheckIcon,
-    title: "DSGVO-konform",
+    title: "Datenschutz nach DSGVO",
     desc: "Hosting in Deutschland, keine Drittland-Übermittlung.",
   },
   {
     icon: ScaleIcon,
     title: "BFSG / WCAG 2.1",
-    desc: "Prüfung nach EN 301 549 mit menschlicher Sichtung.",
+    desc: "Prüfung nach EN 301 549, Bezahlreports mit menschlicher Sichtung.",
   },
   {
     icon: GlobeIcon,
