@@ -1,7 +1,7 @@
 # 🤝 Handover für die nächste Session
 
 > **Lies das nach `CLAUDE.md` als ZWEITES.**
-> **Stand:** 20.06.2026 · **Letzte Session:** Marketing-Strategie + Legal-Reality-Check + Computer-Use-Aktivierung
+> **Stand:** 21.06.2026 · **Letzte Session:** Co-Founder-Agenten-Sprint — Funnel live verifiziert (Computer Use), Conversion-/Legal-Fixes, SEO-Pillar-Pages, paste-ready Launch-Assets, Notion-Pipeline. 3 offene PRs (#40/#41/#42).
 
 ---
 
@@ -11,25 +11,24 @@
 |---|---|
 | **Live-Status** | ✅ `bfsg-fix.de/health` = `ok:true, stripe:true, live:true, mailer aktiv` |
 | **Computer Use** | ✅ aktiviert (User Matthias hat Settings > General > „Computer use" angeschaltet) |
-| **Offene PRs** | 0 (alles auf main) — PR #5 (uralt) geschlossen |
-| **Letzter Merge** | PR #38 — Computer-Use-Aktivierung |
-| **Nächste konkrete Aufgabe** | `docs/SALES-DAY-1-V2.md` Schritt 1-8 ausführen → erste Sales |
-| **Goal-Frist** | „morgen Verkäufe" (laut letztem User-Goal) |
+| **Offene PRs** | **3 offen, Review/Merge durch Matthias:** #40 (Conversion/Legal-Fix), #41 (Launch-Assets + Checkliste + Repo-Hygiene), #42 (6 SEO-Pillar-Pages, Build lokal grün verifiziert) |
+| **Letzter Merge** | PR #39 — Session-Handover |
+| **Nächste konkrete Aufgabe** | `docs/LAUNCH-HEUTE-CHECKLISTE.md` abarbeiten → nur Matthias-Schritte (Stripe-Testkauf, Ads-Konten, Listings) → erste Sales |
+| **Funnel** | ✅ E2E live verifiziert (Scan→Teaser→Checkout-Modal→Stripe-Live, alle Legal-Seiten 200, §356a-Consent sauber) |
+| **Scanner-Limit** | ⚠️ Bot-geschützte Seiten (z. B. Zalando) scheitern — bei normalen SMB-Shops ok |
 
 ---
 
 ## 🎯 Was Matthias jetzt sofort braucht
 
-**Erst-Aufgabe in der nächsten Session** (Priorität HOCH):
+**Erst-Aufgabe** (Priorität HOCH): Die 3 offenen PRs (#40/#41/#42) reviewen + mergen, dann **`docs/LAUNCH-HEUTE-CHECKLISTE.md`** öffnen — das ist das zentrale Handlungsdokument mit nur den Schritten, die NUR Matthias kann (Konten + Karte + Submits), jeweils mit fertigem Copy-Paste-Text inline:
 
-Matthias hat Computer Use aktiviert. Er erwartet, dass Claude Code in der Desktop App jetzt **direkt Marketing-Tasks ausführt** (Browser steuern). Konkret:
+1. **Stripe-Live-Testkauf** (10 Min) — eigene Karte, dann Refund. PFLICHT bevor Ads-Budget fließt.
+2. **Google Ads Konto + Karte** (8 Min) — nur Konto anlegen, Kampagne kommt mit fertigem Setup aus der Checkliste.
+3. **Bing Ads Konto + Karte** (5 Min) — für späteren Google-Import.
+4. **3 Top-Listings** (12 Min) — SaaSHub/G2/OMR, Texte stehen fertig in der Checkliste.
 
-1. **Stripe-Live-Test** (15 Min) — Matthias kauft selbst mit eigener Karte, du beobachtest Webhook + Mail-Versand
-2. **Google Ads Konto-Setup** (15 Min) — Matthias loggt sich ein, du füllst Kampagnen-Settings aus
-3. **Bing Ads Konto-Setup** (10 Min) — Matthias loggt sich ein, du importierst von Google
-4. **3 Listings einreichen** (20 Min) — du füllst die Forms (SaaSHub, G2, OMR) aus den Templates in `marketing/listings-submission-templates.md`
-
-**WICHTIG:** Bei jeder Browser-Aktion fragt Claude Code um Erlaubnis (Computer-Use-Permission-Prompt). Matthias muss „Allow" klicken. Keine Auto-Zustimmung erwarten.
+**Realitäts-Check (ehrlich):** Verkäufe kommen frühestens in 3–7 Tagen (Google-Ads-Freigabe 24–72h + Lernphase). „Sales heute" aus Null-Traffic-Standstart ist unrealistisch — aber der Funnel ist verifiziert und alle Assets sind zünd-fertig. Schnellster realistischer Spike: Show HN (braucht ehrlichen Post = vorhanden, + Matthias' HN-Account).
 
 ---
 
@@ -256,11 +255,12 @@ Bei Wahl 1 → Computer-Use-Browser nutzen für:
 
 Nichts blockierendes. Aber für Vollständigkeit:
 
-- ⏳ User soll noch die **Stripe-Live-Test-Bestellung** mit eigener Karte machen (Schritt 1 in SALES-DAY-1-V2)
-- ⏳ Google Ads + Bing Ads Konten anlegen (Schritte 2-3) — braucht Matthias mit seiner Karte
-- ⏳ AGB-Generator-Abo abschließen (IT-Recht-Kanzlei 15 €/Mo) — `docs/LEGAL-REALITY-CHECK-2026.md`
-- ⏳ DPAs sammeln (Brevo/Stripe/Hetzner/Sentry) → `docs/legal-templates/dpa-checkliste.md`
-- ⏳ § 356a Widerrufs-Button vor 19.06.2026 implementieren — DEADLINE WAR GESTERN, Risiko mittel
+- ✅ **§ 356a / Widerruf erledigt** — `WiderrufForm.tsx` + `/widerruf` + `/widerrufsbelehrung` live; Checkout-Consent (ausdrücklicher Sofort-Ausführungs-Verzicht) sauber implementiert (`CheckoutModal.tsx` + `scanner/app.js:324`).
+- ⏳ Nur Matthias: **Stripe-Live-Testkauf**, **Google/Bing Ads Konten + Karte**, **Listings/PMs absenden** → alles Schritt-für-Schritt mit Copy-Paste-Text in `docs/LAUNCH-HEUTE-CHECKLISTE.md`
+- ⏳ 3 PRs mergen (#40/#41/#42) → triggert Auto-Deploy auf main
+- ⏳ AGB-Generator-Abo (IT-Recht-Kanzlei 15 €/Mo) + DPAs sammeln (Brevo/Stripe/Hetzner) — `docs/legal-templates/dpa-checkliste.md`
+- 💡 **Wachstums-Unlock diese Woche:** echtes aggregiertes Scan-Dataset erzeugen (für Show HN + 28.06.-PM) — `marketing/show-hn-launch-post.md` VERSION 2 wartet auf Belege. Autonom machbar, aber Ergebnis wird publiziert → mit Matthias abstimmen.
+- 💡 Landing-Detail (niedrige Prio): Hero-Headline fadet per Animation ein → ~1 s unsichtbar beim Laden (LCP/Conversion-Detail, bewusstes Design — nur falls Core-Web-Vitals leiden).
 
 ---
 
