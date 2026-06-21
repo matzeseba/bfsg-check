@@ -8,75 +8,97 @@
 
 ## Post-Format (Show HN)
 
-**Title (80 chars max, no exclamation marks, no „BFSG" als erstes Wort):**
+> **WICHTIG — EHRLICHKEITS-REGEL:** Nur belegbare Behauptungen im Post.
+> Unbelegte Statistiken (z. B. "89% der Sites", "10.000 Scans") ERST einfügen,
+> wenn das Dataset tatsächlich existiert und public ist. HN-Community erkennt
+> und bestraft aufgeblasene Launch-Claims sofort — das vernichtet Reputation.
+> AKTUELLE VERSION: Ehrlicher Tool-Launch ohne Dataset-Behauptungen.
+> VERSION 2 (nach erstem echten Dataset): Datenstory-Version weiter unten.
+
+---
+
+### VERSION 1 — Jetzt launchbar (ehrlich, ohne Dataset)
+
+**Title (80 chars max):**
 ```
-Show HN: I scanned 10,000 .de e-commerce sites for accessibility — dataset inside
+Show HN: I built a WCAG 2.1 AA compliance scanner for German websites (BFSG law)
 ```
 
-**Body (300-500 words, kein hard-sell):**
+**Body:**
 
 ```
 Hi HN,
 
-I'm Matthias, a solo founder from northern Germany. I built bfsg-fix.de — 
-an automated accessibility scanner that gives German online shops a 
-WCAG 2.1 AA score and a fix-plan PDF.
+I'm Matthias, a solo developer from northern Germany. I built bfsg-fix.de —
+an automated accessibility scanner for German websites, with German-language
+PDF reports and fix recommendations.
 
-Why? Because of the BFSG (German Accessibility Strengthening Act), 
-which came into force on June 28, 2025. Every B2C website with >10 
-employees is now legally required to be accessible — but most don't 
-know it, and the abmahnung wave has already started (~5,000 cease-and-
-desist letters issued by German law firms since August 2025).
+**Why this exists:** Germany's BFSG (Barrierefreiheitsstärkungsgesetz /
+Accessibility Strengthening Act) came into force June 28, 2025. Every B2C
+website with >10 employees must meet WCAG 2.1 AA. German law firms have
+been sending cease-and-desist letters since August 2025 (covered by WBS
+Legal, Heise, t3n).
 
-While building the product, I ran the scanner against 10,000 random .de 
-e-commerce sites (anonymously aggregated). Here's what I found:
+**What the scanner does:**
+- Free 60-second scan: score (0–100) + top findings
+- Full PDF report in German: all WCAG 2.1 AA issues with code-level fix
+  suggestions (€199 one-time)
+- Multi-page crawl + implementation plan + 30-day support (€499)
+- Cookie banner compliance check per TDDDG (€49/€79)
 
-Top 5 findings (% of sites with the issue):
-1. Color contrast below WCAG 4.5:1 threshold → 89%
-2. Missing alt attributes on images → 76%
-3. No skip links for keyboard users → 71%
-4. Form inputs without labels → 64%
-5. Cookie banner without first-level opt-out → 58%
+**Tech stack:**
+- Node.js + Express + Playwright (headless browser)
+- axe-core + Pa11y as base engines, with custom BFSG-specific rules
+- Hetzner CPX22 in Nürnberg (German data residency, GDPR-compliant)
+- Stripe Live payments, Brevo SMTP for delivery
 
-Average BFSG score: 47/100. Best site: 88/100 (only 1% reached >85). 
-Worst: 12/100.
+**What I learned building this:**
+- axe-core misses ~30–50% of real-world WCAG failures (color contrast
+  calculation differs depending on rendering engine and font anti-aliasing)
+- Pa11y + axe-core together have meaningful but not full overlap —
+  combining them catches more, but manual testing is still irreplaceable
+- Overlay tools (AccessiBe, UserWay) are explicitly called out by German
+  accessibility watchdogs as insufficient — the market wants honest audits
+- Building a scanner for German-specific law required reading the actual
+  BFSG text, not just mapping to WCAG (there are BFSG-specific exemptions
+  and scope nuances)
 
-The full anonymized dataset is on GitHub: 
-https://github.com/matzeseba/bfsg-check-dataset (planned — Werkzeug-
-Specific findings only, no individual site identification).
+**What I don't claim:**
+The tool gives you an automated technical analysis — not a legal guarantee
+of conformity. No tool can. The report says so explicitly.
 
-Tech stack:
-- Node.js + Express + Playwright
-- axe-core + Pa11y as scan engines, custom BFSG rule overlay
-- Cloudflare Pages + Hetzner CPX22 (Germany)
-- Stripe Live + Brevo SMTP
-- All German-language reports, DSGVO compliant
+**Honest status:** Just launched. Zero customers so far. If you run a
+German-market website or know someone who does, I'd genuinely love
+feedback on the scan results (the free scan requires no login).
 
-What surprised me:
-- Even sites that paid for "accessibility overlays" (AccessiBe, UserWay) 
-  still failed core WCAG criteria — overlays don't fix underlying HTML
-- The biggest improvements came from 30-minute developer interventions, 
-  not enterprise consulting packages
-- German shops are about 2 years behind US/UK in compliance maturity
+I'm the founder. Happy to answer questions about WCAG internals, the
+German compliance landscape, or building solo SaaS in Germany.
 
-The product:
-- Free scan (60 seconds) → score + top-3 findings
-- Full PDF report €199 (one-time)
-- Implementation plan + 30-day support €499
-- Monthly re-check €39/month
-
-It's me + the codebase, no investors, no team. Built in 6 weeks using 
-Claude Code multi-agent sprints (which itself is an interesting story).
-
-Happy to answer questions about:
-- BFSG compliance landscape
-- Building a solo SaaS in Germany
-- The scanner architecture
-- The dataset methodology
-
-Site: https://bfsg-fix.de
-Dataset (when live): https://github.com/matzeseba/bfsg-check-dataset
+https://bfsg-fix.de — free scan, no login required.
 ```
+
+---
+
+### VERSION 2 — Erst verwenden wenn Dataset real existiert
+
+> [BELEG NÖTIG] Die folgende Version enthält Statistiken aus einem
+> noch nicht existenten aggregierten Dataset. Sie darf ERST gepostet werden,
+> wenn bfsg-check-dataset auf GitHub public ist und die Zahlen aus echten
+> Scan-Daten stammen (nicht aus Schätzungen). Vorher ist das Schleichwerbung
+> mit falschen Tatsachenbehauptungen — UWG §5 + HN-Bann-Risiko.
+
+**Title V2 (erst nach echtem Dataset):**
+```
+Show HN: I scanned N .de e-commerce sites for WCAG compliance — dataset + tool
+```
+
+**Was zu belegen wäre vor Posting:**
+- [ ] Tatsächliche Anzahl gescannter Sites (nicht geschätzt)
+- [ ] Aggregierter CSV-Datensatz public auf GitHub (MIT-Lizenz, kein PII)
+- [ ] Statistiken aus echten Scan-Ergebnissen berechnet (nicht angenommen)
+- [ ] README mit Methodik: welche Sites, wie gesampelt, welche axe-Regeln
+
+Erst dann: Title mit echter Zahl, Body mit echten Statistiken.
 
 ---
 

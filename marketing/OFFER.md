@@ -7,7 +7,7 @@
 | 0 | **Kostenloser Sofort-Check** (Teaser-Scan) | 0 € | — | Lead-Magnet, zeigt nur Anzahl Probleme |
 | 1 | **Basis-Report** | 199 € | ~98 % | Vollreport bis 5 Unterseiten + Erklärung |
 | 2 | **Profi-Report** ⭐ | 499 € | ~97 % | bis 25 Seiten + Umsetzungsplan + Checkliste + 30 Tage Support |
-| 3 | **Re-Check-Abo** | 49 €/Monat | ~95 % | monatliche Überwachung = wiederkehrender Umsatz (MRR) |
+| 3 | **Re-Check-Abo** | 39 €/Monat | ~95 % | monatliche Überwachung = wiederkehrender Umsatz (MRR) |
 | 4 | **Fix-Done-for-you** (optional) | ab 1.500 € | variabel | Mängel werden behoben (mehr Aufwand/Kontakt) |
 
 ## Warum diese Struktur
@@ -20,9 +20,9 @@
 ## Conversion-Mechanik
 
 ```
-Cold-E-Mail / Ad  ─►  Gratis-Check (Stufe 0)  ─►  Report 199/499 € (Stufe 1/2)
-                                                         │
-                                                   Upsell ins Abo (Stufe 3)
+Ad / SEO / Listing  ─►  Gratis-Check (Stufe 0)  ─►  Report 199/499 € (Stufe 1/2)
+                                                              │
+                                                        Upsell ins Abo (Stufe 3)
 ```
 
 ## Zielkunden (priorisiert)

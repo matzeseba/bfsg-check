@@ -44,7 +44,7 @@ Was wir liefern:
 - Vollreport (Basis 199 €): PDF mit allen Findings nach WCAG 2.1 AA
 - Profi-Paket (499 €): Multi-Page-Crawl + Umsetzungsplan + 30 Tage 
   E-Mail-Support
-- Cookie-Check (99 € / 249 €): TDDDG-konforme Cookie-Banner-Prüfung
+- Cookie-Check (49 € / 79 €): TDDDG-konforme Cookie-Banner-Prüfung
 - Re-Check-Abo (39 €/Monat): monatliche Überprüfung mit Diff-Report
 
 Technisch: axe-core + Pa11y + eigene Regelwerke. Hosting in Deutschland 
@@ -237,8 +237,8 @@ Preis-Stufen:
   - Basis: 199 € (einmalig)
   - Profi: 499 € (einmalig)
   - Re-Check: 39 €/Monat
-  - Cookie-Basis: 99 €
-  - Cookie-Profi: 249 €
+  - Cookie-Basis: 49 €
+  - Cookie-Profi: 79 €
 
 Zielgruppe: Kleine und mittelständische Unternehmen, Online-Shops
 Branchen: E-Commerce, Reise, Bildung, Gesundheit

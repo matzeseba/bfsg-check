@@ -10,7 +10,7 @@
 
 - **Pivot vom Produkt zum Service-Layer:** Der Auto-Scan ist Gratis-Commodity (axe, WAVE, Lighthouse, BFSGuard liefern denselben Befund). Verkauft wird der **Fix-Plan** (technisches Briefing pro Befund, priorisiert, mit Code-Snippets) und die **Barrierefreiheitserklärungs-Vorlage** — beides liefern Gratis-Tools nicht.
 - **Search-First, kein Cold-Outreach:** Google-Ads (Such-Intent „bfsg website prüfen", „barrierefreiheit shop") + SEO (Long-Tail-Ratgeber) sind die einzigen DSGVO/UWG-sauberen Kanäle für ein Solo-Setup. Cold-Mail ist nach § 7 UWG **gesperrt** (Abmahnrisiko 1.000–5.000 € pro Mail). Influencer/Affiliates nur als warmer Partner-Kanal (Web-Agenturen, IT-Kanzleien).
-- **Preise validiert, aber nicht final:** Basis 199 €, Profi 499 €, Cookie-Basis 49 €, Cookie-Profi 79 €, Re-Check-Abo 49 €/Mo. Fünf strukturierte A/B-Tests (siehe `pricing-experiments.md`) klären in den ersten 90 Tagen, ob Preise nach oben oder unten gehören.
+- **Preise validiert, aber nicht final:** Basis 199 €, Profi 499 €, Cookie-Basis 49 €, Cookie-Profi 79 €, Re-Check-Abo 39 €/Mo. Fünf strukturierte A/B-Tests (siehe `pricing-experiments.md`) klären in den ersten 90 Tagen, ob Preise nach oben oder unten gehören.
 - **Stufenweises Budget:** Start mit 300 €/Mo (Bootstrap) → 1 k€ (Validierung nach erster 3 % Conversion) → 3 k€ (Skalierung) → 10 k€ (max. profitabler CPA). Jede Stufe braucht **Trigger-KPIs**, sonst kein Hochschalten.
 - **Monetarisierungs-Realität:** Ziel-AOV 350 € (Mischung Basis/Profi/Cookie), Ziel-Scan→Purchase 3 %, Ziel-MRR-Wachstum +10 %/Monat ab Monat 4. Bei CAC > 150 € pro Verkauf wird neu bewertet.
 
