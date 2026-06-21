@@ -13,3 +13,12 @@ deployment/docker-compose.override.yml
 deployment/.env
 # Sub-Agent-Worktrees (ephemere Kopien während paralleler Arbeit)
 .claude/
+
+# Second Brain Vault (lokal, nicht committen)
+vault/
+
+# Lokale Env-Secrets + Build-Artefakte (NIE committen)
+*.env.local
+.next/
+# Voice-Stack: ~600 MB Modelle/Binaries — lokal, gehoeren nicht ins Git
+scripts/voice/
