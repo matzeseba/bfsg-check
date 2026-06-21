@@ -35,6 +35,16 @@ export function PricingCards({
   const { openCheckout } = useCheckout();
   const [annual, setAnnual] = React.useState(false);
 
+  // Der Monatlich/Jaehrlich-Toggle ergibt nur Sinn, wenn ein KAUFBARES Abo
+  // angezeigt wird. Bei reinen Einmal-Paketen (Basis/Profi/Cookie) tut er nichts
+  // und wirkt mit "-2 Monate" sogar irrefuehrend. Solange das Abo deaktiviert ist
+  // (available:false), blenden wir ihn aus — und zeigen ihn automatisch wieder,
+  // sobald ein Abo kaufbar wird.
+  const hasEnabledSub = packages.some(
+    (p) => p.mode === "subscription" && p.available !== false,
+  );
+  const showToggle = showAnnualToggle && hasEnabledSub;
+
   return (
     <section
       id={id}
@@ -56,7 +66,7 @@ export function PricingCards({
             {subtitle}
           </p>
 
-          {showAnnualToggle && (
+          {showToggle && (
             <div className="mt-6 inline-flex items-center gap-3 rounded-full border border-border/70 bg-card/70 p-1 shadow-card-soft backdrop-blur">
               <button
                 type="button"
