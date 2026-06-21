@@ -156,6 +156,27 @@ scripts/          PDF-Generator + Helper-Scripts
 
 ---
 
+## ⚡ Cache-Prompting (FESTE REGEL — gilt für die festen Agenten)
+
+> **Warum:** Die 217 Agency-Agenten + diese CLAUDE.md sind ein großer, stabiler Prompt-Prefix. Claude Code cached den automatisch (System- + Projekt-Kontext-Layer). Cache-Read kostet ~0,1×, ein Cache-Miss zahlt den vollen Prefix neu. Cache-bewusst arbeiten = schneller + günstiger. Details: `docs/CACHE-PROMPTING-AGENTS.md`.
+
+**Wie Caching hier wirkt (Stand 21.06.2026, doc-belegt):**
+- **Automatisch + an by default.** Der feste Agenten-Prefix + CLAUDE.md laden 1× beim Session-Start und liegen im Cache. Nichts manuell zu setzen.
+- **Subagents:** jeder Agency-Agent baut seinen **eigenen** Cache (kalt → warm über seine Turns), **immer 5-Min-TTL** (auch bei Abo). Die 1h-TTL gilt nur fürs Haupt-Gespräch.
+
+**Regeln, um den warmen Prefix NICHT zu zerstören:**
+1. **Kein Modellwechsel mitten in der Session** (Opus↔Sonnet, `/fast`-Toggle, Effort-Änderung) — jedes davon = voller Re-Read des gesamten Prefix.
+2. **CLAUDE.md / `.claude/agents/` nicht mitten im Task ändern.** Edits greifen ohnehin erst nächste Session und der Mid-Session-Edit ist zwar cache-sicher, aber Struktur-Churn vermeiden. Agenten-/Regel-Änderungen an Session-Grenzen.
+3. **MCP-Server / Plugins nicht unnötig mitten in der Session an-/abschalten** (kann Prefix invalidieren, wenn Tools in den Prefix laden).
+4. **Agency-Sprints batchen:** unabhängige Agenten in EINER Nachricht parallel starten; iterative Arbeit innerhalb des 5-Min-Fensters halten. Bei langen Pausen `/loop`-Kadenz < 5 Min oder die 1h-Haupt-Cache (s. u.).
+5. **Warmen Agenten weiternutzen** via `SendMessage` (Kontext + Cache bleiben warm) statt neuem `Agent`-Call, wenn die Arbeit zusammenhängt.
+6. **Subagent-Prompts self-contained** geben (Persona-Datei-Pfad + voller Task vorne), da jeder Subagent kalt startet und nur über eigene Turns warm wird — Nachfüttern in Tröpfchen ist teuer.
+
+**Optionaler 1h-Haupt-Cache (manuell, vom User zu setzen — NICHT eigenmächtig):**
+- `ENABLE_PROMPT_CACHING_1H=1` in `.claude/settings.json` (`env`-Block) hält den **Haupt-Gespräch**-Cache 1h warm (gut für lange Sprints mit Weg-Pausen). Trade-off: Cache-Writes 2× statt 1,25×; greift nur bei API-Key-Auth (bei Abo ist 1h ohnehin automatisch). Zurück: Zeile entfernen oder `FORCE_PROMPT_CACHING_5M=1`. Komplett aus: `DISABLE_PROMPT_CACHING=1`.
+
+---
+
 ## 📞 Bei Fragen / Blockern
 
 - **User-E-Mail:** matze.seba@outlook.de (für Account-Erstellungen, etc.)

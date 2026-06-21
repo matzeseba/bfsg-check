@@ -1,7 +1,24 @@
 # 🤝 Handover für die nächste Session
 
 > **Lies das nach `CLAUDE.md` als ZWEITES.**
-> **Stand:** 21.06.2026 · **Letzte Session:** Co-Founder-Agenten-Sprint — Funnel live verifiziert (Computer Use), Conversion-/Legal-Fixes, SEO-Pillar-Pages, paste-ready Launch-Assets, Notion-Pipeline. 3 offene PRs (#40/#41/#42).
+> **Stand:** 21.06.2026 (spät) · **Letzte Session:** Agency-Agents-Integration + Pre-Launch-Audit-Sprint + Cache-Prompting-Regel. Davor: Co-Founder-Sprint (Funnel live verifiziert, Conversion-/Legal-Fixes, SEO-Pillar-Pages, Launch-Assets, Notion-Pipeline).
+
+---
+
+## 🆕 Update 21.06.2026 (spät) — Agency-Agents + Audits + Caching
+
+- ✅ **Agency-Agents installiert** (`msitarzewski/agency-agents`, MIT, 114k★): **217 Spezial-Agenten** in `.claude/agents/agency/` (lokal/gitignored). Ab nächstem Session-Start nativ als `subagent_type` nutzbar. Regel: `CLAUDE.md` → „🤖 Agency-Agents". **Standard-Werkzeug für jede Spezial-Aufgabe.**
+- ✅ **6 parallele Audit-Teams** (Security/Code/A11y/Legal/Conversion/SRE) → `docs/agency-audits/2026-06-21-MASTER-SUMMARY.md` (Launch-Ampel + Owner-Split, gegen `origin/main` re-validiert).
+- ✅ **PR #46 gemerged + live** (Health: `ok:true, stripe:true, live:true, mailer aktiv`). Enthält: MotionConfig-A11y-Fix + 2 Legal-Copy-Entschärfungen (UWG §5).
+- ✅ **Cache-Prompting-Regel** verankert: `CLAUDE.md` → „⚡ Cache-Prompting" + `docs/CACHE-PROMPTING-AGENTS.md`.
+- ✅ **§ 356a Widerruf-Button:** Audit ergab **ERFÜLLT** — alter „OVERDUE"-Flag war stale.
+
+### 🔴 Offen vor Ad-Skalierung (priorisiert, brauchen User-OK / Server / Tests)
+1. **SSRF-Redirect-Pin** (Security C1) — Scanner folgt 30x zu internen/Metadata-IPs. `scanner/lib/url-guard.js` + `scan*.js`.
+2. **Backup scharf schalten + 1 Restore-Test** (SRE S-01) — Server.
+3. **Code-Fixes C2/C3** — GoBD-Rechnungsnummern-Verbrennung + toter `resend.js`-Befehl (`scanner/app.js`).
+4. **ResultCard-Conversion-Brücke** + Noten-Schwellen Seite„C"/PDF„B" angleichen.
+> Details + Severity je Befund: `docs/agency-audits/`.
 
 ---
 
