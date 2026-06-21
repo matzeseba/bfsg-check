@@ -28,8 +28,8 @@
 |---|---|
 | **Live-Status** | ✅ `bfsg-fix.de/health` = `ok:true, stripe:true, live:true, mailer aktiv` |
 | **Computer Use** | ✅ aktiviert (User Matthias hat Settings > General > „Computer use" angeschaltet) |
-| **Offene PRs** | **3 offen, Review/Merge durch Matthias:** #40 (Conversion/Legal-Fix), #41 (Launch-Assets + Checkliste + Repo-Hygiene), #42 (6 SEO-Pillar-Pages, Build lokal grün verifiziert) |
-| **Letzter Merge** | PR #39 — Session-Handover |
+| **Offene PRs** | ✅ **0 offen** — alle gemerged (#40–#44 Funnel/Legal/SEO + #46 Agency-Agents/Audits + #47 Cache-Regel); #45 als superseded geschlossen |
+| **Letzter Merge** | PR #47 — Cache-Prompting-Regel (`main` aktuell, deployed, Health grün) |
 | **Nächste konkrete Aufgabe** | `docs/LAUNCH-HEUTE-CHECKLISTE.md` abarbeiten → nur Matthias-Schritte (Stripe-Testkauf, Ads-Konten, Listings) → erste Sales |
 | **Funnel** | ✅ E2E live verifiziert (Scan→Teaser→Checkout-Modal→Stripe-Live, alle Legal-Seiten 200, §356a-Consent sauber) |
 | **Scanner-Limit** | ⚠️ Bot-geschützte Seiten (z. B. Zalando) scheitern — bei normalen SMB-Shops ok |
