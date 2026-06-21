@@ -20,6 +20,12 @@
 4. **ResultCard-Conversion-Brücke** + Noten-Schwellen Seite„C"/PDF„B" angleichen.
 > Details + Severity je Befund: `docs/agency-audits/`.
 
+### 🧠 Parallel-Session-Work (Jarvis-Cockpit) + Session-Config
+- ✅ **Im Repo (committet):** `docs/ai-os-research/` (Masterplan + Architektur + Security-Review + Setup-Guides für das lokale Cockpit), `vault-template/` (Second-Brain-Template, keine Secrets), `scripts/legal_copy_grep.py` + `scripts/memory_extractor.py` (Tools).
+- ⚠️ **LOKAL-ONLY, bewusst NICHT im Repo:** `cockpit/` + `cockpit-ui/` (Jarvis-Cockpit Next.js/Node-Apps, „standalone, nie auf Prod"), `scripts/voice/` (~600 MB Piper/Whisper-Modelle, gitignored), `vault/` (echtes Second-Brain, gitignored). **Grund:** `cockpit-ui/.env.local` (Secret) + Build-Artefakte + Binär-Modelle gehören nicht ins Git. `.gitignore` wurde entsprechend gehärtet (`*.env.local`, `.next/`, `scripts/voice/`). → Cockpit-Apps können auf Wunsch sauber versioniert werden (jetzt secret-/bloat-sicher).
+- ✅ **SessionStart-Hook** aktiv: `.claude/settings.json` (lokal) injiziert bei jedem Session-Start einen Verweis auf dieses Handover. Du musst nichts mehr tippen.
+- 📊 **Notion-Dashboard:** [BFSG-Check — Launch & Ops Board](https://app.notion.com/p/3802191b1070812ba39ce089c9e3b510?pvs=1) + [Sales Pipeline](https://app.notion.com/p/f10735999280434bbcd2c0c596d138f6?pvs=1). ⚠️ Der `Notion Dashboard Sync` (GitHub Action) lief zuletzt auf **failure** — vermutlich fehlende Secrets (`NOTION_TOKEN`/`NOTION_DB_*`), siehe `docs/DASHBOARD-NOTION-SETUP.md`.
+
 ---
 
 ## ⚡ TL;DR für Schnell-Start (60 Sekunden)
