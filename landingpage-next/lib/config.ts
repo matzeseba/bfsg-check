@@ -28,9 +28,9 @@ export type PackageConfig = {
 export const SITE = {
   url: "https://bfsg-fix.de",
   name: "BFSG-Check",
-  title: "BFSG-Check — Ist Ihre Website BFSG-konform? | Kostenlose Sofort-Prüfung",
+  title: "BFSG-Check — Ist Ihre Website barrierefrei genug? | Kostenloser WCAG-Sofort-Check",
   description:
-    "Prüfen Sie in 60 Sekunden, ob Ihre Website das Barrierefreiheitsstärkungsgesetz (BFSG) erfüllt. Kostenloser Sofort-Check, ausführlicher Report auf Wunsch.",
+    "Prüfen Sie in 60 Sekunden, wo Ihre Website die Anforderungen des Barrierefreiheitsstärkungsgesetzes (BFSG) noch verfehlt — automatisierte WCAG-2.1-AA-Analyse, ausführlicher Report auf Wunsch.",
   email: "hallo@bfsg-fix.de",
 } as const;
 
@@ -54,10 +54,10 @@ export const HERO = {
   pillFlag: "DE",
   pill: "BFSG seit 28.06.2025 in Kraft · Erste Abmahnungen rollen an",
   headlineLead: "Ist Ihre Website",
-  headlineEmph: "BFSG-konform?",
-  headlineTail: "In 60 Sekunden wissen Sie es.",
+  headlineEmph: "barrierefrei genug?",
+  headlineTail: "In 60 Sekunden wissen Sie es — bevor es eine Kanzlei tut.",
   subline:
-    "Automatisierter Sofort-Check nach WCAG 2.1 / EN 301 549 — mit konkretem, menschlich geprüftem Fix-Plan zum Abarbeiten. Premium-Audit ohne Kanzlei-Honorar.",
+    "Wir scannen Ihre Seite nach über 80 WCAG-2.1-AA-Regeln und liefern jeden Mangel priorisiert — mit Copy-Paste-Fix und menschlicher Sichtung. Premium-Audit ohne Kanzlei-Honorar.",
   cta: "Jetzt kostenlos prüfen",
   ctaSecondary: "Pakete ansehen",
   placeholder: "https://ihre-website.de",
@@ -96,8 +96,8 @@ export const HERO_VISUAL = {
 // Risiko-/Urgency-Band: faktenbasiert, kein UWG-Versprechen.
 export const RISK_BAND = {
   kicker: "Seit 28.06.2025 in Kraft",
-  title: "Das BFSG ist keine Zukunftsmusik mehr — die Frist ist verstrichen.",
-  desc: "Betroffene Unternehmen müssen ihre digitalen Angebote barrierefrei anbieten. Wettbewerber, Verbände und abmahnende Kanzleien dürfen Verstöße verfolgen. Wer jetzt prüft, behebt Mängel in Ruhe — statt unter Abmahn-Druck.",
+  title: "Die BFSG-Frist ist seit dem 28. Juni 2025 verstrichen — und die ersten Abmahnungen sind da.",
+  desc: "Betroffene Unternehmen müssen ihre digitalen Angebote barrierefrei anbieten. Wettbewerber, Verbände und abmahnende Kanzleien dürfen Verstöße verfolgen. Wer jetzt prüft, behebt Mängel in Ruhe statt unter Abmahn-Druck. In 60 Sekunden sehen Sie, wo Sie stehen — kostenlos und ohne Anmeldung.",
   points: [
     { value: "28.06.2025", label: "Stichtag bereits überschritten" },
     { value: "WCAG 2.1 AA", label: "geforderter Mindeststandard" },
@@ -190,7 +190,7 @@ export const PACKAGES: PackageConfig[] = [
   {
     id: "profi",
     name: "BFSG-Report Profi",
-    tag: "Beliebt · Profi",
+    tag: "Empfohlen · Profi",
     price: "499 €",
     description: "Report + Umsetzungsplan",
     mode: "payment",
@@ -198,7 +198,7 @@ export const PACKAGES: PackageConfig[] = [
     featured: true,
     moneyBack: "30 Tage Geld-zurück bei berechtigter Reklamation",
     features: [
-      "Alles aus Basis",
+      "Alles aus Basis — plus tiefere Abdeckung:",
       "Bis zu 25 Unterseiten",
       "Konkreter Umsetzungs-Fahrplan",
       "Entwickler-Checkliste (Copy-Paste)",
@@ -245,7 +245,7 @@ export const COOKIE_PACKAGES: PackageConfig[] = [
   {
     id: "cookie-profi",
     name: "Cookie-Check Profi",
-    tag: "Beliebt · Cookie Profi",
+    tag: "Empfohlen · Cookie Profi",
     price: "79 €",
     description: "Tiefere Prüfung & manuelle Sichtung",
     mode: "payment",
@@ -253,7 +253,7 @@ export const COOKIE_PACKAGES: PackageConfig[] = [
     featured: true,
     moneyBack: "30 Tage Geld-zurück bei berechtigter Reklamation",
     features: [
-      "Alles aus Cookie Basis",
+      "Alles aus Cookie Basis — plus tiefere Prüfung:",
       "Erweiterte Tracker-Liste (TCF-Hinweise)",
       "Prüfung bekannter CMP-Konfigurationen",
       "Menschliche Sichtung vor Auslieferung",
@@ -270,12 +270,12 @@ export const DIFFERENTIATORS = [
   {
     kicker: "Tiefer als Gratis-Tools",
     title: "Menschliche Sichtung vor Auslieferung",
-    desc: "Automatische Tests finden 30–50 % der Mängel. Bei uns liest ein Mensch jeden Report quer, bevor er rausgeht — keine False Positives, keine generischen Empfehlungen.",
+    desc: "Automatische Tests finden erfahrungsgemäß nur 30–50 % der Mängel — den Rest übersehen sie. Bei uns liest ein Mensch jeden Report quer, bevor er rausgeht: keine False Positives, keine generischen Empfehlungen.",
   },
   {
     kicker: "Günstiger als Beratung",
     title: "Pauschalpreis statt Stundensatz",
-    desc: "Sie zahlen einmalig 199 € oder 499 € — kein Tagessatz, kein Beratungsmonster. Genug Tiefe für die Pflicht, ohne Overengineering.",
+    desc: "Sie zahlen einmalig 199 € oder 499 € — kein Tagessatz, keine offene Rechnung. Sie wissen vorab auf den Euro genau, was es kostet.",
   },
 ] as const;
 
@@ -289,20 +289,28 @@ export const FAQ_ITEMS = [
     a: "Gratis-Tools liefern Rohdaten — hunderte Findings ohne Priorisierung, ohne Lösungs-Snippet, ohne Kontext. Wir kuratieren: jeder Mangel bekommt eine Priorität, einen konkreten Fix und landet im Umsetzungs-Fahrplan. Plus: Entwurf der Barrierefreiheitserklärung, fertig zum Veröffentlichen.",
   },
   {
-    q: "Ersetzt der Report eine Rechtsberatung?",
-    a: "Nein. Der Report ist eine technische Vorprüfung nach WCAG 2.1 und deckt einen Großteil der häufigen Mängel ab. Für eine rechtsverbindliche Bewertung konsultieren Sie bitte einen Fachanwalt für IT- oder Wettbewerbsrecht.",
-  },
-  {
     q: "Wie genau ist die KI-gestützte Prüfung?",
     a: "Automatisierte Tests finden erfahrungsgemäß rund 30–50 % aller Mängel zuverlässig (Kontraste, Alt-Texte, Labels, Tastatur-Fokus). Komplexe Punkte wie Bedienlogik oder semantische Korrektheit ergänzen wir durch eine menschliche Sichtung vor Auslieferung.",
   },
   {
-    q: "Ist BFSG-Check DSGVO-konform?",
-    a: "Ja. Wir hosten ausschließlich in Deutschland, übermitteln keine Daten in Drittländer, speichern nur das, was zur Vertragsabwicklung nötig ist (E-Mail, Rechnungsadresse, gescannte URL) und nutzen nur technisch notwendige Cookies ohne Consent. Details in der Datenschutzerklärung.",
-  },
-  {
     q: "Was passiert nach dem Kauf?",
     a: "Nach erfolgreicher Zahlung startet der vollständige Scan automatisch. Sie erhalten Report (PDF) und Entwurf der Barrierefreiheitserklärung typischerweise innerhalb weniger Stunden per E-Mail.",
+  },
+  {
+    q: "Was, wenn der Report keine relevanten Mängel findet?",
+    a: "Dann erhalten Sie genau diese Bestätigung schriftlich — eine dokumentierte, automatisierte WCAG-2.1-AA-Erstprüfung Ihrer Seite zum Stichtag, inklusive Entwurf der Barrierefreiheitserklärung. In der Praxis findet der Scan bei nahezu jeder gewachsenen Website Optimierungspotenzial.",
+  },
+  {
+    q: "Reichen 5 bzw. 25 Unterseiten für meine Website?",
+    a: "Für die meisten KMU-Websites und Shops genügt das: Geprüft werden Ihre repräsentativen Seitentypen (Startseite, Kategorie, Produkt, Formular, Checkout) — denn dieselben Mängelmuster wiederholen sich seitenübergreifend. Bei sehr großen Portalen sprechen Sie uns vor dem Kauf kurz an.",
+  },
+  {
+    q: "Ersetzt der Report eine Rechtsberatung?",
+    a: "Nein. Der Report ist eine technische Vorprüfung nach WCAG 2.1 und deckt einen Großteil der häufigen Mängel ab. Für eine rechtsverbindliche Bewertung konsultieren Sie bitte einen Fachanwalt für IT- oder Wettbewerbsrecht.",
+  },
+  {
+    q: "Ist BFSG-Check DSGVO-konform?",
+    a: "Ja. Wir hosten ausschließlich in Deutschland, übermitteln keine Daten in Drittländer, speichern nur das, was zur Vertragsabwicklung nötig ist (E-Mail, Rechnungsadresse, gescannte URL) und nutzen nur technisch notwendige Cookies ohne Consent. Details in der Datenschutzerklärung.",
   },
   {
     q: "Wie erhalte ich eine Rechnung?",

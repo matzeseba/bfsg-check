@@ -32,11 +32,13 @@ export function Hero() {
       {/* Spotlight statt freischwebender Blobs — wirkt intentionaler. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-[-30%] -z-10 size-[80vw] max-w-5xl -translate-x-1/2 rounded-full bg-brand-mint/10 blur-[100px]"
+        className="pointer-events-none absolute left-1/2 top-[-30%] -z-10 size-[80vw] max-w-5xl -translate-x-1/2 rounded-full bg-brand-mint/10 blur-[70px]"
       />
+      {/* Zweiter Glow nur ab md+: zwei gestapelte Großradius-Blur-Layer hinter
+          dem LCP-Element sind auf Mobile ein teurer GPU-Blur-Pass. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute right-[-10%] top-[-10%] -z-10 size-[45vw] rounded-full bg-brand-violet/15 blur-[90px]"
+        className="pointer-events-none absolute right-[-10%] top-[-10%] -z-10 hidden size-[45vw] rounded-full bg-brand-violet/15 blur-[70px] md:block"
       />
 
       <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-5 pt-14 pb-20 sm:px-6 sm:pt-20 sm:pb-28 lg:grid-cols-[1.04fr_0.96fr] lg:gap-12">
@@ -65,13 +67,11 @@ export function Hero() {
             </a>
           </motion.div>
 
-          {/* Editorial-Headline: Fraunces-Serif, betontes Wort als Serif-Italic. */}
-          <motion.h1
-            initial={{ opacity: 0, y: 22 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.05, ease: EASE }}
-            className="mt-6 font-display text-[clamp(2.6rem,6.4vw,4.6rem)] leading-[0.98] font-semibold tracking-[-0.025em] text-balance"
-          >
+          {/* Editorial-Headline: Fraunces-Serif, betontes Wort als Serif-Italic.
+              Bewusst OHNE Entrance-Animation: die H1 ist das LCP-Element — ein
+              opacity:0-Start würde den Largest Contentful Paint künstlich um die
+              Animationsdauer verzögern (relevant für paid-Ads-Quality-Score). */}
+          <h1 className="mt-6 font-display text-[clamp(2.6rem,6.4vw,4.6rem)] leading-[0.98] font-semibold tracking-[-0.025em] text-balance">
             <span className="block gradient-text-soft">{HERO.headlineLead}</span>
             <span className="block italic gradient-text">
               {HERO.headlineEmph}
@@ -79,16 +79,11 @@ export function Hero() {
             <span className="mt-1 block font-sans text-[0.4em] font-medium tracking-tight text-muted-foreground not-italic">
               {HERO.headlineTail}
             </span>
-          </motion.h1>
+          </h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.15, ease: EASE }}
-            className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground text-pretty"
-          >
+          <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground text-pretty">
             {HERO.subline}
-          </motion.p>
+          </p>
 
           <motion.div
             initial={{ opacity: 0, y: 16 }}

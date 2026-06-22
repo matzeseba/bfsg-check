@@ -197,24 +197,38 @@
     background-image:
       radial-gradient(at 12% 0%, color-mix(in oklch, var(--brand-mint), transparent 92%) 0px, transparent 50%),
       radial-gradient(at 92% 6%, color-mix(in oklch, var(--brand-indigo), transparent 90%) 0px, transparent 55%);
-    background-attachment: fixed;
+    /* Kein background-attachment: fixed — erzwingt auf Mobile Full-Viewport-Repaint
+       pro Scroll-Frame (INP-/Jank-Killer auf paid-Ads-Traffic). Der Wash sitzt oben
+       im Hero, wo er sichtbar ist; mitscrollen ist optisch unkritisch. */
     position: relative;
   }
   /* Grain/Noise-Overlay: nimmt den flachen Digital-Look, gibt Papier-Haptik.
-     Reines inline-SVG (feTurbulence), kein Asset. */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    opacity: 0.035;
-    mix-blend-mode: soft-light;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+     Reines inline-SVG (feTurbulence), kein Asset. Nur ab md+ — die fixierte,
+     soft-light-geblendete Full-Viewport-Ebene ist auf Mobile zu teuer (Composite
+     + Repaint je Scroll-Frame) und auf kleinen Screens kaum wahrnehmbar. */
+  @media (min-width: 768px) {
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.035;
+      mix-blend-mode: soft-light;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    .dark body::before {
+      opacity: 0.06;
+      mix-blend-mode: overlay;
+    }
   }
-  .dark body::before {
-    opacity: 0.06;
-    mix-blend-mode: overlay;
+  /* Sichtbarer Fokus-Indikator für rohe Links (Buttons/Inputs haben eigene
+     focus-visible-Ringe). WCAG 2.4.7 — vorher fielen reine <a> auf den
+     UA-Default zurück. */
+  a:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
   }
   ::selection {
     background-color: color-mix(in oklch, var(--brand-mint), transparent 65%);
