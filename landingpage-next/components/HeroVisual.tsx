@@ -147,7 +147,7 @@ export function HeroVisual() {
             <p className="text-[13px] font-medium text-foreground">
               + priorisierter Fix-Plan &amp; Entwurf der Erklärung
             </p>
-            <span className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-brand-deep px-2.5 py-1.5 text-[11px] font-semibold text-primary-foreground">
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-brand-deep px-2.5 py-1.5 text-[11px] font-semibold text-on-deep">
               Pakete
               <ArrowRightIcon className="size-3" />
             </span>

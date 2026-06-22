@@ -4,6 +4,13 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Vordergrund für IMMER dunkle Marken-Flächen (brand-deep/brand-indigo sind in
+   beiden Themes dunkel). primary-foreground kippt im Dark-Mode auf dunkel und
+   wäre dort unlesbar — diese Utility bleibt konstant hell. */
+@utility text-on-deep {
+  color: oklch(0.985 0.004 95);
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
