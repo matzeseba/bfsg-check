@@ -25,7 +25,9 @@ function gradeFor(score: number): {
   verdict: string;
   tone: "good" | "warn" | "bad";
 } {
-  if (score >= 85) {
+  // Schwellen identisch zum Backend (scanner/lib/report.js: A>=90, B>=75, C>=50),
+  // damit der Teaser dieselbe Note zeigt wie der bezahlte PDF-Report.
+  if (score >= 90) {
     return {
       grade: "A",
       variant: "default",
@@ -33,7 +35,7 @@ function gradeFor(score: number): {
       tone: "good",
     };
   }
-  if (score >= 70) {
+  if (score >= 75) {
     return {
       grade: "B",
       variant: "secondary",
@@ -41,7 +43,7 @@ function gradeFor(score: number): {
       tone: "warn",
     };
   }
-  if (score >= 55) {
+  if (score >= 50) {
     return {
       grade: "C",
       variant: "secondary",
@@ -152,7 +154,7 @@ export function ResultCard({ result }: { result: ScanResult }) {
           </a>
           <Button
             onClick={() => openCheckout("profi")}
-            className="h-10 min-h-11 gap-1.5 rounded-xl bg-brand-mint text-sm font-semibold text-brand-deep hover:bg-brand-mint/85 sm:min-h-10"
+            className="h-11 gap-1.5 rounded-xl bg-brand-mint text-sm font-semibold text-brand-deep hover:bg-brand-mint/85"
           >
             Vollreport sichern
             <ArrowRightIcon className="size-4" />

@@ -85,7 +85,7 @@ export function Header() {
           <span className="flex items-baseline gap-1">
             <span>BFSG</span>
             <span className="text-muted-foreground">·</span>
-            <span className="text-brand-mint">Check</span>
+            <span className="text-brand-indigo dark:text-brand-mint">Check</span>
           </span>
         </Link>
 

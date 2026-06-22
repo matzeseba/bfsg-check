@@ -27,7 +27,7 @@ export function StatsBar() {
         className="pointer-events-none absolute -right-32 -bottom-32 -z-10 size-[40rem] rounded-full bg-brand-violet/30 blur-[100px]"
       />
 
-      <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-20">
+      <div className="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-24">
         <div className="mx-auto max-w-2xl text-center">
           <p className="font-mono text-xs font-medium tracking-[0.2em] text-brand-mint uppercase">
             Belastbar geprüft

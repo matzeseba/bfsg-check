@@ -1,11 +1,20 @@
 "use client";
 
 import * as motion from "motion/react-client";
-import { AlertTriangleIcon } from "lucide-react";
+import {
+  AlertTriangleIcon,
+  CalendarClockIcon,
+  GavelIcon,
+  ScaleIcon,
+} from "lucide-react";
 
 import { RISK_BAND } from "@/lib/config";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
+
+// Pro Risk-Point ein passendes Icon (Reihenfolge = RISK_BAND.points):
+// Stichtag · geforderter Standard · Klagebefugnis.
+const POINT_ICONS = [CalendarClockIcon, ScaleIcon, GavelIcon] as const;
 
 // Soft-Urgency-Band: faktenbasierter Kontext zur BFSG-Frist. Bewusst KEINE
 // Drohung, KEIN UWG-Versprechen — nur "die Frist ist da, jetzt in Ruhe handeln".
@@ -20,7 +29,7 @@ export function RiskBand() {
         aria-hidden
         className="pointer-events-none absolute -left-20 top-1/2 -z-10 size-72 -translate-y-1/2 rounded-full bg-brand-amber/10 blur-[80px]"
       />
-      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:px-6 sm:py-20 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:gap-14">
+      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-20 sm:px-6 sm:py-24 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:gap-14">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -52,7 +61,9 @@ export function RiskBand() {
           }}
           className="grid gap-3"
         >
-          {RISK_BAND.points.map((p) => (
+          {RISK_BAND.points.map((p, i) => {
+            const Icon = POINT_ICONS[i] ?? AlertTriangleIcon;
+            return (
             <motion.li
               key={p.label}
               variants={{
@@ -61,8 +72,8 @@ export function RiskBand() {
               }}
               className="group/risk flex items-center gap-4 rounded-2xl border border-border/70 bg-card/80 p-4 shadow-card-soft backdrop-blur transition-colors hover:border-brand-amber/40"
             >
-              <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-brand-amber/12 font-mono text-sm font-bold tabular-nums text-brand-amber">
-                §
+              <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-brand-amber/12 text-brand-amber">
+                <Icon className="size-5" aria-hidden />
               </span>
               <div className="min-w-0">
                 <p className="font-display text-lg font-semibold tracking-tight tabular-nums">
@@ -71,7 +82,8 @@ export function RiskBand() {
                 <p className="text-sm text-muted-foreground">{p.label}</p>
               </div>
             </motion.li>
-          ))}
+            );
+          })}
         </motion.ul>
       </div>
     </section>

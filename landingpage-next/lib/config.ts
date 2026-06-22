@@ -128,20 +128,25 @@ export const HOW_IT_WORKS = [
 
 // num/prefix/suffix/decimals steuern den Count-up in StatsBar; bei null wird
 // `value` statisch angezeigt (z. B. "EN 301 549").
-export const STATS = [
+export type StatItem = {
+  value: string;
+  num: number | null;
+  prefix?: string;
+  suffix?: string;
+  decimals?: number;
+  label: string;
+};
+
+export const STATS: StatItem[] = [
   {
     value: "60 Sek.",
     num: 60,
     suffix: " Sek.",
     label: "bis zum ersten Ergebnis",
   },
-  {
-    value: "WCAG 2.1",
-    num: 2.1,
-    prefix: "WCAG ",
-    decimals: 1,
-    label: "AA-konform geprüft",
-  },
+  // num:null → statisch rendern. Eine Versionsnummer ("2.1") darf NICHT über
+  // toLocaleString("de-DE") laufen, sonst wird daraus das Dezimalkomma "2,1".
+  { value: "WCAG 2.1", num: null, label: "Prüfung nach AA-Standard" },
   { value: "EN 301 549", num: null, label: "Audit-Methodik" },
   {
     value: "100 %",
@@ -151,14 +156,17 @@ export const STATS = [
   },
 ] as const;
 
+// Ehrliches Normen-/Standards-Band statt erfundener Presse-Logos.
+// Alle hier genannten Normen sind die tatsächliche Prüfgrundlage (UWG-sauber,
+// keine Schleichwerbung/Fake-Mentions).
 export const LOGO_CLOUD = {
-  kicker: "Bald berichtet in",
+  kicker: "Geprüft nach anerkannten Standards",
   logos: [
-    { name: "TechCrunch DE", width: 132 },
-    { name: "t3n", width: 56 },
-    { name: "OMR", width: 64 },
-    { name: "heise online", width: 124 },
-    { name: "Computerwoche", width: 156 },
+    { name: "WCAG 2.1 AA", width: 96 },
+    { name: "EN 301 549", width: 96 },
+    { name: "BITV 2.0", width: 72 },
+    { name: "BFSG", width: 56 },
+    { name: "§ 25 TDDDG", width: 88 },
   ],
 } as const;
 

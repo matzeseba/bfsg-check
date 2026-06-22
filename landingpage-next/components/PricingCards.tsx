@@ -22,6 +22,9 @@ type PricingCardsProps = {
   kicker?: string;
   id?: string;
   showAnnualToggle?: boolean;
+  // true = innerhalb einer Sektion mit eigenem Header gerendert (z.B. CookieSection).
+  // Dann kein eigenes Top-Padding, damit der Vertikalrhythmus symmetrisch bleibt.
+  embedded?: boolean;
 };
 
 export function PricingCards({
@@ -31,6 +34,7 @@ export function PricingCards({
   kicker = "Pakete & Preise",
   id = "pakete",
   showAnnualToggle = true,
+  embedded = false,
 }: PricingCardsProps) {
   const { openCheckout } = useCheckout();
   const [annual, setAnnual] = React.useState(false);
@@ -51,7 +55,12 @@ export function PricingCards({
       aria-labelledby={`${id}-heading`}
       className="relative isolate overflow-hidden bg-background"
     >
-      <div className="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-24">
+      <div
+        className={cn(
+          "mx-auto max-w-6xl px-5 sm:px-6",
+          embedded ? "pt-10 pb-0" : "py-20 sm:py-24",
+        )}
+      >
         <div className="mx-auto max-w-2xl text-center">
           <p className="font-mono text-xs font-medium tracking-[0.2em] text-brand-indigo uppercase dark:text-brand-mint">
             {kicker}
@@ -157,7 +166,7 @@ function PricingCard({
       className={cn(
         "group/card relative flex h-full flex-col overflow-hidden rounded-3xl p-7 backdrop-blur transition-all duration-300",
         pkg.featured
-          ? "border-gradient bg-card shadow-card-hover md:scale-[1.03]"
+          ? "border-gradient bg-card shadow-card-hover hover:-translate-y-1.5 hover:shadow-elevated"
           : "border border-border/70 bg-card/85 shadow-card-soft hover:-translate-y-1.5 hover:shadow-card-hover",
       )}
     >
@@ -201,7 +210,7 @@ function PricingCard({
           )}
         </div>
         {isSub && annual && (
-          <p className="mt-1 text-xs text-brand-mint">
+          <p className="mt-1 text-xs font-medium text-brand-indigo dark:text-brand-mint">
             Spart 98 € im Vergleich zur Monatszahlung
           </p>
         )}

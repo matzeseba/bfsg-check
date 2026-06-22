@@ -57,7 +57,7 @@ export function Testimonials() {
                 <span className="relative inline-flex size-11 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-indigo to-brand-deep text-primary-foreground shadow-glow-mint">
                   <Icon className="size-5" aria-hidden />
                 </span>
-                <p className="relative mt-5 font-mono text-xs font-semibold tracking-[0.16em] text-brand-mint uppercase">
+                <p className="relative mt-5 font-mono text-xs font-semibold tracking-[0.16em] text-brand-indigo uppercase dark:text-brand-mint">
                   {item.kicker}
                 </p>
                 <h3 className="relative mt-2 font-display text-xl font-semibold tracking-tight text-balance">

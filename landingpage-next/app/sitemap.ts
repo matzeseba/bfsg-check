@@ -48,6 +48,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "yearly",
       priority: 0.3,
     },
+    {
+      url: `${siteUrl}/datenschutz/anfrage`,
+      lastModified,
+      changeFrequency: "yearly",
+      priority: 0.2,
+    },
     // SEO Pillar Pages
     {
       url: `${siteUrl}/bfsg-checkliste-online-shop`,

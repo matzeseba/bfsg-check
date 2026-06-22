@@ -69,6 +69,16 @@ export function ScanForm({ initialUrl = "", variant = "hero" }: ScanFormProps) {
 
   return (
     <div className="flex w-full flex-col gap-4">
+      {/* Persistente Live-Region: existiert immer im DOM, damit Screenreader den
+          Statuswechsel ansagen (eine erst mit Inhalt gemountete Region wird oft
+          nicht vorgelesen). */}
+      <p className="sr-only" role="status" aria-live="polite">
+        {loading
+          ? "Prüfung läuft…"
+          : result
+            ? `Prüfung abgeschlossen: ${result.score} von 100 Punkten, ${result.totalIssues} Funde.`
+            : ""}
+      </p>
       <form
         onSubmit={onSubmit}
         className="group/scan relative rounded-2xl border border-border/70 bg-card/85 p-1.5 shadow-card-soft backdrop-blur transition-all focus-within:border-brand-mint/60 focus-within:shadow-glow-mint"
