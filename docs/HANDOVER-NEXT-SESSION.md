@@ -188,6 +188,22 @@ bfsg-check/
 
 ---
 
+## 🧰 Projekt-Skills (projektspezifisch — vor passenden Tasks nutzen)
+
+| Skill | Wofür |
+|---|---|
+| `legal-copy-grep` | Deterministischer Regex-Scan auf verbotene Begriffe (BFSG-konform/rechtssicher/garantiert/TÜV/DEKRA …) → **vor jedem PR-Merge** laufen lassen |
+| `scan-dataset-aggregat` | Anonymisierte Auswertung echter Scans aus `scanner/out/` → liefert das Show-HN/PR-Dataset (KEINE Kunden-URLs) |
+| `stripe-revenue-snapshot` | Umsatz / MRR / Refund-Quote / Paket-Split schnell |
+| `ads-performance-pull` | Täglicher Google-Ads-Report (CPA / CTR / Spend / Top-Keywords) |
+| `ab-test-tracker` | A/B-Tests anlegen + Signifikanz (p<0,05) auswerten (Bezug: `marketing/pricing-experiments.md`) |
+| `backup-verify` | Server-Backup-Status via SSH prüfen (Restore nur mit User-OK) |
+| `upsell-trigger` | 14-Tage-Nach-Kauf-Upsell-Drafts erstellen (nie automatisch senden) |
+
+> Operative Memories zusätzlich in `MEMORY.md` (Build-vor-Merge, gh-REST u. a.).
+
+---
+
 ## 🚫 Bekannte Sackgassen / NICHT machen
 
 | Was | Warum |
@@ -287,9 +303,9 @@ Nichts blockierendes. Aber für Vollständigkeit:
 
 - ✅ **§ 356a / Widerruf erledigt** — `WiderrufForm.tsx` + `/widerruf` + `/widerrufsbelehrung` live; Checkout-Consent (ausdrücklicher Sofort-Ausführungs-Verzicht) sauber implementiert (`CheckoutModal.tsx` + `scanner/app.js:324`).
 - ⏳ Nur Matthias: **Stripe-Live-Testkauf**, **Google/Bing Ads Konten + Karte**, **Listings/PMs absenden** → alles Schritt-für-Schritt mit Copy-Paste-Text in `docs/LAUNCH-HEUTE-CHECKLISTE.md`
-- ⏳ 3 PRs mergen (#40/#41/#42) → triggert Auto-Deploy auf main
+- ✅ **5 PRs (#40–#44) gemerged + live deployed + verifiziert** (Co-Founder-Sprint): Conversion-/Legal-Fixes, Launch-Assets + Checkliste, 6 SEO-Seiten, Preis-Toggle-Fix, Funnel-Audit. Live geprüft: Fake-Presse weg, neue Stat da, alle SEO-Routen 200.
 - ⏳ AGB-Generator-Abo (IT-Recht-Kanzlei 15 €/Mo) + DPAs sammeln (Brevo/Stripe/Hetzner) — `docs/legal-templates/dpa-checkliste.md`
-- 💡 **Wachstums-Unlock diese Woche:** echtes aggregiertes Scan-Dataset erzeugen (für Show HN + 28.06.-PM) — `marketing/show-hn-launch-post.md` VERSION 2 wartet auf Belege. Autonom machbar, aber Ergebnis wird publiziert → mit Matthias abstimmen.
+- 💡 **Wachstums-Unlock — Scan-Dataset für Show HN VERSION 2 + 28.06.-PM:** Sauberster Weg ist der Skill **`scan-dataset-aggregat`** — er wertet die bereits vorhandenen Scans aus `scanner/out/` anonymisiert aus (häufigste WCAG-Fehler, Score-Verteilung, Branchen; **strikt KEINE Kunden-URLs**), statt externe Sites zu scannen. Zahlen erzeugen ist autonom machbar; die Publikation (Show HN / Pressemitteilung) braucht Matthias' Freigabe. `marketing/show-hn-launch-post.md` VERSION 2 wartet auf diese Belege.
 - 💡 Landing-Detail (niedrige Prio): Hero-Headline fadet per Animation ein → ~1 s unsichtbar beim Laden (LCP/Conversion-Detail, bewusstes Design — nur falls Core-Web-Vitals leiden).
 
 ---
