@@ -78,7 +78,7 @@ export function Footer() {
               <span className="flex items-baseline gap-1">
                 <span>BFSG</span>
                 <span className="text-muted-foreground">·</span>
-                <span className="text-brand-mint">Check</span>
+                <span className="text-brand-indigo dark:text-brand-mint">Check</span>
               </span>
             </Link>
             <p className="mt-3 max-w-sm text-sm text-muted-foreground">
@@ -113,15 +113,21 @@ export function Footer() {
                 <ArrowRightIcon className="size-3.5" />
               </Button>
             </form>
-            {submitted ? (
-              <p className="mt-2 text-xs text-brand-mint">
-                Danke — wir melden uns mit Updates zum Launch.
-              </p>
-            ) : (
-              <p className="mt-2 text-xs text-muted-foreground">
-                Monatliche Compliance-News. Kein Spam, jederzeit abbestellbar.
-              </p>
-            )}
+            {/* Persistente Live-Region: existiert dauerhaft im DOM, damit der
+                Statuswechsel von Screenreadern angesagt wird (WCAG 4.1.3). */}
+            <p
+              role="status"
+              aria-live="polite"
+              className="mt-2 text-xs text-muted-foreground"
+            >
+              {submitted ? (
+                <span className="text-brand-indigo dark:text-brand-mint">
+                  Danke — wir melden uns mit Updates zum Launch.
+                </span>
+              ) : (
+                "Monatliche Compliance-News. Kein Spam, jederzeit abbestellbar."
+              )}
+            </p>
           </div>
 
           {/* Link-Spalten */}

@@ -39,8 +39,9 @@ export function CookieSection() {
         subtitle="Welche Tracker feuern wirklich vor Consent? Was setzt Cookies? Wir prüfen mit echtem Browser und liefern Belege."
         kicker="Cookie-Check"
         showAnnualToggle={false}
+        embedded
       />
-      <p className="mx-auto max-w-3xl px-6 pb-16 text-center text-xs text-muted-foreground">
+      <p className="mx-auto mt-12 max-w-2xl px-6 pb-20 text-center text-xs text-muted-foreground">
         Beobachtete Tracker-Requests können bei korrektem Consent Mode v2
         cookielos und zulässig sein — wir markieren diese Fälle ehrlich als
         &bdquo;manuell verifizieren&ldquo;. Keine Rechtsberatung.

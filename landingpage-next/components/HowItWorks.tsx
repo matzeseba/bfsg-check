@@ -72,7 +72,7 @@ export function HowItWorks() {
                   <div className="flex w-full items-center justify-center md:justify-between">
                     <span
                       aria-hidden
-                      className="font-mono text-xs font-bold tracking-[0.2em] text-brand-mint"
+                      className="font-mono text-xs font-bold tracking-[0.2em] text-brand-indigo dark:text-brand-mint"
                     >
                       {step.step}
                     </span>
@@ -82,7 +82,7 @@ export function HowItWorks() {
                     />
                   </div>
                   <div className="relative mt-5 flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-indigo to-brand-deep text-primary-foreground shadow-glow-mint transition-transform duration-300 group-hover/step:scale-110">
-                    {Icon ? <Icon className="size-5.5" /> : null}
+                    {Icon ? <Icon className="size-5" /> : null}
                   </div>
                   <h3 className="mt-5 font-display text-xl font-semibold tracking-tight">
                     {step.title}

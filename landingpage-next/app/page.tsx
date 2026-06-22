@@ -3,6 +3,7 @@ import { CtaSection } from "@/components/CtaSection";
 import { FAQAccordion } from "@/components/FAQAccordion";
 import { Hero } from "@/components/Hero";
 import { HowItWorks } from "@/components/HowItWorks";
+import { LogoCloud } from "@/components/LogoCloud";
 import { PricingCards } from "@/components/PricingCards";
 import { RiskBand } from "@/components/RiskBand";
 import { StatsBar } from "@/components/StatsBar";
@@ -13,6 +14,7 @@ export default function Home() {
   return (
     <>
       <Hero />
+      <LogoCloud />
       <RiskBand />
       <HowItWorks />
       <StatsBar />

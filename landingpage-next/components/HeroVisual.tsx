@@ -165,10 +165,12 @@ function SeverityDot({ tone }: { tone: string }) {
       : tone === "mid"
         ? "bg-brand-amber"
         : "bg-brand-mint";
+  // tone="high" (kritisch) pulst dezent → "Live-Scan"-Anmutung; sonst statisch.
+  const pulse = tone === "high" ? "animate-pulse-soft" : "";
   return (
-    <span className="relative inline-flex size-2.5 shrink-0">
-      <span className={`absolute inline-flex size-full rounded-full ${cls}`} />
-    </span>
+    <span
+      className={`inline-flex size-2.5 shrink-0 rounded-full ${cls} ${pulse}`}
+    />
   );
 }
 

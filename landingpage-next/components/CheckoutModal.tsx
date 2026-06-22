@@ -171,12 +171,12 @@ export function CheckoutModal() {
                         <span className="text-sm font-medium leading-tight">
                           {p.name}
                           {p.featured && !isDisabled && (
-                            <span className="ml-1.5 text-[10px] font-semibold uppercase tracking-wide text-brand-mint">
+                            <span className="ml-1.5 text-xs font-semibold uppercase tracking-wide text-brand-indigo dark:text-brand-mint">
                               · Empfohlen
                             </span>
                           )}
                           {isDisabled && (
-                            <span className="ml-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                            <span className="ml-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                               · Bald verfügbar
                             </span>
                           )}

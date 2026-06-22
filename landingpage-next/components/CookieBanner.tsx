@@ -143,9 +143,10 @@ export function CookieBanner() {
 
   return (
     <div
-      role="dialog"
+      // Nicht-blockierender Banner ohne Fokus-Trap → role="region" (kein
+      // "dialog", das Screenreadern eine Fokusführung verspricht, die es nicht gibt).
+      role="region"
       aria-label="Cookie-Hinweis"
-      aria-modal="false"
       className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-3xl rounded-xl border border-border bg-popover p-5 shadow-xl ring-1 ring-foreground/10"
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

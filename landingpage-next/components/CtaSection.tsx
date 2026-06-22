@@ -70,7 +70,7 @@ export function CtaSection() {
               <Button
                 size="lg"
                 variant="ghost"
-                className="h-12 gap-1.5 rounded-xl bg-[oklch(0.97_0.004_95)]/0 px-5 text-base font-medium text-[oklch(0.97_0.004_95)] hover:bg-[oklch(0.97_0.004_95)]/10 hover:text-[oklch(0.97_0.004_95)]"
+                className="h-12 gap-1.5 rounded-xl px-5 text-base font-medium text-[oklch(0.97_0.004_95)] hover:bg-[oklch(0.97_0.004_95)]/10 hover:text-[oklch(0.97_0.004_95)]"
                 render={<a href="#pakete" />}
               >
                 Pakete ansehen
