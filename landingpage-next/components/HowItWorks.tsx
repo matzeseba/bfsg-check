@@ -81,7 +81,7 @@ export function HowItWorks() {
                       className="hidden h-px flex-1 mx-3 bg-gradient-to-r from-brand-mint/40 to-transparent md:block"
                     />
                   </div>
-                  <div className="relative mt-5 flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-indigo to-brand-deep text-primary-foreground shadow-glow-mint transition-transform duration-300 group-hover/step:scale-110">
+                  <div className="relative mt-5 flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-indigo to-brand-deep text-on-deep shadow-glow-mint transition-transform duration-300 group-hover/step:scale-110">
                     {Icon ? <Icon className="size-5" /> : null}
                   </div>
                   <h3 className="mt-5 font-display text-xl font-semibold tracking-tight">

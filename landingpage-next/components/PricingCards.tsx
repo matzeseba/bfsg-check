@@ -84,7 +84,7 @@ export function PricingCards({
                 className={cn(
                   "inline-flex min-h-11 items-center rounded-full px-5 text-xs font-medium transition-colors",
                   !annual
-                    ? "bg-brand-deep text-primary-foreground"
+                    ? "bg-brand-deep text-on-deep"
                     : "text-muted-foreground hover:text-foreground",
                 )}
               >
@@ -97,7 +97,7 @@ export function PricingCards({
                 className={cn(
                   "inline-flex min-h-11 items-center gap-1.5 rounded-full px-5 text-xs font-medium transition-colors",
                   annual
-                    ? "bg-brand-deep text-primary-foreground"
+                    ? "bg-brand-deep text-on-deep"
                     : "text-muted-foreground hover:text-foreground",
                 )}
               >
@@ -118,7 +118,7 @@ export function PricingCards({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.55, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-              className={cn("relative", pkg.featured && "md:-my-4")}
+              className="relative"
             >
               <PricingCard
                 pkg={pkg}
@@ -162,35 +162,41 @@ function PricingCard({
     : pkg.priceSuffix;
 
   return (
-    <div
-      className={cn(
-        "group/card relative flex h-full flex-col overflow-hidden rounded-3xl p-7 backdrop-blur transition-all duration-300",
-        pkg.featured
-          ? "border-gradient bg-card shadow-card-hover hover:-translate-y-1.5 hover:shadow-elevated"
-          : "border border-border/70 bg-card/85 shadow-card-soft hover:-translate-y-1.5 hover:shadow-card-hover",
-      )}
-    >
+    // Aeusserer Wrapper OHNE overflow-hidden, damit die "Meistgewaehlt"-Badge
+    // oben ueberstehen darf. Die Card selbst clippt (overflow-hidden) nur ihre
+    // dekorativen Inneren (Glow + Border-Gradient).
+    <div className="relative h-full">
       {pkg.featured && (
-        <>
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -top-24 -right-24 size-64 rounded-full bg-brand-mint/20 blur-[70px]"
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-mint/60 to-transparent"
-          />
-          <Badge
-            className="absolute -top-3 left-1/2 -translate-x-1/2 gap-1 bg-brand-mint px-3 py-1 text-[11px] font-bold tracking-wide text-brand-deep uppercase shadow-glow-mint"
-            variant="default"
-          >
-            <SparklesIcon className="size-3" />
-            Meistgewählt
-          </Badge>
-        </>
+        <Badge
+          className="absolute -top-3 left-1/2 z-20 -translate-x-1/2 gap-1 bg-brand-mint px-3 py-1 text-[11px] font-bold tracking-wide text-brand-deep uppercase shadow-glow-mint"
+          variant="default"
+        >
+          <SparklesIcon className="size-3" />
+          Meistgewählt
+        </Badge>
       )}
+      <div
+        className={cn(
+          "group/card relative flex h-full flex-col overflow-hidden rounded-3xl p-7 backdrop-blur transition-all duration-300",
+          pkg.featured
+            ? "border-gradient bg-card shadow-card-hover hover:-translate-y-1.5 hover:shadow-elevated"
+            : "border border-border/70 bg-card/85 shadow-card-soft hover:-translate-y-1.5 hover:shadow-card-hover",
+        )}
+      >
+        {pkg.featured && (
+          <>
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -top-24 -right-24 size-64 rounded-full bg-brand-mint/20 blur-[70px]"
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-mint/60 to-transparent"
+            />
+          </>
+        )}
 
-      <div className="relative">
+        <div className="relative">
         <p className="font-mono text-xs font-semibold tracking-[0.18em] text-brand-indigo uppercase dark:text-brand-mint">
           {pkg.tag}
         </p>
@@ -259,7 +265,7 @@ function PricingCard({
               "h-11 w-full gap-1.5 rounded-xl text-sm font-semibold transition-transform hover:scale-[1.015]",
               pkg.featured
                 ? "bg-brand-mint text-brand-deep hover:bg-brand-mint/85"
-                : "bg-brand-deep text-primary-foreground hover:bg-brand-indigo",
+                : "bg-brand-deep text-on-deep hover:bg-brand-indigo",
             )}
           >
             {isSub ? "Abo starten" : "Paket wählen"}
@@ -272,6 +278,7 @@ function PricingCard({
             {pkg.moneyBack}
           </p>
         )}
+        </div>
       </div>
     </div>
   );

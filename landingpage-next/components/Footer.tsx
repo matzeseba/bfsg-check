@@ -70,7 +70,7 @@ export function Footer() {
             >
               <span
                 aria-hidden
-                className="relative inline-flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-brand-indigo to-brand-deep text-primary-foreground shadow-glow-mint"
+                className="relative inline-flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-brand-indigo to-brand-deep text-on-deep shadow-glow-mint"
               >
                 <AccessibilityIcon className="size-4.5" />
                 <span className="pointer-events-none absolute -right-1 -bottom-1 size-2.5 rounded-full bg-brand-mint ring-2 ring-card" />
@@ -107,7 +107,7 @@ export function Footer() {
               <Button
                 type="submit"
                 size="lg"
-                className="h-11 gap-1 rounded-xl bg-brand-deep px-4 text-sm font-semibold text-primary-foreground hover:bg-brand-indigo"
+                className="h-11 gap-1 rounded-xl bg-brand-deep px-4 text-sm font-semibold text-on-deep hover:bg-brand-indigo"
               >
                 Abonnieren
                 <ArrowRightIcon className="size-3.5" />

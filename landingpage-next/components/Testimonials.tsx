@@ -54,7 +54,7 @@ export function Testimonials() {
                   aria-hidden
                   className="pointer-events-none absolute -top-16 -right-16 size-44 rounded-full bg-brand-mint/0 blur-3xl transition-colors duration-500 group-hover/diff:bg-brand-mint/15"
                 />
-                <span className="relative inline-flex size-11 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-indigo to-brand-deep text-primary-foreground shadow-glow-mint">
+                <span className="relative inline-flex size-11 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-indigo to-brand-deep text-on-deep shadow-glow-mint">
                   <Icon className="size-5" aria-hidden />
                 </span>
                 <p className="relative mt-5 font-mono text-xs font-semibold tracking-[0.16em] text-brand-indigo uppercase dark:text-brand-mint">

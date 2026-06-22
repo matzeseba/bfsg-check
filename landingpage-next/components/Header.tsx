@@ -77,7 +77,7 @@ export function Header() {
         >
           <span
             aria-hidden
-            className="relative inline-flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-brand-indigo to-brand-deep text-primary-foreground shadow-glow-mint"
+            className="relative inline-flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-brand-indigo to-brand-deep text-on-deep shadow-glow-mint"
           >
             <AccessibilityIcon className="size-4.5" />
             <span className="pointer-events-none absolute -right-1 -bottom-1 size-2.5 rounded-full bg-brand-mint ring-2 ring-background" />
