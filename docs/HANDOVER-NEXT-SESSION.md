@@ -1,7 +1,28 @@
 # 🤝 Handover für die nächste Session
 
 > **Lies das nach `CLAUDE.md` als ZWEITES.**
-> **Stand:** 21.06.2026 (sehr spät) · **Letzte Session:** AI-OS „Jarvis"-Cockpit gebaut (lokal) — Recherche→Masterplan→Komplett-Sprint, Voice-Pipeline verifiziert, Second Brain, Norton-False-Positive gelöst, Merge #49 (Docs/Vault/Tools; Cockpit lokal). Davor: Agency-Agents-Integration + Pre-Launch-Audit-Sprint + Cache-Prompting-Regel; Co-Founder-Sprint (Funnel live, Legal-/Conversion-Fixes, SEO, Launch-Assets, Notion-Pipeline).
+> **Stand:** 22.06.2026 · **Letzte Session:** Conversion-Optimierung der Landingpage durch 5-Agenten-Spezialisten-Review → PR #54 (Draft, Legal-P0s + Performance + CRO; **Merge nach `main` morgen geplant**). Davor: AI-OS „Jarvis"-Cockpit (lokal), Agency-Agents-Integration + Pre-Launch-Audit, Cache-Prompting-Regel, Co-Founder-Sprint (Funnel live).
+
+---
+
+## 🆕 Update 22.06.2026 — Conversion-Optimierung (Spezialisten-Team-Review)
+
+- ✅ **5 Agency-Agenten parallel** (CRO/Growth · Visual-Design · Conversion-Copy · A11y/Trust · Mobile-Performance) haben die komplette Landingpage auditiert → konvergente, hoch-konfidente Maßnahmen umgesetzt.
+- ✅ **PR #54 (Draft):** „Conversion-Optimierung: Legal-P0s, Performance & CRO-Politur". Build grün (Next 16, TS strict, ESLint clean, 20/20 Seiten). **Merge nach `main` = morgen geplant** (User-Entscheid 22.06.) → Auto-Deploy auf Prod.
+- **Legal-P0s gefixt (vor paid Traffic kritisch):**
+  - „BFSG-konform" aus H1 + SEO-`<title>` + Meta-Description raus (UWG §5) → „barrierefrei genug?" / WCAG-Framing.
+  - Cookie-Banner: beide Consent-Buttons gleichwertig (§25 TDDDG / Dark-Pattern-Verbot — das eigene Cookie-Produkt prüft genau das).
+  - „Meistgewählt"/„Beliebt" → „Empfohlen" (unbelegbare Marktaussage).
+- **Performance/CWV:** `background-attachment:fixed` + Grain-Overlay (Mobile-Scroll-Jank) entfernt/gegated; Hero-H1+Subline statisch (LCP nicht mehr durch `opacity:0` verzögert); Hero-Blurs reduziert.
+- **A11y:** Fokus-Ring auf allen Buttons sichtbar (ring-offset, auch auf Mint-CTAs); Link-Fokus-Outline (WCAG 2.4.7); `size=lg` = 44px Touch-Target.
+- **CRO/Copy:** Featured-Pricing-Card mit echter Elevation; CTA-Labels, Risk-Band-Urgency, Differentiators geschärft; 2 neue FAQ-Objections + Reihenfolge.
+
+### 🔴 BACKLOG aus dem Conversion-Review (brauchen Assets/User — NICHT in PR #54)
+> Laut Trust-Audit die **zwei stärksten Deal-Closer** für einen Solo-Founder ohne Kunden-Logos. Bewusst zurückgestellt, weil echtes Material nötig ist.
+1. **Gründer-Block auf der Landingpage** — kleine Sektion „Wer dahintersteht": Foto + Name + ein Satz („Ich prüfe jeden Report persönlich, bevor er rausgeht. — Matthias Seba"). 100 % legal, nicht fälschbar, stärkstes Vertrauenssignal im B2B-Solo-Verkauf. **Braucht:** 1 Foto + finalen Satz vom User. Platzierung: zwischen `Testimonials` (Differentiators) und `PricingCards`, oder im `TrustSection`.
+2. **Beispiel-Report (anonymisiertes PDF)** zum Ansehen VOR dem Kauf — „Beispiel-Report ansehen →" im Hero (unter dem Scan-Form) + bei den Pricing-Cards. Senkt die „Was bekomme ich eigentlich?"-Reibung beim 199–499 €-Blind-Kauf massiv. **Braucht:** 1 echten/anonymisierten Report aus `scanner/` als PDF, abgelegt unter `landingpage-next/public/`.
+
+> Weitere, riskantere/größere Ideen aus dem Review (separat zu bewerten, NICHT eilig): Section-Reordering (Differentiators nach Pricing), „Bald verfügbar"-Abo-Karte aus dem 3er-Grid in einen Teaser ziehen, Email-Capture-Fallback bei Scan-Fehler (statt Random-Demo-Zahlen), `ResultCard`-Upsell auf 199 € Basis ankern + „+N weitere Befunde gesperrt", `next.config` `optimizePackageImports` (gegen Next-16-Docs prüfen, s. `landingpage-next/AGENTS.md`).
 
 ---
 
@@ -41,7 +62,7 @@
 |---|---|
 | **Live-Status** | ✅ `bfsg-fix.de/health` = `ok:true, stripe:true, live:true, mailer aktiv` |
 | **Computer Use** | ✅ aktiviert (User Matthias hat Settings > General > „Computer use" angeschaltet) |
-| **Offene PRs** | ✅ **0 offen** — alle gemerged (#40–#44 Funnel/Legal/SEO + #46 Audits + #47 Cache-Regel + #48 Handover + #49 AI-OS-Docs); #45 superseded |
+| **Offene PRs** | 🟡 **#54 offen (Draft)** — Conversion-Optimierung, Build grün, **Merge nach `main` morgen geplant**. Davor: #40–#49 alle gemerged; #45 superseded |
 | **Letzter Merge** | PR #49 — AI-OS-Research-Docs + Vault-Template + Tools (Cockpit/Voice bewusst lokal); `main` aktuell, Health grün |
 | **Nächste konkrete Aufgabe** | `docs/LAUNCH-HEUTE-CHECKLISTE.md` abarbeiten → nur Matthias-Schritte (Stripe-Testkauf, Ads-Konten, Listings) → erste Sales |
 | **Funnel** | ✅ E2E live verifiziert (Scan→Teaser→Checkout-Modal→Stripe-Live, alle Legal-Seiten 200, §356a-Consent sauber) |
