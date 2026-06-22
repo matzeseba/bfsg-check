@@ -1,7 +1,7 @@
 # 🤝 Handover für die nächste Session
 
 > **Lies das nach `CLAUDE.md` als ZWEITES.**
-> **Stand:** 21.06.2026 (spät) · **Letzte Session:** Agency-Agents-Integration + Pre-Launch-Audit-Sprint + Cache-Prompting-Regel. Davor: Co-Founder-Sprint (Funnel live verifiziert, Conversion-/Legal-Fixes, SEO-Pillar-Pages, Launch-Assets, Notion-Pipeline).
+> **Stand:** 21.06.2026 (sehr spät) · **Letzte Session:** AI-OS „Jarvis"-Cockpit gebaut (lokal) — Recherche→Masterplan→Komplett-Sprint, Voice-Pipeline verifiziert, Second Brain, Norton-False-Positive gelöst, Merge #49 (Docs/Vault/Tools; Cockpit lokal). Davor: Agency-Agents-Integration + Pre-Launch-Audit-Sprint + Cache-Prompting-Regel; Co-Founder-Sprint (Funnel live, Legal-/Conversion-Fixes, SEO, Launch-Assets, Notion-Pipeline).
 
 ---
 
@@ -26,6 +26,13 @@
 - ✅ **SessionStart-Hook** aktiv: `.claude/settings.json` (lokal) injiziert bei jedem Session-Start einen Verweis auf dieses Handover. Du musst nichts mehr tippen.
 - 📊 **Notion-Dashboard:** [BFSG-Check — Launch & Ops Board](https://app.notion.com/p/3802191b1070812ba39ce089c9e3b510?pvs=1) + [Sales Pipeline](https://app.notion.com/p/f10735999280434bbcd2c0c596d138f6?pvs=1). ⚠️ Der `Notion Dashboard Sync` (GitHub Action) lief zuletzt auf **failure** — vermutlich fehlende Secrets (`NOTION_TOKEN`/`NOTION_DB_*`), siehe `docs/DASHBOARD-NOTION-SETUP.md`.
 
+### 🛰️ Cockpit-Funktionsstand (verifiziert 21.06.2026 — alles LOKAL, nicht auf Prod)
+- **Start:** Backend `cd cockpit && npm start` (127.0.0.1:4317) · Frontend `cd cockpit-ui && npm run dev` (3017) · Voice: Skripte unter `scripts/voice/` (faster-whisper STT :5301 + Piper TTS :5302). Komplettanleitung: **`docs/ai-os-research/START-HIER.md`**.
+- ✅ **Verifiziert lauffähig:** Dashboard (14 Panels, Live-`/health`), Second-Brain-Suche (Vault `bfsg-check/vault/`, gitignored, 16 Notizen, `/api/brain` configured:true), 18 Agenten-Aktionen + 5-Ebenen-Governance, **Voice TTS→STT-Round-Trip** (Piper „Thorsten" + faster-whisper-small, deutsch). Frontend-Build grün, Backend `node --check` grün, Security R-01..R-05 umgesetzt.
+- ⚠️ **Agenten-Auth-Caveat:** Der verschachtelte `claude -p` (den die Aktions-Buttons auslösen) gibt **in der Claude-Code-Agent-Sandbox 401** (host-verwaltete Auth). Auf dem **normalen** Rechner, wo `claude` im Terminal eingeloggt funktioniert, laufen die Aktionen. Schnelltest: `claude -p "ok"` im normalen Terminal → wenn „ok", funktionieren die Buttons. (`claude.js` wertet `is_error` jetzt aus → Fehler erscheinen ehrlich als `failed`.)
+- ✅ **Norton-False-Positive gelöst:** `MD:HttpRequest-inf [Susp]` bei URL-dichten Markdown → Projektordner `C:\Users\Administrator\bfsg-check\*` in Norton ausgeschlossen (Echtzeit/Auto-Protect), Quarantäne geleert. Vault liegt **innerhalb** des Repos (gitignored) → kein zweiter Ausschluss nötig. Runbook: `docs/ai-os-research/12-norton-fp-runbook.md`.
+- 🔑 **Für echte Zahlen (nur User kann das):** `cockpit/.env` füllen — Stripe Restricted Read-Key, `ADMIN_TOKEN`, `GITHUB_TOKEN` (Google-Ads + Developer-Token später, 2–5 Tage). Eintragen übernimmt Claude nach Erhalt. Details: `docs/ai-os-research/10-daten-setup.md`.
+
 ---
 
 ## ⚡ TL;DR für Schnell-Start (60 Sekunden)
@@ -34,8 +41,8 @@
 |---|---|
 | **Live-Status** | ✅ `bfsg-fix.de/health` = `ok:true, stripe:true, live:true, mailer aktiv` |
 | **Computer Use** | ✅ aktiviert (User Matthias hat Settings > General > „Computer use" angeschaltet) |
-| **Offene PRs** | ✅ **0 offen** — alle gemerged (#40–#44 Funnel/Legal/SEO + #46 Agency-Agents/Audits + #47 Cache-Regel); #45 als superseded geschlossen |
-| **Letzter Merge** | PR #47 — Cache-Prompting-Regel (`main` aktuell, deployed, Health grün) |
+| **Offene PRs** | ✅ **0 offen** — alle gemerged (#40–#44 Funnel/Legal/SEO + #46 Audits + #47 Cache-Regel + #48 Handover + #49 AI-OS-Docs); #45 superseded |
+| **Letzter Merge** | PR #49 — AI-OS-Research-Docs + Vault-Template + Tools (Cockpit/Voice bewusst lokal); `main` aktuell, Health grün |
 | **Nächste konkrete Aufgabe** | `docs/LAUNCH-HEUTE-CHECKLISTE.md` abarbeiten → nur Matthias-Schritte (Stripe-Testkauf, Ads-Konten, Listings) → erste Sales |
 | **Funnel** | ✅ E2E live verifiziert (Scan→Teaser→Checkout-Modal→Stripe-Live, alle Legal-Seiten 200, §356a-Consent sauber) |
 | **Scanner-Limit** | ⚠️ Bot-geschützte Seiten (z. B. Zalando) scheitern — bei normalen SMB-Shops ok |
