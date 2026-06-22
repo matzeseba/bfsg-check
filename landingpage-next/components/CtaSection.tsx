@@ -53,9 +53,9 @@ export function CtaSection() {
               </span>
             </h2>
             <p className="mx-auto mt-5 max-w-2xl text-base text-[oklch(0.97_0.004_95)]/75 text-pretty sm:text-lg">
-              Kostenloser Sofort-Check. Vollreport bei Bedarf. Keine
-              Verpflichtung, keine Anmeldung — und kein generischer
-              Lighthouse-Dump.
+              Kostenloser Sofort-Check, Ergebnis in 60 Sekunden. Keine
+              Anmeldung, keine Verpflichtung — und kein generischer
+              Lighthouse-Dump, sondern priorisierte Mängel mit Fix.
             </p>
 
             <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">

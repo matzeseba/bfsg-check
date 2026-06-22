@@ -165,20 +165,24 @@ export function CookieBanner() {
             .
           </p>
         </div>
+        {/* § 25 TDDDG / Dark-Pattern-Verbot: "Ablehnen" und "Akzeptieren" müssen
+            gleichwertig sein (gleiche Größe, gleiches visuelles Gewicht, keine
+            Hervorhebung einer Option). Beide Buttons daher identische Variante. */}
         <div className="flex flex-wrap gap-2 sm:flex-nowrap">
           <Button
             type="button"
-            variant="outline"
+            variant="secondary"
             size="lg"
-            className="min-h-11"
+            className="min-h-11 flex-1 sm:flex-none"
             onClick={() => setConsent(false)}
           >
             Nur notwendige
           </Button>
           <Button
             type="button"
+            variant="secondary"
             size="lg"
-            className="min-h-11"
+            className="min-h-11 flex-1 sm:flex-none"
             onClick={() => setConsent(true)}
           >
             Alle akzeptieren

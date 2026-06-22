@@ -29,8 +29,8 @@ type PricingCardsProps = {
 
 export function PricingCards({
   packages = PACKAGES,
-  title = "Pakete, die zur Pflicht passen — nicht zur Beratungsrechnung.",
-  subtitle = "Pauschalpreise, klare Lieferung. Einmalig prüfen oder dauerhaft absichern.",
+  title = "Ein Festpreis statt Stundensatz — Mängel finden, bevor es teuer wird.",
+  subtitle = "Pauschalpreis, feste Lieferung binnen weniger Stunden. Einmal prüfen — oder mit dem Re-Check dauerhaft absichern.",
   kicker = "Pakete & Preise",
   id = "pakete",
   showAnnualToggle = true,
@@ -172,14 +172,14 @@ function PricingCard({
           variant="default"
         >
           <SparklesIcon className="size-3" />
-          Meistgewählt
+          Empfohlen
         </Badge>
       )}
       <div
         className={cn(
           "group/card relative flex h-full flex-col overflow-hidden rounded-3xl p-7 backdrop-blur transition-all duration-300",
           pkg.featured
-            ? "border-gradient bg-card shadow-card-hover hover:-translate-y-1.5 hover:shadow-elevated"
+            ? "border-gradient bg-card shadow-elevated lg:scale-[1.03] hover:-translate-y-1.5 hover:shadow-elevated"
             : "border border-border/70 bg-card/85 shadow-card-soft hover:-translate-y-1.5 hover:shadow-card-hover",
         )}
       >
@@ -268,7 +268,7 @@ function PricingCard({
                 : "bg-brand-deep text-on-deep hover:bg-brand-indigo",
             )}
           >
-            {isSub ? "Abo starten" : "Paket wählen"}
+            {isSub ? "Abo starten" : "Jetzt bestellen"}
             <ArrowRightIcon className="size-4" />
           </Button>
         )}
