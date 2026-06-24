@@ -97,15 +97,18 @@ export function HeroVisual() {
             </div>
           </div>
 
-          {/* Findings-Liste (gestaffelt) */}
-          <ul className="grid gap-2">
+          {/* Findings-Liste (gestaffelt). min-w-0 auf ul UND li nötig: die Flex-
+              Zeile (truncate-Titel + shrink-0-Badge) erzwingt sonst eine min-
+              content-Breite, die die Grid-Spalte der Karte ~14px zu breit macht →
+              alle inneren Kästen rutschen nach rechts (per Playwright vermessen). */}
+          <ul className="grid min-w-0 gap-2">
             {v.findings.map((f, i) => (
               <motion.li
                 key={f.title}
                 initial={reduced ? false : { opacity: 0, x: 10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.7 + i * 0.1, duration: 0.4 }}
-                className="flex items-center gap-3 rounded-xl border border-border/55 bg-card/70 px-3 py-2.5"
+                className="flex min-w-0 items-center gap-3 rounded-xl border border-border/55 bg-card/70 px-3 py-2.5"
               >
                 <SeverityDot tone={f.tone} />
                 <span className="min-w-0 flex-1 truncate text-[13px] font-medium">
