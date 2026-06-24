@@ -75,7 +75,7 @@ export function HeroVisual() {
           {/* Kopf: Score-Gauge + Verdikt */}
           <div className="flex items-center gap-4 rounded-2xl border border-border/60 bg-background/60 p-4">
             <ScoreGauge value={v.score} reduced={reduced} />
-            <div className="flex-1">
+            <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5 font-mono text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
                 <span className="inline-flex size-1.5 animate-pulse-soft rounded-full bg-brand-mint" />
                 Audit abgeschlossen
@@ -144,7 +144,7 @@ export function HeroVisual() {
           {/* Fix-Plan-Teaser — dekorativ (Teil des aria-hidden Visuals): kein
               echter Anchor, sonst läge ein interaktives Element in aria-hidden. */}
           <div className="pointer-events-none flex items-center justify-between gap-3 rounded-xl border border-brand-mint/40 bg-gradient-to-r from-brand-mint/12 to-brand-violet/10 px-4 py-3">
-            <p className="text-[13px] font-medium text-foreground">
+            <p className="min-w-0 text-[13px] font-medium text-foreground">
               + priorisierter Fix-Plan &amp; Entwurf der Erklärung
             </p>
             <span className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-brand-deep px-2.5 py-1.5 text-[11px] font-semibold text-on-deep">
@@ -187,7 +187,7 @@ function ContrastSample({
   return (
     <div
       className={
-        "rounded-xl border p-3 " +
+        "min-w-0 rounded-xl border p-3 " +
         (fail
           ? "border-brand-rose/30 bg-brand-rose/8"
           : "border-brand-mint/40 bg-brand-mint/10")
