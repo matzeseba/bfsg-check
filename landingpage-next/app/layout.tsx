@@ -6,7 +6,7 @@ import { CheckoutModal } from "@/components/CheckoutModal";
 import { CookieBanner } from "@/components/CookieBanner";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
-import { JsonLd } from "@/components/JsonLd";
+import { SiteJsonLd } from "@/components/JsonLd";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "@/components/ui/sonner";
 import { CheckoutProvider } from "@/lib/checkout-context";
@@ -147,7 +147,7 @@ export default function RootLayout({
             </CheckoutProvider>
           </MotionConfig>
         </ThemeProvider>
-        <JsonLd />
+        <SiteJsonLd />
       </body>
     </html>
   );

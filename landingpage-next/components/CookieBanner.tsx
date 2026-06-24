@@ -118,6 +118,7 @@ export function CookieBanner() {
     getMountedSnapshot,
     getMountedServerSnapshot,
   );
+  const headingRef = React.useRef<HTMLHeadingElement>(null);
 
   React.useEffect(() => {
     if (typeof window === "undefined") return;
@@ -130,8 +131,15 @@ export function CookieBanner() {
     }
   }, [consent]);
 
-  if (!mounted) return null;
-  if (consent.ts) return null;
+  const visible = mounted && !consent.ts;
+
+  // Fokus auf den Banner-Titel setzen, sobald er sichtbar wird, damit
+  // Tastatur-/Screenreader-Nutzer den Hinweis sofort erreichen (DOM-Ende sonst).
+  React.useEffect(() => {
+    if (visible) headingRef.current?.focus();
+  }, [visible]);
+
+  if (!visible) return null;
 
   function setConsent(marketing: boolean) {
     writeConsent({
@@ -146,12 +154,19 @@ export function CookieBanner() {
       // Nicht-blockierender Banner ohne Fokus-Trap → role="region" (kein
       // "dialog", das Screenreadern eine Fokusführung verspricht, die es nicht gibt).
       role="region"
-      aria-label="Cookie-Hinweis"
+      aria-labelledby="cookie-banner-title"
       className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-3xl rounded-xl border border-border bg-popover p-5 shadow-xl ring-1 ring-foreground/10"
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex-1">
-          <p className="font-semibold">Cookies &amp; Tracking</p>
+          <h2
+            id="cookie-banner-title"
+            ref={headingRef}
+            tabIndex={-1}
+            className="font-semibold outline-none"
+          >
+            Cookies &amp; Tracking
+          </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Wir verwenden ausschließlich technisch notwendige Cookies
             (Session/Sicherheit). Marketing- und Analytics-Tools laden wir erst

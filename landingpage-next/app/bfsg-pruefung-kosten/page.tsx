@@ -146,7 +146,7 @@ export default function BfsgPruefungKostenPage() {
               <tbody>
                 {[
                   ["Kosten", "0 €", "199–499 €", "1.500–5.000 €"],
-                  ["WCAG-Mängel-Abdeckung", "30–40 %", "40–55 %", "80–95 %"],
+                  ["WCAG-Mängel-Abdeckung", "30–40 %", "30–50 %", "80–95 %"],
                   ["Fix-Plan enthalten", "Nein", "Ja", "Ja"],
                   ["Barrierefreiheitserklärung", "Nein", "Entwurf", "Vollständig"],
                   ["Expertise beim Auftraggeber nötig", "Hoch", "Gering", "Gering"],

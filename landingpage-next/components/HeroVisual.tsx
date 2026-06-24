@@ -138,12 +138,9 @@ export function HeroVisual() {
             />
           </div>
 
-          {/* Fix-Plan-Teaser */}
-          <a
-            href="#pakete"
-            tabIndex={-1}
-            className="flex items-center justify-between gap-3 rounded-xl border border-brand-mint/40 bg-gradient-to-r from-brand-mint/12 to-brand-violet/10 px-4 py-3"
-          >
+          {/* Fix-Plan-Teaser — dekorativ (Teil des aria-hidden Visuals): kein
+              echter Anchor, sonst läge ein interaktives Element in aria-hidden. */}
+          <div className="pointer-events-none flex items-center justify-between gap-3 rounded-xl border border-brand-mint/40 bg-gradient-to-r from-brand-mint/12 to-brand-violet/10 px-4 py-3">
             <p className="text-[13px] font-medium text-foreground">
               + priorisierter Fix-Plan &amp; Entwurf der Erklärung
             </p>
@@ -151,7 +148,7 @@ export function HeroVisual() {
               Pakete
               <ArrowRightIcon className="size-3" />
             </span>
-          </a>
+          </div>
         </div>
       </div>
     </div>

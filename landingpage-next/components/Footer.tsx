@@ -131,7 +131,10 @@ export function Footer() {
           </div>
 
           {/* Link-Spalten */}
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
+          {/* 1 Spalte mobil, ab schmalem Viewport 3 Spalten — vermeidet, dass
+              die dritte Spalte ("Konto") allein in einer zweiten Reihe hängt
+              (kein eigenes xs-Breakpoint in dieser Tailwind-v4-Config definiert). */}
+          <div className="grid grid-cols-1 gap-8 min-[480px]:grid-cols-3">
             {COLUMNS.map((col) => (
               <div key={col.title} className="text-center sm:text-left">
                 <p className="font-mono text-xs font-semibold tracking-[0.18em] text-foreground uppercase">

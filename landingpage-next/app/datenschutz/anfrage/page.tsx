@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "DSGVO-Anfrage stellen",
   description:
     "Datenauskunft oder Löschung nach Art. 15 / 17 DSGVO bei BFSG-Check beantragen.",
+  alternates: { canonical: "/datenschutz/anfrage" },
   robots: { index: false, follow: true },
 };
 

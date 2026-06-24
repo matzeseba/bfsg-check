@@ -26,7 +26,6 @@ export default async function OpengraphImage() {
           background:
             "linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #0b1220 100%)",
           color: "#f8fafc",
-          fontFamily: "Inter, system-ui, sans-serif",
         }}
       >
         <div

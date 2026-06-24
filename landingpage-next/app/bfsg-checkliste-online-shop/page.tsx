@@ -176,7 +176,7 @@ export default function BfsgChecklisteOnlineShopPage() {
         <section className="mt-14">
           <h2 className="text-2xl font-semibold">Häufigste Fehler in Shopify, WooCommerce und Shopware</h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            Automatisierte Scans mehrerer hundert deutscher Shops zeigen, dass unabhängig vom Shop-System immer
+            Erfahrungswerte aus axe-core-/WCAG-Audits zeigen, dass unabhängig vom Shop-System immer
             wieder dieselben Mängel auftauchen.
           </p>
 
@@ -224,7 +224,7 @@ export default function BfsgChecklisteOnlineShopPage() {
                 <tr className="bg-muted/20">
                   <td className="px-3 py-2 font-semibold">Automatisierter Scan mit Report</td>
                   <td className="px-3 py-2 text-muted-foreground">Shop-Betreiber ohne Tech-Team; erste strukturierte Übersicht</td>
-                  <td className="px-3 py-2 text-muted-foreground">ca. 40–55 % der Mängel</td>
+                  <td className="px-3 py-2 text-muted-foreground">ca. 30–50 % der Mängel</td>
                   <td className="px-3 py-2 text-muted-foreground">199–499 €</td>
                 </tr>
                 <tr className="bg-background">

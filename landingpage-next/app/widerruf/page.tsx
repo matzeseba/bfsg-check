@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Vertrag widerrufen",
   description:
     "Verbraucher-Widerruf nach §§ 355 ff. BGB für Bestellungen bei BFSG-Check.",
+  alternates: { canonical: "/widerruf" },
   robots: { index: false, follow: true },
 };
 

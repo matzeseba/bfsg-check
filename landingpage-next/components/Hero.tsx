@@ -41,7 +41,7 @@ export function Hero() {
         className="pointer-events-none absolute right-[-10%] top-[-10%] -z-10 hidden size-[45vw] rounded-full bg-brand-violet/15 blur-[70px] md:block"
       />
 
-      <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-5 pt-14 pb-20 sm:px-6 sm:pt-20 sm:pb-28 lg:grid-cols-[1.04fr_0.96fr] lg:gap-12">
+      <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-5 pt-14 pb-20 sm:px-6 sm:pt-20 sm:pb-28 lg:grid-cols-2 lg:gap-12">
         {/* Linke Spalte: Text + Scan-Form. Mobile zentriert (eigenstaendige Saeule),
             Desktop links (Teil der 2-Spalten-Komposition mit Hero-Visual). */}
         <div className="relative flex flex-col items-center text-center lg:items-start lg:text-left">
@@ -73,10 +73,9 @@ export function Hero() {
               Animationsdauer verzögern (relevant für paid-Ads-Quality-Score). */}
           <h1 className="mt-6 font-display text-[clamp(2.05rem,6.7vw,4.6rem)] leading-[1.05] font-semibold tracking-[-0.025em] text-balance">
             <span className="block gradient-text-soft">{HERO.headlineLead}</span>
-            {/* pb-[0.12em]: gradient-text nutzt background-clip:text — bei enger
-                Zeilenhöhe beschneidet die Clip-Box die Unterlängen (g/j/ß). Das
-                Bottom-Padding gibt der Box Raum, sonst werden die „g" abgeschnitten. */}
-            <span className="block italic gradient-text pb-[0.12em]">
+            {/* Unterlängen-Schutz (g/j/ß) sitzt jetzt zentral in der .gradient-text-
+                Utility (padding-bottom), gilt damit für alle Gradient-Headlines. */}
+            <span className="block italic gradient-text">
               {HERO.headlineEmph}
             </span>
             <span className="mt-1 block font-sans text-[0.4em] font-medium tracking-tight text-muted-foreground not-italic">

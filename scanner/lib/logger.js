@@ -86,7 +86,8 @@ export function httpLog() {
         req: (req) => ({
           method: req.method,
           url: req.url.replace(/email=[^&]+/i, 'email=[REDACTED]'),
-          remoteAddr: req.headers['x-forwarded-for'] || req.socket?.remoteAddress
+          // req.ip (trust-proxy-aware) bevorzugen; roher XFF-Header ist spoofbar.
+          remoteAddr: req.ip || req.socket?.remoteAddress
         })
       }
     });

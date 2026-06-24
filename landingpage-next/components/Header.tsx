@@ -63,9 +63,11 @@ export function Header() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 w-full transition-all duration-300",
+        // Dauerhaft leichter Blur + saturate (kein Live-Toggle des Blur-Filters
+        // beim Scroll → vermeidet INP/Jank-Spike). Nur bg-/border-Opacity wechseln.
+        "sticky top-0 z-40 w-full backdrop-blur-md backdrop-saturate-150 transition-colors duration-300",
         scrolled
-          ? "border-b border-border/70 bg-background/75 backdrop-blur-xl backdrop-saturate-150 supports-[backdrop-filter]:bg-background/65"
+          ? "border-b border-border/70 bg-background/75 supports-[backdrop-filter]:bg-background/65"
           : "border-b border-transparent bg-transparent",
       )}
     >

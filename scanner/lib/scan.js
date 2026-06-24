@@ -7,7 +7,21 @@
 
 import { chromium } from 'playwright';
 import AxeBuilder from '@axe-core/playwright';
-import { assertPublicHttpUrl, verifyNoDnsRebinding } from './url-guard.js';
+import { assertPublicHttpUrl, verifyNoDnsRebinding, installSsrfGuard } from './url-guard.js';
+
+// Lädt eine Seite robust: erst networkidle (sauberste Settle-Heuristik), bei
+// Timeout Fallback auf domcontentloaded. Tracking-/Long-Poll-lastige Kundenseiten
+// erreichen nie networkidle — ohne Fallback bräche sonst der (bezahlte) Scan ab.
+// Wichtig: das Rebinding-Verify steht VOR dem try, darf NICHT vom Fallback
+// verschluckt werden (sonst SSRF-/Rebinding-Schutz umgangen).
+async function gotoResilient(page, safeUrl, addresses, timeout) {
+  await verifyNoDnsRebinding(safeUrl, addresses);
+  try {
+    await page.goto(safeUrl, { waitUntil: 'networkidle', timeout });
+  } catch {
+    await page.goto(safeUrl, { waitUntil: 'domcontentloaded', timeout });
+  }
+}
 
 export async function scanUrl(url, { timeout = 45000 } = {}) {
   // SSRF-Schutz + Rebinding-Pin: erst Adressen auflösen + verifizieren.
@@ -22,11 +36,12 @@ export async function scanUrl(url, { timeout = 45000 } = {}) {
       'Mozilla/5.0 (compatible; BFSG-Audit/1.0; +https://example.com/bfsg-check)'
   });
   const page = await context.newPage();
+  // SSRF-Guard: jede (auch redirect-ausgelöste) Navigation gegen interne IPs prüfen.
+  await installSsrfGuard(page);
 
   try {
-    // Direkt vor dem Browser-Goto noch einmal DNS prüfen → Rebinding-Detection.
-    await verifyNoDnsRebinding(safe.url, safe.addresses);
-    await page.goto(safe.url, { waitUntil: 'networkidle', timeout });
+    // Rebinding-Detection + robustes Laden (networkidle → domcontentloaded-Fallback).
+    await gotoResilient(page, safe.url, safe.addresses, timeout);
 
     // axe-core nach WCAG 2.1 A + AA und Best-Practices laufen lassen.
     const results = await new AxeBuilder({ page })
@@ -106,10 +121,10 @@ export async function scanSite(startUrl, { maxPages = 5, perPageTimeout = 30000 
       }
 
       const page = await context.newPage();
+      await installSsrfGuard(page);
       try {
-        // DNS-Rebinding-Pin: vor jedem Goto erneut auflösen + vergleichen.
-        await verifyNoDnsRebinding(safeTarget.url, safeTarget.addresses);
-        await page.goto(safeTarget.url, { waitUntil: 'networkidle', timeout: perPageTimeout });
+        // Rebinding-Pin + robustes Laden (networkidle → domcontentloaded-Fallback).
+        await gotoResilient(page, safeTarget.url, safeTarget.addresses, perPageTimeout);
         const results = await new AxeBuilder({ page })
           .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'best-practice'])
           .analyze();

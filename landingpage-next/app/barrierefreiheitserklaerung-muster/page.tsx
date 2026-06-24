@@ -86,7 +86,7 @@ const FAQ = [
   },
   {
     q: "Reicht ein automatisierter Scan als Grundlage für die Erklärung?",
-    a: "Ein automatisierter Scan ist eine zulässige Methode für die Selbstbewertung und muss entsprechend als solche in der Erklärung ausgewiesen werden ('Selbstbewertung mittels automatisierter technischer Analyse'). Er deckt ca. 40–55 % der WCAG-Mängel ab — vollständige manuelle Prüfung wird empfohlen, ist aber nicht zwingend vorgeschrieben.",
+    a: "Ein automatisierter Scan ist eine zulässige Methode für die Selbstbewertung und muss entsprechend als solche in der Erklärung ausgewiesen werden ('Selbstbewertung mittels automatisierter technischer Analyse'). Er deckt ca. 30–50 % der WCAG-Mängel ab — vollständige manuelle Prüfung wird empfohlen, ist aber nicht zwingend vorgeschrieben.",
   },
 ];
 

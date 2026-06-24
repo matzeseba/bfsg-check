@@ -11,7 +11,7 @@ export function CookieSection() {
       aria-labelledby="cookie-heading"
       className="relative overflow-hidden bg-muted/40"
     >
-      <div className="mx-auto max-w-6xl px-5 pt-20 pb-0 sm:px-6 sm:pt-24">
+      <div className="mx-auto max-w-6xl px-5 pt-20 sm:px-6 sm:pt-24">
         <div className="mx-auto max-w-2xl text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-brand-amber/40 bg-brand-amber/10 px-3 py-1 text-xs font-medium text-foreground">
             <CookieIcon className="size-3.5 text-brand-amber" />
@@ -41,7 +41,7 @@ export function CookieSection() {
         showAnnualToggle={false}
         embedded
       />
-      <p className="mx-auto mt-12 max-w-2xl px-6 pb-20 text-center text-xs text-muted-foreground">
+      <p className="mx-auto mt-12 max-w-2xl px-6 pb-20 text-center text-xs text-muted-foreground sm:pb-24">
         Beobachtete Tracker-Requests können bei korrektem Consent Mode v2
         cookielos und zulässig sein — wir markieren diese Fälle ehrlich als
         &bdquo;manuell verifizieren&ldquo;. Keine Rechtsberatung.

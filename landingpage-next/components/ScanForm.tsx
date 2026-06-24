@@ -13,10 +13,12 @@ import { ResultCard, type ScanResult } from "./ResultCard";
 
 export type ScanFormProps = {
   initialUrl?: string;
+  // Beibehalten als öffentliche API (Aufrufer setzen variant="hero"); das Layout
+  // ist aktuell für beide Varianten identisch, daher hier nicht ausgewertet.
   variant?: "hero" | "inline";
 };
 
-export function ScanForm({ initialUrl = "", variant = "hero" }: ScanFormProps) {
+export function ScanForm({ initialUrl = "" }: ScanFormProps) {
   const [url, setUrl] = React.useState(initialUrl);
   const [loading, setLoading] = React.useState(false);
   const [result, setResult] = React.useState<ScanResult | null>(null);
@@ -62,10 +64,20 @@ export function ScanForm({ initialUrl = "", variant = "hero" }: ScanFormProps) {
     }
   }
 
-  const inputWrapper =
-    variant === "hero"
-      ? "flex flex-col gap-1.5 sm:flex-row sm:items-center"
-      : "flex flex-col gap-1.5 sm:flex-row sm:items-center";
+  // Variant beeinflusst das Layout aktuell nicht — eine Konstante statt eines
+  // Ternaries mit identischen Zweigen (toter Code).
+  const inputWrapper = "flex flex-col gap-1.5 sm:flex-row sm:items-center";
+
+  // Genau EINE Live-Region: Lade-/Ergebnis-/Fehlerstatus wird in derselben
+  // persistenten sr-only-role=status-Region angesagt (zwei konkurrierende
+  // Live-Regions können sich gegenseitig überschreiben/doppelt ansagen).
+  const liveStatus = loading
+    ? "Prüfung läuft…"
+    : error
+      ? error
+      : result
+        ? `Prüfung abgeschlossen: ${result.score} von 100 Punkten, ${result.totalIssues} Funde.`
+        : "";
 
   return (
     <div className="flex w-full flex-col gap-4">
@@ -73,11 +85,7 @@ export function ScanForm({ initialUrl = "", variant = "hero" }: ScanFormProps) {
           Statuswechsel ansagen (eine erst mit Inhalt gemountete Region wird oft
           nicht vorgelesen). */}
       <p className="sr-only" role="status" aria-live="polite">
-        {loading
-          ? "Prüfung läuft…"
-          : result
-            ? `Prüfung abgeschlossen: ${result.score} von 100 Punkten, ${result.totalIssues} Funde.`
-            : ""}
+        {liveStatus}
       </p>
       <form
         onSubmit={onSubmit}
@@ -129,11 +137,9 @@ export function ScanForm({ initialUrl = "", variant = "hero" }: ScanFormProps) {
       <p className="px-1 text-xs text-muted-foreground">
         Kostenlos · ohne Anmeldung · ohne Tracker. Bei Bestellung Stripe-Checkout.
       </p>
-      {error && (
-        <p className="text-xs text-muted-foreground" role="status">
-          {error}
-        </p>
-      )}
+      {/* Nur visuell — die Ansage erfolgt über die einzige Live-Region oben,
+          damit keine zwei Live-Regions konkurrieren. */}
+      {error && <p className="text-xs text-muted-foreground">{error}</p>}
       {result && <ResultCard result={result} />}
     </div>
   );

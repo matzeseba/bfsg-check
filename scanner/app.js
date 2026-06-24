@@ -137,6 +137,13 @@ async function handleCheckoutCompleted(event) {
     // Eigene Rechnung (§ 14 UStG) erzeugen — Fallback zur Stripe-Receipt-Mail.
     // Schlägt sie fehl, darf das die Report-Auslieferung NICHT blockieren.
     const invoice = await safeGenerateInvoice({ orderId: s.id, email, company: meta.company || '', pkg, amount: s.amount_total });
+    // Rechnungsnummer SOFORT persistieren (vor Mailversand): schlägt der Versand
+    // fehl oder crasht der Prozess zwischen Rechnung und Mail, kennt der Order-Record
+    // die bereits vergebene fortlaufende GoBD-Nummer. Sonst zöge ein Resend eine
+    // ZWEITE Rechnungsnummer für denselben Verkauf (GoBD-Lücke/Doppelrechnung).
+    if (invoice?.invoiceNumber) {
+      await markStatus(s.id, 'INVOICED', { invoiceNumber: invoice.invoiceNumber, invoicePdfPath: invoice.pdfPath || null });
+    }
     // Subject/Anschreiben passend zum Paket (BFSG / Cookie / Re-Check).
     const emailKind = isSub ? PKG_CONFIG[pkg]?.emailKind || 'bfsg' : order.emailKind;
     await sendReportFor({
@@ -455,8 +462,9 @@ app.post('/api/resend/:sessionId', requireAdminAuth, async (req, res) => {
       pdfPath: result.pdfPath, stmtPath: result.stmtPath,
       emailKind: result.emailKind || 'bfsg',
       diffText: diffSummaryText(result.diff),
-      invoicePdfPath: invoice?.pdfPath || null,
-      invoiceNumber: invoice?.invoiceNumber || null
+      // Bereits erzeugte Rechnung (Nummer + PDF) wiederverwenden statt neu zu ziehen.
+      invoicePdfPath: invoice?.pdfPath || order.invoicePdfPath || null,
+      invoiceNumber: invoice?.invoiceNumber || order.invoiceNumber || null
     });
     await markStatus(sessionId, 'RESENT', { pdfPath: result.pdfPath, invoiceNumber: invoice?.invoiceNumber || order.invoiceNumber || null });
     res.json({ ok: true, sessionId, email: order.email, status: 'RESENT' });

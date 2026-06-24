@@ -1,6 +1,7 @@
 "use client";
 
 import * as motion from "motion/react-client";
+import Link from "next/link";
 import {
   ArrowRightIcon,
   ShieldAlertIcon,
@@ -25,8 +26,10 @@ function gradeFor(score: number): {
   verdict: string;
   tone: "good" | "warn" | "bad";
 } {
-  // Schwellen identisch zum Backend (scanner/lib/report.js: A>=90, B>=75, C>=50),
-  // damit der Teaser dieselbe Note zeigt wie der bezahlte PDF-Report.
+  // Frontend-Teaser-Note aus dem Score abgeleitet (A>=90, B>=75, C>=50, sonst D),
+  // angelehnt an die Backend-Stufen in scanner/lib/report.js. Der Scan-Endpoint
+  // liefert im aktuellen ScanResult-Vertrag keine grade/verdict-Felder; sobald er
+  // das tut, hier direkt rendern statt neu berechnen.
   if (score >= 90) {
     return {
       grade: "A",
@@ -146,12 +149,12 @@ export function ResultCard({ result }: { result: ScanResult }) {
           wählbar.
         </p>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <a
-            href="#pakete"
+          <Link
+            href="/#pakete"
             className="inline-flex min-h-11 items-center justify-center rounded-xl px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             Alle Pakete vergleichen
-          </a>
+          </Link>
           <Button
             onClick={() => openCheckout("profi")}
             className="h-11 gap-1.5 rounded-xl bg-brand-mint text-sm font-semibold text-brand-deep hover:bg-brand-mint/85"

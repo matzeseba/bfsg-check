@@ -151,12 +151,9 @@ export const STATS: StatItem[] = [
   // toLocaleString("de-DE") laufen, sonst wird daraus das Dezimalkomma "2,1".
   { value: "WCAG 2.1", num: null, label: "Prüfung nach AA-Standard" },
   { value: "EN 301 549", num: null, label: "Audit-Methodik" },
-  {
-    value: "100 %",
-    num: 100,
-    suffix: " %",
-    label: "Hosting in Deutschland",
-  },
+  // Eigenschaft, keine Mess-Quote: statisch "DE" statt "100 %" (eine Prozentzahl
+  // suggeriert ein gemessenes Ergebnis, hier ist es ein fixes Hosting-Merkmal).
+  { value: "DE", num: null, label: "Hosting in Deutschland" },
 ] as const;
 
 // Ehrliches Normen-/Standards-Band statt erfundener Presse-Logos.
