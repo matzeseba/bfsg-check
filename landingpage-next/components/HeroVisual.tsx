@@ -68,7 +68,7 @@ export function HeroVisual() {
           <span className="size-2.5 rounded-full bg-brand-rose/60" />
           <span className="size-2.5 rounded-full bg-brand-amber/70" />
           <span className="size-2.5 rounded-full bg-brand-mint/80" />
-          <span className="shrink-0 rounded-md border border-brand-amber/40 bg-brand-amber/12 px-1.5 py-0.5 font-mono text-[9px] font-semibold tracking-wide text-brand-amber uppercase">
+          <span className="shrink-0 rounded-md bg-brand-amber px-1.5 py-0.5 font-mono text-[9px] font-semibold tracking-wide text-brand-deep uppercase">
             {v.sampleLabel}
           </span>
           <div className="mx-auto flex min-w-0 items-center gap-2 rounded-lg bg-background/80 px-3 py-1 font-mono text-[11px] text-muted-foreground">
