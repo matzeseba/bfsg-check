@@ -71,9 +71,12 @@ export function Hero() {
               Bewusst OHNE Entrance-Animation: die H1 ist das LCP-Element — ein
               opacity:0-Start würde den Largest Contentful Paint künstlich um die
               Animationsdauer verzögern (relevant für paid-Ads-Quality-Score). */}
-          <h1 className="mt-6 font-display text-[clamp(2.6rem,6.4vw,4.6rem)] leading-[0.98] font-semibold tracking-[-0.025em] text-balance">
+          <h1 className="mt-6 font-display text-[clamp(2.05rem,6.7vw,4.6rem)] leading-[1.05] font-semibold tracking-[-0.025em] text-balance">
             <span className="block gradient-text-soft">{HERO.headlineLead}</span>
-            <span className="block italic gradient-text">
+            {/* pb-[0.12em]: gradient-text nutzt background-clip:text — bei enger
+                Zeilenhöhe beschneidet die Clip-Box die Unterlängen (g/j/ß). Das
+                Bottom-Padding gibt der Box Raum, sonst werden die „g" abgeschnitten. */}
+            <span className="block italic gradient-text pb-[0.12em]">
               {HERO.headlineEmph}
             </span>
             <span className="mt-1 block font-sans text-[0.4em] font-medium tracking-tight text-muted-foreground not-italic">

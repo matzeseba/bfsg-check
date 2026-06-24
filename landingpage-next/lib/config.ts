@@ -28,7 +28,7 @@ export type PackageConfig = {
 export const SITE = {
   url: "https://bfsg-fix.de",
   name: "BFSG-Check",
-  title: "BFSG-Check — Ist Ihre Website barrierefrei genug? | Kostenloser WCAG-Sofort-Check",
+  title: "BFSG-Check — Ist Ihre Website bereit fürs BFSG? | Kostenloser WCAG-Sofort-Check",
   description:
     "Prüfen Sie in 60 Sekunden, wo Ihre Website die Anforderungen des Barrierefreiheitsstärkungsgesetzes (BFSG) noch verfehlt — automatisierte WCAG-2.1-AA-Analyse, ausführlicher Report auf Wunsch.",
   email: "hallo@bfsg-fix.de",
@@ -54,7 +54,10 @@ export const HERO = {
   pillFlag: "DE",
   pill: "BFSG seit 28.06.2025 in Kraft · Erste Abmahnungen rollen an",
   headlineLead: "Ist Ihre Website",
-  headlineEmph: "barrierefrei genug?",
+  // "bereit fürs BFSG?" bringt den vom Owner gewünschten BFSG-Hook zurück, ohne
+  // die laut CLAUDE.md/UWG §5 verbotene Konformitäts-Aussage "BFSG-konform"
+  // (= Garantie-Behauptung). Eine Bereitschafts-FRAGE behauptet keine Konformität.
+  headlineEmph: "bereit fürs BFSG?",
   headlineTail: "In 60 Sekunden wissen Sie es — bevor es eine Kanzlei tut.",
   subline:
     "Wir scannen Ihre Seite nach über 80 WCAG-2.1-AA-Regeln und liefern jeden Mangel priorisiert — mit Copy-Paste-Fix und menschlicher Sichtung. Premium-Audit ohne Kanzlei-Honorar.",
