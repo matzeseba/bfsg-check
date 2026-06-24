@@ -318,7 +318,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: "Fällt Umsatzsteuer an?",
-    a: "Für Bestellungen aus Deutschland weisen wir die gesetzliche USt aus, sofern wir nicht die Kleinunternehmer-Regelung nach §19 UStG nutzen. Im B2B-Reverse-Charge-Fall (EU-Ausland mit gültiger USt-ID) wird die Steuerschuld auf den Empfänger übertragen.",
+    a: "Nein. Wir nutzen die Kleinunternehmer-Regelung nach § 19 UStG und weisen daher keine Umsatzsteuer aus. Der angegebene Preis ist der Gesamtpreis; auf der Rechnung steht der Hinweis „kein Ausweis von Umsatzsteuer gemäß § 19 UStG\".",
   },
   {
     q: "Kann ich vom Vertrag zurücktreten?",

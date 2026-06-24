@@ -133,9 +133,9 @@ export function PricingCards({
         </div>
 
         <p className="mx-auto mt-10 max-w-2xl text-center text-xs text-muted-foreground">
-          Alle Preise inkl. ges. USt. · Stripe-Checkout (Karte, SEPA, Apple/Google
-          Pay) · Rechnung automatisch per E-Mail · 30 Tage Geld-zurück bei
-          berechtigter Reklamation.
+          Alle Preise sind Gesamtpreise (keine USt-Ausweisung gem. § 19 UStG) ·
+          Stripe-Checkout (Karte, SEPA, Apple/Google Pay) · Rechnung automatisch
+          per E-Mail · 30 Tage Geld-zurück bei berechtigter Reklamation.
         </p>
       </div>
     </section>
@@ -225,7 +225,7 @@ function PricingCard({
         )}
         {!isSub && (
           <p className="mt-1 text-xs text-muted-foreground">
-            einmalig, inkl. USt.
+            einmalig · keine USt (§ 19 UStG)
           </p>
         )}
       </div>

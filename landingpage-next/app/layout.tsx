@@ -75,8 +75,6 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: SITE.title,
     description: SITE.description,
-    creator: "@bfsgcheck",
-    site: "@bfsgcheck",
   },
   robots: {
     index: true,

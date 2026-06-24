@@ -15,7 +15,6 @@ const organizationSchema: JsonLdSchema = {
   logo: `${siteUrl}/opengraph-image`,
   description:
     "BFSG-Check ist der automatisierte Barrierefreiheits-Scanner für deutsche Websites mit verständlichem Fix-Plan und laufendem Monitoring.",
-  sameAs: ["https://www.linkedin.com/company/bfsg-check"],
 };
 
 const websiteSchema: JsonLdSchema = {

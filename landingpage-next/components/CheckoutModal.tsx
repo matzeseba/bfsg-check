@@ -49,6 +49,7 @@ export function CheckoutModal() {
     null,
   );
   const [consent, setConsent] = React.useState(false);
+  const [company, setCompany] = React.useState("");
   const [submitting, setSubmitting] = React.useState(false);
 
   const [lastOpen, setLastOpen] = React.useState(state.open);
@@ -62,6 +63,7 @@ export function CheckoutModal() {
       setEmail("");
       setCustomerType(null);
       setConsent(false);
+      setCompany("");
     }
   }
 
@@ -108,6 +110,7 @@ export function CheckoutModal() {
           email,
           customerType,
           consent,
+          company: customerType === "business" ? company.trim() : "",
         }),
       });
       const data = (await response.json().catch(() => ({}))) as {
@@ -257,6 +260,22 @@ export function CheckoutModal() {
               </div>
             </RadioGroup>
           </fieldset>
+
+          {customerType === "business" && (
+            <div className="grid gap-1.5">
+              <Label htmlFor="co-company" className="font-normal">
+                Firma <span className="text-muted-foreground">(für die Rechnung, optional)</span>
+              </Label>
+              <Input
+                id="co-company"
+                type="text"
+                autoComplete="organization"
+                placeholder="Musterfirma GmbH"
+                value={company}
+                onChange={(event) => setCompany(event.target.value)}
+              />
+            </div>
+          )}
 
           {customerType === "consumer" && (
             <div className="rounded-md border border-border bg-muted/50 p-3 text-xs">
