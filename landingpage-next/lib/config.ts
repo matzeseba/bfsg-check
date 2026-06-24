@@ -28,7 +28,7 @@ export type PackageConfig = {
 export const SITE = {
   url: "https://bfsg-fix.de",
   name: "BFSG-Check",
-  title: "BFSG-Check — Ist Ihre Website barrierefrei genug? | Kostenloser WCAG-Sofort-Check",
+  title: "BFSG-Check — Ist Ihre Website bereit fürs BFSG? | Kostenloser WCAG-Sofort-Check",
   description:
     "Prüfen Sie in 60 Sekunden, wo Ihre Website die Anforderungen des Barrierefreiheitsstärkungsgesetzes (BFSG) noch verfehlt — automatisierte WCAG-2.1-AA-Analyse, ausführlicher Report auf Wunsch.",
   email: "hallo@bfsg-fix.de",
@@ -54,7 +54,10 @@ export const HERO = {
   pillFlag: "DE",
   pill: "BFSG seit 28.06.2025 in Kraft · Erste Abmahnungen rollen an",
   headlineLead: "Ist Ihre Website",
-  headlineEmph: "barrierefrei genug?",
+  // "bereit fürs BFSG?" bringt den vom Owner gewünschten BFSG-Hook zurück, ohne
+  // die laut CLAUDE.md/UWG §5 verbotene Konformitäts-Aussage "BFSG-konform"
+  // (= Garantie-Behauptung). Eine Bereitschafts-FRAGE behauptet keine Konformität.
+  headlineEmph: "bereit fürs BFSG?",
   headlineTail: "In 60 Sekunden wissen Sie es — bevor es eine Kanzlei tut.",
   subline:
     "Wir scannen Ihre Seite nach über 80 WCAG-2.1-AA-Regeln und liefern jeden Mangel priorisiert — mit Copy-Paste-Fix und menschlicher Sichtung. Premium-Audit ohne Kanzlei-Honorar.",
@@ -148,12 +151,9 @@ export const STATS: StatItem[] = [
   // toLocaleString("de-DE") laufen, sonst wird daraus das Dezimalkomma "2,1".
   { value: "WCAG 2.1", num: null, label: "Prüfung nach AA-Standard" },
   { value: "EN 301 549", num: null, label: "Audit-Methodik" },
-  {
-    value: "100 %",
-    num: 100,
-    suffix: " %",
-    label: "Hosting in Deutschland",
-  },
+  // Eigenschaft, keine Mess-Quote: statisch "DE" statt "100 %" (eine Prozentzahl
+  // suggeriert ein gemessenes Ergebnis, hier ist es ein fixes Hosting-Merkmal).
+  { value: "DE", num: null, label: "Hosting in Deutschland" },
 ] as const;
 
 // Ehrliches Normen-/Standards-Band statt erfundener Presse-Logos.
@@ -318,7 +318,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: "Fällt Umsatzsteuer an?",
-    a: "Für Bestellungen aus Deutschland weisen wir die gesetzliche USt aus, sofern wir nicht die Kleinunternehmer-Regelung nach §19 UStG nutzen. Im B2B-Reverse-Charge-Fall (EU-Ausland mit gültiger USt-ID) wird die Steuerschuld auf den Empfänger übertragen.",
+    a: "Nein. Wir nutzen die Kleinunternehmer-Regelung nach § 19 UStG und weisen daher keine Umsatzsteuer aus. Der angegebene Preis ist der Gesamtpreis; auf der Rechnung steht der Hinweis „kein Ausweis von Umsatzsteuer gemäß § 19 UStG\".",
   },
   {
     q: "Kann ich vom Vertrag zurücktreten?",

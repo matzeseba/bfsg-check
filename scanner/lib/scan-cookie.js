@@ -7,7 +7,7 @@
 // cookielos/zulässig sein) → niedrigere Schwere + verifizieren-Formulierung.
 
 import { chromium } from 'playwright';
-import { assertPublicHttpUrl, verifyNoDnsRebinding } from './url-guard.js';
+import { assertPublicHttpUrl, verifyNoDnsRebinding, installSsrfGuard } from './url-guard.js';
 
 // Bekannte Tracking-/Werbe-HOSTS (host-genau, keine nackten Substrings).
 const TRACKER_HOSTS = [
@@ -49,6 +49,7 @@ export async function scanCookie(url, { timeout = 45000 } = {}) {
     ignoreHTTPSErrors: process.env.SCAN_IGNORE_HTTPS === 'true'
   });
   const page = await context.newPage();
+  await installSsrfGuard(page);
 
   const trackerHits = new Set();
   const fontHits = new Set();
@@ -67,8 +68,10 @@ export async function scanCookie(url, { timeout = 45000 } = {}) {
   });
 
   try {
+    // Rebinding-Verify VOR dem try — darf nicht vom networkidle-Fallback
+    // verschluckt werden (sonst Rebinding-/SSRF-Schutz umgangen).
+    await verifyNoDnsRebinding(url, safe.addresses);
     try {
-      await verifyNoDnsRebinding(url, safe.addresses);
       await page.goto(url, { waitUntil: 'networkidle', timeout });
     } catch {
       // networkidle kann auf Tracking-lastigen Seiten nie eintreten → Fallback.

@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Datenschutzerklärung",
   description:
     "Datenschutzerklärung von BFSG-Check — welche Daten wir verarbeiten, warum, und wie Sie Ihre Rechte ausüben.",
+  alternates: { canonical: "/datenschutz" },
 };
 
 export default function DatenschutzPage() {

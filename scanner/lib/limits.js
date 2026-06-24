@@ -12,10 +12,11 @@ export function rateLimit({ windowMs = 60_000, max = 5 } = {}) {
   }, windowMs).unref?.();
 
   return (req, res, next) => {
-    const ip =
-      (req.headers['x-forwarded-for']?.split(',')[0].trim()) ||
-      req.socket?.remoteAddress ||
-      'unknown';
+    // req.ip respektiert `app.set('trust proxy', 1)` und nimmt die vom VERTRAUTEN
+    // Proxy (Caddy) gesetzte Client-IP. Den rohen X-Forwarded-For-Header NICHT
+    // selbst parsen — er ist client-kontrolliert und ein Angreifer könnte das
+    // Rate-Limit durch IP-Rotation pro Request komplett aushebeln (Kosten-DoS).
+    const ip = req.ip || req.socket?.remoteAddress || 'unknown';
     const now = Date.now();
     let e = hits.get(ip);
     if (!e || e.reset < now) {

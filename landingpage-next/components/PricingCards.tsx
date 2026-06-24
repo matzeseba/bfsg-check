@@ -53,7 +53,10 @@ export function PricingCards({
     <section
       id={id}
       aria-labelledby={`${id}-heading`}
-      className="relative isolate overflow-hidden bg-background"
+      className={cn(
+        "relative isolate overflow-hidden",
+        embedded ? "bg-transparent" : "bg-background",
+      )}
     >
       <div
         className={cn(
@@ -130,9 +133,9 @@ export function PricingCards({
         </div>
 
         <p className="mx-auto mt-10 max-w-2xl text-center text-xs text-muted-foreground">
-          Alle Preise inkl. ges. USt. · Stripe-Checkout (Karte, SEPA, Apple/Google
-          Pay) · Rechnung automatisch per E-Mail · 30 Tage Geld-zurück bei
-          berechtigter Reklamation.
+          Alle Preise sind Gesamtpreise (keine USt-Ausweisung gem. § 19 UStG) ·
+          Stripe-Checkout (Karte, SEPA, Apple/Google Pay) · Rechnung automatisch
+          per E-Mail · 30 Tage Geld-zurück bei berechtigter Reklamation.
         </p>
       </div>
     </section>
@@ -179,7 +182,7 @@ function PricingCard({
         className={cn(
           "group/card relative flex h-full flex-col overflow-hidden rounded-3xl p-7 backdrop-blur transition-all duration-300",
           pkg.featured
-            ? "border-gradient bg-card shadow-elevated lg:scale-[1.03] hover:-translate-y-1.5 hover:shadow-elevated"
+            ? "border-gradient bg-card shadow-elevated hover:-translate-y-1.5 hover:shadow-elevated"
             : "border border-border/70 bg-card/85 shadow-card-soft hover:-translate-y-1.5 hover:shadow-card-hover",
         )}
       >
@@ -217,12 +220,12 @@ function PricingCard({
         </div>
         {isSub && annual && (
           <p className="mt-1 text-xs font-medium text-brand-indigo dark:text-brand-mint">
-            Spart 98 € im Vergleich zur Monatszahlung
+            Spart {monthly * 12 - yearly} € im Vergleich zur Monatszahlung
           </p>
         )}
         {!isSub && (
           <p className="mt-1 text-xs text-muted-foreground">
-            einmalig, inkl. USt.
+            einmalig · keine USt (§ 19 UStG)
           </p>
         )}
       </div>

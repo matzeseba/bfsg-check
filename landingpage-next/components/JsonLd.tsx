@@ -10,10 +10,11 @@ const organizationSchema: JsonLdSchema = {
   "@type": "Organization",
   name: organizationName,
   url: siteUrl,
+  // TODO: dediziertes quadratisches Logo (kein quadratisches Asset in public/
+  // vorhanden — bis dahin auf das OG-Banner zeigen, das immerhin existiert).
   logo: `${siteUrl}/opengraph-image`,
   description:
     "BFSG-Check ist der automatisierte Barrierefreiheits-Scanner für deutsche Websites mit verständlichem Fix-Plan und laufendem Monitoring.",
-  sameAs: ["https://www.linkedin.com/company/bfsg-check"],
 };
 
 const websiteSchema: JsonLdSchema = {
@@ -26,14 +27,6 @@ const websiteSchema: JsonLdSchema = {
     "@type": "Organization",
     name: organizationName,
   },
-  potentialAction: {
-    "@type": "SearchAction",
-    target: {
-      "@type": "EntryPoint",
-      urlTemplate: `${siteUrl}/?q={search_term_string}`,
-    },
-    "query-input": "required name=search_term_string",
-  },
 };
 
 type ProductInput = {
@@ -43,6 +36,8 @@ type ProductInput = {
   priceSpecification?: JsonLdSchema;
   category: string;
   sku: string;
+  // Anker-Ziel der Offer-URL (statt Root → konkreter Paket-/Cookie-Abschnitt).
+  offerUrl: string;
   // Default InStock; nicht kaufbare Produkte (Abo-Gate) explizit anders.
   availability?: string;
 };
@@ -55,6 +50,7 @@ const products: ProductInput[] = [
     price: "199.00",
     category: "Barrierefreiheits-Audit",
     sku: "bfsg-basis",
+    offerUrl: `${siteUrl}/#pakete`,
   },
   {
     name: "BFSG-Check Profi",
@@ -63,14 +59,16 @@ const products: ProductInput[] = [
     price: "499.00",
     category: "Barrierefreiheits-Audit",
     sku: "bfsg-profi",
+    offerUrl: `${siteUrl}/#pakete`,
   },
   {
     name: "Cookie-Check Basis",
     description:
-      "Automatische Prüfung Ihres Cookie-Banners auf TDDDG- und DSGVO-Konformität mit konkreter Umsetzungs-Empfehlung.",
+      "Automatische technische Messung Ihres Cookie-Banners gem. § 25 TDDDG mit konkreter Umsetzungs-Empfehlung.",
     price: "49.00",
     category: "Cookie-Compliance",
     sku: "cookie-basis",
+    offerUrl: `${siteUrl}/#cookie`,
   },
   {
     name: "Cookie-Check Profi",
@@ -79,6 +77,7 @@ const products: ProductInput[] = [
     price: "79.00",
     category: "Cookie-Compliance",
     sku: "cookie-profi",
+    offerUrl: `${siteUrl}/#cookie`,
   },
   {
     name: "BFSG-Re-Check-Abo",
@@ -100,6 +99,7 @@ const products: ProductInput[] = [
     },
     category: "Monitoring-Abo",
     sku: "recheck-abo",
+    offerUrl: `${siteUrl}/#pakete`,
     // Abo noch nicht kaufbar (Backend ENABLE_ABO=false) → nicht als InStock auszeichnen.
     availability: "https://schema.org/PreOrder",
   },
@@ -111,7 +111,7 @@ const productSchemas: JsonLdSchema[] = products.map((product) => {
     price: product.price,
     priceCurrency: "EUR",
     availability: product.availability ?? "https://schema.org/InStock",
-    url: siteUrl,
+    url: product.offerUrl,
     seller: {
       "@type": "Organization",
       name: organizationName,
@@ -158,17 +158,11 @@ const faqSchema: JsonLdSchema = {
   })),
 };
 
-const schemas: Array<{ id: string; data: JsonLdSchema }> = [
-  { id: "ld-organization", data: organizationSchema },
-  { id: "ld-website", data: websiteSchema },
-  ...productSchemas.map((data, index) => ({
-    id: `ld-product-${products[index].sku}`,
-    data,
-  })),
-  { id: "ld-faq", data: faqSchema },
-];
-
-export function JsonLd() {
+function JsonLdScripts({
+  schemas,
+}: {
+  schemas: Array<{ id: string; data: JsonLdSchema }>;
+}) {
   return (
     <>
       {schemas.map(({ id, data }) => (
@@ -184,4 +178,32 @@ export function JsonLd() {
   );
 }
 
-export const __jsonLdFaqs = faqs;
+// Global (in layout.tsx): gilt für die GANZE Domain — Organization + WebSite.
+export function SiteJsonLd() {
+  return (
+    <JsonLdScripts
+      schemas={[
+        { id: "ld-organization", data: organizationSchema },
+        { id: "ld-website", data: websiteSchema },
+      ]}
+    />
+  );
+}
+
+// Nur Startseite (in app/page.tsx): Produkt-Angebote + sichtbare FAQ.
+// Darf NICHT global geladen werden — sonst seitenfremdes Markup auf
+// /impressum, Pillar-Pages etc. (Spam-/Manual-Action-Risiko) + doppelte
+// FAQPage auf Pillar-Pages.
+export function HomeJsonLd() {
+  return (
+    <JsonLdScripts
+      schemas={[
+        ...productSchemas.map((data, index) => ({
+          id: `ld-product-${products[index].sku}`,
+          data,
+        })),
+        { id: "ld-faq", data: faqSchema },
+      ]}
+    />
+  );
+}

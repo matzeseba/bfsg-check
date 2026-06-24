@@ -44,22 +44,30 @@ export function CheckoutModal() {
   const [selectedPkgId, setSelectedPkgId] = React.useState<PackageId>(
     state.pkg ?? DEFAULT_PKG,
   );
-  const [lastOpen, setLastOpen] = React.useState(state.open);
-  if (state.open !== lastOpen) {
-    setLastOpen(state.open);
-    if (state.open) {
-      setSelectedPkgId(state.pkg ?? DEFAULT_PKG);
-    }
-  }
-
-  const pkg = packageFor(selectedPkgId);
-
   const [email, setEmail] = React.useState("");
   const [customerType, setCustomerType] = React.useState<CustomerType | null>(
     null,
   );
   const [consent, setConsent] = React.useState(false);
+  const [company, setCompany] = React.useState("");
   const [submitting, setSubmitting] = React.useState(false);
+
+  const [lastOpen, setLastOpen] = React.useState(state.open);
+  if (state.open !== lastOpen) {
+    setLastOpen(state.open);
+    if (state.open) {
+      // Frischer Vorgang: Auswahl seeden UND personenbezogene Felder leeren,
+      // damit keine E-Mail/Kundentyp/Einwilligung aus einem vorigen Öffnen
+      // (ggf. anderes Paket/anderer Vorgang) stehen bleibt (stale Consent).
+      setSelectedPkgId(state.pkg ?? DEFAULT_PKG);
+      setEmail("");
+      setCustomerType(null);
+      setConsent(false);
+      setCompany("");
+    }
+  }
+
+  const pkg = packageFor(selectedPkgId);
 
   // URL ist die Quelle der Wahrheit im Checkout-Context — kein lokales Mirror-State.
   const url = state.url;
@@ -102,6 +110,7 @@ export function CheckoutModal() {
           email,
           customerType,
           consent,
+          company: customerType === "business" ? company.trim() : "",
         }),
       });
       const data = (await response.json().catch(() => ({}))) as {
@@ -252,12 +261,28 @@ export function CheckoutModal() {
             </RadioGroup>
           </fieldset>
 
+          {customerType === "business" && (
+            <div className="grid gap-1.5">
+              <Label htmlFor="co-company" className="font-normal">
+                Firma <span className="text-muted-foreground">(für die Rechnung, optional)</span>
+              </Label>
+              <Input
+                id="co-company"
+                type="text"
+                autoComplete="organization"
+                placeholder="Musterfirma GmbH"
+                value={company}
+                onChange={(event) => setCompany(event.target.value)}
+              />
+            </div>
+          )}
+
           {customerType === "consumer" && (
             <div className="rounded-md border border-border bg-muted/50 p-3 text-xs">
-              <Label
-                htmlFor="co-consent"
-                className="items-start gap-2 font-normal leading-snug"
-              >
+              {/* Kein htmlFor: das Label umschließt das Control bereits
+                  (implizite Assoziation) — ein zusätzliches htmlFor auf den
+                  Base-UI-Button erzeugte eine doppelte Label-Zuordnung. */}
+              <Label className="items-start gap-2 font-normal leading-snug">
                 <Checkbox
                   id="co-consent"
                   checked={consent}

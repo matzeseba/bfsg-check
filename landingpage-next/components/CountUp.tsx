@@ -61,7 +61,11 @@ export function CountUp({
   return (
     <span ref={ref} className={className}>
       {prefix}
-      <span className="tabular-nums">{formatted}</span>
+      {/* Mindestbreite reserviert den Platz der breitesten Zahl, damit das
+          Hochzählen die Ziffern nicht horizontal verschiebt (CLS in der Zelle). */}
+      <span className="inline-block min-w-[3ch] text-left tabular-nums">
+        {formatted}
+      </span>
       {suffix}
     </span>
   );

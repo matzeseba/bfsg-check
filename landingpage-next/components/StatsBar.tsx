@@ -20,17 +20,17 @@ export function StatsBar() {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-32 -top-24 -z-10 size-[40rem] rounded-full bg-brand-mint/12 blur-[100px]"
+        className="pointer-events-none absolute -left-32 -top-24 -z-10 size-[40rem] rounded-full bg-brand-mint/12 blur-[64px]"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-32 -bottom-32 -z-10 size-[40rem] rounded-full bg-brand-violet/30 blur-[100px]"
+        className="pointer-events-none absolute -right-32 -bottom-32 -z-10 size-[40rem] rounded-full bg-brand-violet/30 blur-[64px]"
       />
 
       <div className="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-24">
         <div className="mx-auto max-w-2xl text-center">
           <p className="font-mono text-xs font-medium tracking-[0.2em] text-brand-mint uppercase">
-            Belastbar geprüft
+            Geprüft nach anerkannten Normen
           </p>
           <h2
             id="stats-heading"
@@ -53,7 +53,7 @@ export function StatsBar() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.5, delay: i * 0.07 }}
-              className="text-center md:border-l md:border-[oklch(0.97_0.004_95)]/15 md:pl-5 md:text-left"
+              className="text-center md:border-l md:border-[oklch(0.97_0.004_95)]/15 md:pl-5 md:text-left [&:nth-child(4n+1)]:md:border-l-0 [&:nth-child(4n+1)]:md:pl-0"
             >
               <dt className="font-display text-4xl font-bold tracking-tight tabular-nums text-brand-mint sm:text-5xl">
                 {stat.num === null ? (

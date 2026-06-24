@@ -41,7 +41,7 @@ export function Hero() {
         className="pointer-events-none absolute right-[-10%] top-[-10%] -z-10 hidden size-[45vw] rounded-full bg-brand-violet/15 blur-[70px] md:block"
       />
 
-      <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-5 pt-14 pb-20 sm:px-6 sm:pt-20 sm:pb-28 lg:grid-cols-[1.04fr_0.96fr] lg:gap-12">
+      <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-5 pt-14 pb-20 sm:px-6 sm:pt-20 sm:pb-28 lg:grid-cols-2 lg:gap-12">
         {/* Linke Spalte: Text + Scan-Form. Mobile zentriert (eigenstaendige Saeule),
             Desktop links (Teil der 2-Spalten-Komposition mit Hero-Visual). */}
         <div className="relative flex flex-col items-center text-center lg:items-start lg:text-left">
@@ -71,8 +71,10 @@ export function Hero() {
               Bewusst OHNE Entrance-Animation: die H1 ist das LCP-Element — ein
               opacity:0-Start würde den Largest Contentful Paint künstlich um die
               Animationsdauer verzögern (relevant für paid-Ads-Quality-Score). */}
-          <h1 className="mt-6 font-display text-[clamp(2.6rem,6.4vw,4.6rem)] leading-[0.98] font-semibold tracking-[-0.025em] text-balance">
+          <h1 className="mt-6 font-display text-[clamp(2.05rem,6.7vw,4.6rem)] leading-[1.05] font-semibold tracking-[-0.025em] text-balance">
             <span className="block gradient-text-soft">{HERO.headlineLead}</span>
+            {/* Unterlängen-Schutz (g/j/ß) sitzt jetzt zentral in der .gradient-text-
+                Utility (padding-bottom), gilt damit für alle Gradient-Headlines. */}
             <span className="block italic gradient-text">
               {HERO.headlineEmph}
             </span>

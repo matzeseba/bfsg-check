@@ -4,6 +4,7 @@ export const metadata: Metadata = {
   title: "Allgemeine Geschäftsbedingungen",
   description:
     "AGB von BFSG-Check für die automatisierte Barrierefreiheits-Prüfung und Reports.",
+  alternates: { canonical: "/agb" },
 };
 
 export default function AgbPage() {

@@ -1,6 +1,7 @@
 "use client";
 
 import * as motion from "motion/react-client";
+import Link from "next/link";
 import { ArrowRightIcon, ShieldCheckIcon, SparklesIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -62,7 +63,7 @@ export function CtaSection() {
               <Button
                 size="lg"
                 className="h-12 gap-1.5 rounded-xl bg-brand-mint px-6 text-base font-semibold text-brand-deep transition-transform hover:bg-brand-mint/85 hover:scale-[1.02]"
-                render={<a href="#scan" />}
+                render={<Link href="/#scan" />}
               >
                 Kostenlos prüfen
                 <ArrowRightIcon className="size-4" />
@@ -71,7 +72,7 @@ export function CtaSection() {
                 size="lg"
                 variant="ghost"
                 className="h-12 gap-1.5 rounded-xl px-5 text-base font-medium text-[oklch(0.97_0.004_95)] hover:bg-[oklch(0.97_0.004_95)]/10 hover:text-[oklch(0.97_0.004_95)]"
-                render={<a href="#pakete" />}
+                render={<Link href="/#pakete" />}
               >
                 Pakete ansehen
               </Button>

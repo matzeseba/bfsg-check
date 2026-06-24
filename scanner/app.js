@@ -137,6 +137,13 @@ async function handleCheckoutCompleted(event) {
     // Eigene Rechnung (§ 14 UStG) erzeugen — Fallback zur Stripe-Receipt-Mail.
     // Schlägt sie fehl, darf das die Report-Auslieferung NICHT blockieren.
     const invoice = await safeGenerateInvoice({ orderId: s.id, email, company: meta.company || '', pkg, amount: s.amount_total });
+    // Rechnungsnummer SOFORT persistieren (vor Mailversand): schlägt der Versand
+    // fehl oder crasht der Prozess zwischen Rechnung und Mail, kennt der Order-Record
+    // die bereits vergebene fortlaufende GoBD-Nummer. Sonst zöge ein Resend eine
+    // ZWEITE Rechnungsnummer für denselben Verkauf (GoBD-Lücke/Doppelrechnung).
+    if (invoice?.invoiceNumber) {
+      await markStatus(s.id, 'INVOICED', { invoiceNumber: invoice.invoiceNumber, invoicePdfPath: invoice.pdfPath || null });
+    }
     // Subject/Anschreiben passend zum Paket (BFSG / Cookie / Re-Check).
     const emailKind = isSub ? PKG_CONFIG[pkg]?.emailKind || 'bfsg' : order.emailKind;
     await sendReportFor({
@@ -323,6 +330,11 @@ app.post('/api/checkout', rateLimit({ windowMs: 60_000, max: 10 }), async (req, 
   // Verbraucher: Sofort-Erfüllung erfordert ausdrückliche Widerrufs-Verzicht-Zustimmung (§ 356 IV/V BGB).
   if (customerType === 'consumer' && consent !== true)
     return res.status(400).json({ error: 'Zustimmung zur sofortigen Ausführung und Kenntnis des Widerrufs-Erlöschens erforderlich' });
+  // E-Mail validieren: eine fehlerhafte Adresse macht das bezahlte Produkt
+  // unzustellbar (Geld kassiert, Report kommt nie an).
+  const cleanEmail = String(email).trim().slice(0, 200);
+  if (cleanEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail))
+    return res.status(400).json({ error: 'Bitte eine gültige E-Mail-Adresse angeben' });
   let safe;
   try {
     safe = await assertPublicHttpUrl(/^https?:\/\//i.test(url) ? url : 'https://' + url);
@@ -342,14 +354,14 @@ app.post('/api/checkout', rateLimit({ windowMs: 60_000, max: 10 }), async (req, 
     };
     // Subscription-Metadata: damit invoice.paid die Bestellung wiederfindet.
     const subscription_data = p.mode === 'subscription'
-      ? { metadata: { url: safe.url, pkg, company: baseMeta.company, email: email || '' } }
+      ? { metadata: { url: safe.url, pkg, company: baseMeta.company, email: cleanEmail || '' } }
       : undefined;
     const session = await stripe.checkout.sessions.create({
       mode: p.mode,
       line_items: [
         { price_data: { currency: 'eur', product_data: { name: p.name }, unit_amount: p.amount, ...recurring }, quantity: 1 }
       ],
-      customer_email: email || undefined,
+      customer_email: cleanEmail || undefined,
       metadata: baseMeta,
       subscription_data,
       submit_type: p.mode === 'payment' ? 'pay' : undefined,
@@ -360,6 +372,40 @@ app.post('/api/checkout', rateLimit({ windowMs: 60_000, max: 10 }), async (req, 
   } catch (err) {
     console.error('[checkout] Fehler:', err.message);
     res.status(500).json({ error: 'Checkout fehlgeschlagen' });
+  }
+});
+
+// --- Newsletter-Anmeldung via Brevo Double-Opt-in (§7 UWG/DSGVO-konform) ---
+// Erfolg = Bestätigungsmail verschickt (DOI), NICHT bereits abonniert. Aktiv, sobald
+// BREVO_API_KEY + BREVO_NEWSLETTER_LIST_ID + BREVO_DOI_TEMPLATE_ID gesetzt sind UND
+// in Brevo eine Newsletter-Liste + ein aktives DOI-Template existieren.
+app.post('/api/newsletter', rateLimit({ windowMs: 60_000, max: 5 }), async (req, res) => {
+  const email = String(req.body?.email || '').trim().slice(0, 200);
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    return res.status(400).json({ error: 'Bitte eine gültige E-Mail-Adresse angeben.' });
+
+  const apiKey = process.env.BREVO_API_KEY;
+  const listId = Number(process.env.BREVO_NEWSLETTER_LIST_ID);
+  const templateId = Number(process.env.BREVO_DOI_TEMPLATE_ID);
+  const redirectionUrl = process.env.BREVO_DOI_REDIRECT_URL || `${PUBLIC_URL}/?newsletter=bestaetigt`;
+  if (!apiKey || !listId || !templateId) {
+    logger.warn('Newsletter-Anfrage, aber Brevo-DOI nicht konfiguriert (BREVO_API_KEY/_NEWSLETTER_LIST_ID/_DOI_TEMPLATE_ID).');
+    return res.status(503).json({ error: 'Newsletter ist gerade nicht verfügbar. Bitte später erneut versuchen.' });
+  }
+
+  try {
+    const r = await fetch('https://api.brevo.com/v3/contacts/doubleOptinConfirmation', {
+      method: 'POST',
+      headers: { 'api-key': apiKey, 'content-type': 'application/json', accept: 'application/json' },
+      body: JSON.stringify({ email, includeListIds: [listId], templateId, redirectionUrl })
+    });
+    if (r.status === 201 || r.status === 204) return res.json({ ok: true, status: 'pending' });
+    const body = await r.text().catch(() => '');
+    logger.error({ status: r.status, body: body.slice(0, 300) }, 'Brevo-DOI fehlgeschlagen');
+    return res.status(502).json({ error: 'Anmeldung derzeit nicht möglich. Bitte später erneut.' });
+  } catch (err) {
+    logger.error({ err: err.message }, 'Newsletter-Endpoint Fehler');
+    return res.status(502).json({ error: 'Anmeldung derzeit nicht möglich.' });
   }
 });
 
@@ -455,8 +501,9 @@ app.post('/api/resend/:sessionId', requireAdminAuth, async (req, res) => {
       pdfPath: result.pdfPath, stmtPath: result.stmtPath,
       emailKind: result.emailKind || 'bfsg',
       diffText: diffSummaryText(result.diff),
-      invoicePdfPath: invoice?.pdfPath || null,
-      invoiceNumber: invoice?.invoiceNumber || null
+      // Bereits erzeugte Rechnung (Nummer + PDF) wiederverwenden statt neu zu ziehen.
+      invoicePdfPath: invoice?.pdfPath || order.invoicePdfPath || null,
+      invoiceNumber: invoice?.invoiceNumber || order.invoiceNumber || null
     });
     await markStatus(sessionId, 'RESENT', { pdfPath: result.pdfPath, invoiceNumber: invoice?.invoiceNumber || order.invoiceNumber || null });
     res.json({ ok: true, sessionId, email: order.email, status: 'RESENT' });
