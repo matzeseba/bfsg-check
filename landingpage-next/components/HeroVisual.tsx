@@ -22,16 +22,19 @@ export function HeroVisual() {
   const v = HERO_VISUAL;
 
   return (
-    <div className="group/visual relative" aria-hidden>
+    <div className="group/visual relative w-full min-w-0" aria-hidden>
       {/* Spotlight-Halo dahinter (dezenter als ein klassischer Blob). */}
       <div className="pointer-events-none absolute -inset-8 -z-10">
         <div className="absolute left-1/2 top-1/3 size-[80%] -translate-x-1/2 rounded-full bg-brand-mint/20 blur-[80px]" />
         <div className="absolute right-0 bottom-0 size-[55%] rounded-full bg-brand-violet/20 blur-[80px]" />
       </div>
 
-      {/* Schwebende Akzent-Badges (Layering/Tiefe). */}
+      {/* Schwebende Akzent-Badges (Layering/Tiefe). Erst ab sm sichtbar: der
+          negative Ueberhang (-left/-right) wuerde auf sehr schmalen Screens vom
+          overflow-hidden der Section abgeschnitten und horizontalen Overflow
+          erzeugen. Ab sm ist genug Rand fuer den Float-Effekt da. */}
       <FloatBadge
-        className="-left-3 top-16 sm:-left-8"
+        className="top-16 -left-8 hidden sm:block"
         delay={0.9}
         reduced={reduced}
         slow
@@ -40,7 +43,7 @@ export function HeroVisual() {
         EN 301 549
       </FloatBadge>
       <FloatBadge
-        className="-right-3 bottom-24 sm:-right-6"
+        className="bottom-24 -right-6 hidden sm:block"
         delay={1.1}
         reduced={reduced}
       >
@@ -62,9 +65,9 @@ export function HeroVisual() {
           <span className="size-2.5 rounded-full bg-brand-rose/60" />
           <span className="size-2.5 rounded-full bg-brand-amber/70" />
           <span className="size-2.5 rounded-full bg-brand-mint/80" />
-          <div className="mx-auto inline-flex items-center gap-2 rounded-lg bg-background/80 px-3 py-1 font-mono text-[11px] text-muted-foreground">
-            <span className="inline-flex size-1.5 rounded-full bg-brand-mint" />
-            bfsg-fix.de/{v.reportPath}
+          <div className="mx-auto flex min-w-0 items-center gap-2 rounded-lg bg-background/80 px-3 py-1 font-mono text-[11px] text-muted-foreground">
+            <span className="inline-flex size-1.5 shrink-0 rounded-full bg-brand-mint" />
+            <span className="min-w-0 truncate">bfsg-fix.de/{v.reportPath}</span>
           </div>
         </div>
 

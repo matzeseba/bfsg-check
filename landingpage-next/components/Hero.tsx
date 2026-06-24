@@ -43,8 +43,11 @@ export function Hero() {
 
       <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-5 pt-14 pb-20 sm:px-6 sm:pt-20 sm:pb-28 lg:grid-cols-2 lg:gap-12">
         {/* Linke Spalte: Text + Scan-Form. Mobile zentriert (eigenstaendige Saeule),
-            Desktop links (Teil der 2-Spalten-Komposition mit Hero-Visual). */}
-        <div className="relative flex flex-col items-center text-center lg:items-start lg:text-left">
+            Desktop links (Teil der 2-Spalten-Komposition mit Hero-Visual).
+            min-w-0: eine 1fr-Grid-Spalte hat min-content als Mindestbreite — ohne
+            min-w-0 wuerde sie auf Mobile breiter als der Viewport, der zentrierte
+            Text saesse dann in einer zu breiten Spalte (wirkt nach links verschoben). */}
+        <div className="relative flex min-w-0 flex-col items-center text-center lg:items-start lg:text-left">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -143,12 +146,14 @@ export function Hero() {
           </motion.div>
         </div>
 
-        {/* Rechte Spalte: Audit-Report-Visual */}
+        {/* Rechte Spalte: Audit-Report-Visual. min-w-0 laesst die Spalte unter
+            ihre min-content-Breite schrumpfen; mx-auto + max-w-md zentriert das
+            Visual auf Mobile sauber mittig, ohne Desktop (lg+) zu beeinflussen. */}
         <motion.div
           initial={{ opacity: 0, y: 30, scale: 0.97 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
-          className="relative"
+          className="relative mx-auto w-full min-w-0 max-w-md lg:max-w-none"
         >
           <HeroVisual />
         </motion.div>
