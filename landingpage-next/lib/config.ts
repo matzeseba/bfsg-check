@@ -78,8 +78,12 @@ export const HERO = {
 } as const;
 
 // Daten fuer das Hero-Audit-Report-Visual (rein illustrativ, kein echter Scan).
+// Sichtbar als Beispiel/Demo gekennzeichnet: sampleLabel (Chip in der App-Chrome)
+// + sampleBadge (Eck-Badge auf der Karte) machen die Vorschau-Natur transparent.
 export const HERO_VISUAL = {
   reportPath: "report/4f2a",
+  sampleLabel: "Beispiel",
+  sampleBadge: "Demo-Vorschau",
   score: 62,
   grade: "C",
   totalFindings: 17,
