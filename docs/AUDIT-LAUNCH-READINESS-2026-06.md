@@ -186,3 +186,19 @@ I have enough verified evidence to deliver the review.
 **🔴 Rot — bestätigt.** Die sechs P0 sind real und je ein echter Blocker (zwei davon — SSRF-Redirect + Rate-Limit-Bypass — sind ausnutzbar mit Kosten-/Sicherheitsfolge; zwei — §14-Adresse + Doppelrechnung — machen jede Rechnung rechts-/GoBD-fehlerhaft; einer — Light-Fokus — untergräbt die Produkt-Kernaussage im eigenen Dogfood; einer — networkidle — bricht den bezahlten Scan-Pfad). Nach Fall der sechs P0 **plus** der zwei nachgeschärften P1 (E-Mail-Validierung am Checkout hochstufen, INVOICED-Persist unmittelbar nach Invoice) wechselt die Ampel auf **🟡 Gelb**: launchfähig für kontrollierten Start, aber die P1-Liste (besonders Mail-Retry P1#3, Abo-Idempotenz-Persist P1#2, Chromium-Root P1#4) ist vor Ads-Traffic/Skalierung abzuarbeiten. **🟢 Grün** erst nach P1-Komplettabbau + Live-Verifikation der Bucket-(c)-Punkte auf dem Hetzner-Host.
 
 Verifizierte Anker: scanner/lib/scan.js:29,112 · scanner/lib/limits.js:16 + scanner/app.js:60 · scanner/app.js:139,153,156,450 + scanner/lib/orders.js:70 · scanner/lib/url-guard.js:76-104 · scanner/lib/invoice.js:22,67-70,149 · scanner/lib/scan-cookie.js:69-76 · landingpage-next/app/globals.css (--ring/--input Light) · landingpage-next/components/Hero.tsx:44 + components/HeroVisual.tsx · scanner/app.js:317,345,352.
+
+---
+
+## ✅ Umsetzungs-Status (24.06.2026) — PR #55
+
+**Erledigt & gebaut (Build grün FE 20 Seiten / Backend-Tests grün):**
+- **Alle 6 P0-Launch-Blocker** umgesetzt (SSRF-Guard, §14-ENV-Platzhalter, Rate-Limit req.ip, Resend-Doppelrechnung, Light-Fokus-Ring, networkidle-Fallback).
+- **Gemeldete Hero-Bugs**: Unterlängen-Clipping (zentral in `.gradient-text`), Headline-Größe/Zentrierung, Featured-Card-scale raus, Hero-Grid symmetrisch, Headline-Copy „bereit fürs BFSG?".
+- **Breite FE-Fixes** (SEO/JSON-LD-Split, Canonicals, Perf/optimizePackageImports, A11y, Visual, Legal-Copy) — via 2 Implementierungs-Agenten.
+- **Owner-Entscheidungen**: USt §19-Captions+FAQ · Social-Links entfernt · B2B-Firmenfeld · Newsletter→Brevo-DOI (env-gated) · Checkout-E-Mail-Validierung.
+
+**Offen — Owner-Setup (Newsletter):** In Brevo eine **Newsletter-Liste** + ein **aktives Double-Opt-in-Template** anlegen (existieren noch nicht, per API geprüft), dann `BREVO_API_KEY/_NEWSLETTER_LIST_ID/_DOI_TEMPLATE_ID` im Server-`.env` setzen → Footer-Anmeldung ist sofort live.
+
+**Offen — vor Launch im Server-`.env` setzen:** `INVOICE_FROM_NAME/_ADDRESS`, `VAT_MODE=kleinunternehmer`, `ADMIN_TOKEN`, (optional `SENTRY_DSN`).
+
+**Offen — Bucket (c), braucht Live-Test/Server (NICHT in PR #55):** SSRF-Egress-Proxy + Pen-Test · Chromium-non-root/Sandbox · Mail-Retry · Webhook-Idempotenz-Persist/Reconcile · async-Zahlart (SEPA) · Multi-Instance-Rechnungszähler · DSGVO-Compaction · diverse P1/P2-Backend-Härtungen (siehe Tabellen oben). Diese gezielt in einer Server-Session abarbeiten.
