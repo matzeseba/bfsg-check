@@ -53,9 +53,6 @@ export function HeroVisual() {
 
       {/* Karte mit Border-Gradient + tiefem Mint-getoenten Schatten. */}
       <div className="border-gradient relative overflow-hidden rounded-[1.7rem] bg-card/90 p-1.5 shadow-elevated backdrop-blur-sm">
-        <span className="pointer-events-none absolute right-3 top-3 z-30 rounded-full border border-border/70 bg-card/85 px-2 py-0.5 font-mono text-[9px] font-semibold tracking-wide text-muted-foreground uppercase backdrop-blur">
-          {v.sampleBadge}
-        </span>
         {/* Scan-Beam-Sweep + feine Scanlines (nur ohne reduced-motion sichtbar). */}
         {!reduced && (
           <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden rounded-[1.7rem]">
@@ -68,7 +65,7 @@ export function HeroVisual() {
           <span className="size-2.5 rounded-full bg-brand-rose/60" />
           <span className="size-2.5 rounded-full bg-brand-amber/70" />
           <span className="size-2.5 rounded-full bg-brand-mint/80" />
-          <span className="shrink-0 rounded-md bg-brand-amber px-1.5 py-0.5 font-mono text-[9px] font-semibold tracking-wide text-brand-deep uppercase">
+          <span className="shrink-0 rounded-md bg-brand-amber px-2 py-0.5 font-mono text-[10px] font-semibold tracking-wide text-brand-deep uppercase">
             {v.sampleLabel}
           </span>
           <div className="mx-auto flex min-w-0 items-center gap-2 rounded-lg bg-background/80 px-3 py-1 font-mono text-[11px] text-muted-foreground">

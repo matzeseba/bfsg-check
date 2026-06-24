@@ -3,7 +3,7 @@
 import * as motion from "motion/react-client";
 import { ArrowRightIcon, CheckCircle2Icon } from "lucide-react";
 
-import { HERO } from "@/lib/config";
+import { HERO, HERO_VISUAL } from "@/lib/config";
 
 import { HeroVisual } from "./HeroVisual";
 import { ScanForm } from "./ScanForm";
@@ -155,6 +155,15 @@ export function Hero() {
           transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
           className="relative mx-auto w-full min-w-0 max-w-md lg:max-w-none"
         >
+          <p className="mb-4 flex items-center justify-center gap-2 text-center text-sm font-semibold tracking-tight text-foreground lg:justify-start lg:text-left">
+            <span
+              aria-hidden
+              className="inline-flex shrink-0 items-center rounded-md bg-brand-amber px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-wide text-brand-deep uppercase"
+            >
+              Beispiel
+            </span>
+            <span>{HERO_VISUAL.previewHeading}</span>
+          </p>
           <HeroVisual />
         </motion.div>
       </div>
