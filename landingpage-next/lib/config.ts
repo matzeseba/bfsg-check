@@ -83,7 +83,7 @@ export const HERO = {
 export const HERO_VISUAL = {
   reportPath: "report/4f2a",
   sampleLabel: "Beispiel",
-  previewHeading: "Beispiel-Report — so sieht Ihr Audit aus",
+  previewHeading: "So sieht Ihr kostenloses Sofort-Ergebnis aus",
   score: 62,
   grade: "C",
   totalFindings: 17,
