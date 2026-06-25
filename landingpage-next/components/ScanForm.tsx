@@ -18,6 +18,20 @@ export type ScanFormProps = {
   variant?: "hero" | "inline";
 };
 
+// Grobe Fehlerkategorie aus der Backend-Antwort (Feld `reason`) → ehrliche,
+// kategorie-spezifische deutsche Meldung. KEINE erfundenen Score-Zahlen mehr.
+const REASON_MESSAGES: Record<string, string> = {
+  timeout:
+    "Die Seite hat zu lange zum Laden gebraucht. Bitte erneut versuchen.",
+  tls: "Das Sicherheitszertifikat der Seite konnte nicht überprüft werden.",
+  dns: "Die Seite war nicht erreichbar. Bitte die Adresse prüfen.",
+  blocked:
+    "Die Seite hat die automatisierte Prüfung blockiert. Eine manuelle Analyse ist trotzdem möglich.",
+};
+
+const GENERIC_ERROR =
+  "Der Live-Scan ist gerade nicht erreichbar. Bitte in einem Moment erneut versuchen.";
+
 export function ScanForm({ initialUrl = "" }: ScanFormProps) {
   const [url, setUrl] = React.useState(initialUrl);
   const [loading, setLoading] = React.useState(false);
@@ -25,43 +39,39 @@ export function ScanForm({ initialUrl = "" }: ScanFormProps) {
   const [error, setError] = React.useState<string | null>(null);
   const { setUrl: pushUrl } = useCheckout();
 
-  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!url) return;
+  async function runScan(target: string) {
+    if (!target) return;
     setLoading(true);
     setError(null);
     setResult(null);
-    pushUrl(url);
+    pushUrl(target);
 
     try {
       const response = await fetch(
-        `/api/scan?url=${encodeURIComponent(url)}`,
+        `/api/scan?url=${encodeURIComponent(target)}`,
         { method: "GET", headers: { Accept: "application/json" } },
       );
-      if (!response.ok) {
-        throw new Error(`api ${response.status}`);
+      const data = (await response.json().catch(() => null)) as
+        | (ScanResult & { reason?: string; error?: string })
+        | null;
+      if (!response.ok || !data || typeof data.score !== "number") {
+        // Ehrlicher Fehlerpfad: kategorie-spezifische Meldung, KEINE erfundenen
+        // Zahlen. Die Score-Anzeige bleibt leer, bis ein echtes Ergebnis vorliegt.
+        const reason = data?.reason;
+        setError((reason && REASON_MESSAGES[reason]) || GENERIC_ERROR);
+        return;
       }
-      const data = (await response.json()) as ScanResult;
       setResult(data);
     } catch {
-      // Demo-Fallback ohne Backend, damit die Page auch offline anschaulich bleibt.
-      const fallback: ScanResult = {
-        score: Math.floor(40 + Math.random() * 45),
-        totalIssues: Math.floor(5 + Math.random() * 30),
-        topIssues: [
-          "Fehlende Alt-Texte bei Bildern",
-          "Unzureichende Farbkontraste",
-          "Formularfelder ohne sichtbares Label",
-        ],
-        fallback: true,
-      };
-      setResult(fallback);
-      setError(
-        "Live-Scan derzeit nicht erreichbar — beispielhafte Ergebnisse werden gezeigt.",
-      );
+      setError(GENERIC_ERROR);
     } finally {
       setLoading(false);
     }
+  }
+
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    await runScan(url);
   }
 
   // Variant beeinflusst das Layout aktuell nicht — eine Konstante statt eines
@@ -137,9 +147,24 @@ export function ScanForm({ initialUrl = "" }: ScanFormProps) {
       <p className="px-1 text-xs text-muted-foreground">
         Kostenlos · ohne Anmeldung · ohne Tracker. Bei Bestellung Stripe-Checkout.
       </p>
-      {/* Nur visuell — die Ansage erfolgt über die einzige Live-Region oben,
-          damit keine zwei Live-Regions konkurrieren. */}
-      {error && <p className="text-xs text-muted-foreground">{error}</p>}
+      {/* Ehrlicher Fehlerzustand: klare Meldung + "Erneut versuchen". KEINE
+          erfundenen Demo-Score-Zahlen. Die Ansage für Screenreader erfolgt über
+          die einzige Live-Region oben (hier nur visuell). */}
+      {error && !loading && (
+        <div className="flex flex-col gap-2 rounded-xl border border-border/70 bg-muted/40 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-muted-foreground">{error}</p>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => runScan(url)}
+            disabled={!url}
+            className="shrink-0 rounded-lg"
+          >
+            Erneut versuchen
+          </Button>
+        </div>
+      )}
       {result && <ResultCard result={result} />}
     </div>
   );

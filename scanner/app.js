@@ -14,6 +14,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Stripe from 'stripe';
 import { scanUrl } from './lib/scan.js';
+import { classifyScanError } from './lib/scan-error.js';
 import { renderTeaser } from './lib/report.js';
 import { fulfillOrder, PKG_CONFIG } from './lib/fulfill.js';
 import {
@@ -307,14 +308,20 @@ app.get('/api/scan', rateLimit({ windowMs: 60_000, max: 5 }), async (req, res) =
   try {
     const cached = cache.get(safe.url);
     if (cached && Date.now() - cached.t < TTL) return res.json(cached.data);
-    const scan = await scanGate(() => scanUrl(safe.url, { timeout: 30000 }));
+    // TLS-Toleranz NUR für den Gratis-Teaser, env-gated (Default aus = striktes
+    // Verhalten unverändert). Der bezahlte Scan-Pfad bleibt immer strikt.
+    const lenientTls = process.env.SCAN_TEASER_LENIENT_TLS === 'true';
+    const scan = await scanGate(() => scanUrl(safe.url, { timeout: 30000, lenientTls }));
     const teaser = renderTeaser(scan);
     if (cache.size >= CACHE_MAX) cache.clear();
     cache.set(safe.url, { t: Date.now(), data: teaser });
     res.json(teaser);
   } catch (err) {
+    // Echte Ursache server-seitig loggen, dem Client nur die grobe Kategorie +
+    // deutsche Klartextmeldung geben (keine Interna/Hosts/IPs leaken).
     console.error('[scan] Fehler:', err.message);
-    res.status(502).json({ error: 'Scan fehlgeschlagen. Bitte später erneut versuchen.' });
+    const { reason, status, message } = classifyScanError(err.message);
+    res.status(status).json({ error: message, reason });
   }
 });
 

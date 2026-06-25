@@ -8,30 +8,41 @@
 import { chromium } from 'playwright';
 import AxeBuilder from '@axe-core/playwright';
 import { assertPublicHttpUrl, verifyNoDnsRebinding, installSsrfGuard } from './url-guard.js';
+import { classifyScanError } from './scan-error.js';
 
-// Lädt eine Seite robust: erst networkidle (sauberste Settle-Heuristik), bei
-// Timeout Fallback auf domcontentloaded. Tracking-/Long-Poll-lastige Kundenseiten
-// erreichen nie networkidle — ohne Fallback bräche sonst der (bezahlte) Scan ab.
-// Wichtig: das Rebinding-Verify steht VOR dem try, darf NICHT vom Fallback
-// verschluckt werden (sonst SSRF-/Rebinding-Schutz umgangen).
+// Lädt eine Seite robust + schnell: PRIMÄR domcontentloaded (zuverlässig, auch
+// auf Tracking-/Long-Poll-lastigen Seiten erreichbar), DANN eine KURZE, begrenzte
+// Settle-Phase auf networkidle, deren eigener Timeout den Scan NICHT abbricht
+// (best effort — wenn die Seite nie ruhig wird, scannen wir trotzdem den geladenen
+// DOM). Vorher (networkidle mit vollem Budget zuerst) verbrannten tracking-lastige
+// Seiten das gesamte Timeout, ohne je networkidle zu erreichen.
+// Wichtig: das Rebinding-Verify steht VOR den Navigationen, darf NICHT verschluckt
+// werden (sonst SSRF-/Rebinding-Schutz umgangen).
+// Settle-Budget: max. 1/3 des Gesamt-Budgets, gedeckelt 6–8 s.
 async function gotoResilient(page, safeUrl, addresses, timeout) {
   await verifyNoDnsRebinding(safeUrl, addresses);
-  try {
-    await page.goto(safeUrl, { waitUntil: 'networkidle', timeout });
-  } catch {
-    await page.goto(safeUrl, { waitUntil: 'domcontentloaded', timeout });
-  }
+  // Zuverlässiger Primärladevorgang. Wirft (z.B. TLS/DNS/Connection) wird durch
+  // an den Aufrufer durchgereicht — dort greift der Retry / die Klassifizierung.
+  await page.goto(safeUrl, { waitUntil: 'domcontentloaded', timeout });
+  // Kurze, gekappte Netzwerk-Ruhe-Phase. Eigenes kleines Budget; ein Timeout hier
+  // ist KEIN Fehler (axe läuft danach trotzdem auf dem geladenen DOM).
+  const settleBudget = Math.max(2000, Math.min(8000, Math.floor(timeout / 3)));
+  await page
+    .waitForLoadState('networkidle', { timeout: settleBudget })
+    .catch(() => { /* Seite wird nie ganz ruhig (Tracking/Polling) — bewusst ignoriert. */ });
 }
 
-export async function scanUrl(url, { timeout = 45000 } = {}) {
+export async function scanUrl(url, { timeout = 45000, lenientTls = false } = {}) {
   // SSRF-Schutz + Rebinding-Pin: erst Adressen auflösen + verifizieren.
   const safe = await assertPublicHttpUrl(/^https?:\/\//i.test(url) ? url : 'https://' + url);
   const browser = await chromium.launch({ args: ['--no-sandbox', '--disable-dev-shm-usage'] });
   const context = await browser.newContext({
     locale: 'de-DE',
     // Produktion: TLS-Fehler NICHT ignorieren (echte Kundenseiten haben gültiges TLS).
-    // Nur für Testumgebungen via SCAN_IGNORE_HTTPS=true übersteuerbar.
-    ignoreHTTPSErrors: process.env.SCAN_IGNORE_HTTPS === 'true',
+    // Übersteuerbar via SCAN_IGNORE_HTTPS=true (Testumgebung) ODER pro Aufruf via
+    // lenientTls=true (nur der Gratis-Teaser nutzt das env-gated, s. app.js). Der
+    // SSRF-/Rebinding-Schutz bleibt davon UNBERÜHRT (separater DNS-/IP-Check).
+    ignoreHTTPSErrors: lenientTls || process.env.SCAN_IGNORE_HTTPS === 'true',
     userAgent:
       'Mozilla/5.0 (compatible; BFSG-Audit/1.0; +https://example.com/bfsg-check)'
   });
@@ -40,8 +51,21 @@ export async function scanUrl(url, { timeout = 45000 } = {}) {
   await installSsrfGuard(page);
 
   try {
-    // Rebinding-Detection + robustes Laden (networkidle → domcontentloaded-Fallback).
-    await gotoResilient(page, safe.url, safe.addresses, timeout);
+    // Rebinding-Detection + robustes Laden (domcontentloaded + kurze Settle-Phase).
+    // Ein leichter Retry bei transientem Navigationsfehler — jeder Versuch läuft
+    // über gotoResilient(), d.h. verifyNoDnsRebinding() greift bei JEDEM Versuch
+    // erneut (SSRF-/Rebinding-Schutz wird durch den Retry NICHT umgangen).
+    // KEIN Retry bei Timeout: dann ist die Seite nur langsam — ein zweiter voller
+    // Versuch verdoppelt nur die Wartezeit und riskiert, das HTTP-/Proxy-Budget zu
+    // sprengen. classifyScanError ist die einzige Quelle des Timeout-Kriteriums.
+    try {
+      await gotoResilient(page, safe.url, safe.addresses, timeout);
+    } catch (firstErr) {
+      if (classifyScanError(firstErr?.message).reason === 'timeout') throw firstErr;
+      await gotoResilient(page, safe.url, safe.addresses, timeout).catch(() => {
+        throw firstErr; // Originalfehler durchreichen (für die Klassifizierung).
+      });
+    }
 
     // axe-core nach WCAG 2.1 A + AA und Best-Practices laufen lassen.
     const results = await new AxeBuilder({ page })
