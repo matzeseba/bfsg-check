@@ -1,7 +1,45 @@
 # 🤝 Handover für die nächste Session
 
 > **Lies das nach `CLAUDE.md` als ZWEITES.**
-> **Stand:** 22.06.2026 · **Letzte Session:** Conversion-Optimierung der Landingpage durch 5-Agenten-Spezialisten-Review → PR #54 (Draft, Legal-P0s + Performance + CRO; **Merge nach `main` morgen geplant**). Davor: AI-OS „Jarvis"-Cockpit (lokal), Agency-Agents-Integration + Pre-Launch-Audit, Cache-Prompting-Regel, Co-Founder-Sprint (Funnel live).
+> **Stand:** 24.06.2026 (Abend) · **ZIEL: heute Abend Go-Live.** Letzte Sessions: Conversion-Optimierung (PR #54) · lückenloser FE+BE-Launch-Readiness-Audit (100 verifizierte Funde, alle 6 P0 im Code gefixt, PR #55) · 4 Owner-Entscheidungen umgesetzt · Hero mobil-zentriert + Vorschau-Kasten als „Beispiel" gekennzeichnet (PRs #56–#61). **Alles gemergt + live.** Offene Go-Live-Aufgaben: **siehe direkt unten.**
+
+---
+
+## 🚀 GO-LIVE-CHECKLISTE (Stand 24.06.2026, Abend) — DAS HIER ZUERST
+
+> **Was bleibt bis zum Live-Gang offen.** Detail-Belege je Backend-Fund: `docs/AUDIT-LAUNCH-READINESS-2026-06.md` (vollständige P0/P1/P2-Tabellen + Buckets).
+> Status der Website selbst: **bereits deployed & grün** (`/health` ok, Stripe live, Mailer aktiv). „Go-Live" = Launch/Ads scharf schalten — dafür fehlt v. a. Owner-Setup + etwas Server-Härtung.
+
+### 🔴 A) PFLICHT heute Abend — nur der Owner kann das (Server-`.env` + Konten)
+1. **Rechnungs-Pflichtangaben im Server-`.env`** (`/opt/bfsg-check/deployment/.env`) setzen — sonst trägt JEDE Rechnungs-PDF einen Platzhalter als Anbieter-Anschrift (§14 UStG = formfehlerhaft, Audit-P0#2):
+   - `INVOICE_FROM_NAME=Matthias Seba`
+   - `INVOICE_FROM_ADDRESS=Lange Straße 20, 27449 Kutenholz`
+   - `VAT_MODE=kleinunternehmer`
+   - `ADMIN_TOKEN=` (langes Zufallsgeheimnis, z. B. `openssl rand -hex 32`) — schützt `/api/admin/*`
+   - `SENTRY_DSN=` (optional)
+   → danach `docker compose up -d --build`, dann **1 Test-Rechnung erzeugen und Anschrift/„§19"-Hinweis prüfen**. (Platzhalter stehen bereits in `deployment/.env.example`.)
+2. **Stripe-Live-Testkauf** (eigene Karte → danach Refund) — PFLICHT bevor echte Zahlungen/Ads laufen. Verifizieren: Webhook → Scan startet → PDF + eigene Rechnung + Mail kommen an. (Deckt zugleich den Resend-/Rechnungs-Pfad-Live-Test ab, Audit-P0#4.)
+3. **Newsletter aktivieren** (optional fürs reine Go-Live — ohne Config meldet das Footer-Formular ehrlich „gerade nicht verfügbar"): in Brevo (a) eine **Newsletter-Liste** anlegen, (b) ein **Double-Opt-in-Template** anlegen + aktivieren (existiert beides noch nicht — per API geprüft), dann im Server-`.env`: `BREVO_API_KEY`, `BREVO_NEWSLETTER_LIST_ID`, `BREVO_DOI_TEMPLATE_ID`, `BREVO_DOI_REDIRECT_URL`. Code + Endpoint (`/api/newsletter`) sind fertig und env-gated.
+
+### 🟠 B) Server-/Code-Härtung vor Ad-Skalierung (brauchen Server- oder Live-Test — NICHT im Sandbox machbar)
+- **SSRF endgültig schließen (Audit-P0#1):** Code-Guard ist live (Per-Navigation-IP-Check inkl. Redirect-Hops + immer-aktiver Private-IP-Check). **Volle Absicherung = Netz-Egress-Policy / IP-pinnender Proxy auf Hetzner + Pen-Test** gegen interne IPs/Metadaten. Vor breiter Exposition verifizieren.
+- **networkidle-Fallback (P0#6) + AxeBuilder-Timeout (#45):** gegen reale tracking-/long-poll-lastige Kundenseiten live testen.
+- **Chromium läuft als root mit `--no-sandbox` (P1#4):** `USER pwuser` im `scanner/Dockerfile` + Sandbox aktivieren, Container-Rebuild + Smoke-Test.
+- **Mail-Retry (P1#3):** `sendMail` mit 3× Backoff + Mail-Try vom Scan/Rechnungs-Try trennen — **noch NICHT umgesetzt** (verhindert FAILED-Order trotz fertigem Report bei transienter SMTP-Störung).
+- **Webhook-Idempotenz-Persistenz + Reconcile-Sweeper (P1#2, #50, #54)** und **async-Zahlart/SEPA (#59):** vor Skalierung / vor `ENABLE_ABO=true`.
+- **Multi-Instance-Rechnungszähler (#58)** + **echte DSGVO-Compaction (#60):** erst bei Skalierung/2. Instanz relevant.
+- **Rest:** ~40 P2-Politur-Items — siehe Audit-Doc, nicht Go-Live-blockierend.
+> Hinweis: Der §19-Brutto/Netto-Fix (P1#1) ist durch die Owner-Entscheidung „Kleinunternehmer" **gegenstandslos** (Default ist korrekt).
+
+### 🟢 C) Conversion-Backlog (brauchen Assets vom Owner — nicht Go-Live-blockierend)
+- **Gründer-Block** auf der Landingpage: Foto + Name + Satz („Ich prüfe jeden Report persönlich, bevor er rausgeht. — Matthias Seba"). Stärkstes Trust-Signal für Solo-Founder. **Braucht:** 1 Foto + finalen Satz.
+- **Beispiel-Report-PDF** zum Ansehen vor dem Kauf (Link im Hero/bei den Pakketen). **Braucht:** 1 anonymisierten Report aus `scanner/` als PDF unter `landingpage-next/public/`.
+
+### ✅ In dieser Session bereits erledigt + LIVE (nicht mehr offen)
+- **Conversion-Optimierung** (PR #54): Legal-P0s („BFSG-konform" raus → „bereit fürs BFSG?"), Cookie-2-Button-Balance, Performance/CWV, A11y-Fokus, CRO-Copy.
+- **Launch-Readiness-Audit** (PR #55): alle 6 P0-Blocker im Code (SSRF-Guard, §14-ENV-Platzhalter, Rate-Limit `req.ip`, Resend-Doppelrechnung, Light-Fokus-Ring, networkidle-Fallback) + breite FE-Fixes (SEO/JSON-LD-Split, Canonicals, Perf, A11y, Legal-Copy).
+- **4 Owner-Entscheidungen:** USt §19-Captions+FAQ · Social-Links entfernt · B2B-Firmenfeld im Checkout · Newsletter→Brevo-DOI-Endpoint · Checkout-E-Mail-Validierung.
+- **Hero/Visual:** Headline-Clipping + Mobile-Zentrierung (per Browser-Messung auf 22/22px verifiziert), Headline „bereit fürs BFSG?", Vorschau-Kasten als **„Beispiel"** gekennzeichnet (Chip + Überschrift „So sieht Ihr kostenloses Sofort-Ergebnis aus"), Eck-Badge entfernt (PRs #56–#61).
 
 ---
 
@@ -62,7 +100,7 @@
 |---|---|
 | **Live-Status** | ✅ `bfsg-fix.de/health` = `ok:true, stripe:true, live:true, mailer aktiv` |
 | **Computer Use** | ✅ aktiviert (User Matthias hat Settings > General > „Computer use" angeschaltet) |
-| **Offene PRs** | 🟡 **#54 offen (Draft)** — Conversion-Optimierung, Build grün, **Merge nach `main` morgen geplant**. Davor: #40–#49 alle gemerged; #45 superseded |
+| **Offene PRs** | ✅ **0 offen** — #54–#61 alle gemerged + live (Conversion, Launch-Audit, Owner-Entscheidungen, Hero/Visual-Politur). Offene Go-Live-Aufgaben siehe „🚀 GO-LIVE-CHECKLISTE" oben |
 | **Letzter Merge** | PR #49 — AI-OS-Research-Docs + Vault-Template + Tools (Cockpit/Voice bewusst lokal); `main` aktuell, Health grün |
 | **Nächste konkrete Aufgabe** | `docs/LAUNCH-HEUTE-CHECKLISTE.md` abarbeiten → nur Matthias-Schritte (Stripe-Testkauf, Ads-Konten, Listings) → erste Sales |
 | **Funnel** | ✅ E2E live verifiziert (Scan→Teaser→Checkout-Modal→Stripe-Live, alle Legal-Seiten 200, §356a-Consent sauber) |
