@@ -1,7 +1,7 @@
 # 🤝 Handover für die nächste Session
 
 > **Lies das nach `CLAUDE.md` als ZWEITES.**
-> **Stand:** 24.06.2026 (Abend) · **ZIEL: heute Abend Go-Live.** Letzte Sessions: Conversion-Optimierung (PR #54) · lückenloser FE+BE-Launch-Readiness-Audit (100 verifizierte Funde, alle 6 P0 im Code gefixt, PR #55) · 4 Owner-Entscheidungen umgesetzt · Hero mobil-zentriert + Vorschau-Kasten als „Beispiel" gekennzeichnet (PRs #56–#61). **Alles gemergt + live.** Offene Go-Live-Aufgaben: **siehe direkt unten.**
+> **Stand:** 25.06.2026 · **ZIEL: heute Abend Go-Live.** · **Neu (25.06.):** Gratischeck-Backend-Reliability-Fix nach `main` gemergt (PR #63) — Owner-Aktion `SCAN_TEASER_LENIENT_TLS=true` offen, siehe GO-LIVE-CHECKLISTE A.4. Letzte Sessions: Conversion-Optimierung (PR #54) · lückenloser FE+BE-Launch-Readiness-Audit (100 verifizierte Funde, alle 6 P0 im Code gefixt, PR #55) · 4 Owner-Entscheidungen umgesetzt · Hero mobil-zentriert + Vorschau-Kasten als „Beispiel" gekennzeichnet (PRs #56–#61). **Alles gemergt + live.** Offene Go-Live-Aufgaben: **siehe direkt unten.**
 
 ---
 
@@ -20,6 +20,7 @@
    → danach `docker compose up -d --build`, dann **1 Test-Rechnung erzeugen und Anschrift/„§19"-Hinweis prüfen**. (Platzhalter stehen bereits in `deployment/.env.example`.)
 2. **Stripe-Live-Testkauf** (eigene Karte → danach Refund) — PFLICHT bevor echte Zahlungen/Ads laufen. Verifizieren: Webhook → Scan startet → PDF + eigene Rechnung + Mail kommen an. (Deckt zugleich den Resend-/Rechnungs-Pfad-Live-Test ab, Audit-P0#4.)
 3. **Newsletter aktivieren** (optional fürs reine Go-Live — ohne Config meldet das Footer-Formular ehrlich „gerade nicht verfügbar"): in Brevo (a) eine **Newsletter-Liste** anlegen, (b) ein **Double-Opt-in-Template** anlegen + aktivieren (existiert beides noch nicht — per API geprüft), dann im Server-`.env`: `BREVO_API_KEY`, `BREVO_NEWSLETTER_LIST_ID`, `BREVO_DOI_TEMPLATE_ID`, `BREVO_DOI_REDIRECT_URL`. Code + Endpoint (`/api/newsletter`) sind fertig und env-gated.
+4. **Gratischeck-TLS-Toleranz aktivieren** (PR #63, behebt „Gratischeck zeigt nur Demowerte"): im Server-`.env` `SCAN_TEASER_LENIENT_TLS=true` setzen, dann `docker compose up -d --build`. Erlaubt dem **kostenlosen** Teaser-Scan, kleine SMB-Seiten mit unvollständiger/abgelaufener Zertifikatskette trotzdem zu prüfen (Default `false` = strikt). Der **bezahlte** Scan-Pfad bleibt immer strikt; SSRF-/DNS-Rebinding-Schutz ist davon unberührt. **Danach verifizieren:** `curl "https://bfsg-fix.de/api/scan?url=https://kutenholz.de"` muss echte Werte statt 502 liefern; `…?url=https://www.zalando.de` sollte deutlich schneller als die früheren ~32 s antworten.
 
 ### 🟠 B) Server-/Code-Härtung vor Ad-Skalierung (brauchen Server- oder Live-Test — NICHT im Sandbox machbar)
 - **SSRF endgültig schließen (Audit-P0#1):** Code-Guard ist live (Per-Navigation-IP-Check inkl. Redirect-Hops + immer-aktiver Private-IP-Check). **Volle Absicherung = Netz-Egress-Policy / IP-pinnender Proxy auf Hetzner + Pen-Test** gegen interne IPs/Metadaten. Vor breiter Exposition verifizieren.
@@ -40,6 +41,17 @@
 - **Launch-Readiness-Audit** (PR #55): alle 6 P0-Blocker im Code (SSRF-Guard, §14-ENV-Platzhalter, Rate-Limit `req.ip`, Resend-Doppelrechnung, Light-Fokus-Ring, networkidle-Fallback) + breite FE-Fixes (SEO/JSON-LD-Split, Canonicals, Perf, A11y, Legal-Copy).
 - **4 Owner-Entscheidungen:** USt §19-Captions+FAQ · Social-Links entfernt · B2B-Firmenfeld im Checkout · Newsletter→Brevo-DOI-Endpoint · Checkout-E-Mail-Validierung.
 - **Hero/Visual:** Headline-Clipping + Mobile-Zentrierung (per Browser-Messung auf 22/22px verifiziert), Headline „bereit fürs BFSG?", Vorschau-Kasten als **„Beispiel"** gekennzeichnet (Chip + Überschrift „So sieht Ihr kostenloses Sofort-Ergebnis aus"), Eck-Badge entfernt (PRs #56–#61).
+
+---
+
+## 🆕 Update 25.06.2026 — Gratischeck Backend-Live-Check zuverlässiger (PR #63)
+
+- **Problem:** Der Gratischeck lieferte bei echten Kundenseiten oft **nur Demowerte**. Ursache war NICHT „Backend unerreichbar" (Endpoint live & grün), sondern **Zuverlässigkeit**: bei Scan-Fehlschlag zeigte das Frontend zufällige Beispielzahlen. Reproduziert am Live-Server: `example.com` ok (2 s), `zalando.de` 200 aber **31,6 s**, `kutenholz.de` (SMB) **502 in 1,2 s**.
+- **Fix (PR #63, Draft→Merge):**
+  - **Backend `scanner/`:** `gotoResilient` lädt `domcontentloaded` zuerst + kurze gekappte `networkidle`-Settle-Phase (1/3 des Budgets, 2–8 s) statt `networkidle` mit vollem 30-s-Budget → behebt die 30-s-Hänger. **SSRF-/DNS-Rebinding-Schutz bleibt auf jedem Pfad aktiv.** Leichter 1×-Retry bei transientem Fehler (kein Retry bei Timeout). Neue reine Funktion `classifyScanError()` (`lib/scan-error.js`): `/api/scan` liefert grobe Kategorie (`timeout|tls|dns|blocked|unknown`) + deutsche Klartextmeldung + Status (504 bei Timeout), ohne Interna zu leaken. 9 neue Unit-Tests, **59/59 grün**.
+  - **Frontend `landingpage-next/`:** `ScanForm` zeigt im Fehlerfall **keine zufälligen Demowerte** mehr, sondern eine ehrliche, kategorie-spezifische Meldung + Button „Erneut versuchen". `ResultCard`-Demo-Hinweis entfernt.
+- **🔴 OWNER-AKTION (1 Zeile, schaltet den vollen Effekt frei):** im Server-`.env` `SCAN_TEASER_LENIENT_TLS=true` setzen + `docker compose up -d --build` — Details + Verifikations-`curl`s siehe **GO-LIVE-CHECKLISTE → A) Punkt 4** oben. Ohne dieses Flag scheitern SMB-Seiten mit unvollständiger Zertifikatskette weiterhin (dann greift jetzt aber wenigstens die ehrliche Fehler-/Retry-Anzeige statt Demowerten).
+- **Prozess:** Spezialisten-Agenten-Flow (Prüfung → Engineering-Agent → 3 Review-Agenten + `code-review` → Tests). Build grün: scanner 59/59, landingpage `tsc`/`eslint`/`next build` EXIT 0.
 
 ---
 
