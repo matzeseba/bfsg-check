@@ -17,7 +17,6 @@ export type ScanResult = {
   score: number;
   totalIssues: number;
   topIssues?: string[];
-  fallback?: boolean;
 };
 
 function gradeFor(score: number): {
@@ -63,7 +62,7 @@ function gradeFor(score: number): {
 }
 
 export function ResultCard({ result }: { result: ScanResult }) {
-  const { score, totalIssues, topIssues, fallback } = result;
+  const { score, totalIssues, topIssues } = result;
   const { grade, variant, verdict, tone } = gradeFor(score);
   const { openCheckout } = useCheckout();
   const positive = score >= 75;
@@ -137,11 +136,6 @@ export function ResultCard({ result }: { result: ScanResult }) {
               </li>
             ))}
         </ul>
-        {fallback && (
-          <p className="text-xs text-muted-foreground">
-            Hinweis: Demo-Werte — der Live-Backend-Scan war nicht erreichbar.
-          </p>
-        )}
       </div>
       <div className="flex flex-col items-stretch gap-3 border-t border-border/60 bg-muted/40 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs text-muted-foreground">
