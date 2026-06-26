@@ -3,6 +3,7 @@
 import * as motion from "motion/react-client";
 import Link from "next/link";
 import {
+  AlertTriangleIcon,
   ArrowRightIcon,
   ShieldAlertIcon,
   ShieldCheckIcon,
@@ -128,9 +129,11 @@ export function ResultCard({ result }: { result: ScanResult }) {
             .slice(0, 3)
             .map((issue) => (
               <li key={issue} className="flex items-start gap-2">
-                <span
+                {/* WCAG 1.4.1: Bedeutung nicht allein über Farbe — Icon je Befund,
+                    Farbe bleibt zusätzlich (rot = Mangel). */}
+                <AlertTriangleIcon
                   aria-hidden
-                  className="mt-1.5 inline-block size-1.5 shrink-0 rounded-full bg-brand-rose"
+                  className="mt-0.5 size-4 shrink-0 text-brand-rose"
                 />
                 <span>{issue}</span>
               </li>
