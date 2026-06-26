@@ -118,6 +118,43 @@ test('Status-Übergang: PAID → FAILED → RESENDING → RESENT (Resend-Pfad)',
   assert.equal(order.status, 'RESENT');
 });
 
+test('Mail-Retry (P1#3): INVOICED → READY_NOT_MAILED → RESENT behält Rechnungsnummer (kein FAILED, kein Neuscan)', async () => {
+  const evt = mockCheckoutSessionEvent({ sessionId: 'cs_readynotmailed' });
+  await recordPaid({
+    eventId: evt.id, sessionId: evt.data.object.id,
+    email: 'mailfail@test.de', url: 'https://mailfail.example.com',
+    pkg: 'basis', amount: 19900
+  });
+
+  // Phase 1 abgeschlossen: Scan+PDF+Rechnung fertig, Rechnungsnummer persistiert.
+  await markStatus(evt.data.object.id, 'FULFILLING');
+  await markStatus(evt.data.object.id, 'INVOICED', {
+    invoiceNumber: 'RE-2026-0042', invoicePdfPath: '/tmp/RE-2026-0042.pdf'
+  });
+
+  // Phase 2 (Mailversand) scheitert nach allen Retries → READY_NOT_MAILED, NICHT FAILED.
+  await markStatus(evt.data.object.id, 'READY_NOT_MAILED', {
+    error: 'SMTP 451 greylisted nach 3 Versuchen',
+    pdfPath: '/tmp/report.pdf', stmtPath: '/tmp/stmt.md', emailKind: 'bfsg',
+    invoiceNumber: 'RE-2026-0042', invoicePdfPath: '/tmp/RE-2026-0042.pdf'
+  });
+  let order = await getOrder(evt.data.object.id);
+  assert.equal(order.status, 'READY_NOT_MAILED', 'Mail-Fehler darf NICHT FAILED setzen — Report ist fertig');
+  assert.notEqual(order.status, 'FAILED');
+  assert.equal(order.invoiceNumber, 'RE-2026-0042', 'Rechnungsnummer bleibt erhalten');
+  assert.ok(order.pdfPath, 'Report-PDF-Pfad ist persistiert (Resend braucht keinen Neuscan)');
+
+  // Mail-only-Resend: derselbe Report + dieselbe Rechnungsnummer (keine zweite Nummer).
+  await markStatus(evt.data.object.id, 'RESENDING');
+  await markStatus(evt.data.object.id, 'RESENT', {
+    pdfPath: order.pdfPath, invoiceNumber: order.invoiceNumber, resendMode: 'mail-only'
+  });
+  order = await getOrder(evt.data.object.id);
+  assert.equal(order.status, 'RESENT');
+  assert.equal(order.invoiceNumber, 'RE-2026-0042', 'Resend zieht KEINE neue Rechnungsnummer (GoBD-Idempotenz)');
+  assert.equal(order.resendMode, 'mail-only', 'Resend war reiner Mailversand (kein fulfillOrder)');
+});
+
 test('Subscription-Lifecycle: record → markCancelled', async () => {
   const subId = `sub_test_${Date.now()}`;
   await recordSubscription({

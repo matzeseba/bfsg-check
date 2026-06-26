@@ -129,15 +129,24 @@ async function handleCheckoutCompleted(event) {
     });
   }
 
+  // Erfüllung in ZWEI getrennte Phasen geteilt (P1#3):
+  //  Phase 1 — teuer + nicht idempotent: Scan + PDF + Rechnung (mit Nummern-Vergabe).
+  //  Phase 2 — billig + wiederholbar: nur der Mailversand.
+  // So zieht eine transiente SMTP-/Brevo-Störung NICHT das fertige Produkt in FAILED
+  // (was beim Resend einen Komplett-Neuscan + ggf. Doppelrechnung auslöste). Stattdessen
+  // landet die Order in READY_NOT_MAILED — der Resend-Pfad sendet dann NUR die Mail neu
+  // (kein Neuscan, keine neue Rechnungsnummer: er übernimmt die persistierte Nummer).
+  let order;
+  let invoice;
   try {
     await assertPublicHttpUrl(meta.url);
     await markStatus(s.id, 'FULFILLING');
-    const order = await scanGate(() =>
+    order = await scanGate(() =>
       fulfillOrder({ url: meta.url, company: meta.company || '', email: email || '', pkg })
     );
     // Eigene Rechnung (§ 14 UStG) erzeugen — Fallback zur Stripe-Receipt-Mail.
     // Schlägt sie fehl, darf das die Report-Auslieferung NICHT blockieren.
-    const invoice = await safeGenerateInvoice({ orderId: s.id, email, company: meta.company || '', pkg, amount: s.amount_total });
+    invoice = await safeGenerateInvoice({ orderId: s.id, email, company: meta.company || '', pkg, amount: s.amount_total });
     // Rechnungsnummer SOFORT persistieren (vor Mailversand): schlägt der Versand
     // fehl oder crasht der Prozess zwischen Rechnung und Mail, kennt der Order-Record
     // die bereits vergebene fortlaufende GoBD-Nummer. Sonst zöge ein Resend eine
@@ -145,8 +154,26 @@ async function handleCheckoutCompleted(event) {
     if (invoice?.invoiceNumber) {
       await markStatus(s.id, 'INVOICED', { invoiceNumber: invoice.invoiceNumber, invoicePdfPath: invoice.pdfPath || null });
     }
-    // Subject/Anschreiben passend zum Paket (BFSG / Cookie / Re-Check).
-    const emailKind = isSub ? PKG_CONFIG[pkg]?.emailKind || 'bfsg' : order.emailKind;
+    if (isSub) {
+      await saveSnapshot(s.subscription, order.snapshot);
+    }
+  } catch (err) {
+    // Phase-1-Fehler: Scan/Report/Rechnung kamen NICHT zustande → echtes FAILED.
+    // Der Resend MUSS hier neu scannen (es liegt kein fertiges Produkt vor).
+    await markStatus(s.id, 'FAILED', { error: err.message });
+    await sendAlert(
+      `Bezahlt, aber Erfüllung fehlgeschlagen: ${email}`,
+      `Session: ${s.id}\nURL: ${meta.url}\nPaket: ${pkg}\nFehler: ${err.message}\n\nManuell nachliefern: node resend.js ${s.id}`
+    );
+    sentry.captureException(err, { webhook_event: 'checkout.session.completed', session_id: s.id });
+    logger.error({ sessionId: s.id, err: err.message }, 'ERFÜLLUNG FEHLGESCHLAGEN');
+    return;
+  }
+
+  // Phase 2: Mailversand (sendReportFor → deliver mit 3× Retry/Backoff bei transienten Fehlern).
+  // Subject/Anschreiben passend zum Paket (BFSG / Cookie / Re-Check).
+  const emailKind = isSub ? PKG_CONFIG[pkg]?.emailKind || 'bfsg' : order.emailKind;
+  try {
     await sendReportFor({
       to: email, company: meta.company || '',
       pdfPath: order.pdfPath, stmtPath: order.stmtPath,
@@ -155,19 +182,31 @@ async function handleCheckoutCompleted(event) {
       invoicePdfPath: invoice?.pdfPath || null,
       invoiceNumber: invoice?.invoiceNumber || null
     });
-    if (isSub) {
-      await saveSnapshot(s.subscription, order.snapshot);
-    }
     await markStatus(s.id, 'MAILED', { pdfPath: order.pdfPath, invoiceNumber: invoice?.invoiceNumber || null });
     logger.info({ sessionId: s.id, pkg, amount: s.amount_total, invoiceNumber: invoice?.invoiceNumber || null }, 'Report ausgeliefert');
   } catch (err) {
-    await markStatus(s.id, 'FAILED', { error: err.message });
+    // Report + Rechnung sind FERTIG, nur die Mail ging nach allen Retries nicht raus.
+    // NICHT FAILED setzen (Resend würde sonst neu scannen + neue Rechnung ziehen),
+    // sondern READY_NOT_MAILED: der Resend-Pfad sendet dann nur die Mail erneut und
+    // übernimmt die bereits persistierten Artefakte (PDF/Statement/Rechnung) — kein
+    // Neuscan, keine neue Rechnungsnummer (Idempotenz gewahrt). Pfade mitpersistieren,
+    // damit der Mail-only-Resend self-contained ohne erneuten fulfillOrder läuft.
+    await markStatus(s.id, 'READY_NOT_MAILED', {
+      error: err.message,
+      pdfPath: order.pdfPath,
+      stmtPath: order.stmtPath || null,
+      emailKind,
+      invoiceNumber: invoice?.invoiceNumber || null,
+      invoicePdfPath: invoice?.pdfPath || null
+    });
     await sendAlert(
-      `Bezahlt, aber Erfüllung fehlgeschlagen: ${email}`,
-      `Session: ${s.id}\nURL: ${meta.url}\nPaket: ${pkg}\nFehler: ${err.message}\n\nManuell nachliefern: node resend.js ${s.id}`
+      `Bezahlt, Report fertig — aber Mailversand fehlgeschlagen: ${email}`,
+      `Session: ${s.id}\nURL: ${meta.url}\nPaket: ${pkg}\nFehler: ${err.message}\n\n` +
+      `Report + Rechnung liegen vor. NUR Mail erneut senden (kein Neuscan):\n` +
+      `POST /api/resend/${s.id}`
     );
-    sentry.captureException(err, { webhook_event: 'checkout.session.completed', session_id: s.id });
-    logger.error({ sessionId: s.id, err: err.message }, 'ERFÜLLUNG FEHLGESCHLAGEN');
+    sentry.captureException(err, { webhook_event: 'checkout.session.completed', session_id: s.id, stage: 'mail' });
+    logger.error({ sessionId: s.id, err: err.message }, 'MAILVERSAND FEHLGESCHLAGEN (Report fertig, READY_NOT_MAILED)');
   }
 }
 
@@ -496,6 +535,28 @@ app.post('/api/resend/:sessionId', requireAdminAuth, async (req, res) => {
       return res.status(409).json({ error: `Order Status ${order.status} — bereits ausgeliefert. Nutze ?force=true.` });
     }
     await markStatus(sessionId, 'RESENDING');
+
+    // READY_NOT_MAILED (P1#3): Scan + Report + Rechnung sind bereits FERTIG, nur die
+    // Mail kam nicht raus. Dann NUR die Mail erneut senden — kein Neuscan, keine neue
+    // Rechnungsnummer. Alle nötigen Artefakt-Pfade liegen am Order-Record. Fällt ein
+    // Pfad (z. B. nach Server-Neustart mit verlorenem out/-Volume), greift unten der
+    // Voll-Resend-Fallback.
+    const mailOnly = order.status === 'READY_NOT_MAILED' && order.pdfPath;
+    if (mailOnly) {
+      await sendReportFor({
+        to: order.email, company: order.company || '',
+        pdfPath: order.pdfPath, stmtPath: order.stmtPath || null,
+        emailKind: order.emailKind || 'bfsg',
+        // Diff nicht persistiert; Re-Check-Mail zeigt dann „keine Veränderungen" — bei
+        // Erstkäufen (basis/profi/cookie) ohnehin irrelevant, da kein Diff verwendet wird.
+        diffText: '',
+        invoicePdfPath: order.invoicePdfPath || null,
+        invoiceNumber: order.invoiceNumber || null
+      });
+      await markStatus(sessionId, 'RESENT', { pdfPath: order.pdfPath, invoiceNumber: order.invoiceNumber || null, resendMode: 'mail-only' });
+      return res.json({ ok: true, sessionId, email: order.email, status: 'RESENT', mode: 'mail-only' });
+    }
+
     const result = await scanGate(() =>
       fulfillOrder({ url: order.url, company: order.company || '', email: order.email, pkg: order.pkg || 'basis' })
     );
