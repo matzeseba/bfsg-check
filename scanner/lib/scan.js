@@ -7,7 +7,7 @@
 
 import { chromium } from 'playwright';
 import AxeBuilder from '@axe-core/playwright';
-import { assertPublicHttpUrl, verifyNoDnsRebinding, installSsrfGuard } from './url-guard.js';
+import { assertPublicHttpUrl, verifyNoDnsRebinding, installSsrfGuard, pinnedHostResolverArg } from './url-guard.js';
 import { classifyScanError } from './scan-error.js';
 
 // Lädt eine Seite robust + schnell: PRIMÄR domcontentloaded (zuverlässig, auch
@@ -35,7 +35,11 @@ async function gotoResilient(page, safeUrl, addresses, timeout) {
 export async function scanUrl(url, { timeout = 45000, lenientTls = false } = {}) {
   // SSRF-Schutz + Rebinding-Pin: erst Adressen auflösen + verifizieren.
   const safe = await assertPublicHttpUrl(/^https?:\/\//i.test(url) ? url : 'https://' + url);
-  const browser = await chromium.launch({ args: ['--no-sandbox', '--disable-dev-shm-usage'] });
+  // IP-Pin: Chromium-Resolver auf die geprüfte öffentliche IP zwingen (SSRF C1).
+  const pinArg = pinnedHostResolverArg(new URL(safe.url).hostname, safe.addresses);
+  const browser = await chromium.launch({
+    args: ['--no-sandbox', '--disable-dev-shm-usage', ...(pinArg ? [pinArg] : [])]
+  });
   const context = await browser.newContext({
     locale: 'de-DE',
     // Produktion: TLS-Fehler NICHT ignorieren (echte Kundenseiten haben gültiges TLS).
@@ -116,7 +120,12 @@ export async function scanSite(startUrl, { maxPages = 5, perPageTimeout = 30000 
   addrCache.set(new URL(safeRoot.url).hostname, safeRoot.addresses);
   maxPages = Math.max(1, Math.min(50, Number(maxPages) || 5));
 
-  const browser = await chromium.launch({ args: ['--no-sandbox', '--disable-dev-shm-usage'] });
+  // IP-Pin: der Crawl bleibt same-origin (ein Host), daher genügt der Root-Host-Pin.
+  // Redirects auf ANDERE Hosts fängt installSsrfGuard pro Request ab (SSRF C1).
+  const pinArg = pinnedHostResolverArg(new URL(safeRoot.url).hostname, safeRoot.addresses);
+  const browser = await chromium.launch({
+    args: ['--no-sandbox', '--disable-dev-shm-usage', ...(pinArg ? [pinArg] : [])]
+  });
   const context = await browser.newContext({
     locale: 'de-DE',
     ignoreHTTPSErrors: process.env.SCAN_IGNORE_HTTPS === 'true',
