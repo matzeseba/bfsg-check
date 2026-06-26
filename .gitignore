@@ -6,6 +6,8 @@ scanner/.env
 out/
 scanner/out/
 *.pdf
+# Ausnahme: anonymisierter Beispiel-Report ist ein ausgeliefertes Landingpage-Asset
+!landingpage-next/public/beispiel-report.pdf
 .DS_Store
 *.log
 # Server-spezifische Phase-1-Configs (von cloud-init geschrieben, NICHT ins Repo)
