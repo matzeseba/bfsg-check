@@ -1,7 +1,8 @@
 // Persistente Bestell-Nachverfolgung + Idempotenz.
 // Append-only JSONL: jede bezahlte Bestellung wird SOFORT festgehalten, bevor
 // der Report erzeugt wird. So geht keine Zahlung verloren, Doppel-Webhooks werden
-// erkannt, und fehlgeschlagene Erfüllungen sind manuell nachlieferbar (resend.js).
+// erkannt, und fehlgeschlagene Erfüllungen sind manuell nachlieferbar
+// (POST /api/resend/:sessionId mit Admin-Bearer-Token, siehe app.js).
 
 import { appendFile, mkdir, readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
