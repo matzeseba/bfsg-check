@@ -5,6 +5,43 @@
 
 ---
 
+## ▶️ NÄCHSTE SESSION — 1 offener Owner-Schritt (per Computer Use erledigen)
+
+> **Ziel:** Den Gratischeck auch für kleine SMB-Seiten mit unsauberer Zertifikatskette zum Laufen bringen. Der Code dafür ist seit PR #63 live; es fehlt nur noch **ein Feature-Flag im Server-`.env`**. Dieser Block ist als Computer-Use-Aufgabe selbst-enthalten — einfach ausführen lassen.
+
+**Aufgabe für Computer Use (copy-paste in ein Terminal auf dem Mac):**
+
+```bash
+# 1) Auf den Server (SSH-Config-Alias laut CLAUDE.md = "bfsg")
+ssh bfsg
+
+# 2) Ins Deployment-Verzeichnis
+cd /opt/bfsg-check/deployment
+
+# 3) Flag setzen (fügt die Zeile hinzu, falls sie noch fehlt; sonst auf true setzen)
+grep -q '^SCAN_TEASER_LENIENT_TLS=' .env \
+  && sed -i 's/^SCAN_TEASER_LENIENT_TLS=.*/SCAN_TEASER_LENIENT_TLS=true/' .env \
+  || echo 'SCAN_TEASER_LENIENT_TLS=true' >> .env
+
+# 4) Kontrolle: muss "SCAN_TEASER_LENIENT_TLS=true" zeigen
+grep '^SCAN_TEASER_LENIENT_TLS=' .env
+
+# 5) Neu bauen + starten
+docker compose up -d --build
+
+# 6) Verifizieren (vom Server ODER vom Mac aus)
+curl -s "https://bfsg-fix.de/api/scan?url=https://kutenholz.de"      # ERWARTUNG: echtes JSON mit "score", NICHT 502
+curl -s -o /dev/null -w "%{time_total}s\n" "https://bfsg-fix.de/api/scan?url=https://www.zalando.de"  # ERWARTUNG: deutlich < 32 s
+```
+
+**Erfolgskriterium:** `kutenholz.de` liefert ein JSON mit `"score"` (statt `{"error":...}`/502); `zalando.de` antwortet spürbar schneller als die früheren ~32 s.
+
+**Rollback (falls etwas hakt):** in `.env` `SCAN_TEASER_LENIENT_TLS=false` setzen, `docker compose up -d --build`. Der bezahlte Scan-Pfad ist von dem Flag NIE betroffen (bleibt immer strikt); SSRF-/DNS-Rebinding-Schutz ebenfalls unberührt.
+
+**Wichtig:** Server-SSH geht nur vom Mac des Owners (Alias `bfsg`), NICHT aus der Claude-Code-Web-/Sandbox-Umgebung — daher ist dies ein Computer-Use-/Mac-Schritt, kein Sandbox-Schritt.
+
+---
+
 ## 🚀 GO-LIVE-CHECKLISTE (Stand 24.06.2026, Abend) — DAS HIER ZUERST
 
 > **Was bleibt bis zum Live-Gang offen.** Detail-Belege je Backend-Fund: `docs/AUDIT-LAUNCH-READINESS-2026-06.md` (vollständige P0/P1/P2-Tabellen + Buckets).
