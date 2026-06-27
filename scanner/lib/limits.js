@@ -25,15 +25,27 @@ export function rateLimit({ windowMs = 60_000, max = 5 } = {}) {
     }
     e.count++;
     if (e.count > max) {
-      res.set('Retry-After', String(Math.ceil((e.reset - now) / 1000)));
-      return res.status(429).json({ error: 'Zu viele Anfragen. Bitte kurz warten.' });
+      const retryAfter = Math.ceil((e.reset - now) / 1000);
+      res.set('Retry-After', String(retryAfter));
+      // `reason` + `retryAfter` MITSENDEN: ohne sie zeigt das Frontend bei 429 die
+      // generische "Live-Scan nicht erreichbar"-Meldung, obwohl der Server gesund ist
+      // und der Nutzer nur zu schnell hintereinander geprueft hat. retryAfter steht
+      // ohnehin im Header (kein Info-Leak).
+      return res
+        .status(429)
+        .json({ error: 'Zu viele Anfragen. Bitte kurz warten.', reason: 'rate_limit', retryAfter });
     }
     next();
   };
 }
 
 // --- Concurrency-Gate (p-limit-Ersatz) ---
-export function concurrencyGate(maxConcurrent = 2) {
+// maxQueued (Default unbegrenzt = bisheriges Verhalten): begrenzt die Warteschlange.
+// Ist sie voll, lehnt das Gate SOFORT mit einem QUEUE_FULL-Fehler ab (Fast-Fail),
+// statt die Verbindung unbegrenzt offen zu halten. So entartet ein Traffic-Spike
+// nicht zu einer immer laenger werdenden Queue + haengenden Requests; der Aufrufer
+// kann ehrlich mit 503 + Retry-After antworten.
+export function concurrencyGate(maxConcurrent = 2, { maxQueued = Infinity } = {}) {
   let active = 0;
   const queue = [];
   const runNext = () => {
@@ -50,6 +62,12 @@ export function concurrencyGate(maxConcurrent = 2) {
   };
   return function gate(fn) {
     return new Promise((resolve, reject) => {
+      if (queue.length >= maxQueued) {
+        const err = new Error('scan-queue-full');
+        err.code = 'QUEUE_FULL';
+        reject(err);
+        return;
+      }
       queue.push({ fn, resolve, reject });
       runNext();
     });

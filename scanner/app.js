@@ -55,7 +55,19 @@ const PACKAGES = {
 };
 
 // max. 2 gleichzeitige Headless-Browser server-weit (verhindert OOM).
-const scanGate = concurrencyGate(Number(process.env.MAX_CONCURRENT_SCANS || 2));
+// Gratis-Teaser-Gate: begrenzte Concurrency + Warteschlangen-Cap. Bei vollem Stau
+// lieber sofort ehrlich 503 ("ausgelastet") als unbegrenzt wachsende Queue +
+// haengende Verbindungen unter Traffic-Spitzen.
+const scanGate = concurrencyGate(Number(process.env.MAX_CONCURRENT_SCANS || 2), {
+  maxQueued: Number(process.env.SCAN_QUEUE_MAX || 40)
+});
+// SEPARATES Gate fuer den BEZAHLTEN Pfad (fulfillOrder): eigener Concurrency-Slot,
+// KEIN Queue-Cap. So kann ein Gratis-Teaser-Ansturm die Auslieferung bezahlter
+// Bestellungen weder verdraengen (Head-of-Line) noch mit 503 abweisen (Umsatzschutz).
+// Default 1 (bezahlte Scans sind selten + duerfen serialisiert werden) haelt die
+// RAM-Spitze klein; auf 4-GB-Hosts ggf. MAX_CONCURRENT_SCANS=1 setzen, um die
+// Gesamt-Browser-Spitze bei 2 zu halten.
+const paidScanGate = concurrencyGate(Number(process.env.MAX_CONCURRENT_PAID_SCANS || 1));
 
 const app = express();
 app.set('trust proxy', 1);
@@ -141,7 +153,7 @@ async function handleCheckoutCompleted(event) {
   try {
     await assertPublicHttpUrl(meta.url);
     await markStatus(s.id, 'FULFILLING');
-    order = await scanGate(() =>
+    order = await paidScanGate(() =>
       fulfillOrder({ url: meta.url, company: meta.company || '', email: email || '', pkg })
     );
     // Eigene Rechnung (§ 14 UStG) erzeugen — Fallback zur Stripe-Receipt-Mail.
@@ -246,7 +258,7 @@ async function handleInvoicePaid(event) {
 
   try {
     await assertPublicHttpUrl(sub.url);
-    const order = await scanGate(() =>
+    const order = await paidScanGate(() =>
       fulfillOrder({
         url: sub.url, company: sub.company || '', email: sub.email,
         pkg: sub.pkg || 'abo',
@@ -332,7 +344,11 @@ const cache = new Map();
 const TTL = 5 * 60 * 1000;
 const CACHE_MAX = 500;
 
-app.get('/api/scan', rateLimit({ windowMs: 60_000, max: 5 }), async (req, res) => {
+// max: 15/min/IP — hoch genug, dass ein ungeduldiger Nutzer (oder geteiltes
+// Buero-/NAT-IP) nicht versehentlich blockiert wird, niedrig genug als Kosten-/DoS-
+// Schutz (jeder Scan startet Chromium). Bei Ueberschreitung jetzt ehrliche
+// "kurz warten"-Meldung statt "nicht erreichbar".
+app.get('/api/scan', rateLimit({ windowMs: 60_000, max: Number(process.env.SCAN_RATE_MAX || 15) }), async (req, res) => {
   let target = req.query.url;
   if (!target) return res.status(400).json({ error: 'Parameter url fehlt' });
   if (!/^https?:\/\//i.test(target)) target = 'https://' + target;
@@ -352,10 +368,23 @@ app.get('/api/scan', rateLimit({ windowMs: 60_000, max: 5 }), async (req, res) =
     const lenientTls = process.env.SCAN_TEASER_LENIENT_TLS === 'true';
     const scan = await scanGate(() => scanUrl(safe.url, { timeout: 30000, lenientTls }));
     const teaser = renderTeaser(scan);
-    if (cache.size >= CACHE_MAX) cache.clear();
+    // LRU-artige Eviction: nur den AELTESTEN Eintrag entfernen statt den GESAMTEN
+    // Cache zu leeren (cache.clear() erzeugte Saegezahn-Hit-Rate + Last-Spike, sobald
+    // 500 distinct URLs erreicht waren). Map haelt Insertion-Order -> keys().next() = aeltester.
+    while (cache.size >= CACHE_MAX) cache.delete(cache.keys().next().value);
     cache.set(safe.url, { t: Date.now(), data: teaser });
     res.json(teaser);
   } catch (err) {
+    // Server ausgelastet (Warteschlange voll): ehrliches Fast-Fail mit Retry-After
+    // statt haengender Verbindung. Muss VOR classifyScanError stehen.
+    if (err && err.code === 'QUEUE_FULL') {
+      res.set('Retry-After', '20');
+      return res.status(503).json({
+        error: 'Der Live-Scan ist gerade ausgelastet. Bitte in ein paar Sekunden erneut versuchen.',
+        reason: 'busy',
+        retryAfter: 20
+      });
+    }
     // Echte Ursache server-seitig loggen, dem Client nur die grobe Kategorie +
     // deutsche Klartextmeldung geben (keine Interna/Hosts/IPs leaken).
     console.error('[scan] Fehler:', err.message);
@@ -557,7 +586,7 @@ app.post('/api/resend/:sessionId', requireAdminAuth, async (req, res) => {
       return res.json({ ok: true, sessionId, email: order.email, status: 'RESENT', mode: 'mail-only' });
     }
 
-    const result = await scanGate(() =>
+    const result = await paidScanGate(() =>
       fulfillOrder({ url: order.url, company: order.company || '', email: order.email, pkg: order.pkg || 'basis' })
     );
     // Rechnung nachreichen, falls bei der fehlgeschlagenen Erst-Auslieferung noch keine erzeugt wurde.

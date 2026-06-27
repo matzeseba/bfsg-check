@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   AlertTriangleIcon,
   ArrowRightIcon,
+  CheckCircle2Icon,
   ShieldAlertIcon,
   ShieldCheckIcon,
 } from "lucide-react";
@@ -114,31 +115,49 @@ export function ResultCard({ result }: { result: ScanResult }) {
         </Badge>
       </div>
       <div className="grid gap-3 px-5 py-4">
-        <p className="text-sm font-medium">
-          Top-Befunde aus der Sofort-Prüfung
-        </p>
-        <ul className="grid gap-2 text-sm text-muted-foreground">
-          {(topIssues && topIssues.length > 0
-            ? topIssues
-            : [
-                "Fehlende Alt-Texte bei Bildern",
-                "Unzureichende Farbkontraste",
-                "Formularfelder ohne sichtbares Label",
-              ]
-          )
-            .slice(0, 3)
-            .map((issue) => (
-              <li key={issue} className="flex items-start gap-2">
-                {/* WCAG 1.4.1: Bedeutung nicht allein über Farbe — Icon je Befund,
-                    Farbe bleibt zusätzlich (rot = Mangel). */}
-                <AlertTriangleIcon
-                  aria-hidden
-                  className="mt-0.5 size-4 shrink-0 text-brand-rose"
-                />
-                <span>{issue}</span>
-              </li>
-            ))}
-        </ul>
+        {totalIssues > 0 ? (
+          <>
+            <p className="text-sm font-medium">
+              Top-Befunde aus der Sofort-Prüfung
+            </p>
+            {topIssues && topIssues.length > 0 ? (
+              <ul className="grid gap-2 text-sm text-muted-foreground">
+                {topIssues.slice(0, 3).map((issue) => (
+                  <li key={issue} className="flex items-start gap-2">
+                    {/* WCAG 1.4.1: Bedeutung nicht allein über Farbe — Icon je Befund,
+                        Farbe bleibt zusätzlich (rot = Mangel). */}
+                    <AlertTriangleIcon
+                      aria-hidden
+                      className="mt-0.5 size-4 shrink-0 text-brand-rose"
+                    />
+                    <span>{issue}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              // Befunde vorhanden, aber keine Titel im Teaser — KEINE erfundenen
+              // Beispiele, sondern eine ehrliche Zusammenfassung.
+              <p className="text-sm text-muted-foreground">
+                {totalIssues} {totalIssues === 1 ? "Befund" : "Befunde"} erkannt —
+                die einzelnen Stellen stehen im Vollreport.
+              </p>
+            )}
+          </>
+        ) : (
+          // 0 echte Funde: positiver Klartext statt hartcodierter Platzhalter-Mängel
+          // (Score 100/„0 Funde" darf sich nicht selbst widersprechen).
+          <div className="flex items-start gap-2">
+            <CheckCircle2Icon
+              aria-hidden
+              className="mt-0.5 size-4 shrink-0 text-brand-mint"
+            />
+            <p className="text-sm text-muted-foreground">
+              Keine automatisiert erkennbaren Verstöße gefunden. Automatisierte Tests
+              decken rund 30–50 % der Barrieren ab — eine manuelle Prüfung wird dennoch
+              empfohlen.
+            </p>
+          </div>
+        )}
       </div>
       <div className="flex flex-col items-stretch gap-3 border-t border-border/60 bg-muted/40 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs text-muted-foreground">

@@ -37,24 +37,28 @@ export async function scanUrl(url, { timeout = 45000, lenientTls = false } = {})
   const safe = await assertPublicHttpUrl(/^https?:\/\//i.test(url) ? url : 'https://' + url);
   // IP-Pin: Chromium-Resolver auf die geprüfte öffentliche IP zwingen (SSRF C1).
   const pinArg = pinnedHostResolverArg(new URL(safe.url).hostname, safe.addresses);
-  const browser = await chromium.launch({
-    args: ['--no-sandbox', '--disable-dev-shm-usage', ...(pinArg ? [pinArg] : [])]
-  });
-  const context = await browser.newContext({
-    locale: 'de-DE',
-    // Produktion: TLS-Fehler NICHT ignorieren (echte Kundenseiten haben gültiges TLS).
-    // Übersteuerbar via SCAN_IGNORE_HTTPS=true (Testumgebung) ODER pro Aufruf via
-    // lenientTls=true (nur der Gratis-Teaser nutzt das env-gated, s. app.js). Der
-    // SSRF-/Rebinding-Schutz bleibt davon UNBERÜHRT (separater DNS-/IP-Check).
-    ignoreHTTPSErrors: lenientTls || process.env.SCAN_IGNORE_HTTPS === 'true',
-    userAgent:
-      'Mozilla/5.0 (compatible; BFSG-Audit/1.0; +https://example.com/bfsg-check)'
-  });
-  const page = await context.newPage();
-  // SSRF-Guard: jede (auch redirect-ausgelöste) Navigation gegen interne IPs prüfen.
-  await installSsrfGuard(page);
-
+  // browser AUSSERHALB des try deklarieren + launch INNERHALB: wirft newContext/
+  // newPage/installSsrfGuard, schliesst das finally den Browser-Prozess trotzdem
+  // (sonst Zombie-Chromium + FD-Leak im Fehlerfall, der unter Last den Host mitreisst).
+  let browser;
   try {
+    browser = await chromium.launch({
+      args: ['--no-sandbox', '--disable-dev-shm-usage', ...(pinArg ? [pinArg] : [])]
+    });
+    const context = await browser.newContext({
+      locale: 'de-DE',
+      // Produktion: TLS-Fehler NICHT ignorieren (echte Kundenseiten haben gültiges TLS).
+      // Übersteuerbar via SCAN_IGNORE_HTTPS=true (Testumgebung) ODER pro Aufruf via
+      // lenientTls=true (nur der Gratis-Teaser nutzt das env-gated, s. app.js). Der
+      // SSRF-/Rebinding-Schutz bleibt davon UNBERÜHRT (separater DNS-/IP-Check).
+      ignoreHTTPSErrors: lenientTls || process.env.SCAN_IGNORE_HTTPS === 'true',
+      userAgent:
+        'Mozilla/5.0 (compatible; BFSG-Audit/1.0; +https://example.com/bfsg-check)'
+    });
+    const page = await context.newPage();
+    // SSRF-Guard: jede (auch redirect-ausgelöste) Navigation gegen interne IPs prüfen.
+    await installSsrfGuard(page);
+
     // Rebinding-Detection + robustes Laden (domcontentloaded + kurze Settle-Phase).
     // Ein leichter Retry bei transientem Navigationsfehler — jeder Versuch läuft
     // über gotoResilient(), d.h. verifyNoDnsRebinding() greift bei JEDEM Versuch
@@ -102,7 +106,7 @@ export async function scanUrl(url, { timeout = 45000, lenientTls = false } = {})
       incomplete: results.incomplete.length
     };
   } finally {
-    await browser.close();
+    await browser?.close().catch(() => {});
   }
 }
 
@@ -123,21 +127,24 @@ export async function scanSite(startUrl, { maxPages = 5, perPageTimeout = 30000 
   // IP-Pin: der Crawl bleibt same-origin (ein Host), daher genügt der Root-Host-Pin.
   // Redirects auf ANDERE Hosts fängt installSsrfGuard pro Request ab (SSRF C1).
   const pinArg = pinnedHostResolverArg(new URL(safeRoot.url).hostname, safeRoot.addresses);
-  const browser = await chromium.launch({
-    args: ['--no-sandbox', '--disable-dev-shm-usage', ...(pinArg ? [pinArg] : [])]
-  });
-  const context = await browser.newContext({
-    locale: 'de-DE',
-    ignoreHTTPSErrors: process.env.SCAN_IGNORE_HTTPS === 'true',
-    userAgent: 'Mozilla/5.0 (compatible; BFSG-Audit/1.0; +https://example.com/bfsg-check)'
-  });
-
   const visited = new Set();
   const queue = [startUrl];
   const pageResults = [];
   const errors = [];
 
+  // browser AUSSERHALB des try deklarieren + launch INNERHALB -> finally schliesst
+  // den Prozess auch dann, wenn newContext/newPage werfen (kein Zombie-/FD-Leak).
+  let browser;
   try {
+    browser = await chromium.launch({
+      args: ['--no-sandbox', '--disable-dev-shm-usage', ...(pinArg ? [pinArg] : [])]
+    });
+    const context = await browser.newContext({
+      locale: 'de-DE',
+      ignoreHTTPSErrors: process.env.SCAN_IGNORE_HTTPS === 'true',
+      userAgent: 'Mozilla/5.0 (compatible; BFSG-Audit/1.0; +https://example.com/bfsg-check)'
+    });
+
     while (queue.length && visited.size < maxPages) {
       const target = queue.shift();
       if (visited.has(target)) continue;
@@ -196,7 +203,7 @@ export async function scanSite(startUrl, { maxPages = 5, perPageTimeout = 30000 
       }
     }
   } finally {
-    await browser.close();
+    await browser?.close().catch(() => {});
   }
 
   // Aggregation auf Regel-Ebene.
