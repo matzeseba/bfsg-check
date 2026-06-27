@@ -27,6 +27,12 @@ const REASON_MESSAGES: Record<string, string> = {
   dns: "Die Seite war nicht erreichbar. Bitte die Adresse prüfen.",
   blocked:
     "Die Seite hat die automatisierte Prüfung blockiert. Eine manuelle Analyse ist trotzdem möglich.",
+  // Rate-Limit (HTTP 429): NICHT als "Server nicht erreichbar" beschriften — der
+  // Server ist gesund, der Nutzer hat nur zu schnell hintereinander geprüft.
+  rate_limit:
+    "Zu viele Prüfungen in kurzer Zeit. Bitte einen Moment warten und erneut versuchen.",
+  // Server ausgelastet (HTTP 503): alle Scan-Slots belegt + Warteschlange voll.
+  busy: "Der Live-Scan ist gerade stark ausgelastet. Bitte in ein paar Sekunden erneut versuchen.",
 };
 
 const GENERIC_ERROR =
@@ -52,13 +58,20 @@ export function ScanForm({ initialUrl = "" }: ScanFormProps) {
         { method: "GET", headers: { Accept: "application/json" } },
       );
       const data = (await response.json().catch(() => null)) as
-        | (ScanResult & { reason?: string; error?: string })
+        | (ScanResult & { reason?: string; error?: string; retryAfter?: number })
         | null;
       if (!response.ok || !data || typeof data.score !== "number") {
         // Ehrlicher Fehlerpfad: kategorie-spezifische Meldung, KEINE erfundenen
         // Zahlen. Die Score-Anzeige bleibt leer, bis ein echtes Ergebnis vorliegt.
+        // 429 (rate_limit) und 503 (busy) liefern jetzt ein `reason` -> echte
+        // Meldung statt der generischen "nicht erreichbar"-Sammelmeldung.
         const reason = data?.reason;
-        setError((reason && REASON_MESSAGES[reason]) || GENERIC_ERROR);
+        const base = (reason && REASON_MESSAGES[reason]) || GENERIC_ERROR;
+        const retryAfter =
+          typeof data?.retryAfter === "number" ? data.retryAfter : null;
+        setError(
+          retryAfter && retryAfter > 1 ? `${base} (in ca. ${retryAfter} s)` : base,
+        );
         return;
       }
       setResult(data);
