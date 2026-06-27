@@ -97,6 +97,26 @@ export function Hero() {
             className="mt-8 w-full max-w-xl"
           >
             <ScanForm variant="hero" />
+            {/* Dezenter Conversion-Anker: anonymisierter Muster-Report als PDF.
+                Senkt die "Was bekomme ich eigentlich?"-Reibung vor dem Kauf.
+                Root-relativ, neuer Tab, rel=noopener. Bewusst neutrales Wording
+                ("Beispiel", "automatisierte WCAG-2.1-AA-Analyse") im Rahmen der
+                zulaessigen Pflicht-Sprache laut CLAUDE.md. */}
+            <p className="mt-3 px-1 text-xs text-muted-foreground">
+              <a
+                href="/beispiel-report.pdf"
+                target="_blank"
+                rel="noopener"
+                className="inline-flex items-center gap-1 font-medium text-foreground/80 underline decoration-border underline-offset-4 transition-colors hover:text-foreground hover:decoration-brand-mint"
+              >
+                Beispiel-Report ansehen
+                <ArrowRightIcon className="size-3" aria-hidden />
+              </a>
+              <span className="ml-1.5">
+                — anonymisiertes Muster einer automatisierten WCAG-2.1-AA-Analyse
+                (PDF)
+              </span>
+            </p>
           </motion.div>
 
           <motion.ul
