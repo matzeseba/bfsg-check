@@ -65,6 +65,19 @@ async function pushInvoiceAttachment(attachments, invoicePdfPath, invoiceNumber)
   attachments.push({ filename, content: await readFile(invoicePdfPath) });
 }
 
+// Liest eine OPTIONALE Anhang-Datei (z. B. Barrierefreiheitserklärung) defensiv:
+// fehlt sie (out/-Volume nach Restart weg, Datei gelöscht), wird der Anhang
+// übersprungen statt den gesamten Versand zu kippen — das Kernprodukt (Report-PDF)
+// hat Vorrang. Pflicht-Anhänge (PDF) werden weiterhin strikt gelesen.
+async function pushOptionalAttachment(attachments, filePath, filename) {
+  if (!filePath) return;
+  try {
+    attachments.push({ filename, content: await readFile(filePath) });
+  } catch {
+    console.warn(`[mailer] optionaler Anhang fehlt/übersprungen: ${filename} (${filePath})`);
+  }
+}
+
 // Sendet die passende Variante (BFSG-Erstreport / Cookie-Report / Re-Check mit Diff)
 // auf Basis von emailKind aus PKG_CONFIG. invoicePdfPath (optional) wird als
 // zusätzlicher Rechnungs-Anhang mitgesendet.
@@ -73,7 +86,7 @@ export async function sendReportFor({ to, company = '', pdfPath, stmtPath, email
     return sendCookieReport({ to, company, pdfPath, invoicePdfPath, invoiceNumber });
   }
   if (emailKind === 'recheck') {
-    return sendRecheckReport({ to, company, pdfPath, diffText, invoicePdfPath, invoiceNumber });
+    return sendRecheckReport({ to, company, pdfPath, stmtPath, diffText, invoicePdfPath, invoiceNumber });
   }
   return sendReport({ to, company, pdfPath, stmtPath, invoicePdfPath, invoiceNumber });
 }
@@ -98,11 +111,8 @@ ${FROM_NAME}`;
   const attachments = [];
   if (pdfPath) attachments.push({ filename: 'BFSG-Report.pdf', content: await readFile(pdfPath) });
   // Als .txt statt .md — wird von Mailclients zuverlässiger angezeigt/geöffnet.
-  if (stmtPath)
-    attachments.push({
-      filename: 'Barrierefreiheitserklaerung.txt',
-      content: await readFile(stmtPath)
-    });
+  // Defensiv: fehlt die Erklärung, blockiert das NICHT die Report-Auslieferung.
+  await pushOptionalAttachment(attachments, stmtPath, 'Barrierefreiheitserklaerung.txt');
   await pushInvoiceAttachment(attachments, invoicePdfPath, invoiceNumber);
 
   return deliver({ to, subject, text, attachments });
@@ -132,7 +142,7 @@ ${FROM_NAME}`;
   return deliver({ to, subject, text, attachments });
 }
 
-export async function sendRecheckReport({ to, company = '', pdfPath, diffText = '', invoicePdfPath = null, invoiceNumber = null }) {
+export async function sendRecheckReport({ to, company = '', pdfPath, stmtPath = null, diffText = '', invoicePdfPath = null, invoiceNumber = null }) {
   if (!isEmail(to)) throw new Error('Ungültige Empfängeradresse: ' + to);
   const subject = `Ihr monatlicher BFSG-Re-Check${company ? ' — ' + oneLine(company) : ''}`;
   const text = `Hier ist Ihr aktueller Re-Check.
@@ -140,16 +150,21 @@ export async function sendRecheckReport({ to, company = '', pdfPath, diffText = 
 VERÄNDERUNGEN SEIT LETZTEM SCAN
 ${diffText || 'Keine Veränderungen erkannt.'}
 
-Den vollständigen Report mit allen aktuellen Befunden und Lösungshinweisen
-finden Sie im Anhang.${invoicePdfPath ? ' Ihre Rechnung liegt ebenfalls bei.' : ''}
+Im Anhang finden Sie:
+1. Den vollständigen Re-Check-Report (PDF) mit allen aktuellen Befunden und Lösungshinweisen.${stmtPath ? '\n2. Ihre auf den aktuellen Stand gebrachte Erklärung zur Barrierefreiheit (Vorlage).' : ''}${invoicePdfPath ? `\n${stmtPath ? '3' : '2'}. Ihre Rechnung (PDF).` : ''}
 
-Sie können Ihr Abo jederzeit über /kuendigen.html beenden.
+Sie können Ihr Abo jederzeit über https://bfsg-fix.de/kuendigen beenden.
 
 Mit freundlichen Grüßen
 ${FROM_NAME}`;
 
   const attachments = [];
   if (pdfPath) attachments.push({ filename: 'BFSG-Recheck.pdf', content: await readFile(pdfPath) });
+  // Aktualisierte Erklärung zur Barrierefreiheit mitschicken (.txt für maximale
+  // Mailclient-Kompatibilität) — Owner-Anforderung: jeder Re-Check liefert die
+  // auf den aktuellen Stand gebrachte Erklärung. Defensiv: fehlende Datei
+  // überspringt nur den Anhang, blockiert nicht den Re-Check-Versand.
+  await pushOptionalAttachment(attachments, stmtPath, 'Barrierefreiheitserklaerung-aktuell.txt');
   await pushInvoiceAttachment(attachments, invoicePdfPath, invoiceNumber);
   return deliver({ to, subject, text, attachments });
 }

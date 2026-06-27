@@ -88,7 +88,7 @@ const FAQ = [
   },
   {
     q: "Was kostet ein Cookie-Banner-Check?",
-    a: "Der kostenlose Gratis-Check von BFSG-Check gibt einen ersten Überblick. Der Cookie-Basis-Check (49 €) prüft, welche Tracker vor Consent feuern, welche Cookies gesetzt werden und ob Google Fonts oder US-Drittland-Transfers ohne Einwilligung stattfinden — mit konkreter Handlungsempfehlung pro Fund.",
+    a: "Der kostenlose Gratis-Check von BFSG-Check gibt einen ersten Überblick. Der Cookie-Basis-Check (39 €) prüft, welche Tracker vor Consent feuern, welche Cookies gesetzt werden und ob Google Fonts oder US-Drittland-Transfers ohne Einwilligung stattfinden — mit konkreter Handlungsempfehlung pro Fund.",
   },
 ];
 
@@ -231,9 +231,9 @@ export default function CookieBannerFehlerPage() {
         <section className="mt-14 rounded-2xl border border-border bg-card/60 px-6 py-8">
           <h2 className="text-xl font-semibold">Cookie-Banner jetzt technisch prüfen lassen</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Der BFSG-Check Cookie-Basis-Check (49 €) prüft automatisiert, welche Tracker vor Consent feuern,
+            Der BFSG-Check Cookie-Basis-Check (39 €) prüft automatisiert, welche Tracker vor Consent feuern,
             welche Cookies ohne Einwilligung gesetzt werden, ob Google Fonts oder US-Drittland-Transfers
-            stattfinden — mit konkreter Handlungsempfehlung je Fund. Der Cookie-Profi-Check (79 €) enthält
+            stattfinden — mit konkreter Handlungsempfehlung je Fund. Der Cookie-Profi-Check (69 €) enthält
             zusätzlich eine manuelle Sichtung der CMP-Konfiguration.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">

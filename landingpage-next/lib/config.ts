@@ -188,10 +188,10 @@ export const PACKAGES: PackageConfig[] = [
     id: "basis",
     name: "BFSG-Report Basis",
     tag: "Basis",
-    price: "199 €",
+    price: "129 €",
     description: "Einmaliger Vollreport",
     mode: "payment",
-    amountCents: 19900,
+    amountCents: 12900,
     moneyBack: "30 Tage Geld-zurück bei berechtigter Reklamation",
     features: [
       "Vollständiger WCAG-2.1-Report (PDF)",
@@ -204,10 +204,10 @@ export const PACKAGES: PackageConfig[] = [
     id: "profi",
     name: "BFSG-Report Profi",
     tag: "Empfohlen · Profi",
-    price: "499 €",
+    price: "399 €",
     description: "Report + Umsetzungsplan",
     mode: "payment",
-    amountCents: 49900,
+    amountCents: 39900,
     featured: true,
     moneyBack: "30 Tage Geld-zurück bei berechtigter Reklamation",
     features: [
@@ -222,12 +222,12 @@ export const PACKAGES: PackageConfig[] = [
     id: "abo",
     name: "BFSG Re-Check Abo",
     tag: "Abo",
-    price: "39 €",
+    price: "24,99 €",
     priceSuffix: "/Monat",
     description: "Dauerhafte Überwachung",
     mode: "subscription",
-    amountCents: 3900,
-    available: false, // Backend ENABLE_ABO=false → noch nicht kaufbar. Auf true, sobald Abo live.
+    amountCents: 2499,
+    available: true, // Abo live (Server ENABLE_ABO=true). Bei Backend-Deaktivierung wieder false setzen.
     moneyBack: "Jederzeit zum Monatsende kündbar",
     features: [
       "Monatlicher Re-Check",
@@ -243,10 +243,10 @@ export const COOKIE_PACKAGES: PackageConfig[] = [
     id: "cookie-basis",
     name: "Cookie-Check (§25 TDDDG)",
     tag: "Cookie Basis",
-    price: "49 €",
+    price: "39 €",
     description: "Einmalige technische Messung",
     mode: "payment",
-    amountCents: 4900,
+    amountCents: 3900,
     moneyBack: "30 Tage Geld-zurück bei berechtigter Reklamation",
     features: [
       "Welche Tracker feuern vor Consent?",
@@ -259,10 +259,10 @@ export const COOKIE_PACKAGES: PackageConfig[] = [
     id: "cookie-profi",
     name: "Cookie-Check Profi",
     tag: "Empfohlen · Cookie Profi",
-    price: "79 €",
+    price: "69 €",
     description: "Tiefere Prüfung & manuelle Sichtung",
     mode: "payment",
-    amountCents: 7900,
+    amountCents: 6900,
     featured: true,
     moneyBack: "30 Tage Geld-zurück bei berechtigter Reklamation",
     features: [
@@ -288,7 +288,7 @@ export const DIFFERENTIATORS = [
   {
     kicker: "Günstiger als Beratung",
     title: "Pauschalpreis statt Stundensatz",
-    desc: "Sie zahlen einmalig 199 € oder 499 € — kein Tagessatz, keine offene Rechnung. Sie wissen vorab auf den Euro genau, was es kostet.",
+    desc: "Sie zahlen einmalig 129 € oder 399 € — kein Tagessatz, keine offene Rechnung. Sie wissen vorab auf den Euro genau, was es kostet.",
   },
 ] as const;
 

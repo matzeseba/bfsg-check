@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Was kostet eine BFSG-Prüfung? Marktpreise 2026 ehrlich verglichen",
     description:
-      "Gratis-Tools, automatisierte Reports (199–499 €) und manuelle Audits (1.500–5.000 €) — welcher Ansatz lohnt sich wann?",
+      "Gratis-Tools, automatisierte Reports (129–399 €) und manuelle Audits (1.500–5.000 €) — welcher Ansatz lohnt sich wann?",
     url: "https://bfsg-fix.de/bfsg-pruefung-kosten",
     type: "article",
   },
@@ -101,7 +101,7 @@ export default function BfsgPruefungKostenPage() {
             Barrierefreiheitserklärung. Für eine strukturierte BFSG-Dokumentation reicht das nicht.
           </p>
 
-          <h3 className="mt-8 text-xl font-semibold">Weg 2: Automatisierter Scan mit Report (199–499 €)</h3>
+          <h3 className="mt-8 text-xl font-semibold">Weg 2: Automatisierter Scan mit Report (129–399 €)</h3>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
             Spezialisierte Scan-Dienste wie BFSG-Check kombinieren automatisierte Prüfwerkzeuge (axe-core,
             eigene Regelwerke) mit menschlicher Sichtung vor Auslieferung. Das Ergebnis ist ein strukturierter
@@ -110,8 +110,8 @@ export default function BfsgPruefungKostenPage() {
           </p>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
             Der Vorteil: keine Expertise beim Auftraggeber nötig, sofortiger Scan-Start, Lieferung typischerweise
-            in Stunden, kein Beratungsmonster. Der Basis-Report (199 €, bis zu 5 Unterseiten) ist für die meisten
-            mittelständischen Shops der effizienteste Einstieg. Der Profi-Report (499 €, bis zu 25 Unterseiten)
+            in Stunden, kein Beratungsmonster. Der Basis-Report (129 €, bis zu 5 Unterseiten) ist für die meisten
+            mittelständischen Shops der effizienteste Einstieg. Der Profi-Report (399 €, bis zu 25 Unterseiten)
             enthält zusätzlich einen Umsetzungs-Fahrplan und 30 Tage E-Mail-Support.
           </p>
 
@@ -145,7 +145,7 @@ export default function BfsgPruefungKostenPage() {
               </thead>
               <tbody>
                 {[
-                  ["Kosten", "0 €", "199–499 €", "1.500–5.000 €"],
+                  ["Kosten", "0 €", "129–399 €", "1.500–5.000 €"],
                   ["WCAG-Mängel-Abdeckung", "30–40 %", "30–50 %", "80–95 %"],
                   ["Fix-Plan enthalten", "Nein", "Ja", "Ja"],
                   ["Barrierefreiheitserklärung", "Nein", "Entwurf", "Vollständig"],
@@ -192,17 +192,17 @@ export default function BfsgPruefungKostenPage() {
           </ul>
         </section>
 
-        {/* Warum 199/499 */}
+        {/* Warum 129/399 */}
         <section className="mt-14">
-          <h2 className="text-2xl font-semibold">Warum 199 € und 499 €?</h2>
+          <h2 className="text-2xl font-semibold">Warum 129 € und 399 €?</h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
             BFSG-Check positioniert sich bewusst zwischen Gratis-Tools und manuellen Kanzlei-Audits. Der Basis-Report
-            zu 199 € deckt die häufigsten automatisch erkennbaren Mängel ab, liefert einen priorisierten Fix-Plan
+            zu 129 € deckt die häufigsten automatisch erkennbaren Mängel ab, liefert einen priorisierten Fix-Plan
             und einen Barrierefreiheitserklärung-Entwurf — alles, was ein mittelständischer Shop für einen ersten
             dokumentierten Nachweis braucht.
           </p>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            Der Profi-Report zu 499 € erweitert das auf bis zu 25 Unterseiten, enthält einen Umsetzungs-Fahrplan
+            Der Profi-Report zu 399 € erweitert das auf bis zu 25 Unterseiten, enthält einen Umsetzungs-Fahrplan
             mit Copy-Paste-Entwickler-Snippets und 30 Tage E-Mail-Support für Rückfragen. Das entspricht etwa
             einer Entwicklerstunde beim Fachanwalt — für einen deutlich breiteren Leistungsumfang.
           </p>

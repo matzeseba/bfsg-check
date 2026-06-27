@@ -27,7 +27,7 @@ import { diffSummaryText } from './lib/diff.js';
 import { generateInvoicePdf } from './lib/invoice.js';
 import { assertPublicHttpUrl } from './lib/url-guard.js';
 import { rateLimit, concurrencyGate } from './lib/limits.js';
-import { claimEvent, recordPaid, markStatus } from './lib/orders.js';
+import { claimEvent, releaseEvent, recordPaid, markStatus } from './lib/orders.js';
 import {
   recordSubscription, saveSnapshot, getSubscription, markCancelled, markSubscriptionStatus
 } from './lib/subscriptions.js';
@@ -45,12 +45,12 @@ const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SEC
 requireMailerOrExit();
 
 const PACKAGES = {
-  basis:          { name: 'BFSG-Report Basis',         amount: 19900, mode: 'payment' },
-  profi:          { name: 'BFSG-Report Profi',         amount: 49900, mode: 'payment' },
-  'cookie-basis': { name: 'Cookie-Check (§25 TDDDG)',  amount:  4900, mode: 'payment' },
-  'cookie-profi': { name: 'Cookie-Check Profi',        amount:  7900, mode: 'payment' },
+  basis:          { name: 'BFSG-Report Basis',         amount: 12900, mode: 'payment' },
+  profi:          { name: 'BFSG-Report Profi',         amount: 39900, mode: 'payment' },
+  'cookie-basis': { name: 'Cookie-Check (§25 TDDDG)',  amount:  3900, mode: 'payment' },
+  'cookie-profi': { name: 'Cookie-Check Profi',        amount:  6900, mode: 'payment' },
   ...(ENABLE_ABO
-    ? { abo: { name: 'BFSG Re-Check Abo', amount: 3900, mode: 'subscription', interval: 'month' } }
+    ? { abo: { name: 'BFSG Re-Check Abo', amount: 2499, mode: 'subscription', interval: 'month' } }
     : {})
 };
 
@@ -90,12 +90,27 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
   }
 
   // Idempotenz für alle Event-Typen (gilt auch für invoice.paid Duplikate).
-  // Atomarer Claim schließt die Race zwischen parallelen Stripe-Retries (F1).
+  // Atomarer In-Memory-Claim schließt die Race zwischen parallelen Stripe-Retries (F1).
   if (!(await claimEvent(event.id))) {
     return res.json({ received: true, duplicate: true });
   }
 
-  // Webhook SOFORT quittieren — Stripe-Retry vermeidet sich, asynchron arbeiten wir.
+  // Order-erzeugende Events VOR der Quittung durabel festhalten: so hinterlässt ein
+  // Crash NACH der Quittung immer eine reconcilebare PAID-Spur (statt bezahlt-aber-
+  // spurlos). Schlägt schon die Persistenz fehl, NICHT quittieren + Claim freigeben →
+  // Stripe stellt erneut zu (sonst bliebe das Event dauerhaft „verarbeitet").
+  try {
+    if (event.type === 'checkout.session.completed') {
+      await prePersistCheckout(event);
+    }
+  } catch (err) {
+    releaseEvent(event.id);
+    logger.error({ eventType: event.type, err: err.message }, 'webhook Vor-Persistenz fehlgeschlagen — kein Ack, Stripe-Retry');
+    sentry.captureException(err, { webhook_event: event.type, stage: 'prePersist' });
+    return res.status(500).send('persist failed');
+  }
+
+  // Quittieren — ab hier ist die zahlungsrelevante Order durabel; weiter asynchron.
   res.json({ received: true });
 
   try {
@@ -114,6 +129,26 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
   }
 });
 
+// Persistiert Zahlung (+ ggf. Subscription) eines abgeschlossenen Checkouts durabel,
+// BEVOR der Webhook quittiert. Duplikate sind durch claimEvent bereits abgefangen, das
+// läuft pro Event also genau einmal. recordPaid schreibt die event.id mit → erfüllte
+// Bestellungen sind nach einem Restart durabel dedupliziert (ensureLoaded).
+async function prePersistCheckout(event) {
+  const s = event.data.object;
+  if (s.payment_status && s.payment_status !== 'paid') return; // unbezahlt → nichts zu sichern
+  const meta = s.metadata || {};
+  const email = s.customer_details?.email || s.customer_email || meta.email;
+  const pkg = PACKAGES[meta.pkg] ? meta.pkg : 'basis';
+  const isSub = s.mode === 'subscription' && !!s.subscription;
+  await recordPaid({ eventId: event.id, sessionId: s.id, email, url: meta.url, pkg, amount: s.amount_total, customerId: s.customer || null });
+  if (isSub) {
+    await recordSubscription({
+      subscriptionId: s.subscription, customerId: s.customer || null,
+      email, url: meta.url, company: meta.company || '', pkg
+    });
+  }
+}
+
 async function handleCheckoutCompleted(event) {
   const s = event.data.object;
   if (s.payment_status && s.payment_status !== 'paid') {
@@ -125,21 +160,8 @@ async function handleCheckoutCompleted(event) {
   const pkg = PACKAGES[meta.pkg] ? meta.pkg : 'basis';
   const isSub = s.mode === 'subscription' && !!s.subscription;
 
-  // Zahlung SOFORT persistieren — bevor irgendetwas erzeugt wird.
-  // Stripe-Customer-ID mitspeichern (Kundenverwaltung / Doppelkauf / Portal).
-  await recordPaid({ eventId: event.id, sessionId: s.id, email, url: meta.url, pkg, amount: s.amount_total, customerId: s.customer || null });
-
-  // Bei Subscription: Subscription-Eintrag anlegen (Snapshot kommt nach Erstausführung).
-  if (isSub) {
-    await recordSubscription({
-      subscriptionId: s.subscription,
-      customerId: s.customer || null,
-      email,
-      url: meta.url,
-      company: meta.company || '',
-      pkg
-    });
-  }
+  // Zahlung + Subscription wurden bereits in prePersistCheckout (vor der Quittung)
+  // durabel festgehalten. Hier startet direkt die Erfüllung.
 
   // Erfüllung in ZWEI getrennte Phasen geteilt (P1#3):
   //  Phase 1 — teuer + nicht idempotent: Scan + PDF + Rechnung (mit Nummern-Vergabe).
@@ -271,6 +293,9 @@ async function handleInvoicePaid(event) {
     await sendReportFor({
       to: sub.email, company: sub.company || '',
       pdfPath: order.pdfPath,
+      // Aktualisierte Erklärung zur Barrierefreiheit pro Monats-Re-Check mitsenden
+      // (Owner-Anforderung; abo.withStatement ist jetzt true → order.stmtPath gesetzt).
+      stmtPath: order.stmtPath,
       emailKind: 'recheck',
       diffText: diffSummaryText(order.diff),
       invoicePdfPath: invoice?.pdfPath || null,
@@ -645,10 +670,45 @@ process.on('uncaughtException', (e) => {
   sentry.captureException(e instanceof Error ? e : new Error(String(e)), { source: 'uncaughtException' });
 });
 
+// Reconcile-Sweeper: beim Start nicht-terminale Bestellungen aufspüren und den
+// Operator alarmieren. Schließt das Restart-Loch (Webhook quittiert nach durabler
+// Order-Persistenz, arbeitet dann asynchron — ein Crash mitten in der Erfüllung
+// hinterlässt eine PAID/FULFILLING/READY_NOT_MAILED-Order, die hier sichtbar wird).
+// BEWUSST nur Alarm, KEIN Auto-Resend: ein automatischer Wiederversand könnte mit dem
+// manuellen Resend-Endpoint oder einer real bereits zugestellten Mail kollidieren und
+// eine zweite Rechnungs-Mail (§14) erzeugen. Recovery läuft über /api/resend (mit
+// eigenem RESENDING-Guard; Mail-only bei READY_NOT_MAILED). FAILED ist beim Fehler
+// bereits alarmiert worden → hier ausgelassen, sonst Alarm-Spam bei jedem Neustart.
+async function reconcileOnStartup() {
+  if (!isStripeLive()) return; // nur im Live-Betrieb relevant
+  try {
+    const { listOrders } = await import('./lib/orders.js');
+    const all = await listOrders({ limit: 1000 });
+    const TERMINAL = new Set(['MAILED', 'RESENT', 'CANCELLED', 'FAILED']);
+    const stuck = all
+      .filter((o) => o.status && !TERMINAL.has(o.status))
+      .map((o) => `${o.sessionId} — ${o.status} (${o.email || '?'}, ${o.url || '?'})`);
+    if (stuck.length) {
+      await sendAlert(
+        `Reconcile beim Start: ${stuck.length} haengende Bestellung(en)`,
+        `Diese Bestellungen sind NICHT im Endzustand (MAILED/RESENT/CANCELLED) und brauchen Aufmerksamkeit:\n\n` +
+        stuck.join('\n') +
+        `\n\nNachliefern je Session (Resend-Endpoint waehlt automatisch Mail-only bei READY_NOT_MAILED, sonst Voll-Resend):\n` +
+        `curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" ${PUBLIC_URL}/api/resend/<sessionId>`
+      );
+      logger.warn({ stuck: stuck.length }, 'Reconcile: haengende Bestellungen gemeldet');
+    }
+  } catch (err) {
+    logger.error({ err: err.message }, 'Reconcile-Sweeper fehlgeschlagen (Start wird fortgesetzt)');
+  }
+}
+
 const server = app.listen(PORT, () => {
   logger.info(
     { publicUrl: PUBLIC_URL, stripe: !!stripe, abo: ENABLE_ABO, mailer: mailerStatus() },
     `BFSG-Audit-Server auf ${PUBLIC_URL}`
   );
+  // Nicht-blockierend: Server ist sofort bereit, Reconcile läuft im Hintergrund.
+  reconcileOnStartup();
 });
 process.on('SIGTERM', () => server.close(() => process.exit(0)));

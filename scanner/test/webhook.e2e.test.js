@@ -11,7 +11,7 @@ const tmp = mkdtempSync(path.join(os.tmpdir(), 'bfsg-webhook-e2e-'));
 process.env.ORDERS_FILE = path.join(tmp, 'orders.jsonl');
 process.env.SUBS_FILE = path.join(tmp, 'subs.jsonl');
 
-const { alreadyProcessed, claimEvent, recordPaid, markStatus, getOrder } = await import('../lib/orders.js');
+const { alreadyProcessed, claimEvent, releaseEvent, recordPaid, markStatus, getOrder } = await import('../lib/orders.js');
 const { recordSubscription, getSubscription, markCancelled, markSubscriptionStatus } = await import('../lib/subscriptions.js');
 
 test('claimEvent: nur EIN paralleler Claim gewinnt (F1 Race-Schutz)', async () => {
@@ -204,6 +204,33 @@ test('recordPaid persistiert Stripe-customerId (Kundenverwaltung)', async () => 
   });
   const order = await getOrder(evt.data.object.id);
   assert.equal(order.customerId, 'cus_ABC123');
+});
+
+test('releaseEvent: gibt einen In-Memory-Claim frei (Vor-Persistenz-Fehlerpfad)', async () => {
+  const eventId = `evt_release_${Date.now()}`;
+  assert.equal(await claimEvent(eventId), true, 'Erst-Claim gewinnt');
+  assert.equal(await claimEvent(eventId), false, 'Zweiter Claim ohne Freigabe scheitert (Dedup)');
+  // Wenn die durable Vor-Persistenz fehlschlägt, gibt der Webhook den Claim frei und
+  // quittiert NICHT → Stripes Redelivery muss das Event erneut beanspruchen können.
+  releaseEvent(eventId);
+  assert.equal(await claimEvent(eventId), true, 'Nach releaseEvent erneut beanspruchbar (Stripe-Redelivery)');
+});
+
+test('Durable Dedup erfüllter Bestellungen: recordPaid persistiert die event.id', async () => {
+  // Kein separater Claim-Write mehr — die Persistenz läuft über recordPaid. Nach einem
+  // (simulierten) Reload muss alreadyProcessed das Event weiterhin kennen.
+  const evt = mockCheckoutSessionEvent({ sessionId: 'cs_dedup_recordpaid' });
+  await recordPaid({
+    eventId: evt.id, sessionId: evt.data.object.id,
+    email: 'dedup@test.de', url: 'https://x.de', pkg: 'basis', amount: 12900
+  });
+  assert.equal(await alreadyProcessed(evt.id), true, 'recordPaid muss die event.id durabel deduplizieren');
+});
+
+test('Abo-Erklärung: PKG_CONFIG.abo erzeugt eine Barrierefreiheitserklärung (withStatement)', async () => {
+  const { PKG_CONFIG } = await import('../lib/fulfill.js');
+  assert.equal(PKG_CONFIG.abo.withStatement, true, 'Abo muss pro Re-Check eine aktualisierte Erklärung erzeugen');
+  assert.equal(PKG_CONFIG.abo.emailKind, 'recheck');
 });
 
 test('Order-Persistenz übersteht Modul-Neuladen (JSONL ist die Source of Truth)', async () => {

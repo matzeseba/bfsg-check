@@ -253,7 +253,7 @@ export default function Wcag21vs22Page() {
           <h2 className="text-xl font-semibold">WCAG-2.1-Stand Ihrer Website prüfen lassen</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             BFSG-Check prüft auf Basis von axe-core 4.x, das WCAG 2.1 AA vollständig und ausgewählte
-            WCAG-2.2-Kriterien abdeckt. Der Basis-Report (199 €) zeigt klar, welche Mängel BFSG-Pflicht
+            WCAG-2.2-Kriterien abdeckt. Der Basis-Report (129 €) zeigt klar, welche Mängel BFSG-Pflicht
             sind und welche WCAG-2.2-Empfehlungen drüber hinaus gehen.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">

@@ -52,8 +52,20 @@ export async function claimEvent(eventId) {
   await ensureLoaded();
   if (!eventId) return true; // ohne ID kein Dedup möglich → durchlassen
   if (processedEvents.has(eventId)) return false;
-  processedEvents.add(eventId);
+  processedEvents.add(eventId); // synchroner Claim (check-then-act ohne await = atomar im Event-Loop)
   return true;
+  // Bewusst KEIN separater durabler Claim-Write hier: erfüllte Events sind durabel
+  // dedupliziert, weil recordPaid/markStatus die event.id mitschreiben (ensureLoaded
+  // lädt sie beim Start zurück in processedEvents). Ein durabler Claim VOR der Order-
+  // Persistenz würde bei einem Crash im schmalen Fenster davor das Event für immer
+  // deduplizieren (bezahlt, nichts geliefert, kein Alarm) — siehe app.js prePersist.
+}
+
+// Gibt einen In-Memory-Claim wieder frei. Nur nötig, wenn die durable Vor-Persistenz
+// im Webhook fehlschlägt und wir NICHT quittieren → Stripes Redelivery muss den Claim
+// erneut beanspruchen können (sonst bliebe das Event für immer „verarbeitet").
+export function releaseEvent(eventId) {
+  if (eventId) processedEvents.delete(eventId);
 }
 
 // Zahlung festhalten (Status PAID), bevor irgendetwas erzeugt wird.

@@ -270,7 +270,7 @@ export default function BarrierefreiheitserklaerungMusterPage() {
         <section className="mt-14 rounded-2xl border border-border bg-card/60 px-6 py-8">
           <h2 className="text-xl font-semibold">Ihren Scan-basierten Erklärungsentwurf erhalten</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            BFSG-Check erstellt im Rahmen des Basis-Reports (199 €) einen Entwurf Ihrer
+            BFSG-Check erstellt im Rahmen des Basis-Reports (129 €) einen Entwurf Ihrer
             Barrierefreiheitserklärung — auf Basis der gefundenen Mängel aus dem WCAG-2.1-Scan. Sie müssen
             die Erklärung dann noch mit eigenen Kontaktdaten ergänzen und veröffentlichen.
           </p>
