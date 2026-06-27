@@ -163,7 +163,7 @@ async function handleCheckoutCompleted(event) {
     await markStatus(s.id, 'FAILED', { error: err.message });
     await sendAlert(
       `Bezahlt, aber Erfüllung fehlgeschlagen: ${email}`,
-      `Session: ${s.id}\nURL: ${meta.url}\nPaket: ${pkg}\nFehler: ${err.message}\n\nManuell nachliefern: node resend.js ${s.id}`
+      `Session: ${s.id}\nURL: ${meta.url}\nPaket: ${pkg}\nFehler: ${err.message}\n\nManuell nachliefern: curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" ${PUBLIC_URL}/api/resend/${s.id}`
     );
     sentry.captureException(err, { webhook_event: 'checkout.session.completed', session_id: s.id });
     logger.error({ sessionId: s.id, err: err.message }, 'ERFÜLLUNG FEHLGESCHLAGEN');
@@ -203,7 +203,7 @@ async function handleCheckoutCompleted(event) {
       `Bezahlt, Report fertig — aber Mailversand fehlgeschlagen: ${email}`,
       `Session: ${s.id}\nURL: ${meta.url}\nPaket: ${pkg}\nFehler: ${err.message}\n\n` +
       `Report + Rechnung liegen vor. NUR Mail erneut senden (kein Neuscan):\n` +
-      `POST /api/resend/${s.id}`
+      `curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" ${PUBLIC_URL}/api/resend/${s.id}`
     );
     sentry.captureException(err, { webhook_event: 'checkout.session.completed', session_id: s.id, stage: 'mail' });
     logger.error({ sessionId: s.id, err: err.message }, 'MAILVERSAND FEHLGESCHLAGEN (Report fertig, READY_NOT_MAILED)');
