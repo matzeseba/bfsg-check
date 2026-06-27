@@ -7,6 +7,8 @@ import {
   CheckIcon,
   ShieldCheckIcon,
   SparklesIcon,
+  TagIcon,
+  type LucideIcon,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -15,11 +17,17 @@ import { PACKAGES, type PackageConfig } from "@/lib/config";
 import { cn } from "@/lib/utils";
 import { useCheckout } from "@/lib/checkout-context";
 
+import { SectionKicker } from "./SectionKicker";
+
 type PricingCardsProps = {
   packages?: PackageConfig[];
   title?: string;
+  // Optionales Italic-Akzentwort in der Headline (Editorial-Rhythmus). Wird nur
+  // kursiv gesetzt, wenn es im title vorkommt.
+  titleAccent?: string;
   subtitle?: string;
   kicker?: string;
+  kickerIcon?: LucideIcon;
   id?: string;
   showAnnualToggle?: boolean;
   // true = innerhalb einer Sektion mit eigenem Header gerendert (z.B. CookieSection).
@@ -30,14 +38,22 @@ type PricingCardsProps = {
 export function PricingCards({
   packages = PACKAGES,
   title = "Ein Festpreis statt Stundensatz — Mängel finden, bevor es teuer wird.",
+  titleAccent = "Festpreis",
   subtitle = "Pauschalpreis, feste Lieferung binnen weniger Stunden. Einmal prüfen — oder mit dem Re-Check dauerhaft absichern.",
   kicker = "Pakete & Preise",
+  kickerIcon = TagIcon,
   id = "pakete",
   showAnnualToggle = true,
   embedded = false,
 }: PricingCardsProps) {
   const { openCheckout } = useCheckout();
   const [annual, setAnnual] = React.useState(false);
+
+  // Headline am Akzentwort splitten (erstes Vorkommen) → genau ein Italic-Wort.
+  const accentIdx = titleAccent ? title.indexOf(titleAccent) : -1;
+  const titlePre = accentIdx >= 0 ? title.slice(0, accentIdx) : title;
+  const titlePost =
+    accentIdx >= 0 ? title.slice(accentIdx + titleAccent.length) : "";
 
   // Der Monatlich/Jaehrlich-Toggle ergibt nur Sinn, wenn ein KAUFBARES Abo
   // angezeigt wird. Bei reinen Einmal-Paketen (Basis/Profi/Cookie) tut er nichts
@@ -64,15 +80,21 @@ export function PricingCards({
           embedded ? "pt-10 pb-0" : "py-20 sm:py-24",
         )}
       >
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="font-mono text-xs font-medium tracking-[0.2em] text-brand-indigo uppercase dark:text-brand-mint">
-            {kicker}
-          </p>
+        <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
+          <SectionKicker icon={kickerIcon} label={kicker} />
           <h2
             id={`${id}-heading`}
-            className="mt-3 font-display text-3xl font-semibold tracking-tight text-balance sm:text-[2.75rem] sm:leading-[1.05]"
+            className="mt-4 font-display text-3xl font-semibold tracking-tight text-balance sm:text-[2.75rem] sm:leading-[1.05]"
           >
-            {title}
+            {accentIdx >= 0 ? (
+              <>
+                {titlePre}
+                <span className="italic gradient-text">{titleAccent}</span>
+                {titlePost}
+              </>
+            ) : (
+              title
+            )}
           </h2>
           <p className="mt-4 text-base text-muted-foreground text-pretty">
             {subtitle}
@@ -267,11 +289,11 @@ function PricingCard({
             className={cn(
               "h-11 w-full gap-1.5 rounded-xl text-sm font-semibold transition-transform hover:scale-[1.015]",
               pkg.featured
-                ? "bg-brand-mint text-brand-deep hover:bg-brand-mint/85"
+                ? "bg-brand-mint text-brand-deep hover:bg-brand-mint/85 focus-visible:ring-brand-deep/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 : "bg-brand-deep text-on-deep hover:bg-brand-indigo",
             )}
           >
-            {isSub ? "Abo starten" : "Jetzt bestellen"}
+            {isSub ? "Abo starten" : "Paket kaufen"}
             <ArrowRightIcon className="size-4" />
           </Button>
         )}

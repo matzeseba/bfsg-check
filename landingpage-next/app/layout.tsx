@@ -6,6 +6,7 @@ import { CheckoutModal } from "@/components/CheckoutModal";
 import { CookieBanner } from "@/components/CookieBanner";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { MobileStickyCta } from "@/components/MobileStickyCta";
 import { SiteJsonLd } from "@/components/JsonLd";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "@/components/ui/sonner";
@@ -95,12 +96,12 @@ export const metadata: Metadata = {
 };
 
 // Next 16: themeColor/colorScheme gehoeren in den viewport-Export.
+// Dark ist der erzwungene Standard (siehe ThemeProvider) → colorScheme "dark"
+// zuerst und eine dunkle Browser-UI-Farbe als Default. next-themes setzt
+// color-scheme auf <html> beim Theme-Wechsel zusaetzlich dynamisch.
 export const viewport: Viewport = {
-  colorScheme: "light dark",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fbfbf8" },
-    { media: "(prefers-color-scheme: dark)", color: "#0d0e1a" },
-  ],
+  colorScheme: "dark light",
+  themeColor: "#0d0e1a",
 };
 
 export default function RootLayout({
@@ -139,6 +140,7 @@ export default function RootLayout({
                 {children}
               </main>
               <Footer />
+              <MobileStickyCta />
               <CheckoutModal />
               <CookieBanner />
               <Toaster />

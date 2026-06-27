@@ -2,26 +2,22 @@ import { ShieldCheckIcon } from "lucide-react";
 
 import { LOGO_CLOUD } from "@/lib/config";
 
+import { SectionKicker } from "./SectionKicker";
+
 // Trust-Band direkt unter dem Hero: die anerkannten Normen, gegen die wir
 // prüfen. Bewusst KEINE erfundenen Presse-Logos (UWG §5a/§5) — nur belegbare,
-// wahre Standards als ruhige, technische Chips.
+// wahre Standards als ruhige, technische Chips. Bewusst als schmales "Band"
+// (kein voller py-20-Sektionsabstand).
 export function LogoCloud() {
   return (
     <section
-      aria-labelledby="logocloud-heading"
+      aria-label={LOGO_CLOUD.kicker}
       className="border-y border-border/50 bg-card/40"
     >
       <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-12">
-        <p
-          id="logocloud-heading"
-          className="flex items-center justify-center gap-2 text-center font-mono text-xs font-medium tracking-[0.2em] text-muted-foreground uppercase"
-        >
-          <ShieldCheckIcon
-            aria-hidden
-            className="size-4 text-brand-indigo dark:text-brand-mint"
-          />
-          {LOGO_CLOUD.kicker}
-        </p>
+        <div className="flex justify-center">
+          <SectionKicker icon={ShieldCheckIcon} label={LOGO_CLOUD.kicker} />
+        </div>
         <ul className="mt-7 flex flex-wrap items-center justify-center gap-3">
           {LOGO_CLOUD.logos.map((norm) => (
             <li key={norm.name}>

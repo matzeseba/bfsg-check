@@ -34,6 +34,7 @@
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
+  --color-border-card: var(--border-card);
   --color-destructive: var(--destructive);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
@@ -106,6 +107,7 @@
   --accent-foreground: oklch(0.18 0.04 270);
   --destructive: oklch(0.585 0.22 25);
   --border: oklch(0.9 0.012 270);
+  --border-card: var(--border);
   /* Input-Rahmen dunkler: vorher ~1.3:1 → unsichtbare Feldgrenze (WCAG 1.4.11).
      Jetzt ≥3:1 gegen das weiße Feld. */
   --input: oklch(0.78 0.02 275);
@@ -157,6 +159,9 @@
   --accent-foreground: oklch(0.17 0.06 275);
   --destructive: oklch(0.7 0.2 25);
   --border: oklch(1 0 0 / 12%);
+  /* Karten-Kante im Dark: /12% ist auf card-nahen Flaechen grenzwertig unsichtbar.
+     /16% gibt der Kante Definition, ohne hart zu wirken. */
+  --border-card: oklch(1 0 0 / 16%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.78 0.16 158);
   --chart-1: oklch(0.78 0.16 158);
@@ -261,10 +266,16 @@
   .text-pretty {
     text-wrap: pretty;
   }
-  /* Mint→Indigo Verlauf fuer betonte Headline-Woerter. */
-  /* padding-bottom: background-clip:text beschneidet bei enger Zeilenhöhe die
-     Unterlängen (g/j/ß/q). Das Bottom-Padding vergrößert die Clip-Box nach unten,
-     ohne den Textfluss zu verschieben — gilt für ALLE Gradient-Headlines. */
+  /* Mint→Violet Verlauf fuer betonte Headline-Woerter.
+     KONTRAST-REGEL: .gradient-text (Mint→Violet) NUR auf hellen/neutralen Flaechen
+     (bg-background / bg-muted / bg-card). Auf near-black Panels (brand-deep/-deeper:
+     StatsBar, CtaSection, Wow-Block-Kicker) faellt der Violet-Anteil unter WCAG AA →
+     dort stattdessen solid `text-brand-mint` nutzen (s. StatsBar/CtaSection).
+     CLIP-BOX-SCHUTZ: background-clip:text beschneidet sonst die Unterlaengen (g/j/ß/q,
+     padding-bottom) UND den rechtsseitigen Italic-Ueberhang des letzten Glyphs (z.B.
+     das „?" in „BFSG?", padding-right). Die negativen Margins neutralisieren die
+     zusaetzliche Box-Breite/-Hoehe → kein Textfluss-Shift, kein CLS. Gilt fuer ALLE
+     Gradient-Headlines. */
   .gradient-text {
     background-image: linear-gradient(
       135deg,
@@ -276,6 +287,9 @@
     background-clip: text;
     color: transparent;
     padding-bottom: 0.1em;
+    margin-bottom: -0.1em;
+    padding-right: 0.09em;
+    margin-right: -0.09em;
   }
   .gradient-text-soft {
     background-image: linear-gradient(
@@ -357,6 +371,20 @@
   }
   .shadow-elevated {
     box-shadow: var(--shadow-elevated);
+  }
+  /* Einheitlicher, ruhiger Karten-Hover (statt pro Sektion eigene -translate-y-*-
+     Kombinationen). -0.25rem wirkt teurer/ruhiger als -1.5. Respektiert reduced-
+     motion via der globalen @media-Regel (transition-duration→0). */
+  .card-lift {
+    transition:
+      transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 0.3s ease;
+  }
+  .card-lift:hover {
+    transform: translateY(-0.25rem);
+    box-shadow: var(--shadow-card-hover);
+    border-color: color-mix(in oklch, var(--brand-mint), transparent 58%);
   }
   /* Border-Gradient via mask-composite: echter Verlaufs-Rahmen statt 1px-Flaeche. */
   .border-gradient {

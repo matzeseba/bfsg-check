@@ -23,10 +23,11 @@ export function HeroVisual() {
 
   return (
     <div className="group/visual relative w-full min-w-0" aria-hidden>
-      {/* Spotlight-Halo dahinter (dezenter als ein klassischer Blob). */}
+      {/* Spotlight-Halo dahinter (dezenter als ein klassischer Blob). Auf Mobile
+          billiger: erster Halo kleinerer Blur-Radius, zweiter (Violet) erst ab md. */}
       <div className="pointer-events-none absolute -inset-8 -z-10">
-        <div className="absolute left-1/2 top-1/3 size-[80%] -translate-x-1/2 rounded-full bg-brand-mint/20 blur-[80px]" />
-        <div className="absolute right-0 bottom-0 size-[55%] rounded-full bg-brand-violet/20 blur-[80px]" />
+        <div className="absolute left-1/2 top-1/3 size-[80%] -translate-x-1/2 rounded-full bg-brand-mint/20 blur-[40px] md:blur-[80px]" />
+        <div className="absolute right-0 bottom-0 hidden size-[55%] rounded-full bg-brand-violet/20 blur-[80px] md:block" />
       </div>
 
       {/* Schwebende Akzent-Badges (Layering/Tiefe). Erst ab sm sichtbar: der

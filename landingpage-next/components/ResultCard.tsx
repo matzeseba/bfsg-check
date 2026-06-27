@@ -160,9 +160,25 @@ export function ResultCard({ result }: { result: ScanResult }) {
         )}
       </div>
       <div className="flex flex-col items-stretch gap-3 border-t border-border/60 bg-muted/40 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+        {/* Personalisiert auf das echte Ergebnis — KEINE erfundenen Zahlen.
+            Mit Funden: konkrete Fund-Zahl + Fix-Versprechen. Ohne Funde: das
+            Dokumentations-Argument (saubere Erstprüfung schriftlich). */}
         <p className="text-xs text-muted-foreground">
-          Vollreport mit jedem Mangel + fertiger Erklärung. Paket im Checkout
-          wählbar.
+          {totalIssues > 0 ? (
+            <>
+              Ihre Seite hat{" "}
+              <span className="font-semibold text-foreground tabular-nums">
+                {totalIssues} {totalIssues === 1 ? "Fund" : "Funde"}
+              </span>
+              . Der Vollreport zeigt jede Stelle — mit Copy-Paste-Fix und Entwurf
+              der Erklärung.
+            </>
+          ) : (
+            <>
+              Lassen Sie sich die saubere WCAG-2.1-AA-Erstprüfung schriftlich
+              bestätigen — inkl. Entwurf der Barrierefreiheitserklärung.
+            </>
+          )}
         </p>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <Link
@@ -173,9 +189,9 @@ export function ResultCard({ result }: { result: ScanResult }) {
           </Link>
           <Button
             onClick={() => openCheckout("profi")}
-            className="h-11 gap-1.5 rounded-xl bg-brand-mint text-sm font-semibold text-brand-deep hover:bg-brand-mint/85"
+            className="h-11 gap-1.5 rounded-xl bg-brand-mint text-sm font-semibold text-brand-deep hover:bg-brand-mint/85 focus-visible:ring-brand-deep/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
-            Vollreport sichern
+            {totalIssues > 0 ? "Vollreport sichern" : "Bestätigung sichern"}
             <ArrowRightIcon className="size-4" />
           </Button>
         </div>

@@ -65,7 +65,7 @@ export function Header() {
       className={cn(
         // Dauerhaft leichter Blur + saturate (kein Live-Toggle des Blur-Filters
         // beim Scroll → vermeidet INP/Jank-Spike). Nur bg-/border-Opacity wechseln.
-        "sticky top-0 z-40 w-full backdrop-blur-md backdrop-saturate-150 transition-colors duration-300",
+        "sticky top-0 z-40 w-full backdrop-blur-sm backdrop-saturate-150 transition-colors duration-300 md:backdrop-blur-md",
         scrolled
           ? "border-b border-border/70 bg-background/75 supports-[backdrop-filter]:bg-background/65"
           : "border-b border-transparent bg-transparent",
@@ -87,7 +87,9 @@ export function Header() {
           <span className="flex items-baseline gap-1">
             <span>BFSG</span>
             <span className="text-muted-foreground">·</span>
-            <span className="text-brand-indigo dark:text-brand-mint">Check</span>
+            <span className="italic text-brand-indigo dark:text-brand-mint">
+              Check
+            </span>
           </span>
         </Link>
 
@@ -126,14 +128,14 @@ export function Header() {
         <div className="ml-auto hidden items-center gap-2 md:flex">
           <ThemeToggle />
           <Button variant="ghost" size="lg" render={<a href="/kuendigen" />}>
-            Konto
+            Konto verwalten
           </Button>
           <Button
             size="lg"
-            className="bg-brand-mint text-brand-deep hover:bg-brand-mint/85"
+            className="bg-brand-mint text-brand-deep hover:bg-brand-mint/85 focus-visible:ring-brand-deep/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             render={<Link href="/#scan" />}
           >
-            Gratis prüfen
+            Kostenlos prüfen
             <ArrowRightIcon className="ml-0.5 size-4" />
           </Button>
         </div>
@@ -178,10 +180,10 @@ export function Header() {
               </Button>
               <Button
                 size="lg"
-                className="bg-brand-mint text-brand-deep hover:bg-brand-mint/85"
+                className="bg-brand-mint text-brand-deep hover:bg-brand-mint/85 focus-visible:ring-brand-deep/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 render={<Link href="/#scan" onClick={() => setOpen(false)} />}
               >
-                Gratis prüfen
+                Kostenlos prüfen
                 <ArrowRightIcon className="ml-0.5 size-4" />
               </Button>
             </div>

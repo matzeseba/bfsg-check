@@ -1,14 +1,19 @@
 "use client";
 
 import * as motion from "motion/react-client";
+import Link from "next/link";
 import {
   AlertTriangleIcon,
+  ArrowRightIcon,
   CalendarClockIcon,
   GavelIcon,
   ScaleIcon,
 } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { RISK_BAND } from "@/lib/config";
+
+import { SectionKicker } from "./SectionKicker";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -19,6 +24,8 @@ const POINT_ICONS = [CalendarClockIcon, ScaleIcon, GavelIcon] as const;
 // Soft-Urgency-Band: faktenbasierter Kontext zur BFSG-Frist. Bewusst KEINE
 // Drohung, KEIN UWG-Versprechen — nur "die Frist ist da, jetzt in Ruhe handeln".
 export function RiskBand() {
+  const [titlePre, titlePost] = RISK_BAND.title.split(RISK_BAND.titleAccent);
+
   return (
     <section
       id="risiko"
@@ -36,19 +43,30 @@ export function RiskBand() {
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.6, ease: EASE }}
         >
-          <span className="inline-flex items-center gap-2 rounded-full border border-brand-amber/40 bg-brand-amber/10 px-3 py-1 text-xs font-medium text-foreground">
-            <AlertTriangleIcon className="size-3.5 text-brand-amber" />
-            {RISK_BAND.kicker}
-          </span>
+          <SectionKicker
+            icon={AlertTriangleIcon}
+            label={RISK_BAND.kicker}
+            tone="warn"
+          />
           <h2
             id="risk-heading"
             className="mt-4 font-display text-3xl font-semibold tracking-tight text-balance sm:text-[2.6rem] sm:leading-[1.05]"
           >
-            {RISK_BAND.title}
+            {titlePre}
+            <span className="italic gradient-text">{RISK_BAND.titleAccent}</span>
+            {titlePost}
           </h2>
           <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground text-pretty">
             {RISK_BAND.desc}
           </p>
+          <Button
+            size="lg"
+            className="mt-6 gap-1.5 rounded-xl bg-brand-mint text-brand-deep shadow-glow-mint transition-transform hover:scale-[1.015] hover:bg-brand-mint/85 focus-visible:ring-brand-deep/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            render={<Link href="/#scan" />}
+          >
+            In 60 Sekunden prüfen
+            <ArrowRightIcon className="size-4" />
+          </Button>
         </motion.div>
 
         <motion.ul
@@ -64,24 +82,43 @@ export function RiskBand() {
           {RISK_BAND.points.map((p, i) => {
             const Icon = POINT_ICONS[i] ?? AlertTriangleIcon;
             return (
-            <motion.li
-              key={p.label}
-              variants={{
-                hidden: { opacity: 0, x: 16 },
-                show: { opacity: 1, x: 0 },
-              }}
-              className="group/risk flex items-center gap-4 rounded-2xl border border-border/70 bg-card/80 p-4 shadow-card-soft backdrop-blur transition-colors hover:border-brand-amber/40"
-            >
-              <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-brand-amber/12 text-brand-amber">
-                <Icon className="size-5" aria-hidden />
-              </span>
-              <div className="min-w-0">
-                <p className="font-display text-lg font-semibold tracking-tight tabular-nums">
-                  {p.value}
-                </p>
-                <p className="text-sm text-muted-foreground">{p.label}</p>
-              </div>
-            </motion.li>
+              <motion.li
+                key={p.label}
+                variants={{
+                  hidden: { opacity: 0, x: 16 },
+                  show: { opacity: 1, x: 0 },
+                }}
+                className="group/risk card-lift flex items-center gap-4 rounded-2xl border border-border/70 bg-card/80 p-4 shadow-card-soft backdrop-blur dark:ring-1 dark:ring-white/5"
+              >
+                <span
+                  className={
+                    "grid size-12 shrink-0 place-items-center rounded-xl bg-brand-amber/12 text-brand-amber " +
+                    (i === 0 ? "animate-pulse-soft" : "")
+                  }
+                >
+                  <Icon className="size-5" aria-hidden />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="font-display text-lg font-semibold tracking-tight tabular-nums">
+                    {p.value}
+                  </p>
+                  <p className="text-sm text-muted-foreground">{p.label}</p>
+                  {/* Severity-Bar: skaliert beim In-View ein (origin-left).
+                      Reine transform-Animation → GPU-billig, reduced-motion-safe. */}
+                  <motion.span
+                    aria-hidden
+                    initial={{ scaleX: 0 }}
+                    whileInView={{ scaleX: 1 }}
+                    viewport={{ once: true }}
+                    transition={{
+                      duration: 0.7,
+                      delay: 0.25 + i * 0.1,
+                      ease: EASE,
+                    }}
+                    className="mt-2 block h-0.5 origin-left rounded-full bg-gradient-to-r from-brand-amber to-brand-amber/15"
+                  />
+                </div>
+              </motion.li>
             );
           })}
         </motion.ul>
