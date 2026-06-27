@@ -1,7 +1,7 @@
 # 🤝 Handover für die nächste Session
 
 > **Lies das nach `CLAUDE.md` als ZWEITES.**
-> **Stand:** 25.06.2026 · **ZIEL: heute Abend Go-Live.** · **Neu (25.06.):** Gratischeck-Backend-Reliability-Fix nach `main` gemergt (PR #63) — Owner-Aktion `SCAN_TEASER_LENIENT_TLS=true` offen, siehe GO-LIVE-CHECKLISTE A.4. Letzte Sessions: Conversion-Optimierung (PR #54) · lückenloser FE+BE-Launch-Readiness-Audit (100 verifizierte Funde, alle 6 P0 im Code gefixt, PR #55) · 4 Owner-Entscheidungen umgesetzt · Hero mobil-zentriert + Vorschau-Kasten als „Beispiel" gekennzeichnet (PRs #56–#61). **Alles gemergt + live.** Offene Go-Live-Aufgaben: **siehe direkt unten.**
+> **Stand:** 27.06.2026 · **Neu (27.06.):** **Dark-Default-Redesign + Conversion-/Dynamik-Politur der Landingpage LIVE** (PR #76 — Dark als dauerhafter Standard, kiberatung-inspirierte Sektions-Rhythmik + Mini-Visuals, heller „Wow"-Counter, Hero-„?"-Clipping-Fix + vergrößerte Vorschau-Überschrift; Build grün, Deploy 43 s, `/health` ok). Details siehe Update-Sektion unten + `docs/redesign/`. · **Neu (25.06.):** Gratischeck-Backend-Reliability-Fix nach `main` gemergt (PR #63) — Owner-Aktion `SCAN_TEASER_LENIENT_TLS=true` offen, siehe GO-LIVE-CHECKLISTE A.4. Letzte Sessions: Conversion-Optimierung (PR #54) · lückenloser FE+BE-Launch-Readiness-Audit (100 verifizierte Funde, alle 6 P0 im Code gefixt, PR #55) · 4 Owner-Entscheidungen umgesetzt · Hero mobil-zentriert + Vorschau-Kasten als „Beispiel" gekennzeichnet (PRs #56–#61). **Alles gemergt + live.** Offene Go-Live-Aufgaben: **siehe direkt unten.**
 
 ---
 
@@ -82,6 +82,25 @@ curl -s -o /dev/null -w "%{time_total}s\n" "https://bfsg-fix.de/api/scan?url=htt
 - **Launch-Readiness-Audit** (PR #55): alle 6 P0-Blocker im Code (SSRF-Guard, §14-ENV-Platzhalter, Rate-Limit `req.ip`, Resend-Doppelrechnung, Light-Fokus-Ring, networkidle-Fallback) + breite FE-Fixes (SEO/JSON-LD-Split, Canonicals, Perf, A11y, Legal-Copy).
 - **4 Owner-Entscheidungen:** USt §19-Captions+FAQ · Social-Links entfernt · B2B-Firmenfeld im Checkout · Newsletter→Brevo-DOI-Endpoint · Checkout-E-Mail-Validierung.
 - **Hero/Visual:** Headline-Clipping + Mobile-Zentrierung (per Browser-Messung auf 22/22px verifiziert), Headline „bereit fürs BFSG?", Vorschau-Kasten als **„Beispiel"** gekennzeichnet (Chip + Überschrift „So sieht Ihr kostenloses Sofort-Ergebnis aus"), Eck-Badge entfernt (PRs #56–#61).
+
+---
+
+## 🆕 Update 27.06.2026 — Dark-Default-Redesign + Conversion-/Dynamik-Politur (PR #76, LIVE)
+
+- **Owner-Auftrag:** Landingpage designtechnisch komplett überarbeiten — **Dark-Mode dauerhaft als Standard** (Farben unverändert), dynamischer + conversion-stärker im Stil von **kiberatung.de**, plus zwei konkrete Fixes.
+- **Prozess (Agenten-Team):** 7-Lens-Audit (CRO/UI/Motion/Copy/A11y/Mobile-Perf/Brand) → 1 Redesign-Architekt-Plan → kohärente Umsetzung aus einer Hand → **5-Lens-Adversarial-Review** (0 P0, **2 P1 gefixt**). Plan + Referenz: `docs/redesign/redesign-masterplan.md` + `docs/redesign/kiberatung-design-analysis.md`.
+- **Umgesetzt (23 Dateien in `landingpage-next/`):**
+  - **Dark als garantierter Standard:** `ThemeProvider` `defaultTheme="dark"` + `enableSystem={false}`; `layout.tsx viewport` themeColor `#0d0e1a` / colorScheme `dark light`. Toggle bleibt funktional + persistiert die Wahl.
+  - **Owner-Fix 1 — Hero-„?"-Clipping:** `.gradient-text` Clip-Box-Schutz (`padding/margin-right`) + „?" als nicht-kursives Kind im selben Gradient-Span (`Hero.tsx`; `config.ts headlineEmph` ohne „?"). Layout-neutral, kein CLS.
+  - **Owner-Fix 2 — Vorschau-Heading:** „So sieht Ihr kostenloses *Sofort-Ergebnis* aus" als vergrößerte Sub-Überschrift + „Vorschau"-Chip (`Hero.tsx`; `config.ts previewAccent`). Bewusst `<p>` (kein `<h2>` → Heading-Outline bleibt intakt).
+  - **Neue Komponenten:** `SectionKicker` (einheitliche Kicker-Pill, tones default/warn/on-deep/on-light), `WowCounter` (heller Invers-Block, animiertes **ehrliches** „80+" = Prüfregeln EN 301 549, KEINE erfundene Zahl), `MobileStickyCta` (consent-gated → kein Cookie-Banner-Overlap).
+  - **Dynamik/Rhythmik:** Sektions-Skelett (Kicker → genau 1 Fraunces-Italic-Akzentwort → Subline) über ALLE Sektionen; Mini-Visuals (HowItWorks-Progress-Line, StatsBar-Underlines, RiskBand-Severity-Bars, Testimonials-Demo-Snippet als „Beispiel" markiert); `card-lift`-Utility; CRO-Sektions-Reihenfolge (TrustSection vor Pricing, Wow nach Stats); `ResultCard` score-/fund-abhängig personalisiert (nur echte Scan-Daten).
+  - **A11y-Härtung (Dogfood):** Mint-Button-Fokusringe gehärtet (Dark: kein Mint-auf-Mint mehr), WowCounter-Kontraste ≥ WCAG AA gegen Creme, reduced-motion bei allen neuen Animationen, Heading-Hierarchie geprüft.
+- **Verifiziert:** `next build` grün (TS strict, 20/20 Seiten) · `eslint` clean · `legal-copy-grep` (mein Diff ohne ROT/GELB) · Deploy 43 s · `/health` ok · live visuell bestätigt.
+- **Backlog aus dem Review (NICHT blockierend):**
+  - P2: Mint-Button-Fokusring-**Außenkante** auf dunklem Background könnte stärker sein (aktuell WCAG-2.4.11-konform über die Innenkante gegen die Mint-Fläche). Optional: zweiter heller Outline-Ring.
+  - **Bestehende `legal-copy-grep`-ROT-Treffer (16) liegen alle in UNVERÄNDERTEN Legal-/SEO-Seiten** (`agb`, `bfsg-pruefung-kosten`, `wcag-2-1-vs-2-2`, `barrierefreiheitserklaerung-muster`, `bfsg-checkliste-online-shop`, `axe-lighthouse-wave-vergleich`) als **Disclaimer-Formulierungen** („keine Garantie für BFSG-Konformität") + Marketing-Planungsdocs (Keyword-/Regel-Erwähnungen). = Repo-Baseline, **kein neues Risiko aus diesem Diff**. Empfehlung: separater, rein rechtlicher Aufräum-Durchgang (viele sind legitime Negationen/Disclaimer, kein blindes Ersetzen).
+  - Mobile-Sticky-CTA + Mini-Visuals wurden am Desktop verifiziert; ein echter Mobile-Viewport-Visual-Check (320–414 px) steht aus (Chrome-MCP `resize_window` lieferte im Test keinen echten schmalen Viewport — responsive Tailwind-Klassen + Build decken es ab).
 
 ---
 
