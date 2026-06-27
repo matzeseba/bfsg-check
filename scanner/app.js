@@ -55,11 +55,19 @@ const PACKAGES = {
 };
 
 // max. 2 gleichzeitige Headless-Browser server-weit (verhindert OOM).
+// Gratis-Teaser-Gate: begrenzte Concurrency + Warteschlangen-Cap. Bei vollem Stau
+// lieber sofort ehrlich 503 ("ausgelastet") als unbegrenzt wachsende Queue +
+// haengende Verbindungen unter Traffic-Spitzen.
 const scanGate = concurrencyGate(Number(process.env.MAX_CONCURRENT_SCANS || 2), {
-  // Warteschlangen-Cap: bei vollem Stau lieber sofort ehrlich 503 ("ausgelastet")
-  // als unbegrenzt wachsende Queue + haengende Verbindungen unter Traffic-Spitzen.
   maxQueued: Number(process.env.SCAN_QUEUE_MAX || 40)
 });
+// SEPARATES Gate fuer den BEZAHLTEN Pfad (fulfillOrder): eigener Concurrency-Slot,
+// KEIN Queue-Cap. So kann ein Gratis-Teaser-Ansturm die Auslieferung bezahlter
+// Bestellungen weder verdraengen (Head-of-Line) noch mit 503 abweisen (Umsatzschutz).
+// Default 1 (bezahlte Scans sind selten + duerfen serialisiert werden) haelt die
+// RAM-Spitze klein; auf 4-GB-Hosts ggf. MAX_CONCURRENT_SCANS=1 setzen, um die
+// Gesamt-Browser-Spitze bei 2 zu halten.
+const paidScanGate = concurrencyGate(Number(process.env.MAX_CONCURRENT_PAID_SCANS || 1));
 
 const app = express();
 app.set('trust proxy', 1);
@@ -145,7 +153,7 @@ async function handleCheckoutCompleted(event) {
   try {
     await assertPublicHttpUrl(meta.url);
     await markStatus(s.id, 'FULFILLING');
-    order = await scanGate(() =>
+    order = await paidScanGate(() =>
       fulfillOrder({ url: meta.url, company: meta.company || '', email: email || '', pkg })
     );
     // Eigene Rechnung (§ 14 UStG) erzeugen — Fallback zur Stripe-Receipt-Mail.
@@ -250,7 +258,7 @@ async function handleInvoicePaid(event) {
 
   try {
     await assertPublicHttpUrl(sub.url);
-    const order = await scanGate(() =>
+    const order = await paidScanGate(() =>
       fulfillOrder({
         url: sub.url, company: sub.company || '', email: sub.email,
         pkg: sub.pkg || 'abo',
@@ -578,7 +586,7 @@ app.post('/api/resend/:sessionId', requireAdminAuth, async (req, res) => {
       return res.json({ ok: true, sessionId, email: order.email, status: 'RESENT', mode: 'mail-only' });
     }
 
-    const result = await scanGate(() =>
+    const result = await paidScanGate(() =>
       fulfillOrder({ url: order.url, company: order.company || '', email: order.email, pkg: order.pkg || 'basis' })
     );
     // Rechnung nachreichen, falls bei der fehlgeschlagenen Erst-Auslieferung noch keine erzeugt wurde.

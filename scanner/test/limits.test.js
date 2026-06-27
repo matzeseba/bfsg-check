@@ -77,3 +77,17 @@ test('concurrencyGate: ohne maxQueued bleibt das bisherige Verhalten (kein Rejec
   ]);
   assert.deepEqual(results, [1, 2, 3]);
 });
+
+test('paidScanGate-Verhalten: ungekapptes Gate weist auch bei Burst NIE ab (Umsatzschutz)', async () => {
+  // Bezahltes Gate (concurrencyGate(1) ohne maxQueued): viele gleichzeitige
+  // fulfillOrder-Aufrufe duerfen sich stauen, aber keiner darf mit QUEUE_FULL
+  // scheitern (sonst FAILED-Order trotz Zahlung).
+  const gate = concurrencyGate(1);
+  let release;
+  const blocker = new Promise((r) => { release = r; });
+  const first = gate(() => blocker); // belegt den Slot, alle anderen warten
+  const rest = Array.from({ length: 20 }, (_, i) => gate(() => Promise.resolve(i)));
+  release('ok');
+  assert.equal(await first, 'ok');
+  assert.deepEqual(await Promise.all(rest), Array.from({ length: 20 }, (_, i) => i));
+});

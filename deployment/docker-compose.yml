@@ -41,6 +41,12 @@ services:
       # Statische Landing-Page (Fallback für /danke.html + Backward-Compat).
       - ../landingpage:/landingpage:ro
     shm_size: 1gb
+    # OOM-Backstop: begrenzt den App-Container (einziger Chromium-Spawner) auf
+    # APP_MEM_LIMIT (Default 3g, env-übersteuerbar im Server-.env). Ein Speicher-
+    # Runaway killt+restartet dann NUR diesen Container (restart: unless-stopped),
+    # statt den Host-OOM-Killer beliebige Container (z.B. Caddy) reissen zu lassen.
+    # 4-GB-Host: 3g lässt ~1 GB für landing-next/admin-next/caddy/OS.
+    mem_limit: ${APP_MEM_LIMIT:-3g}
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://localhost:8080/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
       interval: 30s
