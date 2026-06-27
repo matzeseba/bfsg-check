@@ -1,0 +1,45 @@
+name: Bootstrap Operator SSH Key (one-time)
+
+# Einmaliger, MANUELL ausloesbarer Helfer (kein Deploy, keine push-Trigger).
+# Traegt ueber den bereits autorisierten CI-/Deploy-Key (HETZNER_SSH_KEY) den
+# oeffentlichen SSH-Key des Owner-PCs in /root/.ssh/authorized_keys ein, damit
+# direkter SSH-Zugang von diesem PC moeglich ist (Server-Neuaufbau hatte nur
+# den CI-Key autorisiert). Idempotent: fuegt den Key nur hinzu, wenn er fehlt.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Install operator pubkey into authorized_keys
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: root
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          port: 22
+          script_stop: true
+          request_pty: true
+          script: |
+            set -e
+            # Idempotenter Password-Expiry-Reset (cloud-init setzt sonst chage -d 0).
+            chage -d $(date +%Y-%m-%d) root || true
+            chage -M 99999 root || true
+
+            PUBKEY='ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHZi5Lu9MiiUU+WOzJmpY/RpLfhOzggkZJEh5wRsJAW4 matze-nova-postiz'
+            umask 077
+            mkdir -p /root/.ssh
+            touch /root/.ssh/authorized_keys
+            if grep -qF "$PUBKEY" /root/.ssh/authorized_keys; then
+              echo "Operator-Key bereits vorhanden - nichts zu tun."
+            else
+              echo "$PUBKEY" >> /root/.ssh/authorized_keys
+              echo "Operator-Key hinzugefuegt."
+            fi
+            chmod 600 /root/.ssh/authorized_keys
+            echo "authorized_keys-Zeilen: $(wc -l < /root/.ssh/authorized_keys)"
+            echo "=== Fingerprints der autorisierten Keys (oeffentlich) ==="
+            ssh-keygen -lf /root/.ssh/authorized_keys || true
