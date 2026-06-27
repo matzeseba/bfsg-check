@@ -65,6 +65,19 @@ async function pushInvoiceAttachment(attachments, invoicePdfPath, invoiceNumber)
   attachments.push({ filename, content: await readFile(invoicePdfPath) });
 }
 
+// Liest eine OPTIONALE Anhang-Datei (z. B. Barrierefreiheitserklärung) defensiv:
+// fehlt sie (out/-Volume nach Restart weg, Datei gelöscht), wird der Anhang
+// übersprungen statt den gesamten Versand zu kippen — das Kernprodukt (Report-PDF)
+// hat Vorrang. Pflicht-Anhänge (PDF) werden weiterhin strikt gelesen.
+async function pushOptionalAttachment(attachments, filePath, filename) {
+  if (!filePath) return;
+  try {
+    attachments.push({ filename, content: await readFile(filePath) });
+  } catch {
+    console.warn(`[mailer] optionaler Anhang fehlt/übersprungen: ${filename} (${filePath})`);
+  }
+}
+
 // Sendet die passende Variante (BFSG-Erstreport / Cookie-Report / Re-Check mit Diff)
 // auf Basis von emailKind aus PKG_CONFIG. invoicePdfPath (optional) wird als
 // zusätzlicher Rechnungs-Anhang mitgesendet.
@@ -98,11 +111,8 @@ ${FROM_NAME}`;
   const attachments = [];
   if (pdfPath) attachments.push({ filename: 'BFSG-Report.pdf', content: await readFile(pdfPath) });
   // Als .txt statt .md — wird von Mailclients zuverlässiger angezeigt/geöffnet.
-  if (stmtPath)
-    attachments.push({
-      filename: 'Barrierefreiheitserklaerung.txt',
-      content: await readFile(stmtPath)
-    });
+  // Defensiv: fehlt die Erklärung, blockiert das NICHT die Report-Auslieferung.
+  await pushOptionalAttachment(attachments, stmtPath, 'Barrierefreiheitserklaerung.txt');
   await pushInvoiceAttachment(attachments, invoicePdfPath, invoiceNumber);
 
   return deliver({ to, subject, text, attachments });
@@ -152,12 +162,9 @@ ${FROM_NAME}`;
   if (pdfPath) attachments.push({ filename: 'BFSG-Recheck.pdf', content: await readFile(pdfPath) });
   // Aktualisierte Erklärung zur Barrierefreiheit mitschicken (.txt für maximale
   // Mailclient-Kompatibilität) — Owner-Anforderung: jeder Re-Check liefert die
-  // auf den aktuellen Stand gebrachte Erklärung.
-  if (stmtPath)
-    attachments.push({
-      filename: 'Barrierefreiheitserklaerung-aktuell.txt',
-      content: await readFile(stmtPath)
-    });
+  // auf den aktuellen Stand gebrachte Erklärung. Defensiv: fehlende Datei
+  // überspringt nur den Anhang, blockiert nicht den Re-Check-Versand.
+  await pushOptionalAttachment(attachments, stmtPath, 'Barrierefreiheitserklaerung-aktuell.txt');
   await pushInvoiceAttachment(attachments, invoicePdfPath, invoiceNumber);
   return deliver({ to, subject, text, attachments });
 }
