@@ -164,7 +164,7 @@ async function handleCheckoutCompleted(event) {
     await markStatus(s.id, 'FAILED', { error: err.message });
     await sendAlert(
       `Bezahlt, aber Erfüllung fehlgeschlagen: ${email}`,
-      `Session: ${s.id}\nURL: ${meta.url}\nPaket: ${pkg}\nFehler: ${err.message}\n\nManuell nachliefern: node resend.js ${s.id}`
+      `Session: ${s.id}\nURL: ${meta.url}\nPaket: ${pkg}\nFehler: ${err.message}\n\nManuell nachliefern: curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" ${PUBLIC_URL}/api/resend/${s.id}`
     );
     sentry.captureException(err, { webhook_event: 'checkout.session.completed', session_id: s.id });
     logger.error({ sessionId: s.id, err: err.message }, 'ERFÜLLUNG FEHLGESCHLAGEN');

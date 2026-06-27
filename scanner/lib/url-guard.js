@@ -76,6 +76,23 @@ export async function verifyNoDnsRebinding(urlString, expectedAddresses) {
   }
 }
 
+// SSRF-Redirect-Pin (Security C1): Chromium soll den geprüften Host NICHT mehr
+// frei auflösen dürfen — sonst kann ein 30x-Redirect bzw. DNS-Rebind denselben
+// Host nachträglich auf eine interne IP (169.254.169.254 / 127.0.0.1 / RFC1918)
+// zeigen lassen. Wir pinnen die bereits verifizierte öffentliche IP fix an den
+// Resolver. Gibt das passende Launch-Arg zurück (oder null bei direkter IP /
+// fehlender Adresse — dann ist nichts zu pinnen). Ergänzt installSsrfGuard():
+// der Pin deckt denselben Host ab, der Route-Guard fängt Redirects auf ANDERE
+// (interne) Hosts ab.
+export function pinnedHostResolverArg(host, addresses) {
+  if (!host || net.isIP(host)) return null; // direkte IP braucht kein Mapping
+  const ip = Array.isArray(addresses) ? addresses.find((a) => net.isIP(a)) : null;
+  if (!ip) return null;
+  // Quotes/Leerzeichen im Host wären ungültig — defensiv ablehnen statt Arg zu brechen.
+  if (/[\s,"']/.test(host)) return null;
+  return `--host-resolver-rules=MAP ${host} ${ip}`;
+}
+
 // SSRF-Defense-in-Depth für den Headless-Browser: validiert JEDE Top-Level-
 // Dokument-/Subframe-Navigation (inkl. der durch 30x-Redirects ausgelösten
 // Folge-Navigationen) gegen die IP-Blockliste und bricht interne Ziele ab.
