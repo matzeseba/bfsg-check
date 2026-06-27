@@ -25,7 +25,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const PKG_CONFIG = {
   basis:        { kind: 'bfsg',   maxPages: 5,  withStatement: true,  emailKind: 'bfsg'   },
   profi:        { kind: 'bfsg',   maxPages: 25, withStatement: true,  emailKind: 'bfsg'   },
-  abo:          { kind: 'bfsg',   maxPages: 25, withStatement: false, emailKind: 'recheck'},
+  // Abo: withStatement:true → jeder Monats-Re-Check liefert eine FRISCH erzeugte
+  // Erklärung zur Barrierefreiheit mit (Owner-Wunsch). Diff zeigt die Änderungen,
+  // die Erklärung spiegelt den aktuellen Stand.
+  abo:          { kind: 'bfsg',   maxPages: 25, withStatement: true,  emailKind: 'recheck'},
   'cookie-basis': { kind: 'cookie', maxPages: 1,  withStatement: false, emailKind: 'cookie' },
   'cookie-profi': { kind: 'cookie', maxPages: 5,  withStatement: false, emailKind: 'cookie' }
 };

@@ -47,7 +47,7 @@ const products: ProductInput[] = [
     name: "BFSG-Check Basis",
     description:
       "Einmaliger automatischer BFSG- und WCAG-2.1-AA-Scan Ihrer Website inklusive priorisiertem Fix-Plan mit Code-Snippets.",
-    price: "199.00",
+    price: "129.00",
     category: "Barrierefreiheits-Audit",
     sku: "bfsg-basis",
     offerUrl: `${siteUrl}/#pakete`,
@@ -56,7 +56,7 @@ const products: ProductInput[] = [
     name: "BFSG-Check Profi",
     description:
       "Tiefenscan mit manueller Prüfung kritischer Flows, ausführlichem Fix-Plan, Entwickler-Checkliste und 30 Tagen E-Mail-Support.",
-    price: "499.00",
+    price: "399.00",
     category: "Barrierefreiheits-Audit",
     sku: "bfsg-profi",
     offerUrl: `${siteUrl}/#pakete`,
@@ -65,7 +65,7 @@ const products: ProductInput[] = [
     name: "Cookie-Check Basis",
     description:
       "Automatische technische Messung Ihres Cookie-Banners gem. § 25 TDDDG mit konkreter Umsetzungs-Empfehlung.",
-    price: "49.00",
+    price: "39.00",
     category: "Cookie-Compliance",
     sku: "cookie-basis",
     offerUrl: `${siteUrl}/#cookie`,
@@ -74,7 +74,7 @@ const products: ProductInput[] = [
     name: "Cookie-Check Profi",
     description:
       "Erweiterter Cookie- und Tracking-Audit inklusive Dokumentation für Datenschutzbeauftragte sowie Konfigurations-Vorschlag.",
-    price: "79.00",
+    price: "69.00",
     category: "Cookie-Compliance",
     sku: "cookie-profi",
     offerUrl: `${siteUrl}/#cookie`,
@@ -83,10 +83,10 @@ const products: ProductInput[] = [
     name: "BFSG-Re-Check-Abo",
     description:
       "Monatliches Re-Audit Ihrer Website mit Veränderungs-Report. Sofortige Warnung, wenn neue Inhalte Sie aus der Compliance werfen.",
-    price: "39.00",
+    price: "24.99",
     priceSpecification: {
       "@type": "UnitPriceSpecification",
-      price: "39.00",
+      price: "24.99",
       priceCurrency: "EUR",
       billingDuration: 1,
       billingIncrement: 1,
@@ -100,8 +100,6 @@ const products: ProductInput[] = [
     category: "Monitoring-Abo",
     sku: "recheck-abo",
     offerUrl: `${siteUrl}/#pakete`,
-    // Abo noch nicht kaufbar (Backend ENABLE_ABO=false) → nicht als InStock auszeichnen.
-    availability: "https://schema.org/PreOrder",
   },
 ];
 

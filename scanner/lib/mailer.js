@@ -73,7 +73,7 @@ export async function sendReportFor({ to, company = '', pdfPath, stmtPath, email
     return sendCookieReport({ to, company, pdfPath, invoicePdfPath, invoiceNumber });
   }
   if (emailKind === 'recheck') {
-    return sendRecheckReport({ to, company, pdfPath, diffText, invoicePdfPath, invoiceNumber });
+    return sendRecheckReport({ to, company, pdfPath, stmtPath, diffText, invoicePdfPath, invoiceNumber });
   }
   return sendReport({ to, company, pdfPath, stmtPath, invoicePdfPath, invoiceNumber });
 }
@@ -132,7 +132,7 @@ ${FROM_NAME}`;
   return deliver({ to, subject, text, attachments });
 }
 
-export async function sendRecheckReport({ to, company = '', pdfPath, diffText = '', invoicePdfPath = null, invoiceNumber = null }) {
+export async function sendRecheckReport({ to, company = '', pdfPath, stmtPath = null, diffText = '', invoicePdfPath = null, invoiceNumber = null }) {
   if (!isEmail(to)) throw new Error('Ungültige Empfängeradresse: ' + to);
   const subject = `Ihr monatlicher BFSG-Re-Check${company ? ' — ' + oneLine(company) : ''}`;
   const text = `Hier ist Ihr aktueller Re-Check.
@@ -140,16 +140,24 @@ export async function sendRecheckReport({ to, company = '', pdfPath, diffText = 
 VERÄNDERUNGEN SEIT LETZTEM SCAN
 ${diffText || 'Keine Veränderungen erkannt.'}
 
-Den vollständigen Report mit allen aktuellen Befunden und Lösungshinweisen
-finden Sie im Anhang.${invoicePdfPath ? ' Ihre Rechnung liegt ebenfalls bei.' : ''}
+Im Anhang finden Sie:
+1. Den vollständigen Re-Check-Report (PDF) mit allen aktuellen Befunden und Lösungshinweisen.${stmtPath ? '\n2. Ihre auf den aktuellen Stand gebrachte Erklärung zur Barrierefreiheit (Vorlage).' : ''}${invoicePdfPath ? `\n${stmtPath ? '3' : '2'}. Ihre Rechnung (PDF).` : ''}
 
-Sie können Ihr Abo jederzeit über /kuendigen.html beenden.
+Sie können Ihr Abo jederzeit über https://bfsg-fix.de/kuendigen beenden.
 
 Mit freundlichen Grüßen
 ${FROM_NAME}`;
 
   const attachments = [];
   if (pdfPath) attachments.push({ filename: 'BFSG-Recheck.pdf', content: await readFile(pdfPath) });
+  // Aktualisierte Erklärung zur Barrierefreiheit mitschicken (.txt für maximale
+  // Mailclient-Kompatibilität) — Owner-Anforderung: jeder Re-Check liefert die
+  // auf den aktuellen Stand gebrachte Erklärung.
+  if (stmtPath)
+    attachments.push({
+      filename: 'Barrierefreiheitserklaerung-aktuell.txt',
+      content: await readFile(stmtPath)
+    });
   await pushInvoiceAttachment(attachments, invoicePdfPath, invoiceNumber);
   return deliver({ to, subject, text, attachments });
 }

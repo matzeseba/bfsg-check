@@ -45,12 +45,12 @@ const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SEC
 requireMailerOrExit();
 
 const PACKAGES = {
-  basis:          { name: 'BFSG-Report Basis',         amount: 19900, mode: 'payment' },
-  profi:          { name: 'BFSG-Report Profi',         amount: 49900, mode: 'payment' },
-  'cookie-basis': { name: 'Cookie-Check (§25 TDDDG)',  amount:  4900, mode: 'payment' },
-  'cookie-profi': { name: 'Cookie-Check Profi',        amount:  7900, mode: 'payment' },
+  basis:          { name: 'BFSG-Report Basis',         amount: 12900, mode: 'payment' },
+  profi:          { name: 'BFSG-Report Profi',         amount: 39900, mode: 'payment' },
+  'cookie-basis': { name: 'Cookie-Check (§25 TDDDG)',  amount:  3900, mode: 'payment' },
+  'cookie-profi': { name: 'Cookie-Check Profi',        amount:  6900, mode: 'payment' },
   ...(ENABLE_ABO
-    ? { abo: { name: 'BFSG Re-Check Abo', amount: 3900, mode: 'subscription', interval: 'month' } }
+    ? { abo: { name: 'BFSG Re-Check Abo', amount: 2499, mode: 'subscription', interval: 'month' } }
     : {})
 };
 
@@ -271,6 +271,9 @@ async function handleInvoicePaid(event) {
     await sendReportFor({
       to: sub.email, company: sub.company || '',
       pdfPath: order.pdfPath,
+      // Aktualisierte Erklärung zur Barrierefreiheit pro Monats-Re-Check mitsenden
+      // (Owner-Anforderung; abo.withStatement ist jetzt true → order.stmtPath gesetzt).
+      stmtPath: order.stmtPath,
       emailKind: 'recheck',
       diffText: diffSummaryText(order.diff),
       invoicePdfPath: invoice?.pdfPath || null,
@@ -645,10 +648,65 @@ process.on('uncaughtException', (e) => {
   sentry.captureException(e instanceof Error ? e : new Error(String(e)), { source: 'uncaughtException' });
 });
 
+// Reconcile-Sweeper: beim Start nicht-terminale Bestellungen aufspüren und retten.
+// Schließt das Restart-Loch (Webhook quittiert sofort, arbeitet asynchron — ein
+// Crash mitten in der Erfüllung hinterließe sonst eine bezahlte, aber nicht
+// ausgelieferte Bestellung ohne Wiederanlauf). Strategie:
+//  - READY_NOT_MAILED (Report + Rechnung fertig, nur Mail offen) → automatischer
+//    Mail-only-Resend (idempotent: kein Neuscan, keine neue Rechnungsnummer).
+//  - PAID/FULFILLING/INVOICED/RESENDING (mitten im Flow abgebrochen) → EIN
+//    konsolidierter Operator-Alarm mit Resend-Befehl (kein Auto-Rescan, um
+//    Doppel-Auslieferung/-aufwand zu vermeiden). FAILED ist bereits alarmiert
+//    worden → hier ausgelassen, sonst Alarm-Spam bei jedem Neustart.
+async function reconcileOnStartup() {
+  if (!isStripeLive()) return; // nur im Live-Betrieb relevant
+  try {
+    const { listOrders, markStatus } = await import('./lib/orders.js');
+    const all = await listOrders({ limit: 1000 });
+    const TERMINAL = new Set(['MAILED', 'RESENT', 'CANCELLED', 'FAILED', 'EVENT_CLAIMED']);
+    const pending = all.filter((o) => o.status && !TERMINAL.has(o.status));
+    let remailed = 0;
+    const stuck = [];
+    for (const o of pending) {
+      if (o.status === 'READY_NOT_MAILED' && o.pdfPath) {
+        try {
+          await sendReportFor({
+            to: o.email, company: o.company || '',
+            pdfPath: o.pdfPath, stmtPath: o.stmtPath || null,
+            emailKind: o.emailKind || 'bfsg', diffText: '',
+            invoicePdfPath: o.invoicePdfPath || null, invoiceNumber: o.invoiceNumber || null
+          });
+          await markStatus(o.sessionId, 'RESENT', { resendMode: 'mail-only', resentBy: 'reconcile' });
+          remailed++;
+        } catch (err) {
+          stuck.push(`${o.sessionId} — READY_NOT_MAILED, Remail-Fehler: ${err.message}`);
+        }
+      } else {
+        stuck.push(`${o.sessionId} — ${o.status} (${o.email || '?'}, ${o.url || '?'})`);
+      }
+    }
+    if (remailed) logger.info({ remailed }, 'Reconcile: READY_NOT_MAILED automatisch erneut versendet');
+    if (stuck.length) {
+      await sendAlert(
+        `Reconcile beim Start: ${stuck.length} haengende Bestellung(en)`,
+        `Diese Bestellungen sind NICHT im Endzustand (MAILED/RESENT/CANCELLED) und brauchen Aufmerksamkeit:\n\n` +
+        stuck.join('\n') +
+        `\n\nManuell nachliefern je Session:\n` +
+        `curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" ${PUBLIC_URL}/api/resend/<sessionId>`
+      );
+      logger.warn({ stuck: stuck.length }, 'Reconcile: haengende Bestellungen gemeldet');
+    }
+  } catch (err) {
+    logger.error({ err: err.message }, 'Reconcile-Sweeper fehlgeschlagen (Start wird fortgesetzt)');
+  }
+}
+
 const server = app.listen(PORT, () => {
   logger.info(
     { publicUrl: PUBLIC_URL, stripe: !!stripe, abo: ENABLE_ABO, mailer: mailerStatus() },
     `BFSG-Audit-Server auf ${PUBLIC_URL}`
   );
+  // Nicht-blockierend: Server ist sofort bereit, Reconcile läuft im Hintergrund.
+  reconcileOnStartup();
 });
 process.on('SIGTERM', () => server.close(() => process.exit(0)));

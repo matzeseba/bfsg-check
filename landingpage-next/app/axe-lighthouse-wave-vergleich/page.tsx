@@ -216,7 +216,7 @@ export default function AxeLighthouseWaveVergleichPage() {
           <h2 className="text-xl font-semibold">Ihren Shop mit über 80 WCAG-Regeln prüfen lassen</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             Der kostenlose Sofort-Check gibt einen ersten Überblick in ca. 60 Sekunden. Der Basis-Report
-            (199 €) liefert den vollständigen priorisierten WCAG-2.1-Report mit Fix-Plan für bis zu 5
+            (129 €) liefert den vollständigen priorisierten WCAG-2.1-Report mit Fix-Plan für bis zu 5
             Unterseiten — inklusive Entwurf der Barrierefreiheitserklärung.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">

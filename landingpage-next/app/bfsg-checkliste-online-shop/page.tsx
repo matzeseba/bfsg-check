@@ -225,7 +225,7 @@ export default function BfsgChecklisteOnlineShopPage() {
                   <td className="px-3 py-2 font-semibold">Automatisierter Scan mit Report</td>
                   <td className="px-3 py-2 text-muted-foreground">Shop-Betreiber ohne Tech-Team; erste strukturierte Übersicht</td>
                   <td className="px-3 py-2 text-muted-foreground">ca. 30–50 % der Mängel</td>
-                  <td className="px-3 py-2 text-muted-foreground">199–499 €</td>
+                  <td className="px-3 py-2 text-muted-foreground">129–399 €</td>
                 </tr>
                 <tr className="bg-background">
                   <td className="px-3 py-2 font-semibold">Manuelles Accessibility-Audit</td>
@@ -242,7 +242,7 @@ export default function BfsgChecklisteOnlineShopPage() {
           <h2 className="text-xl font-semibold">Ihren Shop jetzt technisch prüfen lassen</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             Der kostenlose Sofort-Check gibt einen ersten Überblick über kritische WCAG-2.1-Mängel Ihrer
-            Startseite — in ca. 60 Sekunden. Der Basis-Report (199 €) deckt bis zu 5 Unterseiten ab
+            Startseite — in ca. 60 Sekunden. Der Basis-Report (129 €) deckt bis zu 5 Unterseiten ab
             und enthält einen priorisierten Fix-Plan sowie einen Entwurf der Barrierefreiheitserklärung.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">

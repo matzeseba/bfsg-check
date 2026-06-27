@@ -3,7 +3,7 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync } from 'node:fs';
+import { mkdtempSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 
@@ -204,6 +204,26 @@ test('recordPaid persistiert Stripe-customerId (Kundenverwaltung)', async () => 
   });
   const order = await getOrder(evt.data.object.id);
   assert.equal(order.customerId, 'cus_ABC123');
+});
+
+test('claimEvent: Claim wird SOFORT durabel auf Disk geschrieben (Idempotenz-Persistenz)', async () => {
+  const eventId = `evt_durable_${Date.now()}`;
+  assert.equal(await claimEvent(eventId), true, 'Erst-Claim gewinnt');
+  // Der Claim muss als Zeile im ORDERS_FILE stehen, BEVOR irgendeine Erfüllung
+  // läuft — sonst ginge der Dedup-Schutz bei einem Crash/Restart verloren.
+  const txt = readFileSync(process.env.ORDERS_FILE, 'utf8');
+  const claimed = txt
+    .split('\n')
+    .filter(Boolean)
+    .map((l) => JSON.parse(l))
+    .some((r) => r.eventId === eventId && r.status === 'EVENT_CLAIMED');
+  assert.ok(claimed, 'claimEvent muss einen durablen EVENT_CLAIMED-Datensatz schreiben');
+});
+
+test('Abo-Erklärung: PKG_CONFIG.abo erzeugt eine Barrierefreiheitserklärung (withStatement)', async () => {
+  const { PKG_CONFIG } = await import('../lib/fulfill.js');
+  assert.equal(PKG_CONFIG.abo.withStatement, true, 'Abo muss pro Re-Check eine aktualisierte Erklärung erzeugen');
+  assert.equal(PKG_CONFIG.abo.emailKind, 'recheck');
 });
 
 test('Order-Persistenz übersteht Modul-Neuladen (JSONL ist die Source of Truth)', async () => {

@@ -52,7 +52,13 @@ export async function claimEvent(eventId) {
   await ensureLoaded();
   if (!eventId) return true; // ohne ID kein Dedup möglich → durchlassen
   if (processedEvents.has(eventId)) return false;
-  processedEvents.add(eventId);
+  processedEvents.add(eventId); // synchroner Claim (check-then-act ohne await = atomar im Event-Loop)
+  // Claim SOFORT durabel auf Disk schreiben: überlebt einen Prozess-Restart,
+  // sodass ein Stripe-Redelivery NACH einem Crash dedupliziert wird (vorher nur
+  // In-Memory → nach Neustart wäre der Claim verloren gewesen). Der Claim-Datensatz
+  // trägt nur eventId (kein sessionId) → landet in processedEvents, nicht in der
+  // orders-Map (ensureLoaded überspringt sessionId-lose Records dort).
+  await write({ eventId, status: 'EVENT_CLAIMED' });
   return true;
 }
 

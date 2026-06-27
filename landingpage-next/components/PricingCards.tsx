@@ -43,7 +43,11 @@ export function PricingCards({
   kicker = "Pakete & Preise",
   kickerIcon = TagIcon,
   id = "pakete",
-  showAnnualToggle = true,
+  // Standardmäßig AUS: Das Backend bietet nur monatliche Abrechnung (interval:'month');
+  // der Jahres-Toggle wäre rein kosmetisch und würde einen nie abgerechneten
+  // Jahrespreis/Rabatt vorgaukeln (Dark-Pattern). Erst auf true setzen, wenn es ein
+  // echtes Jahres-Abo im Stripe-Checkout gibt.
+  showAnnualToggle = false,
   embedded = false,
 }: PricingCardsProps) {
   const { openCheckout } = useCheckout();
