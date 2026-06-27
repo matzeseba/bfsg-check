@@ -5,6 +5,10 @@
 
 ---
 
+> ▶️ **Nächster Schritt diese Session:** **`docs/LAUNCH-PLAN-EINFACH.md`** (+ `.pdf`) abarbeiten — kompletter kinderleichter Owner-Plan **A–H für Windows** (Rechnungs-`.env`, `SCAN_TEASER_LENIENT_TLS=true`, Stripe-Live-Testkauf, Ads, Listings, Newsletter). Wer-macht-was: **`docs/LAUNCH-3-SPALTEN-PLAN.md`** (Computer-Use / Owner / Code). Code-PRs **#66–#70 gemergt + live** (SSRF-IP-Pin, C3-Fix, Mail-Retry, Beispiel-Report-PDF, A11y-Icon). Server-Zugang: **Windows-PowerShell `ssh root@178.105.83.0`** (KEIN Mac) — der „Terminal auf dem Mac"-Block direkt unten ist im neuen Plan als **Schritt B** Windows-korrigiert enthalten.
+
+---
+
 ## ▶️ NÄCHSTE SESSION — 1 offener Owner-Schritt (per Computer Use erledigen)
 
 > **Ziel:** Den Gratischeck auch für kleine SMB-Seiten mit unsauberer Zertifikatskette zum Laufen bringen. Der Code dafür ist seit PR #63 live; es fehlt nur noch **ein Feature-Flag im Server-`.env`**. Dieser Block ist als Computer-Use-Aufgabe selbst-enthalten — einfach ausführen lassen.
