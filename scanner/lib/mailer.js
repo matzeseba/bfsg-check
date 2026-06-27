@@ -189,21 +189,94 @@ ${FROM_NAME}`;
   return deliver({ to, subject, text, attachments: [] });
 }
 
+// Klassifiziert SMTP-/Netzwerk-Fehler: transient (lohnt Retry) vs. permanent
+// (Retry zwecklos, würde nur Zeit kosten). Transient = Verbindungsabbrüche,
+// Timeouts, Greylisting und temporäre Mailserver-Antworten (SMTP 4xx + die
+// transienten 5xx-Codes für Rate-Limit/„try again later"). Permanent = harte
+// Ablehnung (invalid recipient, Mailbox existiert nicht, Auth/Policy-Reject).
+const TRANSIENT_CODES = new Set([
+  'ETIMEDOUT', 'ECONNRESET', 'ECONNREFUSED', 'ESOCKET', 'ECONNECTION',
+  'EAI_AGAIN', 'ETLS', 'EDNS', 'EPIPE'
+]);
+// Nodemailer legt die SMTP-Antwort-Stufe in err.responseCode (numerisch) ab.
+// 421/450/451/452 = temporär; 454 = TLS temporär; 471 = lokales Greylisting.
+// 421 ist formal 4xx, manche Server senden Rate-Limit aber als 4xx/5xx-Mischung.
+const TRANSIENT_SMTP = new Set([421, 450, 451, 452, 454, 471]);
+
+export function isTransientMailError(err) {
+  if (!err) return false;
+  const code = err.code || '';
+  if (TRANSIENT_CODES.has(code)) return true;
+  // nodemailer-Connection-Fehler signalisieren teils nur über err.command/'CONN'.
+  if (code === 'CONN' || code === 'EENVELOPE' && err.responseCode && TRANSIENT_SMTP.has(err.responseCode)) {
+    return TRANSIENT_SMTP.has(err.responseCode);
+  }
+  const rc = Number(err.responseCode);
+  if (TRANSIENT_SMTP.has(rc)) return true;
+  // Greylisting wird oft als 4xx mit Klartext gemeldet (kein sauberer Code).
+  if (/greylist|temporar|try again|rate limit|too many/i.test(err.message || '')) return true;
+  return false;
+}
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// Verschickt eine Mail mit bis zu 3 Wiederholungen (Backoff 1s/2s/4s + Jitter)
+// AUSSCHLIESSLICH bei transienten Fehlern. Permanente Fehler (ungültiger
+// Empfänger, harte Ablehnung) werfen sofort — kein Retry, da zwecklos.
+// MAX_MAIL_ATTEMPTS env-überschreibbar (Default 3) für Tests/Tuning.
+const MAX_MAIL_ATTEMPTS = Math.max(1, Number(process.env.MAX_MAIL_ATTEMPTS) || 3);
+const MAIL_BACKOFF_BASE_MS = Math.max(0, Number(process.env.MAIL_BACKOFF_BASE_MS ?? 1000));
+
+// Reine Retry-Schleife, vom konkreten Transport entkoppelt (direkt unit-testbar):
+// `send` ist eine async-Funktion, die genau einen Versandversuch macht und das
+// nodemailer-Info-Objekt zurückgibt oder einen Fehler wirft. Retry nur bei
+// transienten Fehlern (isTransientMailError), sonst sofortiges Re-Throw.
+export async function sendWithRetry(send, {
+  to = '',
+  maxAttempts = MAX_MAIL_ATTEMPTS,
+  backoffBaseMs = MAIL_BACKOFF_BASE_MS
+} = {}) {
+  let lastErr;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const info = await send();
+      if (attempt > 1) console.log(`[mailer] Versand an ${to} im ${attempt}. Versuch erfolgreich`);
+      return { info, attempts: attempt };
+    } catch (err) {
+      lastErr = err;
+      const transient = isTransientMailError(err);
+      if (!transient || attempt === maxAttempts) {
+        if (!transient) console.error(`[mailer] Permanenter Fehler an ${to} — kein Retry: ${err.message}`);
+        else console.error(`[mailer] Versand an ${to} nach ${attempt} Versuchen endgültig fehlgeschlagen: ${err.message}`);
+        throw err;
+      }
+      // Exponentieller Backoff (1s/2s/4s) + bis zu 250 ms Jitter gegen Thundering-Herd.
+      const delay = backoffBaseMs * 2 ** (attempt - 1) + Math.floor(Math.random() * 250);
+      console.warn(`[mailer] Transienter Fehler an ${to} (Versuch ${attempt}/${maxAttempts}): ${err.message} — Retry in ${delay} ms`);
+      await sleep(delay);
+    }
+  }
+  throw lastErr; // unerreichbar, aber explizit für den Linter.
+}
+
 async function deliver({ to, subject, text, attachments = [] }) {
   if (!enabled) {
     console.log(`[mailer DRY-RUN] An ${to} | ${subject} | Anhänge: ${attachments.map((a) => a.filename).join(', ') || '—'}`);
     return { dryRun: true };
   }
-  const info = await transporter.sendMail({
-    from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
-    to,
-    replyTo: REPLY_TO || undefined,
-    subject,
-    text,
-    attachments
-  });
+  const { info, attempts } = await sendWithRetry(
+    () => transporter.sendMail({
+      from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
+      to,
+      replyTo: REPLY_TO || undefined,
+      subject,
+      text,
+      attachments
+    }),
+    { to }
+  );
   console.log(`[mailer] An ${to} versendet (${info.messageId})`);
-  return { dryRun: false, messageId: info.messageId };
+  return { dryRun: false, messageId: info.messageId, attempts };
 }
 
 // Betreiber-Alarm bei bezahlt-aber-nicht-geliefert (an ADMIN_EMAIL).
