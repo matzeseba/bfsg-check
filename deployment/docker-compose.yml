@@ -25,6 +25,9 @@ services:
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - ENABLE_ABO=${ENABLE_ABO:-false}
       - MAX_CONCURRENT_SCANS=${MAX_CONCURRENT_SCANS:-2}
+      # Gratis-Teaser-TLS-Toleranz (env-gated, Default aus). Wird in app.js gelesen
+      # und nur an den kostenlosen Teaser-Scan durchgereicht; bezahlter Pfad bleibt strikt.
+      - SCAN_TEASER_LENIENT_TLS=${SCAN_TEASER_LENIENT_TLS:-false}
       - ADMIN_TOKEN=${ADMIN_TOKEN:-}
       - SENTRY_DSN=${SENTRY_DSN:-}
       - VAT_MODE=${VAT_MODE:-kleinunternehmer}
