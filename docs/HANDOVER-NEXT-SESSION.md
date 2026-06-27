@@ -85,6 +85,22 @@ curl -s -o /dev/null -w "%{time_total}s\n" "https://bfsg-fix.de/api/scan?url=htt
 
 ---
 
+## 🆕 Update 27.06.2026 (Abend) — Preise gesenkt + Re-Check-Abo LIVE + PayPal (PR #78)
+
+- **Preise marktbasiert gesenkt (LIVE):** Basis **199→129 €** · Profi **499→399 €** · Re-Check-Abo **39→24,99 €/Mo** · Cookie-Basis **49→39 €** · Cookie-Profi **79→69 €**. Grundlage: tagesaktuelle 3-Agenten-Wettbewerbsrecherche (27.06.) — jeweils leicht unter dem nächsten vergleichbaren Anbieter (musnuss.de 190 €, webAION 490 €, AccessGO/gehirngerecht 39/49 €). Alle Stellen synchron (scanner PACKAGES, landingpage config/JsonLd/CheckoutModal + 6 SEO-Seiten, marketing/OFFER.md). Verifiziert live auf der Startseite.
+- **Re-Check-Abo SCHARF (LIVE):** `ENABLE_ABO=true` im Server-`.env` gesetzt, deployed, `/health` zeigt **`aboEnabled:true`**, Abo-Checkout liefert echte `cs_live_…`-Session. Produktreif gemacht (PR #78):
+  - **Monats-Re-Check** liefert jetzt die **aktualisierte Barrierefreiheitserklärung** mit (vorher NICHT) — `PKG_CONFIG.abo.withStatement=true` + `sendRecheckReport`-Anhang + `handleInvoicePaid` übergibt `stmtPath`.
+  - **Webhook-Idempotenz** korrekt: Order-erzeugende Events werden in `prePersistCheckout()` VOR der Quittung durabel festgehalten (kein stiller Order-Verlust); `releaseEvent()` bei Persist-Fehler → Stripe-Redelivery.
+  - **Reconcile-Sweeper** beim Start = **alert-only** (kein Auto-Resend → kein Doppel-Mail/-Rechnung-Risiko); Recovery über `/api/resend`.
+  - mailer liest optionale Anhänge defensiv. Tests scanner **86/86**, landingpage `next build` grün, legal-copy-grep PASS. Adversariales Code-Review (3 WICHTIG-Befunde) eingearbeitet.
+- **PayPal:** vom Owner im Stripe-Dashboard aktiviert (PayPal-Business via OAuth). Einmalzahlung (Basis/Profi/Cookie) zeigt PayPal automatisch (Code nutzt dynamische Zahlmethoden, keine `payment_method_types`). **Abo-PayPal** (recurring) braucht separate Freischaltung (bis 5 Werktage) — Karte/SEPA decken das Abo bis dahin.
+
+### 🔴 OFFENER OWNER-PUNKT (Stripe-Dashboard, ~1 Min — ich kann es nicht, Dashboard ist für mich gesperrt)
+**Webhook-Event `customer.subscription.updated` ergänzen.** Aktuell abonniert: `checkout.session.completed, invoice.paid, customer.subscription.deleted` (per Stripe-API verifiziert). Für die **`past_due`-Pause** bei Zahlungsausfall fehlt `customer.subscription.updated` (optional zusätzlich `invoice.payment_succeeded` als Fallback). Ohne das Event läuft das Abo trotzdem (Monats-Re-Check via `invoice.paid` + Kündigung via `subscription.deleted`), nur die proaktive Zahlungsausfall-Pause/-Alarm greift nicht. → Stripe-Dashboard → Entwickler → Webhooks → `https://bfsg-fix.de/webhook` → Events ergänzen.
+**Empfohlener Test:** Test-Abo mit eigener Karte (24,99 €) → erster Scan + Report + aktualisierte Erklärung + Rechnung müssen ankommen → kündigen → Kündigungsmail prüfen → Refund.
+
+---
+
 ## 🆕 Update 27.06.2026 — Dark-Default-Redesign + Conversion-/Dynamik-Politur (PR #76, LIVE)
 
 - **Owner-Auftrag:** Landingpage designtechnisch komplett überarbeiten — **Dark-Mode dauerhaft als Standard** (Farben unverändert), dynamischer + conversion-stärker im Stil von **kiberatung.de**, plus zwei konkrete Fixes.
