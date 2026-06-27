@@ -5,6 +5,8 @@ import { CheckCircle2Icon, GlobeIcon, ScanLineIcon } from "lucide-react";
 
 import { HOW_IT_WORKS } from "@/lib/config";
 
+import { SectionKicker } from "./SectionKicker";
+
 const ICON_BY_KEY = {
   globe: GlobeIcon,
   scan: ScanLineIcon,
@@ -29,16 +31,14 @@ export function HowItWorks() {
         className="absolute inset-0 -z-10 hidden dot-bg-dark opacity-50 mask-radial dark:block"
       />
       <div className="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-24">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="font-mono text-xs font-medium tracking-[0.2em] text-brand-indigo uppercase dark:text-brand-mint">
-            Wie es funktioniert
-          </p>
+        <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
+          <SectionKicker icon={ScanLineIcon} label="Wie es funktioniert" />
           <h2
             id="how-heading"
-            className="mt-3 font-display text-3xl font-semibold tracking-tight text-balance sm:text-[2.75rem] sm:leading-[1.05]"
+            className="mt-4 font-display text-3xl font-semibold tracking-tight text-balance sm:text-[2.75rem] sm:leading-[1.05]"
           >
             Drei Schritte vom Verdacht zum{" "}
-            <span className="italic gradient-text">handfesten Fix-Plan</span>.
+            <span className="italic gradient-text">Fix-Plan</span>.
           </h2>
           <p className="mt-4 text-base text-muted-foreground text-pretty">
             Kein Beratungstermin nötig. Kein Workshop. Sie geben die URL ein —
@@ -47,7 +47,8 @@ export function HowItWorks() {
         </div>
 
         <div className="relative mt-14">
-          {/* Scan-Pfad: animierte Verbindungslinie auf Desktop. */}
+          {/* Scan-Pfad-Track (statisch, gestrichelt) + animierte Fortschrittslinie
+              darüber (origin-left scaleX, nur Desktop, reduced-motion-safe). */}
           <div
             aria-hidden
             className="absolute top-14 right-[12%] left-[12%] hidden h-px md:block"
@@ -56,10 +57,19 @@ export function HowItWorks() {
                 "repeating-linear-gradient(to right, color-mix(in oklch, var(--brand-mint), transparent 55%) 0 6px, transparent 6px 14px)",
             }}
           />
+          <motion.div
+            aria-hidden
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 1.1, delay: 0.2, ease: EASE }}
+            className="absolute top-14 right-[12%] left-[12%] hidden h-px origin-left bg-gradient-to-r from-brand-mint via-brand-violet to-transparent md:block"
+          />
 
           <ol className="relative grid gap-6 md:grid-cols-3">
             {HOW_IT_WORKS.map((step, i) => {
               const Icon = ICON_BY_KEY[step.icon as keyof typeof ICON_BY_KEY];
+              const featured = i === 1;
               return (
                 <motion.li
                   key={step.step}
@@ -67,7 +77,12 @@ export function HowItWorks() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-60px" }}
                   transition={{ duration: 0.5, delay: i * 0.1, ease: EASE }}
-                  className="group/step relative flex flex-col items-center rounded-3xl border border-border/70 bg-card/85 p-6 text-center shadow-card-soft backdrop-blur transition-all duration-300 hover:-translate-y-1.5 hover:shadow-card-hover md:items-start md:text-left"
+                  className={
+                    "group/step card-lift relative flex flex-col items-center rounded-3xl p-6 text-center backdrop-blur md:items-start md:text-left " +
+                    (featured
+                      ? "border-gradient bg-card shadow-card-hover"
+                      : "border border-border/70 bg-card/85 shadow-card-soft dark:ring-1 dark:ring-white/5")
+                  }
                 >
                   <div className="flex w-full items-center justify-center md:justify-between">
                     <span
@@ -82,7 +97,13 @@ export function HowItWorks() {
                     />
                   </div>
                   <div className="relative mt-5 flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-indigo to-brand-deep text-on-deep shadow-glow-mint transition-transform duration-300 group-hover/step:scale-110">
-                    {Icon ? <Icon className="size-5" /> : null}
+                    {/* Dezent pulsierender Ring → "live"-Anmutung, gestaffelt. */}
+                    <span
+                      aria-hidden
+                      className="absolute inset-0 rounded-2xl ring-1 ring-brand-mint/40 animate-pulse-soft"
+                      style={{ animationDelay: `${i * 0.4}s` }}
+                    />
+                    {Icon ? <Icon className="relative size-5" /> : null}
                   </div>
                   <h3 className="mt-5 font-display text-xl font-semibold tracking-tight">
                     {step.title}

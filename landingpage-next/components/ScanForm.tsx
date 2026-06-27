@@ -141,7 +141,7 @@ export function ScanForm({ initialUrl = "" }: ScanFormProps) {
             type="submit"
             size="lg"
             disabled={loading || !url}
-            className="h-12 shrink-0 gap-1.5 rounded-xl bg-brand-mint px-5 text-base font-semibold text-brand-deep shadow-glow-mint transition-transform hover:bg-brand-mint/85 hover:scale-[1.015] disabled:opacity-60 disabled:shadow-none"
+            className="h-12 shrink-0 gap-1.5 rounded-xl bg-brand-mint px-5 text-base font-semibold text-brand-deep shadow-glow-mint transition-transform hover:bg-brand-mint/85 hover:scale-[1.015] focus-visible:ring-brand-deep/70 focus-visible:ring-offset-2 focus-visible:ring-offset-card disabled:opacity-60 disabled:shadow-none"
           >
             {loading ? (
               <>

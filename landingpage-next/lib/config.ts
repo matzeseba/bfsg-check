@@ -54,14 +54,16 @@ export const HERO = {
   pillFlag: "DE",
   pill: "BFSG seit 28.06.2025 in Kraft · Erste Abmahnungen rollen an",
   headlineLead: "Ist Ihre Website",
-  // "bereit fürs BFSG?" bringt den vom Owner gewünschten BFSG-Hook zurück, ohne
+  // "bereit fürs BFSG" bringt den vom Owner gewünschten BFSG-Hook zurück, ohne
   // die laut CLAUDE.md/UWG §5 verbotene Konformitäts-Aussage "BFSG-konform"
   // (= Garantie-Behauptung). Eine Bereitschafts-FRAGE behauptet keine Konformität.
-  headlineEmph: "bereit fürs BFSG?",
+  // Das "?" wird in Hero.tsx als eigenes NICHT-kursives Gradient-Span gerendert —
+  // sonst beschneidet background-clip:text den Italic-Überhang des "?" (Owner-Bug).
+  headlineEmph: "bereit fürs BFSG",
   headlineTail: "In 60 Sekunden wissen Sie es — bevor es eine Kanzlei tut.",
   subline:
     "Wir scannen Ihre Seite nach über 80 WCAG-2.1-AA-Regeln und liefern jeden Mangel priorisiert — mit Copy-Paste-Fix und menschlicher Sichtung. Premium-Audit ohne Kanzlei-Honorar.",
-  cta: "Jetzt kostenlos prüfen",
+  cta: "Kostenlos prüfen",
   ctaSecondary: "Pakete ansehen",
   placeholder: "https://ihre-website.de",
   badges: [
@@ -83,7 +85,11 @@ export const HERO = {
 export const HERO_VISUAL = {
   reportPath: "report/4f2a",
   sampleLabel: "Beispiel",
+  // Vorschau-Überschrift über dem Report-Visual. previewAccent = das eine
+  // Fraunces-Italic-Akzentwort (Editorial-Rhythmus); Hero.tsx splittet die
+  // Überschrift an diesem Wort und setzt es kursiv-gradient.
   previewHeading: "So sieht Ihr kostenloses Sofort-Ergebnis aus",
+  previewAccent: "Sofort-Ergebnis",
   score: 62,
   grade: "C",
   totalFindings: 17,
@@ -103,7 +109,10 @@ export const HERO_VISUAL = {
 // Risiko-/Urgency-Band: faktenbasiert, kein UWG-Versprechen.
 export const RISK_BAND = {
   kicker: "Seit 28.06.2025 in Kraft",
-  title: "Die BFSG-Frist ist seit dem 28. Juni 2025 verstrichen — und die ersten Abmahnungen sind da.",
+  // Stichtag steht bereits im Kicker → Titel verschlankt + GENAU EIN Italic-
+  // Akzentwort (titleAccent) für den Editorial-Rhythmus (RiskBand.tsx splittet).
+  title: "Die BFSG-Frist ist verstrichen — und die ersten Abmahnungen sind da.",
+  titleAccent: "verstrichen",
   desc: "Betroffene Unternehmen müssen ihre digitalen Angebote barrierefrei anbieten. Wettbewerber, Verbände und abmahnende Kanzleien dürfen Verstöße verfolgen. Wer jetzt prüft, behebt Mängel in Ruhe statt unter Abmahn-Druck. In 60 Sekunden sehen Sie, wo Sie stehen — kostenlos und ohne Anmeldung.",
   points: [
     { value: "28.06.2025", label: "Stichtag bereits überschritten" },

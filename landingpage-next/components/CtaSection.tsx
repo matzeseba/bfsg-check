@@ -6,6 +6,8 @@ import { ArrowRightIcon, ShieldCheckIcon, SparklesIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
+import { SectionKicker } from "./SectionKicker";
+
 export function CtaSection() {
   return (
     <section
@@ -27,7 +29,7 @@ export function CtaSection() {
           />
           <div
             aria-hidden
-            className="pointer-events-none absolute -right-10 bottom-0 size-80 rounded-full bg-brand-violet/35 blur-[90px]"
+            className="pointer-events-none absolute -right-10 bottom-0 size-80 rounded-full bg-brand-violet/22 blur-[90px]"
           />
           <div
             aria-hidden
@@ -39,10 +41,11 @@ export function CtaSection() {
           />
 
           <div className="relative">
-            <span className="inline-flex items-center gap-2 rounded-full border border-[oklch(0.97_0.004_95)]/20 bg-[oklch(0.97_0.004_95)]/5 px-3 py-1 font-mono text-xs font-medium text-[oklch(0.97_0.004_95)]/80 backdrop-blur">
-              <SparklesIcon className="size-3.5 text-brand-mint" />
-              60 Sekunden bis zum ersten Befund
-            </span>
+            <SectionKicker
+              icon={SparklesIcon}
+              label="60 Sekunden bis zum ersten Befund"
+              tone="on-deep"
+            />
 
             <h2
               id="cta-heading"
@@ -62,7 +65,7 @@ export function CtaSection() {
             <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button
                 size="lg"
-                className="h-12 gap-1.5 rounded-xl bg-brand-mint px-6 text-base font-semibold text-brand-deep transition-transform hover:bg-brand-mint/85 hover:scale-[1.02]"
+                className="h-12 gap-1.5 rounded-xl bg-brand-mint px-6 text-base font-semibold text-brand-deep transition-transform hover:bg-brand-mint/85 hover:scale-[1.02] focus-visible:ring-brand-deep/70 focus-visible:ring-offset-2 focus-visible:ring-offset-brand-deeper"
                 render={<Link href="/#scan" />}
               >
                 Kostenlos prüfen

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { SearchIcon, XIcon } from "lucide-react";
+import { HelpCircleIcon, SearchIcon, XIcon } from "lucide-react";
 
 import {
   Accordion,
@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
 import { FAQ_ITEMS } from "@/lib/config";
+
+import { SectionKicker } from "./SectionKicker";
 
 export function FAQAccordion() {
   const [query, setQuery] = React.useState("");
@@ -31,15 +33,14 @@ export function FAQAccordion() {
       className="relative overflow-hidden bg-background"
     >
       <div className="mx-auto max-w-3xl px-5 py-20 sm:px-6 sm:py-24">
-        <div className="text-center">
-          <p className="font-mono text-xs font-medium tracking-[0.2em] text-brand-indigo uppercase dark:text-brand-mint">
-            FAQ
-          </p>
+        <div className="flex flex-col items-center text-center">
+          <SectionKicker icon={HelpCircleIcon} label="FAQ" />
           <h2
             id="faq-heading"
-            className="mt-3 font-display text-3xl font-semibold tracking-tight text-balance sm:text-[2.75rem] sm:leading-[1.05]"
+            className="mt-4 font-display text-3xl font-semibold tracking-tight text-balance sm:text-[2.75rem] sm:leading-[1.05]"
           >
-            Häufige Fragen — ehrlich beantwortet.
+            Häufige Fragen — <span className="italic gradient-text">ehrlich</span>{" "}
+            beantwortet.
           </h2>
           <p className="mt-4 text-base text-muted-foreground text-pretty">
             Nichts dabei? Schreiben Sie uns: hallo@bfsg-fix.de

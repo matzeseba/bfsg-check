@@ -48,7 +48,7 @@ export function TrustSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.45, delay: i * 0.06 }}
-              className="group/trust flex items-start gap-3 rounded-2xl border border-border/70 bg-card/70 p-4 shadow-card-soft backdrop-blur transition-colors hover:border-brand-mint/40"
+              className="group/trust card-lift flex items-start gap-3 rounded-2xl border border-border/70 bg-card/70 p-4 shadow-card-soft backdrop-blur dark:ring-1 dark:ring-white/5"
             >
               <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-mint/12 text-brand-mint transition-transform duration-300 group-hover/trust:scale-110">
                 <Icon className="size-5" aria-hidden />

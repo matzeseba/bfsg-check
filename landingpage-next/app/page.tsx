@@ -10,7 +10,12 @@ import { RiskBand } from "@/components/RiskBand";
 import { StatsBar } from "@/components/StatsBar";
 import { Testimonials } from "@/components/Testimonials";
 import { TrustSection } from "@/components/TrustSection";
+import { WowCounter } from "@/components/WowCounter";
 
+// Conversion-Dramaturgie: Schmerz (RiskBand) → Mechanismus (HowItWorks) →
+// Anchoring/Differenzierung (Testimonials) → Autorität (StatsBar) → Proof-
+// Höhepunkt (WowCounter) → Risk-Reversal (TrustSection, direkt vor dem Preis) →
+// Entscheidung (Pricing) → Cross-Sell (Cookie) → Resteinwände (FAQ) → Final-CTA.
 export default function Home() {
   return (
     <>
@@ -19,10 +24,11 @@ export default function Home() {
       <LogoCloud />
       <RiskBand />
       <HowItWorks />
-      <StatsBar />
       <Testimonials />
-      <PricingCards />
+      <StatsBar />
+      <WowCounter />
       <TrustSection />
+      <PricingCards />
       <CookieSection />
       <FAQAccordion />
       <CtaSection />

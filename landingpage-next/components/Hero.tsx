@@ -11,6 +11,20 @@ import { ScanForm } from "./ScanForm";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 export function Hero() {
+  // Vorschau-Überschrift am Akzentwort splitten → genau EIN Fraunces-Italic-Wort.
+  // indexOf-Guard: fehlt das Akzentwort mal (künftige Config-Edits), wird die
+  // Überschrift ungesplittet ohne Italic gerendert statt das Wort doppelt zu zeigen.
+  const pvIdx = HERO_VISUAL.previewHeading.indexOf(HERO_VISUAL.previewAccent);
+  const pvPre =
+    pvIdx >= 0
+      ? HERO_VISUAL.previewHeading.slice(0, pvIdx)
+      : HERO_VISUAL.previewHeading;
+  const pvPost =
+    pvIdx >= 0
+      ? HERO_VISUAL.previewHeading.slice(
+          pvIdx + HERO_VISUAL.previewAccent.length,
+        )
+      : "";
   return (
     <section
       id="scan"
@@ -76,10 +90,14 @@ export function Hero() {
               Animationsdauer verzögern (relevant für paid-Ads-Quality-Score). */}
           <h1 className="mt-6 font-display text-[clamp(2.05rem,6.7vw,4.6rem)] leading-[1.05] font-semibold tracking-[-0.025em] text-balance">
             <span className="block gradient-text-soft">{HERO.headlineLead}</span>
-            {/* Unterlängen-Schutz (g/j/ß) sitzt jetzt zentral in der .gradient-text-
-                Utility (padding-bottom), gilt damit für alle Gradient-Headlines. */}
+            {/* Unterlängen-Schutz (g/j/ß) + rechtsseitiger Italic-Überhang sitzen
+                zentral in der .gradient-text-Utility (padding-bottom/-right). Das
+                Fragezeichen liegt als NICHT-kursives Kind im selben Gradient-Span:
+                so läuft der Mint→Violet-Verlauf durchgehend bis zum "?", aber das
+                "?" hat keinen Italic-Überhang mehr → kein Clipping am rechten Rand. */}
             <span className="block italic gradient-text">
               {HERO.headlineEmph}
+              <span className="not-italic">?</span>
             </span>
             <span className="mt-1 block font-sans text-[0.4em] font-medium tracking-tight text-muted-foreground not-italic">
               {HERO.headlineTail}
@@ -175,15 +193,34 @@ export function Hero() {
           transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
           className="relative mx-auto w-full min-w-0 max-w-md lg:max-w-none"
         >
-          <p className="mb-4 flex items-center justify-center gap-2 text-center text-sm font-semibold tracking-tight text-foreground lg:justify-start lg:text-left">
+          {/* Vorschau-Kopf: eigene Sub-Überschrift über dem Report-Visual.
+              Bewusst ein <p> (kein <h2>): visuelle Größe ≠ Heading-Semantik, sonst
+              kippt die Screenreader-Outline (WCAG 1.3.1). Klar kleiner als die H1
+              (max ~1.6rem → kein LCP-Kandidat), aber deutlich als Vorschau erkennbar
+              (Chip "Vorschau" + "Beispiel"-Kennzeichnung im Report selbst). */}
+          <div className="mb-5 text-center lg:text-left">
             <span
               aria-hidden
-              className="inline-flex shrink-0 items-center rounded-md bg-brand-amber px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-wide text-brand-deep uppercase"
+              className="inline-flex items-center gap-1.5 rounded-full bg-brand-amber px-2.5 py-1 font-mono text-[10px] font-bold tracking-[0.16em] text-brand-deep uppercase"
             >
-              Beispiel
+              <span className="inline-flex size-1.5 rounded-full bg-brand-deep/70" />
+              Vorschau
             </span>
-            <span>{HERO_VISUAL.previewHeading}</span>
-          </p>
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.15 }}
+              className="mt-2.5 font-display text-[clamp(1.2rem,2.7vw,1.6rem)] leading-snug font-semibold tracking-tight text-foreground text-balance"
+            >
+              {pvPre}
+              {pvIdx >= 0 && (
+                <span className="italic gradient-text">
+                  {HERO_VISUAL.previewAccent}
+                </span>
+              )}
+              {pvPost}
+            </motion.p>
+          </div>
           <HeroVisual />
         </motion.div>
       </div>
