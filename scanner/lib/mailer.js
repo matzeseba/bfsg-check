@@ -5,6 +5,7 @@
 
 import nodemailer from 'nodemailer';
 import { readFile } from 'node:fs/promises';
+import sentry from './sentry.js';
 
 const {
   SMTP_HOST,
@@ -108,7 +109,15 @@ export const isEmail = (s = '') => /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{
 async function pushInvoiceAttachment(attachments, invoicePdfPath, invoiceNumber) {
   if (!invoicePdfPath) return;
   const filename = invoiceNumber ? `Rechnung-${invoiceNumber}.pdf` : 'Rechnung.pdf';
-  attachments.push({ filename, content: await readFile(invoicePdfPath) });
+  try {
+    attachments.push({ filename, content: await readFile(invoicePdfPath) });
+  } catch {
+    // SF4: Eine fehlende/unlesbare Rechnungs-PDF (z. B. out/-Volume nach Restart weg)
+    // darf NICHT den gesamten Report-Versand kippen — das Kernprodukt ist der Report.
+    // Anhang überspringen + warnen; die Stripe-Receipt bleibt als Beleg gültig, der
+    // Operator kann die Rechnung separat nachreichen.
+    console.warn(`[mailer] Rechnungs-Anhang fehlt/übersprungen: ${filename} (${invoicePdfPath})`);
+  }
 }
 
 // Liest eine OPTIONALE Anhang-Datei (z. B. Barrierefreiheitserklärung) defensiv:
@@ -232,6 +241,30 @@ auf diese E-Mail.
 
 Mit freundlichen Grüßen
 ${FROM_NAME}`;
+  return deliver({ to, subject, text, attachments: [] });
+}
+
+// MF5: Best-Effort-Eingangs-/Verzögerungs-Mail an den ZAHLENDEN Kunden, wenn der
+// automatische Scan/Report fehlschlägt (FAILED). Bewusst KEIN Report-Anhang (es gibt
+// im Fehlerfall kein PDF) und KEINE Termin-/Refund-Zusage — nur „wir haben es bemerkt
+// und kümmern uns". Verhindert, dass ein Kunde nach der Zahlung im Schweigen sitzt
+// (Trust-/Chargeback-Schutz). Ungültige Adresse → Dry-Run-Skip (kein Throw).
+export async function sendDelayNotice({ to, company = '' }) {
+  if (!isEmail(to)) return { dryRun: true, skipped: 'invalid-recipient' };
+  const subject = `Ihre Bestellung ist eingegangen${company ? ' — ' + oneLine(company) : ''}`;
+  const text = `Vielen Dank für Ihre Bestellung — Ihre Zahlung ist bei uns eingegangen.
+
+Bei der automatischen Erstellung Ihres Reports ist ein technisches Problem
+aufgetreten (Ihre Website ließ sich nicht vollständig automatisiert auswerten).
+Wir haben das bemerkt und kümmern uns persönlich darum — Sie erhalten Ihren
+Report in Kürze per E-Mail. Sie müssen nichts weiter tun.
+
+Bei Rückfragen antworten Sie einfach auf diese E-Mail.
+
+Mit freundlichen Grüßen
+${FROM_NAME}
+
+${legalFooter()}`;
   return deliver({ to, subject, text, attachments: [] });
 }
 
@@ -369,5 +402,9 @@ export async function sendAlert(subject, body) {
     });
   } catch (e) {
     console.error('[ALERT] konnte nicht gesendet werden:', e.message);
+    // SF9: Der Alarm-Kanal selbst ist ausgefallen — ein stiller Totalausfall (bezahlt-
+    // aber-nicht-geliefert würde sonst niemanden erreichen). Zusätzlich an Sentry melden,
+    // damit es trotz toter Alarm-Mail sichtbar bleibt.
+    sentry.captureException(e instanceof Error ? e : new Error(String(e)), { stage: 'sendAlert' });
   }
 }

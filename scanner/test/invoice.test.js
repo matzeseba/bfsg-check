@@ -39,7 +39,10 @@ test('renderInvoiceHtml: Kleinunternehmer = kein USt-Ausweis, § 19-Hinweis', ()
   assert.match(html, /Test GmbH/);
 });
 
-test('renderInvoiceHtml: Regelbesteuerung = USt 19% ausgewiesen', () => {
+test('renderInvoiceHtml: Regelbesteuerung = USt 19% aus dem Brutto-Betrag herausgerechnet (§14c)', () => {
+  // SF5: Der uebergebene Betrag (Stripe amount_total) ist BRUTTO. Bei Regelbesteuerung
+  // wird die USt herausgerechnet, sodass der Gesamtbetrag exakt dem gezahlten Betrag
+  // (499,00 €) entspricht — NICHT 19% obendrauf.
   const html = renderInvoiceHtml({
     invoiceNumber: 'RE-2026-0010',
     date: '2026-06-16T12:00:00Z',
@@ -49,9 +52,12 @@ test('renderInvoiceHtml: Regelbesteuerung = USt 19% ausgewiesen', () => {
   });
   assert.match(html, /USt\. 19 %/);
   assert.doesNotMatch(html, /§ 19 UStG/);
-  // 499 netto + 94,81 USt = 593,81 gross
-  assert.match(html, /94,81 €/);
-  assert.match(html, /593,81 €/);
+  // 499,00 brutto → 419,33 netto + 79,67 USt = 499,00 gross (Gesamtbetrag == gezahlter Betrag).
+  assert.match(html, /419,33 €/);
+  assert.match(html, /79,67 €/);
+  assert.match(html, /499,00 €/);
+  // Der zu hohe alte Ausweis (593,81) darf NIE mehr erscheinen.
+  assert.doesNotMatch(html, /593,81 €/);
 });
 
 test('renderInvoiceHtml: HTML-Escaping verhindert XSS in customer-name', () => {

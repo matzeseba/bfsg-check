@@ -18,13 +18,13 @@ import { classifyScanError } from './lib/scan-error.js';
 import { renderTeaser } from './lib/report.js';
 import { fulfillOrder, PKG_CONFIG } from './lib/fulfill.js';
 import {
-  sendReportFor, sendAlert, sendCancellationConfirmation, sendDsgvoToken,
-  mailerStatus, requireMailerOrExit, isStripeLive
+  sendReportFor, sendAlert, sendCancellationConfirmation, sendDsgvoToken, sendDelayNotice,
+  mailerStatus, requireMailerOrExit, isStripeLive, isEmail
 } from './lib/mailer.js';
 import { requireAdminAuth } from './lib/admin-auth.js';
 import { exportUserData, deleteUserData, requestDsgvoToken, consumeDsgvoToken } from './lib/dsgvo.js';
 import { diffSummaryText } from './lib/diff.js';
-import { generateInvoicePdf } from './lib/invoice.js';
+import { generateInvoicePdf, invoiceConfigStatus } from './lib/invoice.js';
 import { assertPublicHttpUrl } from './lib/url-guard.js';
 import { rateLimit, concurrencyGate } from './lib/limits.js';
 import { claimEvent, releaseEvent, recordPaid, markStatus } from './lib/orders.js';
@@ -43,6 +43,23 @@ const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SEC
 
 // Fail-fast: Live-Stripe ohne SMTP würde bezahlte Reports stillschweigend nicht ausliefern.
 requireMailerOrExit();
+
+// MF3/SF6: Im Live-Betrieb müssen die Rechnungs-Pflichtangaben (§14 UStG: Anbieter-
+// Anschrift; §33/34a UStDV: Steuer-/USt-IdNr.) gesetzt sein. KEIN Fail-Fast (würde die
+// Auslieferung des bezahlten Reports blockieren), aber ein lauter Alarm + Log, damit
+// keine formfehlerhafte Rechnung still rausgeht.
+{
+  const invCfg = invoiceConfigStatus();
+  if (isStripeLive() && !invCfg.ok) {
+    logger.error({ missing: invCfg.missing }, 'Rechnungs-Pflichtangaben fehlen im Live-Betrieb (§14 UStG)');
+    sendAlert(
+      'Rechnungs-Pflichtangaben fehlen (§14 UStG)',
+      `Im Live-Betrieb sind folgende ENV-Variablen NICHT gesetzt: ${invCfg.missing.join(', ')}.\n` +
+      `Rechnungen können dadurch formfehlerhaft sein (fehlende Anbieter-Anschrift/Steuernummer).\n` +
+      `Bitte im Server-.env (/opt/bfsg-check/deployment/.env) ergänzen und neu deployen.`
+    ).catch(() => {});
+  }
+}
 
 const PACKAGES = {
   basis:          { name: 'BFSG-Report Basis',         amount: 12900, mode: 'payment' },
@@ -116,7 +133,10 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
   try {
     if (event.type === 'checkout.session.completed') {
       await handleCheckoutCompleted(event);
-    } else if (event.type === 'invoice.paid' || event.type === 'invoice.payment_succeeded') {
+    } else if (event.type === 'invoice.paid') {
+      // MF2: NUR invoice.paid verarbeiten. invoice.payment_succeeded ist ein zweites
+      // Event (eigene event.id → claimEvent dedupliziert es NICHT) für denselben Zyklus
+      // und würde sonst 2× Scan + 2× GoBD-Rechnungsnummer + 2× Mail erzeugen.
       await handleInvoicePaid(event);
     } else if (event.type === 'customer.subscription.updated') {
       await handleSubscriptionUpdated(event);
@@ -140,7 +160,7 @@ async function prePersistCheckout(event) {
   const email = s.customer_details?.email || s.customer_email || meta.email;
   const pkg = PACKAGES[meta.pkg] ? meta.pkg : 'basis';
   const isSub = s.mode === 'subscription' && !!s.subscription;
-  await recordPaid({ eventId: event.id, sessionId: s.id, email, url: meta.url, pkg, amount: s.amount_total, customerId: s.customer || null });
+  await recordPaid({ eventId: event.id, sessionId: s.id, email, url: meta.url, pkg, amount: s.amount_total, customerId: s.customer || null, customerType: meta.customerType || '', consentTs: meta.consentTs || '' });
   if (isSub) {
     await recordSubscription({
       subscriptionId: s.subscription, customerId: s.customer || null,
@@ -203,6 +223,19 @@ async function handleCheckoutCompleted(event) {
       `Bezahlt, aber Erfüllung fehlgeschlagen: ${email}`,
       `Session: ${s.id}\nURL: ${meta.url}\nPaket: ${pkg}\nFehler: ${err.message}\n\nManuell nachliefern: curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" ${PUBLIC_URL}/api/resend/${s.id}`
     );
+    // MF5: Den zahlenden Kunden NICHT im Schweigen lassen — Best-Effort-Eingangs-/
+    // Verzögerungs-Notiz (kein PDF im FAILED-Fall). Eigener try/catch: ein Mail-Fehler
+    // hier darf den Handler nicht kippen, Status bleibt FAILED. Gegen Doppelversand schützt
+    // bereits die Webhook-Idempotenz (claimEvent) — dieser Handler läuft pro Event genau
+    // einmal; customerNoticeSent ist nur eine sichtbare Markierung im Order-Record.
+    try {
+      if (isEmail(email)) {
+        await sendDelayNotice({ to: email, company: meta.company || '' });
+        await markStatus(s.id, 'FAILED', { customerNoticeSent: true });
+      }
+    } catch (noticeErr) {
+      logger.warn({ sessionId: s.id, err: noticeErr.message }, 'Kunden-Verzögerungs-Notiz nicht gesendet');
+    }
     sentry.captureException(err, { webhook_event: 'checkout.session.completed', session_id: s.id });
     logger.error({ sessionId: s.id, err: err.message }, 'ERFÜLLUNG FEHLGESCHLAGEN');
     return;
@@ -239,11 +272,22 @@ async function handleCheckoutCompleted(event) {
       invoiceNumber: invoice?.invoiceNumber || null,
       invoicePdfPath: invoice?.pdfPath || null
     });
+    // MF6: Bei ungültiger Adresse würde ein simpler Resend mit derselben Adresse erneut
+    // werfen — daher hier eine spezifische Handlungsanweisung (Resend MIT korrigierter
+    // Adresse) statt der generischen „nur Mail erneut senden"-Notiz.
+    const badAddr = !isEmail(email);
     await sendAlert(
-      `Bezahlt, Report fertig — aber Mailversand fehlgeschlagen: ${email}`,
-      `Session: ${s.id}\nURL: ${meta.url}\nPaket: ${pkg}\nFehler: ${err.message}\n\n` +
-      `Report + Rechnung liegen vor. NUR Mail erneut senden (kein Neuscan):\n` +
-      `curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" ${PUBLIC_URL}/api/resend/${s.id}`
+      badAddr
+        ? `Bezahlt, Report fertig — Empfängeradresse ungültig: ${email}`
+        : `Bezahlt, Report fertig — aber Mailversand fehlgeschlagen: ${email}`,
+      badAddr
+        ? `Session: ${s.id}\nURL: ${meta.url}\nPaket: ${pkg}\n` +
+          `Die Adresse "${email}" ist nicht automatisch zustellbar. Report + Rechnung liegen vor.\n` +
+          `Mit KORRIGIERTER Adresse erneut senden (kein Neuscan):\n` +
+          `curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" -H "Content-Type: application/json" -d '{"email":"KORREKTE@ADRESSE"}' ${PUBLIC_URL}/api/resend/${s.id}`
+        : `Session: ${s.id}\nURL: ${meta.url}\nPaket: ${pkg}\nFehler: ${err.message}\n\n` +
+          `Report + Rechnung liegen vor. NUR Mail erneut senden (kein Neuscan):\n` +
+          `curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" ${PUBLIC_URL}/api/resend/${s.id}`
     );
     sentry.captureException(err, { webhook_event: 'checkout.session.completed', session_id: s.id, stage: 'mail' });
     logger.error({ sessionId: s.id, err: err.message }, 'MAILVERSAND FEHLGESCHLAGEN (Report fertig, READY_NOT_MAILED)');
@@ -291,15 +335,30 @@ async function handleInvoicePaid(event) {
   if (inv.billing_reason && inv.billing_reason !== 'subscription_cycle') {
     return;
   }
-  if (!inv.subscription) return;
+  // MF4: Stripe hat Invoice.subscription (Top-Level) ab API 2025-03-31 (Basil) entfernt.
+  // Subscription-ID robust aus mehreren möglichen Stellen beziehen, sonst läuft jeder
+  // subscription_cycle bei neuer API-Version still ins Leere (Kunde abgebucht, kein Re-Check).
+  const subId = inv.subscription
+    || inv.parent?.subscription_details?.subscription
+    || inv.lines?.data?.[0]?.parent?.subscription_item_details?.subscription
+    || null;
+  if (!subId) {
+    // NICHT still verschlucken — der Kunde wurde abgebucht, bekäme aber keinen Re-Check.
+    await sendAlert(
+      `invoice.paid ohne auffindbare Subscription-ID: ${inv.id || '?'}`,
+      `Invoice: ${inv.id}\nbilling_reason: ${inv.billing_reason}\nRe-Check wurde NICHT ausgelöst — bitte manuell prüfen (ggf. Stripe-API-Version des Webhook-Endpoints pinnen).`
+    );
+    logger.error({ invoiceId: inv.id }, 'invoice.paid ohne auffindbare Subscription-ID');
+    return;
+  }
 
-  const sub = await getSubscription(inv.subscription);
+  const sub = await getSubscription(subId);
   if (!sub) {
-    console.warn(`[webhook] invoice.paid für unbekannte Subscription ${inv.subscription} — übersprungen.`);
+    console.warn(`[webhook] invoice.paid für unbekannte Subscription ${subId} — übersprungen.`);
     return;
   }
   if (sub.status !== 'ACTIVE') {
-    console.warn(`[webhook] invoice.paid für Subscription ${inv.subscription} mit Status ${sub.status} — übersprungen.`);
+    console.warn(`[webhook] invoice.paid für Subscription ${subId} mit Status ${sub.status} — übersprungen.`);
     return;
   }
 
@@ -333,6 +392,12 @@ async function handleInvoicePaid(event) {
       `Re-Check fehlgeschlagen: ${sub.email}`,
       `Subscription: ${sub.subscriptionId}\nURL: ${sub.url}\nFehler: ${err.message}`
     );
+    // MF5: auch beim Abo-Re-Check den zahlenden Kunden nicht im Schweigen lassen.
+    try {
+      if (isEmail(sub.email)) await sendDelayNotice({ to: sub.email, company: sub.company || '' });
+    } catch (noticeErr) {
+      logger.warn({ subscriptionId: sub.subscriptionId, err: noticeErr.message }, 'Abo-Verzögerungs-Notiz nicht gesendet');
+    }
     sentry.captureException(err, { webhook_event: 'invoice.paid', subscription_id: sub.subscriptionId });
     logger.error({ subscriptionId: sub.subscriptionId, err: err.message }, 'RE-CHECK FEHLGESCHLAGEN');
   }
@@ -458,7 +523,10 @@ app.post('/api/checkout', rateLimit({ windowMs: 60_000, max: 10 }), async (req, 
   // E-Mail validieren: eine fehlerhafte Adresse macht das bezahlte Produkt
   // unzustellbar (Geld kassiert, Report kommt nie an).
   const cleanEmail = String(email).trim().slice(0, 200);
-  if (cleanEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail))
+  // MF6: dieselbe (strengere) Validierung wie der Mailer (isEmail) — sonst passieren
+  // Adressen den Checkout, die später beim Versand hart als „ungültig" werfen und das
+  // bezahlte Produkt unzustellbar machen.
+  if (cleanEmail && !isEmail(cleanEmail))
     return res.status(400).json({ error: 'Bitte eine gültige E-Mail-Adresse angeben' });
   let safe;
   try {
@@ -607,16 +675,32 @@ app.get('/admin/subscriptions', requireAdminAuth, async (req, res) => {
   }
 });
 
-// Resend-Endpoint: bei Fulfillment-Fehler Report nochmal ausliefern.
+// Resend-Endpoint: bei Fulfillment-/Mail-Fehler Report nochmal ausliefern.
+// SF2: atomarer In-Memory-Lock gegen parallele Doppel-Auslieferung (zwei Resends
+// würden sonst doppelt mailen + zwei GoBD-Rechnungsnummern ziehen).
+const resendInFlight = new Set();
 app.post('/api/resend/:sessionId', requireAdminAuth, async (req, res) => {
   const { sessionId } = req.params;
+  const { getOrder, markStatus } = await import('./lib/orders.js');
+  // order = Snapshot von VOR dem RESENDING-Write (für mailOnly-Entscheidung + SF1-Rollback).
+  const order = await getOrder(sessionId);
+  if (!order) return res.status(404).json({ error: 'Session nicht gefunden' });
+  if (order.status === 'MAILED' || order.status === 'RESENT') {
+    return res.status(409).json({ error: `Order Status ${order.status} — bereits ausgeliefert.` });
+  }
+  // Atomarer Claim: check-then-add OHNE await dazwischen ist im Single-Thread-Eventloop
+  // atomar → zwei parallele Resends können nicht beide den Lock bekommen.
+  if (resendInFlight.has(sessionId)) {
+    return res.status(409).json({ error: 'Resend läuft bereits für diese Session' });
+  }
+  resendInFlight.add(sessionId);
+
+  // MF6: optionale, admin-authentifizierte korrigierte Empfängeradresse — liefert eine
+  // bezahlte Bestellung trotz im Checkout vertippter/unzustellbarer Adresse aus.
+  const overrideEmail = (req.body && isEmail(req.body.email)) ? String(req.body.email).trim() : null;
+  const recipient = overrideEmail || order.email;
+
   try {
-    const { getOrder, markStatus } = await import('./lib/orders.js');
-    const order = await getOrder(sessionId);
-    if (!order) return res.status(404).json({ error: 'Session nicht gefunden' });
-    if (order.status === 'MAILED' || order.status === 'RESENT') {
-      return res.status(409).json({ error: `Order Status ${order.status} — bereits ausgeliefert. Nutze ?force=true.` });
-    }
     await markStatus(sessionId, 'RESENDING');
 
     // READY_NOT_MAILED (P1#3): Scan + Report + Rechnung sind bereits FERTIG, nur die
@@ -627,41 +711,62 @@ app.post('/api/resend/:sessionId', requireAdminAuth, async (req, res) => {
     const mailOnly = order.status === 'READY_NOT_MAILED' && order.pdfPath;
     if (mailOnly) {
       await sendReportFor({
-        to: order.email, company: order.company || '',
+        to: recipient, company: order.company || '',
         pdfPath: order.pdfPath, stmtPath: order.stmtPath || null,
         emailKind: order.emailKind || 'bfsg',
         // Diff nicht persistiert; Re-Check-Mail zeigt dann „keine Veränderungen" — bei
         // Erstkäufen (basis/profi/cookie) ohnehin irrelevant, da kein Diff verwendet wird.
         diffText: '',
         invoicePdfPath: order.invoicePdfPath || null,
-        invoiceNumber: order.invoiceNumber || null
+        invoiceNumber: order.invoiceNumber || null,
+        // SF8: §356-V-BGB-Widerrufs-Verzicht-Bestätigung auch beim Resend mitschicken.
+        customerType: order.customerType || '',
+        consentTs: order.consentTs || ''
       });
-      await markStatus(sessionId, 'RESENT', { pdfPath: order.pdfPath, invoiceNumber: order.invoiceNumber || null, resendMode: 'mail-only' });
-      return res.json({ ok: true, sessionId, email: order.email, status: 'RESENT', mode: 'mail-only' });
+      await markStatus(sessionId, 'RESENT', { pdfPath: order.pdfPath, invoiceNumber: order.invoiceNumber || null, resendMode: 'mail-only', resentTo: overrideEmail || undefined });
+      return res.json({ ok: true, sessionId, email: recipient, status: 'RESENT', mode: 'mail-only' });
     }
 
     const result = await paidScanGate(() =>
-      fulfillOrder({ url: order.url, company: order.company || '', email: order.email, pkg: order.pkg || 'basis' })
+      fulfillOrder({ url: order.url, company: order.company || '', email: recipient, pkg: order.pkg || 'basis' })
     );
     // Rechnung nachreichen, falls bei der fehlgeschlagenen Erst-Auslieferung noch keine erzeugt wurde.
     const invoice = order.invoiceNumber
       ? null
-      : await safeGenerateInvoice({ orderId: sessionId, email: order.email, company: order.company || '', pkg: order.pkg || 'basis', amount: order.amount });
+      : await safeGenerateInvoice({ orderId: sessionId, email: recipient, company: order.company || '', pkg: order.pkg || 'basis', amount: order.amount });
+    // GoBD (CORR-1): die frisch vergebene Rechnungsnummer SOFORT persistieren — VOR dem
+    // Mailversand (spiegelt den INVOICED-Checkpoint des Haupt-Pfads, app.js handleCheckoutCompleted).
+    // Sonst verbrennt ein Mail-Fehler die Nummer: der SF1-Rollback schreibt sie nicht in den
+    // Order-Record, und der nächste Resend zöge eine ZWEITE Nummer für denselben Verkauf
+    // (übersprungene/doppelte GoBD-Nummer). markStatus merget gegen den persistierten Record,
+    // sodass die Nummer auch den anschließenden Rollback-Write übersteht.
+    if (invoice?.invoiceNumber) {
+      await markStatus(sessionId, 'INVOICED', { invoiceNumber: invoice.invoiceNumber, invoicePdfPath: invoice.pdfPath || null });
+    }
     await sendReportFor({
-      to: order.email, company: order.company || '',
+      to: recipient, company: order.company || '',
       pdfPath: result.pdfPath, stmtPath: result.stmtPath,
       emailKind: result.emailKind || 'bfsg',
       diffText: diffSummaryText(result.diff),
       // Bereits erzeugte Rechnung (Nummer + PDF) wiederverwenden statt neu zu ziehen.
       invoicePdfPath: invoice?.pdfPath || order.invoicePdfPath || null,
-      invoiceNumber: invoice?.invoiceNumber || order.invoiceNumber || null
+      invoiceNumber: invoice?.invoiceNumber || order.invoiceNumber || null,
+      customerType: order.customerType || '',
+      consentTs: order.consentTs || ''
     });
-    await markStatus(sessionId, 'RESENT', { pdfPath: result.pdfPath, invoiceNumber: invoice?.invoiceNumber || order.invoiceNumber || null });
-    res.json({ ok: true, sessionId, email: order.email, status: 'RESENT' });
+    await markStatus(sessionId, 'RESENT', { pdfPath: result.pdfPath, invoiceNumber: invoice?.invoiceNumber || order.invoiceNumber || null, resentTo: overrideEmail || undefined });
+    return res.json({ ok: true, sessionId, email: recipient, status: 'RESENT' });
   } catch (err) {
+    // SF1: Status NICHT in RESENDING hängen lassen — auf den fachlich korrekten
+    // Vorzustand zurücksetzen (READY_NOT_MAILED wenn ein fertiges Report-PDF vorlag,
+    // sonst FAILED), damit ein erneuter Resend wieder greift + der Reconcile-Sweeper
+    // nicht bei jedem Neustart Alarm schlägt.
+    try { await markStatus(sessionId, order.pdfPath ? 'READY_NOT_MAILED' : 'FAILED', { error: err.message }); } catch { /* Persistenz-Fehler nur loggen */ }
     logger.error({ sessionId, err: err.message }, 'resend Fehler');
     sentry.captureException(err, { stage: 'resend', session_id: sessionId });
-    res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: err.message });
+  } finally {
+    resendInFlight.delete(sessionId);
   }
 });
 

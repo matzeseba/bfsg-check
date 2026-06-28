@@ -27,8 +27,13 @@ services:
       - ENABLE_ABO=${ENABLE_ABO:-false}
       - MAX_CONCURRENT_SCANS=${MAX_CONCURRENT_SCANS:-2}
       # Gratis-Teaser-TLS-Toleranz (env-gated, Default aus). Wird in app.js gelesen
-      # und nur an den kostenlosen Teaser-Scan durchgereicht; bezahlter Pfad bleibt strikt.
+      # und nur an den kostenlosen Teaser-Scan durchgereicht.
       - SCAN_TEASER_LENIENT_TLS=${SCAN_TEASER_LENIENT_TLS:-false}
+      # Bezahlter Scan-Pfad: TLS-Toleranz NUR über dieses SEPARATE Flag (Default leer/false
+      # = strikt). Bewusst getrennt vom Teaser-Flag — ein verkaufter Report darf nicht still
+      # mit gelockerter Zertifikatsprüfung erzeugt werden (s. scanner/lib/fulfill.js).
+      # Nur setzen, wenn der Owner Lenient-TLS im Bezahlpfad bewusst will. SSRF-Schutz unberührt.
+      - SCAN_PAID_LENIENT_TLS=${SCAN_PAID_LENIENT_TLS:-}
       - ADMIN_TOKEN=${ADMIN_TOKEN:-}
       - SENTRY_DSN=${SENTRY_DSN:-}
       - VAT_MODE=${VAT_MODE:-kleinunternehmer}

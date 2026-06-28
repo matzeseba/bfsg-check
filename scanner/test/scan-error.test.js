@@ -38,6 +38,23 @@ test('classifyScanError: blockierte Navigation → reason=blocked', () => {
   assert.equal(r.status, 502);
 });
 
+test('classifyScanError: HTTP-Fehlerstatus (SF10) → korrekte Kategorie', () => {
+  // 404/410 → nicht gefunden (dns-Kategorie, „Adresse pruefen")
+  assert.equal(classifyScanError('http-status-404').reason, 'dns');
+  assert.equal(classifyScanError('http-status-410').reason, 'dns');
+  // 401/403/429 → blockiert
+  assert.equal(classifyScanError('http-status-403').reason, 'blocked');
+  assert.equal(classifyScanError('http-status-401').reason, 'blocked');
+  assert.equal(classifyScanError('http-status-429').reason, 'blocked');
+  // 5xx + sonstige → unknown
+  assert.equal(classifyScanError('http-status-500').reason, 'unknown');
+  assert.equal(classifyScanError('http-status-503').reason, 'unknown');
+  // Status immer 502, Meldung ohne Interna.
+  const r = classifyScanError('http-status-500');
+  assert.equal(r.status, 502);
+  assert.doesNotMatch(r.message, /http-status|500/);
+});
+
 test('classifyScanError: unbekannt → reason=unknown, status 502', () => {
   const r = classifyScanError('irgendwas völlig anderes');
   assert.equal(r.reason, 'unknown');

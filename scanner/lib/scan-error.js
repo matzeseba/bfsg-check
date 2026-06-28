@@ -20,6 +20,35 @@ export function classifyScanError(message = '') {
     };
   }
 
+  // HTTP-Fehlerstatus der Zielseite (von gotoResilient als 'http-status-<code>'
+  // geworfen). Ohne diesen Zweig würde eine 403/404/5xx-Fehlerseite als echtes
+  // Scan-Ergebnis durchrutschen (falscher Score).
+  const httpStatus = m.match(/http-status-(\d{3})/);
+  if (httpStatus) {
+    const code = Number(httpStatus[1]);
+    if (code === 404 || code === 410) {
+      return {
+        reason: 'dns',
+        status: 502,
+        message: 'Die Seite wurde unter dieser Adresse nicht gefunden. Bitte Adresse prüfen.'
+      };
+    }
+    if (code === 401 || code === 403 || code === 429) {
+      return {
+        reason: 'blocked',
+        status: 502,
+        message:
+          'Die Seite hat die automatisierte Prüfung blockiert. Eine manuelle Analyse ist möglich.'
+      };
+    }
+    // 5xx + sonstige 4xx: Gegenseite hat einen Fehler gemeldet.
+    return {
+      reason: 'unknown',
+      status: 502,
+      message: 'Die Seite hat mit einem Fehler geantwortet. Bitte später erneut versuchen.'
+    };
+  }
+
   // TLS-/Zertifikatsfehler.
   if (
     m.includes('err_cert') ||

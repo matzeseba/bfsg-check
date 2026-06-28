@@ -29,6 +29,16 @@ export function computeScore(violations) {
   return { score, grade, verdict };
 }
 
+// Einheitliche Konformitäts-Aussage je Score — EINE Quelle für Report UND
+// Barrierefreiheitserklärung (statement.js), damit derselbe Auftrag nie zwei
+// widersprüchliche Aussagen erhält (SF12). Schwellen: >=90 weitgehend, 50–89
+// teilweise, <50 nicht konform.
+export function statusForScore(score) {
+  if (score >= 90) return 'weitgehend konform';
+  if (score >= 50) return 'teilweise konform';
+  return 'nicht konform';
+}
+
 function esc(s = '') {
   return String(s)
     .replace(/&/g, '&amp;')
@@ -55,10 +65,15 @@ export function renderReport(
     introHtml = '<p>Das Barrierefreiheitsstärkungsgesetz (BFSG) ist seit dem 28.06.2025 in Kraft. Betroffene Unternehmen müssen ihre Websites und Online-Shops barrierefrei gestalten. Dieser Fix-Plan zeigt die konkreten technischen Mängel Ihrer Seite, nach Dringlichkeit priorisiert.</p>',
     legalHtml = '<strong>Wichtiger Hinweis:</strong> Dieser Fix-Plan ist eine automatisierte technische Erstprüfung auf Basis von axe-core (WCAG 2.1), KI-gestützt erstellt und vor Auslieferung menschlich geprüft. Er ist <strong>keine Rechtsberatung</strong> und keine Garantie für BFSG-Konformität. Automatisierte Tests erkennen erfahrungsgemäß rund 30&ndash;50&nbsp;% aller Barrieren; Aspekte wie Tastaturbedienung im Detail, Vorlese-Logik und Verständlichkeit erfordern eine manuelle Ergänzung. Für eine rechtsverbindliche Bewertung ziehen Sie bitte fachkundige Beratung hinzu.',
     diff = null,
-    pagesScanned = null
+    pagesScanned = null,
+    // Score-Beschriftung + Verdikt-Text überschreibbar, damit der Cookie-Report ein
+    // TDDDG-neutrales Label/Verdikt nutzen kann statt der BFSG-„konform"-Aussage (SF13).
+    scoreLabel = 'Konformitäts-Score',
+    verdictText = null
   } = {}
 ) {
-  const { score, grade, verdict } = computeScore(scan.violations);
+  const { score, grade, verdict: gradeVerdict } = computeScore(scan.violations);
+  const verdict = verdictText != null ? verdictText : gradeVerdict;
   const counts = countByImpact(scan.violations);
   const order = ['critical', 'serious', 'moderate', 'minor'];
   const sorted = [...scan.violations].sort(
@@ -188,7 +203,7 @@ export function renderReport(
   <div class="scorecard">
     <div class="grade ${grade}">${grade}</div>
     <div class="scoremeta">
-      <h2>Konformitäts-Score: ${score}/100</h2>
+      <h2>${esc(scoreLabel)}: ${score}/100</h2>
       <p>${esc(verdict)}</p>
     </div>
   </div>

@@ -2,16 +2,13 @@
 // Barrierefreiheit" (Pflichtbestandteil nach BFSG / BITV). Liefert ein
 // vorausgefülltes Gerüst, das der Seitenbetreiber finalisieren muss.
 
-import { computeScore } from './report.js';
+import { computeScore, statusForScore } from './report.js';
 
 export function renderStatement(scan, { company = '[Unternehmen]', email = '[E-Mail-Adresse]' } = {}) {
   const { score } = computeScore(scan.violations);
-  const status =
-    score >= 90
-      ? 'weitgehend konform'
-      : score >= 50
-        ? 'teilweise konform'
-        : 'nicht konform';
+  // Einheitliche Schwellen über report.js (SF12) — verhindert, dass Erklärung und
+  // Report für denselben Auftrag widersprüchliche Konformitäts-Aussagen treffen.
+  const status = statusForScore(score);
   const today = new Date().toLocaleDateString('de-DE');
 
   return `# Erklärung zur Barrierefreiheit

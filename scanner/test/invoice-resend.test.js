@@ -72,6 +72,33 @@ test('GoBD C2: ohne erzeugte Rechnung (FAILED vor INVOICED) zieht Resend korrekt
     'ohne vorhandene Nummer muss der Resend eine (erste) Nummer ziehen');
 });
 
+test('GoBD CORR-1: Voll-Resend persistiert die neue Nummer VOR dem Mailversand → kein Nummern-Verbrennen bei Mailfehler', async () => {
+  // Spiegelt die neue Resend-Sequenz aus app.js: safeGenerateInvoice (zieht Nummer) →
+  // markStatus(INVOICED) VOR sendReportFor → bei Mailfehler Rollback (READY_NOT_MAILED/FAILED).
+  // Ohne den INVOICED-Checkpoint ginge die Nummer beim Rollback verloren und der naechste
+  // Resend zoege eine ZWEITE (uebersprungene) GoBD-Nummer.
+  const sessionId = 'cs_resend_corr1';
+  await recordPaid({
+    eventId: 'evt_corr1', sessionId, email: 'k@example.com',
+    url: 'https://k.example.com', pkg: 'basis', amount: 12900
+  });
+  await markStatus(sessionId, 'FAILED', { error: 'Scan-Fehler vor Rechnung' });
+  let order = await getOrder(sessionId);
+  assert.equal(resendWouldReuseExistingNumber(order), false, 'Vor dem Resend: keine Nummer');
+
+  // Resend (Voll-Pfad): Nummer allokiert + SOFORT persistiert (CORR-1), VOR dem Mailversand.
+  const invoiceNumber = 'RE-2026-0050';
+  await markStatus(sessionId, 'INVOICED', { invoiceNumber, invoicePdfPath: '/out/invoices/RE-2026-0050.pdf' });
+  // Danach scheitert die Mail → SF1-Rollback merget gegen den persistierten Record.
+  order = await getOrder(sessionId);
+  await markStatus(sessionId, order.pdfPath ? 'READY_NOT_MAILED' : 'FAILED', { error: 'SMTP-Timeout im Resend' });
+
+  order = await getOrder(sessionId);
+  assert.equal(order.invoiceNumber, invoiceNumber, 'Nummer ueberlebt den Rollback (kein Verbrennen)');
+  assert.equal(resendWouldReuseExistingNumber(order), true,
+    'Folge-Resend verwendet dieselbe Nummer wieder (keine zweite GoBD-Nummer)');
+});
+
 test('GoBD C2: Happy-Path INVOICED → MAILED behaelt genau eine Nummer', async () => {
   const sessionId = 'cs_ok_1';
   await recordPaid({
