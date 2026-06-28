@@ -189,7 +189,7 @@ export function PricingCards({
         <p className="mx-auto mt-10 max-w-2xl text-center text-xs text-muted-foreground">
           Alle Preise sind Gesamtpreise (keine USt-Ausweisung gem. § 19 UStG) ·
           Stripe-Checkout (Karte, SEPA, Apple/Google Pay) · Rechnung automatisch
-          per E-Mail · 30 Tage Geld-zurück bei berechtigter Reklamation.
+          per E-Mail · keine versteckten Kosten.
         </p>
       </div>
     </section>
