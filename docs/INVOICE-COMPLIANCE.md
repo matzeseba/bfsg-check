@@ -69,7 +69,7 @@ GoBD verlangt:
 |---|---|---|
 | Vollständiger Name + Anschrift Anbieter | Header oben links | env `INVOICE_FROM_*` |
 | Vollständiger Name + Anschrift Empfänger | Mittel-Block "Rechnungsempfänger" | `customer.company` / `customer.email` |
-| Steuer-/USt-IdNr. Anbieter | Header (nur Regelbesteuerung) | env `INVOICE_USTID` / `INVOICE_TAX_NUMBER` |
+| Steuer-/USt-IdNr. Anbieter | Header | env `INVOICE_USTID` / `INVOICE_TAX_NUMBER` — seit **01.01.2025 (§ 33/34a UStDV)** auch für Kleinunternehmer ab 250 € brutto Pflicht (Ausnahme nur Kleinbetrag bis 250 €), nicht mehr nur bei Regelbesteuerung |
 | Rechnungsnummer (fortlaufend) | Header rechts | `nextInvoiceNumber()` |
 | Datum der Rechnung | Header rechts | `new Date()` |
 | Datum der Leistung | impliziert via "Betrag bereits per Online-Zahlung beglichen" | siehe Footer |

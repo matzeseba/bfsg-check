@@ -36,6 +36,11 @@ export const PKG_CONFIG = {
 const COOKIE_REPORT_OPTS = {
   reportTitle: 'Cookie- & Consent-Report (§ 25 TDDDG)',
   pruefnorm: '§ 25 TDDDG / DSGVO (technische Messung)',
+  // TDDDG-neutrales Score-Label statt „Konformitäts-Score" — der Cookie-Report trifft
+  // keine BFSG-/WCAG-Konformitätsaussage (konsistent zum „keine Konformitätsgarantie"-
+  // Disclaimer). Das BFSG-Verdict (z. B. „Weitgehend konform") wird im Cookie-Pfad durch
+  // verdictText (in fulfillOrder gesetzt) ersetzt.
+  scoreLabel: 'Consent-Hygiene-Score',
   introTitle: 'Worum es geht',
   introHtml:
     '<p>Nach § 25 TDDDG dürfen nicht technisch notwendige Cookies und Tracking-/Werbe-Dienste erst NACH einer aktiven Einwilligung des Besuchers geladen werden. Dieser Report misst automatisiert, welche Dienste bereits VOR einer Einwilligung feuern. Es handelt sich um eine technische Messung, keine Rechtsberatung.</p>',
@@ -51,28 +56,38 @@ function slugify(url) {
   }
 }
 
-async function runScan(url, cfg) {
+// Bezahlter Scan-Pfad: TLS-Toleranz ausschließlich über SCAN_PAID_LENIENT_TLS
+// (Default false, KEIN stiller Fallback auf das Teaser-Flag SCAN_TEASER_LENIENT_TLS).
+// Begründung: ein verkaufter Report darf nicht unbemerkt mit gelockerter Zertifikats-
+// prüfung erzeugt werden (MITM-Risiko auf den Ziel-Hop). Der Owner schaltet die
+// Toleranz für den Bezahlpfad bewusst frei. SSRF-/DNS-Rebinding-Schutz ist davon
+// unberührt (orthogonaler DNS-/IP-Pin in url-guard.js).
+export function paidLenientTls(env = process.env) {
+  return env.SCAN_PAID_LENIENT_TLS === 'true';
+}
+
+async function runScan(url, cfg, { lenientTls = false } = {}) {
   if (cfg.kind === 'cookie') {
     // Cookie-Multi-Page derzeit sequentiell same-origin (Engine erweiterbar);
     // V1: scannt nur Startseite (klares 1-Tier-Signal). 'cookie-profi' bekommt
     // Multi-Page erst in v2 — Aufpreis rechtfertigt sich aktuell durch tiefere
     // manuelle Prüfung im Backend.
-    return await scanCookie(url, { timeout: 45000 });
+    return await scanCookie(url, { timeout: 45000, lenientTls });
   }
   if (cfg.maxPages > 1) {
-    return await scanSite(url, { maxPages: cfg.maxPages, perPageTimeout: 30000 });
+    return await scanSite(url, { maxPages: cfg.maxPages, perPageTimeout: 30000, lenientTls });
   }
-  return await scanUrl(url, { timeout: 45000 });
+  return await scanUrl(url, { timeout: 45000, lenientTls });
 }
 
-export async function fulfillOrder({ url, company = '', email = '', pkg = 'basis', prevSnapshot = null, outDir }) {
+export async function fulfillOrder({ url, company = '', email = '', pkg = 'basis', prevSnapshot = null, outDir, lenientTls = paidLenientTls() }) {
   if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
   const cfg = PKG_CONFIG[pkg] || PKG_CONFIG.basis;
   outDir = outDir || path.join(__dirname, '..', 'out', 'orders');
   await mkdir(outDir, { recursive: true });
 
   const slug = `${slugify(url)}-${Date.now()}`;
-  const scan = await runScan(url, cfg);
+  const scan = await runScan(url, cfg, { lenientTls });
 
   // Plausibilitäts-Check: kein leerer/kaputter Report verkaufen.
   if (!scan || (scan.violations.length === 0 && scan.passes === 0)) {
@@ -83,7 +98,14 @@ export async function fulfillOrder({ url, company = '', email = '', pkg = 'basis
   const scanDiff = diff(scan, prevSnapshot);
 
   const reportOpts = cfg.kind === 'cookie'
-    ? { company, ...COOKIE_REPORT_OPTS }
+    ? {
+        company,
+        ...COOKIE_REPORT_OPTS,
+        // TDDDG-neutrales Verdikt statt BFSG-„konform"-Aussage (keine Konformitätsgarantie).
+        verdictText: scan.violations.length === 0
+          ? 'Keine vor einer Einwilligung feuernden Tracker/Cookies gemessen. Dies ist eine technische Einzelmessung — bitte manuell verifizieren, keine Konformitätsaussage.'
+          : 'Vor einer Einwilligung feuernde Tracker/Cookies gemessen — siehe Befunde. Technische Einzelmessung, keine Konformitätsaussage.'
+      }
     : { company, diff: scanDiff, pagesScanned: scan.pagesScanned };
 
   const html = renderReport(scan, reportOpts);

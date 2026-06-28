@@ -15,7 +15,7 @@ delete process.env.SMTP_HOST;
 delete process.env.SMTP_USER;
 delete process.env.SMTP_PASS;
 
-const { sendReportFor, sendReport, sendCookieReport, sendRecheckReport, isEmail, legalFooter, widerrufHinweis } = await import('../lib/mailer.js');
+const { sendReportFor, sendReport, sendCookieReport, sendRecheckReport, sendDelayNotice, isEmail, legalFooter, widerrufHinweis } = await import('../lib/mailer.js');
 
 const tmp = mkdtempSync(path.join(os.tmpdir(), 'bfsg-mailer-'));
 const reportPdf = path.join(tmp, 'report.pdf');
@@ -60,19 +60,47 @@ test('sendReport: ungültige Empfängeradresse wirft', async () => {
   );
 });
 
-test('sendReport: fehlende Rechnungs-Datei wirft (Datei nicht lesbar)', async () => {
+test('sendReport: fehlende Rechnungs-Datei kippt den Versand NICHT (SF4 — Anhang wird uebersprungen)', async () => {
+  // Vorher warf ein fehlendes Rechnungs-PDF und blockierte die GESAMTE Report-Mail.
+  // Jetzt wird der Anhang defensiv uebersprungen — das Kernprodukt (Report) geht raus.
+  const res = await sendReport({
+    to: 'kunde@beispiel.de', pdfPath: reportPdf,
+    invoicePdfPath: path.join(tmp, 'nicht-da.pdf'), invoiceNumber: 'RE-2026-9999'
+  });
+  assert.equal(res.dryRun, true);
+});
+
+test('sendReport: fehlendes REPORT-PDF wirft weiterhin (Pflicht-Anhang strikt)', async () => {
+  // Das Report-PDF ist das Kernprodukt — es bleibt ein harter Pflicht-Anhang.
   await assert.rejects(
-    () => sendReport({
-      to: 'kunde@beispiel.de', pdfPath: reportPdf,
-      invoicePdfPath: path.join(tmp, 'nicht-da.pdf'), invoiceNumber: 'RE-2026-9999'
-    }),
+    () => sendReport({ to: 'kunde@beispiel.de', pdfPath: path.join(tmp, 'kein-report.pdf') }),
     /ENOENT|no such file/i
   );
+});
+
+test('sendDelayNotice (MF5): Verzoegerungs-Notiz laeuft im Dry-Run durch, ungueltige Adresse wird uebersprungen', async () => {
+  const ok = await sendDelayNotice({ to: 'kunde@beispiel.de', company: 'ACME GmbH' });
+  assert.equal(ok.dryRun, true);
+  const bad = await sendDelayNotice({ to: 'keine-email', company: 'ACME' });
+  assert.equal(bad.dryRun, true);
+  assert.equal(bad.skipped, 'invalid-recipient');
 });
 
 test('isEmail: Basis-Validierung', () => {
   assert.equal(isEmail('a@b.de'), true);
   assert.equal(isEmail('kaputt'), false);
+});
+
+test('isEmail (MF6): lehnt ab, was die alte liberale Checkout-Regex durchliess', () => {
+  // Die alte Checkout-Validierung war /^[^\s@]+@[^\s@]+\.[^\s@]+$/ — sie liess u.a.
+  // 1-Zeichen-TLDs und Nicht-ASCII durch, die der Mailer dann hart als „ungueltig"
+  // wirft (bezahltes Produkt unzustellbar). Jetzt validiert der Checkout mit isEmail.
+  assert.equal(isEmail('kunde@firma.c'), false);      // 1-Zeichen-TLD
+  assert.equal(isEmail('müller@möller.de'), false);   // Nicht-ASCII (IDN)
+  assert.equal(isEmail('kunde@firma'), false);        // keine TLD
+  // Gueltige Adressen bleiben gueltig.
+  assert.equal(isEmail('kunde@firma.de'), true);
+  assert.equal(isEmail('first.last+tag@sub.firma.com'), true);
 });
 
 test('legalFooter: Anbieterkennzeichnung + Disclaimer, keine verbotenen Claims', () => {

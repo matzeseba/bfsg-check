@@ -273,22 +273,29 @@ async function startScan(e){
   var btn=document.querySelector('.btn');
   btn.textContent='Pruefe...';btn.disabled=true;
   try{
-    var data;
-    try{
-      // Live-Betrieb: spricht den Teaser-Endpoint von scanner/server.js an.
-      var r=await fetch('/api/scan?url='+encodeURIComponent(url));
-      if(!r.ok) throw new Error('api');
-      data=await r.json();
-    }catch(_){
-      // Demo-Fallback ohne Backend.
-      await new Promise(r=>setTimeout(r,1000));
-      data={score:Math.floor(40+Math.random()*45),totalIssues:Math.floor(5+Math.random()*30)};
+    // Live-Betrieb: spricht den Teaser-Endpoint von scanner/app.js an.
+    var r=await fetch('/api/scan?url='+encodeURIComponent(url));
+    var data=await r.json().catch(function(){return {};});
+    if(!r.ok || typeof data.score!=='number'){
+      // KEINE erfundenen Demowerte mehr (UWG 5: irrefuehrend). Ehrliche Fehlermeldung
+      // statt Zufallszahlen, die nie gemessen wurden.
+      document.getElementById('rScore').textContent='--';
+      document.getElementById('rVerdict').textContent=(data&&data.error)?data.error:'Der Live-Scan ist gerade nicht moeglich. Bitte spaeter erneut versuchen.';
+      document.getElementById('rIssues').textContent='';
+      res.style.display='block';
+      res.scrollIntoView({behavior:'smooth',block:'center'});
+      return false;
     }
     document.getElementById('rScore').textContent=data.score+'/100';
     document.getElementById('rVerdict').textContent=data.score>=75?'Solide Basis, aber Handlungsbedarf.':'Deutliche Maengel — erhoehtes Abmahnrisiko.';
-    document.getElementById('rIssues').textContent=data.totalIssues+' potenzielle Barrieren gefunden';
+    document.getElementById('rIssues').textContent=(data.totalIssues!=null?data.totalIssues:'--')+' potenzielle Barrieren gefunden';
     res.style.display='block';
     res.scrollIntoView({behavior:'smooth',block:'center'});
+  }catch(_){
+    document.getElementById('rScore').textContent='--';
+    document.getElementById('rVerdict').textContent='Verbindung fehlgeschlagen. Bitte spaeter erneut versuchen.';
+    document.getElementById('rIssues').textContent='';
+    res.style.display='block';
   }finally{btn.textContent='Jetzt pruefen';btn.disabled=false;}
   return false;
 }

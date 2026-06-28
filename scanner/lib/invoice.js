@@ -3,12 +3,15 @@
 // GoBD-Pflicht: Rechnungen müssen 10 Jahre aufbewahrt werden.
 //
 // Rendering: simples HTML → Playwright page.pdf(). Fortlaufende Nummer in
-// out/invoice-counter.json mit Flock-Schutz.
+// out/invoice-counter.json, serialisiert über einen In-Process-Mutex (nur
+// Single-Instance — Mehr-Instanz-Betrieb braucht zusätzlich einen externen Lock).
+// Atomarer Zähler-Write (tmp + rename); korrupte Zählerdatei bricht hart ab statt
+// die Sequenz zurückzusetzen (GoBD: keine Doppelnummer).
 //
 // vatMode: 'kleinunternehmer' (§ 19 UStG, kein USt-Ausweis) oder 'regelbesteuerung' (19% USt).
 
 import { chromium } from 'playwright';
-import { mkdir, writeFile, readFile, appendFile } from 'node:fs/promises';
+import { mkdir, writeFile, readFile, appendFile, rename } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -19,7 +22,10 @@ const INVOICE_DIR = process.env.INVOICE_DIR || path.join(__dirname, '..', 'out',
 
 const FROM = {
   name: process.env.INVOICE_FROM_NAME || process.env.FROM_NAME || 'BFSG-Check',
-  address: process.env.INVOICE_FROM_ADDRESS || '[Anbieter-Adresse fehlt, siehe docs/LEGAL-PLACEHOLDERS.md]',
+  // KEIN Platzhalter-Fallback mehr (MF3): ein Platzhaltertext auf einer echten Kunden-
+  // rechnung ist §14-UStG-formfehlerhaft. Fehlt die Anschrift, bleibt die Zeile leer und
+  // der Startup-Check (invoiceConfigStatus + app.js) alarmiert im Live-Betrieb.
+  address: process.env.INVOICE_FROM_ADDRESS || '',
   // Kontaktadresse fuer Rueckfragen (NICHT die no-reply-Sendeadresse). Default info@.
   email: process.env.INVOICE_CONTACT_EMAIL || 'info@bfsg-fix.de',
   ustId: process.env.INVOICE_USTID || '',
@@ -28,6 +34,17 @@ const FROM = {
 };
 
 const VAT_MODE = process.env.VAT_MODE === 'regelbesteuerung' ? 'regelbesteuerung' : 'kleinunternehmer';
+
+// Pflichtangaben-Status für den Startup-Check (MF3/SF6). Reiner Status ohne
+// Seiteneffekt — app.js entscheidet über Alarm. Anbieter-Anschrift (§14 UStG) ist
+// im Live-Betrieb Pflicht; Steuer-/USt-IdNr. seit 01.01.2025 auch für Kleinunternehmer
+// ab 250 € brutto (§ 33/34a UStDV) relevant (z. B. Profi 399 €).
+export function invoiceConfigStatus(env = process.env) {
+  const missing = [];
+  if (!env.INVOICE_FROM_ADDRESS) missing.push('INVOICE_FROM_ADDRESS');
+  if (!env.INVOICE_USTID && !env.INVOICE_TAX_NUMBER) missing.push('INVOICE_USTID|INVOICE_TAX_NUMBER');
+  return { ok: missing.length === 0, missing };
+}
 
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, (c) =>
@@ -81,21 +98,43 @@ async function allocateInvoiceNumber() {
   await mkdir(path.dirname(COUNTER_FILE), { recursive: true });
   let counter = { year, seq: 0 };
   if (existsSync(COUNTER_FILE)) {
+    let parsed;
     try {
-      counter = JSON.parse(await readFile(COUNTER_FILE, 'utf8'));
-      if (counter.year !== year) counter = { year, seq: 0 };
-    } catch { /* corrupt file → reset */ }
+      parsed = JSON.parse(await readFile(COUNTER_FILE, 'utf8'));
+    } catch (err) {
+      // NICHT still auf seq:0 zurücksetzen — das vergäbe bereits genutzte Nummern
+      // erneut (GoBD-Doppelnummer). Lieber hart abbrechen; safeGenerateInvoice in
+      // app.js alarmiert + liefert den Report trotzdem aus (nur ohne eigene Rechnung).
+      throw new Error('Rechnungszähler-Datei unlesbar/korrupt — Abbruch statt Nummern-Reset: ' + err.message);
+    }
+    // Jahres-Rollover nur auf erfolgreich geparster Datei.
+    counter = (parsed && parsed.year === year) ? parsed : { year, seq: 0 };
   }
   counter.seq += 1;
-  await writeFile(COUNTER_FILE, JSON.stringify(counter, null, 2));
+  // Atomar schreiben: erst .tmp, dann rename — verhindert eine halb geschriebene
+  // Zählerdatei (die beim nächsten Lauf als „korrupt" hart abbräche → Auslieferungs-Stopp).
+  const tmpFile = COUNTER_FILE + '.tmp';
+  await writeFile(tmpFile, JSON.stringify(counter, null, 2));
+  await rename(tmpFile, COUNTER_FILE);
   return `RE-${counter.year}-${String(counter.seq).padStart(4, '0')}`;
 }
 
 export function renderInvoiceHtml({ invoiceNumber, date, customer, items, vatMode = VAT_MODE }) {
-  const totalNet = items.reduce((s, i) => s + i.amount, 0);
-  const vatRate = vatMode === 'regelbesteuerung' ? 0.19 : 0;
-  const totalVat = Math.round(totalNet * vatRate);
-  const totalGross = totalNet + totalVat;
+  // Stripe-Beträge (s.amount_total) sind BRUTTO (der vom Kunden gezahlte Endpreis).
+  // Bei Regelbesteuerung die enthaltene USt HERAUSRECHNEN, sodass der Rechnungs-
+  // Gesamtbetrag exakt dem gezahlten Betrag entspricht (§14c UStG: kein zu hoher
+  // USt-Ausweis). Kleinunternehmer: keine USt, brutto = netto = gezahlter Betrag.
+  const sum = items.reduce((s, i) => s + i.amount, 0);
+  let totalNet, totalVat, totalGross;
+  if (vatMode === 'regelbesteuerung') {
+    totalGross = sum;
+    totalNet = Math.round(sum / 1.19);
+    totalVat = totalGross - totalNet;
+  } else {
+    totalNet = sum;
+    totalVat = 0;
+    totalGross = sum;
+  }
   const fmt = (cents) => (cents / 100).toFixed(2).replace('.', ',') + ' €';
   const dateStr = new Date(date).toLocaleDateString('de-DE');
 

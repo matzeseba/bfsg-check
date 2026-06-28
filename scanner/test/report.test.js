@@ -4,7 +4,7 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { renderReport, renderTeaser, computeScore } from '../lib/report.js';
+import { renderReport, renderTeaser, computeScore, statusForScore } from '../lib/report.js';
 import { renderStatement } from '../lib/statement.js';
 import { RULES_DE, COOKIE_RULES, ruleInfo } from '../lib/rules-de.js';
 
@@ -73,6 +73,38 @@ test('renderReport: leere Violations zeigt korrekten Umlaut-Text', () => {
   const html = renderReport(scanStub([]), {});
   assert.match(html, /keine.{0,30}Verstöße/i);
   assertNoAsciiArtifacts(html, 'renderReport(leer)');
+});
+
+test('renderReport (SF13): Cookie-Pfad nutzt TDDDG-neutrales Label + Verdikt, KEIN Konformitäts-Score', () => {
+  // Cookie-Report darf keine BFSG-„konform"-Aussage treffen (keine Konformitätsgarantie).
+  const html = renderReport(scanStub([]), {
+    scoreLabel: 'Consent-Hygiene-Score',
+    verdictText: 'Technische Einzelmessung, keine Konformitätsaussage.'
+  });
+  assert.match(html, /Consent-Hygiene-Score/);
+  assert.doesNotMatch(html, /Konformitäts-Score/);
+  assert.match(html, /keine Konformitätsaussage/);
+  // BFSG-Verdikt darf NICHT erscheinen.
+  assert.doesNotMatch(html, /Weitgehend konform/);
+});
+
+test('renderReport: BFSG-Pfad behält „Konformitäts-Score" (Default-Label)', () => {
+  const html = renderReport(scanStub([viol('label', 'serious', 1)]), { company: 'X GmbH' });
+  assert.match(html, /Konformitäts-Score/);
+});
+
+test('statusForScore (SF12): einheitliche Schwellen, identisch zur Erklärung', () => {
+  assert.equal(statusForScore(95), 'weitgehend konform');
+  assert.equal(statusForScore(90), 'weitgehend konform');
+  assert.equal(statusForScore(70), 'teilweise konform');
+  assert.equal(statusForScore(50), 'teilweise konform');
+  assert.equal(statusForScore(49), 'nicht konform');
+  assert.equal(statusForScore(0), 'nicht konform');
+  // Kopplung: die Barrierefreiheitserklärung muss exakt dieselbe Aussage rendern.
+  // Score 50–74 war der gemeldete Widerspruch (Report-Note C vs. Erklärung).
+  const md = renderStatement(scanStub([viol('color-contrast', 'critical', 6), viol('label', 'serious', 4)]));
+  const { score } = computeScore([viol('color-contrast', 'critical', 6), viol('label', 'serious', 4)]);
+  assert.match(md, new RegExp(statusForScore(score)));
 });
 
 test('renderStatement: Markdown ohne ASCII-Umlaut-Artefakte', () => {

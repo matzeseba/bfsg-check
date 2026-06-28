@@ -37,7 +37,7 @@ function hostInList(host, list) {
   return list.find((h) => host === h || host.endsWith('.' + h));
 }
 
-export async function scanCookie(url, { timeout = 45000 } = {}) {
+export async function scanCookie(url, { timeout = 45000, lenientTls = false } = {}) {
   if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
   // SSRF + Rebinding-Pin
   const safe = await assertPublicHttpUrl(url);
@@ -46,7 +46,10 @@ export async function scanCookie(url, { timeout = 45000 } = {}) {
   const browser = await chromium.launch({ args: ['--no-sandbox', '--disable-dev-shm-usage'] });
   const context = await browser.newContext({
     locale: 'de-DE',
-    ignoreHTTPSErrors: process.env.SCAN_IGNORE_HTTPS === 'true'
+    // lenientTls (env SCAN_PAID_LENIENT_TLS, via fulfill.js) — analog scan.js. Cookie-
+    // Pakete sind bezahlte Produkte und dürfen an Zertifikats-Eigenheiten nicht still
+    // scheitern. SSRF-/Rebinding-Schutz bleibt unberührt (separater DNS-/IP-Check).
+    ignoreHTTPSErrors: lenientTls || process.env.SCAN_IGNORE_HTTPS === 'true'
   });
   const page = await context.newPage();
   await installSsrfGuard(page);

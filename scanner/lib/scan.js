@@ -23,7 +23,15 @@ async function gotoResilient(page, safeUrl, addresses, timeout) {
   await verifyNoDnsRebinding(safeUrl, addresses);
   // Zuverlässiger Primärladevorgang. Wirft (z.B. TLS/DNS/Connection) wird durch
   // an den Aufrufer durchgereicht — dort greift der Retry / die Klassifizierung.
-  await page.goto(safeUrl, { waitUntil: 'domcontentloaded', timeout });
+  const resp = await page.goto(safeUrl, { waitUntil: 'domcontentloaded', timeout });
+  // HTTP-Fehlerstatus (4xx/5xx) NICHT als erfolgreichen Scan werten: page.goto wirft
+  // nur bei Netzwerk-/TLS-/DNS-Fehlern. Eine 403/404/500/503-Fehlerseite ODER ein
+  // WAF-/Bot-Interstitial mit Status >= 400 würde sonst von axe als "echtes Ergebnis"
+  // gescannt → falscher Score auf einer Seite, die der Kunde gar nicht gemeint hat.
+  // resp ist null bei about:blank/Sonder-Navigationen — dann nichts zu prüfen.
+  if (resp && resp.status() >= 400) {
+    throw new Error(`http-status-${resp.status()}`);
+  }
   // Kurze, gekappte Netzwerk-Ruhe-Phase. Eigenes kleines Budget; ein Timeout hier
   // ist KEIN Fehler (axe läuft danach trotzdem auf dem geladenen DOM).
   const settleBudget = Math.max(2000, Math.min(8000, Math.floor(timeout / 3)));
@@ -47,10 +55,12 @@ export async function scanUrl(url, { timeout = 45000, lenientTls = false } = {})
     });
     const context = await browser.newContext({
       locale: 'de-DE',
-      // Produktion: TLS-Fehler NICHT ignorieren (echte Kundenseiten haben gültiges TLS).
-      // Übersteuerbar via SCAN_IGNORE_HTTPS=true (Testumgebung) ODER pro Aufruf via
-      // lenientTls=true (nur der Gratis-Teaser nutzt das env-gated, s. app.js). Der
-      // SSRF-/Rebinding-Schutz bleibt davon UNBERÜHRT (separater DNS-/IP-Check).
+      // Produktion: TLS-Fehler standardmäßig NICHT ignorieren (echte Kundenseiten
+      // haben gültiges TLS). Übersteuerbar via SCAN_IGNORE_HTTPS=true (Testumgebung)
+      // ODER pro Aufruf via lenientTls=true: der Gratis-Teaser nutzt SCAN_TEASER_LENIENT_TLS,
+      // der bezahlte Pfad SCAN_PAID_LENIENT_TLS (beide env-gated, Default aus, s. app.js +
+      // fulfill.js). Der SSRF-/Rebinding-Schutz bleibt davon UNBERÜHRT (separater DNS-/IP-Check),
+      // ignoreHTTPSErrors lockert ausschließlich die Zertifikatsprüfung des Ziel-Hops.
       ignoreHTTPSErrors: lenientTls || process.env.SCAN_IGNORE_HTTPS === 'true',
       userAgent:
         'Mozilla/5.0 (compatible; BFSG-Audit/1.0; +https://example.com/bfsg-check)'
@@ -69,7 +79,11 @@ export async function scanUrl(url, { timeout = 45000, lenientTls = false } = {})
     try {
       await gotoResilient(page, safe.url, safe.addresses, timeout);
     } catch (firstErr) {
-      if (classifyScanError(firstErr?.message).reason === 'timeout') throw firstErr;
+      // KEIN Retry bei Timeout (Seite ist nur langsam) ODER bei deterministischem
+      // HTTP-Fehlerstatus (404/403/5xx ändert sich beim Sofort-Retry nicht — ein
+      // zweiter Chromium-Lauf wäre reine Zeit-/Budget-Verschwendung).
+      const reason = classifyScanError(firstErr?.message).reason;
+      if (reason === 'timeout' || /^http-status-/.test(firstErr?.message || '')) throw firstErr;
       await gotoResilient(page, safe.url, safe.addresses, timeout).catch(() => {
         throw firstErr; // Originalfehler durchreichen (für die Klassifizierung).
       });
@@ -115,7 +129,7 @@ export async function scanUrl(url, { timeout = 45000, lenientTls = false } = {})
 // werden gemerged (Pro-Seiten-Stellen multiplizieren sich nicht, doppelte Stellen
 // werden deduped). passes ist die Summe der bestandenen Regeln, incomplete dito.
 // Fehler einzelner Seiten brechen den Lauf NICHT ab (resilient).
-export async function scanSite(startUrl, { maxPages = 5, perPageTimeout = 30000 } = {}) {
+export async function scanSite(startUrl, { maxPages = 5, perPageTimeout = 30000, lenientTls = false } = {}) {
   if (!/^https?:\/\//i.test(startUrl)) startUrl = 'https://' + startUrl;
   const origin = new URL(startUrl).origin;
   // Adress-Cache pro Hostname für DNS-Rebinding-Pin im Crawl-Loop (Erstauflösung).
@@ -141,7 +155,11 @@ export async function scanSite(startUrl, { maxPages = 5, perPageTimeout = 30000 
     });
     const context = await browser.newContext({
       locale: 'de-DE',
-      ignoreHTTPSErrors: process.env.SCAN_IGNORE_HTTPS === 'true',
+      // lenientTls (env SCAN_PAID_LENIENT_TLS, via fulfill.js) erlaubt dem bezahlten
+      // Multi-Page-Crawl, Seiten mit Zertifikats-Eigenheiten (Hostname-Mismatch,
+      // unvollständige Kette) zu prüfen — sonst besteht der Gratis-Teaser, der Kauf
+      // scheitert aber. SSRF-/Rebinding-Pin bleibt aktiv (orthogonal zu ignoreHTTPSErrors).
+      ignoreHTTPSErrors: lenientTls || process.env.SCAN_IGNORE_HTTPS === 'true',
       userAgent: 'Mozilla/5.0 (compatible; BFSG-Audit/1.0; +https://example.com/bfsg-check)'
     });
 

@@ -71,10 +71,13 @@ export function releaseEvent(eventId) {
 // Zahlung festhalten (Status PAID), bevor irgendetwas erzeugt wird.
 // customerId (Stripe) wird mitgespeichert, falls vorhanden — für Kundenverwaltung,
 // Doppelkauf-Erkennung und spätere Customer-Portal-Anbindung.
-export async function recordPaid({ eventId, sessionId, email, url, pkg, amount, customerId = null }) {
+export async function recordPaid({ eventId, sessionId, email, url, pkg, amount, customerId = null, customerType = '', consentTs = '' }) {
   await ensureLoaded();
   processedEvents.add(eventId);
-  const rec = { eventId, sessionId, email, customerId, url, pkg, amount, status: 'PAID' };
+  // customerType/consentTs mitschreiben (SF8): so kann der Resend die §356-V-BGB-
+  // Widerrufs-Verzicht-Bestätigung für Verbraucher mitsenden (geht sonst beim
+  // Mail-only-Resend verloren).
+  const rec = { eventId, sessionId, email, customerId, url, pkg, amount, customerType, consentTs, status: 'PAID' };
   orders.set(sessionId, rec);
   await write(rec);
   return rec;
