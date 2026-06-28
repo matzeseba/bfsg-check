@@ -16,6 +16,7 @@ import { scanCookie } from './scan-cookie.js';
 import { renderReport } from './report.js';
 import { renderStatement } from './statement.js';
 import { diff, snapshot } from './diff.js';
+import { tlsCertNotice } from './tls-check.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -97,6 +98,15 @@ export async function fulfillOrder({ url, company = '', email = '', pkg = 'basis
   // Diff (für Re-Check-Abo) — first scan, falls prevSnapshot null.
   const scanDiff = diff(scan, prevSnapshot);
 
+  // Ehrlichkeits-Hinweis: Lief der Scan lenient (Cert-Fehler bewusst ignoriert), prüfen
+  // wir das Zertifikat separat und weisen einen realen Mangel als technischen Hinweis aus
+  // (kein WCAG-Verstoß → kein Score-Abzug, nicht in der Erklärung). Defensiv: wirft nie.
+  const notices = [];
+  if (lenientTls) {
+    const tlsNotice = await tlsCertNotice(url);
+    if (tlsNotice) notices.push(tlsNotice);
+  }
+
   const reportOpts = cfg.kind === 'cookie'
     ? {
         company,
@@ -107,6 +117,7 @@ export async function fulfillOrder({ url, company = '', email = '', pkg = 'basis
           : 'Vor einer Einwilligung feuernde Tracker/Cookies gemessen — siehe Befunde. Technische Einzelmessung, keine Konformitätsaussage.'
       }
     : { company, diff: scanDiff, pagesScanned: scan.pagesScanned };
+  reportOpts.notices = notices;
 
   const html = renderReport(scan, reportOpts);
   const htmlPath = path.join(outDir, `${slug}-report.html`);

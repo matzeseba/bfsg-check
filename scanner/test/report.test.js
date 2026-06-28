@@ -93,6 +93,22 @@ test('renderReport: BFSG-Pfad behält „Konformitäts-Score" (Default-Label)', 
   assert.match(html, /Konformitäts-Score/);
 });
 
+test('renderReport: notices (TLS-Hinweis) als eigener Abschnitt, OHNE Score/Erklärung zu beeinflussen', () => {
+  const notice = { title: 'TLS-Zertifikat der Website fehlerhaft', severity: 'moderate', text: 'Das Zertifikat ist abgelaufen. Keine WCAG-Barriere.' };
+  // Identischer Scan, einmal mit und einmal ohne notice → Score-Block muss identisch sein.
+  const withNotice = renderReport(scanStub([viol('label', 'serious', 2)]), { notices: [notice] });
+  const without = renderReport(scanStub([viol('label', 'serious', 2)]), {});
+  assert.match(withNotice, /Weitere technische Hinweise/);
+  assert.match(withNotice, /TLS-Zertifikat der Website fehlerhaft/);
+  assert.match(withNotice, /abgelaufen/);
+  // Ohne notices: kein Hinweis-Abschnitt.
+  assert.doesNotMatch(without, /Weitere technische Hinweise/);
+  // Der Score-/Verdikt-Block ist identisch (notice fließt NICHT in den Score ein).
+  const scoreLine = (s) => (s.match(/Konformitäts-Score: (\d+)\/100/) || [])[1];
+  assert.equal(scoreLine(withNotice), scoreLine(without), 'Score darf durch den TLS-Hinweis nicht sinken');
+  assertNoAsciiArtifacts(withNotice, 'renderReport(notices)');
+});
+
 test('statusForScore (SF12): einheitliche Schwellen, identisch zur Erklärung', () => {
   assert.equal(statusForScore(95), 'weitgehend konform');
   assert.equal(statusForScore(90), 'weitgehend konform');
