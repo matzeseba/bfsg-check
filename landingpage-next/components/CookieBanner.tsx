@@ -91,8 +91,12 @@ function getSnapshot(): Partial<BfsgConsent> {
   return cachedConsent;
 }
 
+// Modul-stabile Referenz, damit getServerSnapshot nicht bei jedem Aufruf ein
+// frisches Objekt liefert (React: "should be cached to avoid an infinite loop").
+const EMPTY_CONSENT: Partial<BfsgConsent> = {};
+
 function getServerSnapshot(): Partial<BfsgConsent> {
-  return {};
+  return EMPTY_CONSENT;
 }
 
 // Hydration-Marker: Server liefert false, Client true — verhindert

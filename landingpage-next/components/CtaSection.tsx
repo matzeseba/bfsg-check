@@ -83,7 +83,7 @@ export function CtaSection() {
 
             <p className="mt-6 inline-flex items-center gap-1.5 text-xs text-[oklch(0.97_0.004_95)]/60">
               <ShieldCheckIcon className="size-3.5 text-brand-mint" />
-              30 Tage Geld-zurück bei berechtigter Reklamation
+              Sichere Zahlung über Stripe · Rechnung sofort per E-Mail
             </p>
           </div>
         </motion.div>

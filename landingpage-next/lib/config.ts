@@ -221,7 +221,7 @@ export const PACKAGES: PackageConfig[] = [
     description: "Einmaliger Vollreport",
     mode: "payment",
     amountCents: 12900,
-    moneyBack: "30 Tage Geld-zurück bei berechtigter Reklamation",
+    moneyBack: "Sichere Zahlung über Stripe · Rechnung sofort per E-Mail",
     features: [
       "Vollständiger WCAG-2.1-Report (PDF)",
       "Alle Mängel priorisiert + Lösung",
@@ -238,7 +238,7 @@ export const PACKAGES: PackageConfig[] = [
     mode: "payment",
     amountCents: 39900,
     featured: true,
-    moneyBack: "30 Tage Geld-zurück bei berechtigter Reklamation",
+    moneyBack: "Sichere Zahlung über Stripe · Rechnung sofort per E-Mail",
     features: [
       "Alles aus dem Basis-Report",
       "Bis zu 25 Unterseiten statt 5 (5× Abdeckung)",
@@ -274,7 +274,7 @@ export const COOKIE_PACKAGES: PackageConfig[] = [
     description: "Einmalige technische Messung",
     mode: "payment",
     amountCents: 3900,
-    moneyBack: "30 Tage Geld-zurück bei berechtigter Reklamation",
+    moneyBack: "Sichere Zahlung über Stripe · Rechnung sofort per E-Mail",
     features: [
       "Welche Tracker feuern vor Consent?",
       "Welche Cookies werden vor Consent gesetzt?",
@@ -291,7 +291,7 @@ export const COOKIE_PACKAGES: PackageConfig[] = [
     mode: "payment",
     amountCents: 6900,
     featured: true,
-    moneyBack: "30 Tage Geld-zurück bei berechtigter Reklamation",
+    moneyBack: "Sichere Zahlung über Stripe · Rechnung sofort per E-Mail",
     features: [
       "Alles aus Cookie Basis",
       "Manuelle Sichtung durch einen Menschen vor Auslieferung",
