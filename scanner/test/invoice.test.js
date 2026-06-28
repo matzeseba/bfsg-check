@@ -60,6 +60,55 @@ test('renderInvoiceHtml: Regelbesteuerung = USt 19% aus dem Brutto-Betrag heraus
   assert.doesNotMatch(html, /593,81 €/);
 });
 
+test('renderInvoiceHtml: Regelbesteuerung — Positions-Einzelpreise sind netto und summieren bitgenau zur Zwischensumme (netto)', () => {
+  // SF5b: Bei Regelbesteuerung weist die Einzelpreis-Spalte NETTO aus (nicht brutto),
+  // konsistent mit der "Zwischensumme (netto)". Zwei Positionen mit Rundungsdrift
+  // (2× 129,00 € brutto): round(12900/1,19)=10840 je Position → Summe 216,80 €, waehrend
+  // round(25800/1,19)=216,81 € waere. Die Zwischensumme MUSS der Summe der gerundeten
+  // Positions-Netti folgen, sonst gilt Positions-Summe ≠ gleichnamige Zwischensumme.
+  const html = renderInvoiceHtml({
+    invoiceNumber: 'RE-2026-0200',
+    date: '2026-06-28T12:00:00Z',
+    customer: { company: 'B2B AG', email: 'rechnung@b2b.de' },
+    items: [
+      { description: 'BFSG-Report Basis', amount: 12900 },
+      { description: 'BFSG-Report Basis', amount: 12900 }
+    ],
+    vatMode: 'regelbesteuerung'
+  });
+
+  const euroToCents = (s) =>
+    Math.round(parseFloat(s.replace(/\s*€/, '').replace(/\./g, '').replace(',', '.')) * 100);
+
+  // Einzelpreis-Zellen NUR aus dem Positions-<tbody> (die Totals-Tabelle hat kein <tbody>).
+  const tbody = html.match(/<tbody>([\s\S]*?)<\/tbody>/)[1];
+  const lineCents = [...tbody.matchAll(/<td class="amount">([^<]+)<\/td>/g)].map((m) => euroToCents(m[1]));
+  assert.equal(lineCents.length, 2, 'Es müssen genau 2 Positions-Einzelpreise gerendert werden');
+
+  // Zwischensumme (netto) aus der Totals-Tabelle.
+  const subCents = euroToCents(
+    html.match(/Zwischensumme \(netto\)<\/td><td class="amount">([^<]+)<\/td>/)[1]
+  );
+
+  // Kern-Assertion: Summe der Positions-Einzelpreise == Zwischensumme (netto).
+  assert.equal(
+    lineCents.reduce((a, b) => a + b, 0),
+    subCents,
+    'Positions-Summe muss bitgenau der Zwischensumme (netto) entsprechen'
+  );
+
+  // Konkret: 108,40 € je Position → 216,80 € Zwischensumme (NICHT 216,81 aus round(brutto/1,19)).
+  assert.equal(subCents, 21680);
+  assert.match(html, /108,40 €/);
+  // Header weist die Spalte explizit als netto aus.
+  assert.match(html, /Einzelpreis \(netto\)/);
+  // Gesamtbetrag == gezahltes Brutto (258,00 €), USt = Differenz (41,20 €).
+  assert.match(html, /258,00 €/);
+  assert.match(html, /41,20 €/);
+  // Regression: Die Einzelpreis-Spalte darf NIE den Brutto-Betrag (12900) zeigen.
+  assert.ok(!lineCents.includes(12900), 'Einzelpreis-Spalte darf nicht den Brutto-Betrag ausweisen');
+});
+
 test('renderInvoiceHtml: HTML-Escaping verhindert XSS in customer-name', () => {
   const html = renderInvoiceHtml({
     invoiceNumber: 'RE-2026-0001',
