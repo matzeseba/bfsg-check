@@ -7,7 +7,7 @@
 // cookielos/zulässig sein) → niedrigere Schwere + verifizieren-Formulierung.
 
 import { chromium } from 'playwright';
-import { assertPublicHttpUrl, verifyNoDnsRebinding, installSsrfGuard } from './url-guard.js';
+import { assertPublicHttpUrl, verifyNoDnsRebinding, installSsrfGuard, pinnedHostResolverArg } from './url-guard.js';
 
 // Bekannte Tracking-/Werbe-HOSTS (host-genau, keine nackten Substrings).
 const TRACKER_HOSTS = [
@@ -42,8 +42,14 @@ export async function scanCookie(url, { timeout = 45000, lenientTls = false } = 
   // SSRF + Rebinding-Pin
   const safe = await assertPublicHttpUrl(url);
   url = safe.url;
+  // IP-Pin: Chromium-Resolver auf die geprüfte öffentliche IP zwingen (SSRF C1).
+  // Schließt das TOCTOU-Restfenster zwischen verifyNoDnsRebinding und Chromiums
+  // eigener Auflösung (1:1 wie scanUrl/scanSite in scan.js).
+  const pinArg = pinnedHostResolverArg(new URL(safe.url).hostname, safe.addresses);
   const siteReg = regDomain(reqHost(url));
-  const browser = await chromium.launch({ args: ['--no-sandbox', '--disable-dev-shm-usage'] });
+  const browser = await chromium.launch({
+    args: ['--no-sandbox', '--disable-dev-shm-usage', ...(pinArg ? [pinArg] : [])]
+  });
   const context = await browser.newContext({
     locale: 'de-DE',
     // lenientTls (env SCAN_PAID_LENIENT_TLS, via fulfill.js) — analog scan.js. Cookie-
