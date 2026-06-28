@@ -1,10 +1,10 @@
-# BFSG-Check Admin (Next.js 16 + Tailwind + shadcn/ui)
+# Barrierefrei-Prüfen Admin (Next.js 16 + Tailwind + shadcn/ui)
 
-Internes Admin-Dashboard für **BFSG-Check**. Zeigt Live-Daten zu Verkäufen,
+Internes Admin-Dashboard für **Barrierefrei-Prüfen**. Zeigt Live-Daten zu Verkäufen,
 Bestellungen, Abos, Server-Status und Marketing-Kampagnen.
 
 > Stand: Scaffold-Phase (Welle 4) — alle Routes liefern Mock-Daten via Server
-> Components. In Welle 5 werden Mocks gegen echte `bfsg-fix.de/admin/*`-Calls
+> Components. In Welle 5 werden Mocks gegen echte `barrierefrei-pruefen.de/admin/*`-Calls
 > ausgetauscht.
 
 ## Stack
@@ -44,7 +44,7 @@ npm run build                     # erzeugt .next/standalone (für Docker)
 ## API-Client (`lib/api.ts`)
 
 Server-Only-Wrapper für das Backend. Liest `ADMIN_TOKEN` aus den env-Variablen
-und sendet Bearer-Auth gegen `ADMIN_API_BASE_URL` (Default `https://bfsg-fix.de`).
+und sendet Bearer-Auth gegen `ADMIN_API_BASE_URL` (Default `https://barrierefrei-pruefen.de`).
 
 Verfügbare Funktionen:
 
@@ -72,11 +72,11 @@ Bis dahin: Dashboard nur lokal hinter SSH oder mit IP-Allowlist deployen.
 
 ## Deploy-Plan
 
-- Sub-Domain: **`admin.bfsg-fix.de`**
+- Sub-Domain: **`admin.barrierefrei-pruefen.de`**
 - Docker-Image über `output: 'standalone'`-Build (kleiner Footprint, kein
   `node_modules` im Image).
 - Reverse-Proxy (Caddy/Traefik auf dem Hetzner-CPX22) terminiert TLS und routet
-  `admin.bfsg-fix.de` an den Container auf Port `3000`.
+  `admin.barrierefrei-pruefen.de` an den Container auf Port `3000`.
 - Deploy-Pipeline: GitHub Actions → SSH → `git pull` + `docker compose up -d`
   (analog Scanner).
 

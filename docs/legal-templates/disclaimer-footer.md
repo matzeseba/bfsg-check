@@ -24,7 +24,7 @@ Konformitätsprüfung.
 Eine Garantie für Vollständigkeit, Aktualität oder rechtliche 
 BFSG-Konformität wird ausdrücklich NICHT übernommen.
 
-BFSG-Check übernimmt keine Haftung für Folgeschäden, die durch 
+Barrierefrei-Prüfen übernimmt keine Haftung für Folgeschäden, die durch 
 Befolgung oder Nichtbefolgung der hier ausgesprochenen Empfehlungen 
 entstehen.
 
@@ -33,8 +33,8 @@ IT-Recht oder Wettbewerbsrecht.
 
 Made in Germany · Stand: {DATE}
 ─────────────────────────────────────────────────────────────────
-BFSG-Check · Matthias Seba · Lange Straße 20 · 27449 Kutenholz
-info@matthias-seba.de · bfsg-fix.de
+Barrierefrei-Prüfen · Matthias Seba · Lange Straße 20 · 27449 Kutenholz
+info@barrierefrei-pruefen.de · barrierefrei-pruefen.de
 ```
 
 ---
@@ -44,11 +44,11 @@ info@matthias-seba.de · bfsg-fix.de
 ```html
 <footer class="text-xs text-muted-foreground mt-8 border-t pt-4">
   <p>
-    <strong>Wichtiger Hinweis:</strong> BFSG-Check liefert automatisierte 
-    technische Analysen nach WCAG 2.1 AA. Wir geben <strong>keine 
-    rechtsverbindliche Konformitäts-Garantie</strong> und ersetzen keine 
-    anwaltliche Beratung. Empfehlungen sind als Hilfestellung für 
-    Entwickler und Site-Betreiber gedacht.
+    <strong>Wichtiger Hinweis:</strong> Barrierefrei-Prüfen liefert 
+    automatisierte technische Analysen nach WCAG 2.1 AA. Wir geben 
+    <strong>keine rechtsverbindliche Konformitäts-Garantie</strong> und 
+    ersetzen keine anwaltliche Beratung. Empfehlungen sind als Hilfestellung 
+    für Entwickler und Site-Betreiber gedacht.
   </p>
   <p class="mt-2">
     Für rechtliche Fragen rund um BFSG, DSGVO oder TDDDG konsultieren 
@@ -67,8 +67,8 @@ info@matthias-seba.de · bfsg-fix.de
     <strong>Vor dem Kauf wichtig zu wissen:</strong>
   </p>
   <ul>
-    <li>BFSG-Check liefert eine automatisierte technische Analyse, 
-        keine rechtsverbindliche Konformitäts-Prüfung.</li>
+    <li>Barrierefrei-Prüfen liefert eine automatisierte technische 
+        Analyse, keine rechtsverbindliche Konformitäts-Prüfung.</li>
     <li>Auto-Scans entdecken ca. 30-40% der WCAG-Issues — manuelle Tests 
         sind zusätzlich empfohlen.</li>
     <li>Wir geben keine Garantie auf vollständige BFSG-Konformität.</li>
@@ -83,11 +83,11 @@ info@matthias-seba.de · bfsg-fix.de
 
 ```
 ---
-BFSG-Check liefert technische Analysen, keine Rechtsberatung.
+Barrierefrei-Prüfen liefert technische Analysen, keine Rechtsberatung.
 Empfehlungen ersetzen nicht die anwaltliche Prüfung.
 
-BFSG-Check · Matthias Seba · bfsg-fix.de
-info@matthias-seba.de
+Barrierefrei-Prüfen · Matthias Seba · barrierefrei-pruefen.de
+info@barrierefrei-pruefen.de
 ```
 
 ---

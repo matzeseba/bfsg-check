@@ -5,7 +5,7 @@ import { KuendigungForm } from "@/components/KuendigungForm";
 export const metadata: Metadata = {
   title: "Abo kündigen",
   description:
-    "Re-Check-Abo bei BFSG-Check jederzeit ohne Angabe von Gründen kündigen.",
+    "Re-Check-Abo bei Barrierefrei-Prüfen jederzeit ohne Angabe von Gründen kündigen.",
   alternates: { canonical: "/kuendigen" },
   robots: { index: false, follow: true },
 };
@@ -19,8 +19,8 @@ export default function KuendigenPage() {
       <p className="mt-4 text-muted-foreground text-pretty">
         Ihr Re-Check-Abo ist jederzeit zum Ende der laufenden Abrechnungsperiode
         kündbar — auf Wunsch auch sofort. Eine formlose E-Mail an{" "}
-        <a href="mailto:kuendigen@bfsg-fix.de" className="underline">
-          kuendigen@bfsg-fix.de
+        <a href="mailto:kuendigen@barrierefrei-pruefen.de" className="underline">
+          kuendigen@barrierefrei-pruefen.de
         </a>{" "}
         genügt ebenfalls.
       </p>

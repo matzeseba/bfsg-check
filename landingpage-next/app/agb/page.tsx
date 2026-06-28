@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Allgemeine Geschäftsbedingungen",
   description:
-    "AGB von BFSG-Check für die automatisierte Barrierefreiheits-Prüfung und Reports.",
+    "AGB von Barrierefrei-Prüfen für die automatisierte Barrierefreiheits-Prüfung und Reports.",
   alternates: { canonical: "/agb" },
 };
 

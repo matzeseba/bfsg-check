@@ -1,4 +1,4 @@
-# Angebots- & Preisstruktur — BFSG-Audit
+# Angebots- & Preisstruktur — Barrierefrei-Prüfen
 
 ## Value Ladder
 

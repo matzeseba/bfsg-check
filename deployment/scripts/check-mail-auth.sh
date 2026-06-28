@@ -2,7 +2,7 @@
 # check-mail-auth.sh — Prüft SPF / DKIM / DMARC für eine Domain
 #
 # Usage: bash deployment/scripts/check-mail-auth.sh [domain]
-# Default-Domain: bfsg-fix.de
+# Default-Domain: barrierefrei-pruefen.de
 #
 # Exit-Codes:
 #   0 = alle Checks OK
@@ -10,7 +10,7 @@
 #   2 = dig nicht installiert
 set -u
 
-DOMAIN="${1:-bfsg-fix.de}"
+DOMAIN="${1:-barrierefrei-pruefen.de}"
 DKIM_SELECTOR="${DKIM_SELECTOR:-mail}"
 
 if ! command -v dig >/dev/null 2>&1; then

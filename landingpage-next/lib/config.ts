@@ -1,4 +1,4 @@
-// Zentrale Konfiguration für BFSG-Check Landingpage.
+// Zentrale Konfiguration für Barrierefrei-Prüfen Landingpage.
 // Preise und Pakete spiegeln scanner/app.js Z40-48 (Quelle der Wahrheit).
 
 export type PackageId =
@@ -26,16 +26,16 @@ export type PackageConfig = {
 };
 
 export const SITE = {
-  url: "https://bfsg-fix.de",
-  name: "BFSG-Check",
-  title: "BFSG-Check — Ist Ihre Website bereit fürs BFSG? | Kostenloser WCAG-Sofort-Check",
+  url: "https://barrierefrei-pruefen.de",
+  name: "Barrierefrei-Prüfen",
+  title: "Barrierefrei-Prüfen — Ist Ihre Website bereit fürs BFSG? | Kostenloser WCAG-Sofort-Check",
   description:
     "Prüfen Sie in 60 Sekunden, wo Ihre Website die Anforderungen des Barrierefreiheitsstärkungsgesetzes (BFSG) noch verfehlt — automatisierte WCAG-2.1-AA-Analyse, ausführlicher Report auf Wunsch.",
-  email: "hallo@bfsg-fix.de",
+  email: "info@barrierefrei-pruefen.de",
 } as const;
 
 export const BRAND = {
-  tagline: "BFSG- & WCAG-Audit für mittelständische Website-Betreiber",
+  tagline: "Ihr unabhängiger WCAG-2.1-AA-Audit — technisch, transparent, persönlich geprüft.",
   productKicker: "Compliance-Scan-Plattform",
   promise: "Premium-Audit ohne Kanzlei-Honorar",
   hostingNote: "Gehostet in Deutschland · DSGVO-konform",
@@ -331,7 +331,7 @@ export type CompareColumn = {
 };
 export const COMPARISON = {
   kicker: "Im Direktvergleich",
-  title: "Wo sich BFSG-Check einordnet",
+  title: "Wo sich Barrierefrei-Prüfen einordnet",
   titleAccent: "einordnet",
   columns: [
     {
@@ -347,7 +347,7 @@ export const COMPARISON = {
       note: "Gut für einen ersten technischen Überblick.",
     },
     {
-      name: "BFSG-Check",
+      name: "Barrierefrei-Prüfen",
       sub: "automatisiert + menschliche Sichtung",
       highlight: true,
       attrs: [
@@ -399,7 +399,7 @@ export const FAQ_ITEMS = [
     a: "Betroffen sind insbesondere Online-Shops und Dienstleister im elektronischen Geschäftsverkehr. Kleinstunternehmen (unter 10 Mitarbeitende und unter 2 Mio. Euro Jahresumsatz) sind bei reinen Dienstleistungen teils ausgenommen. Der kostenlose Check gibt eine erste Einordnung.",
   },
   {
-    q: "Wie unterscheidet sich BFSG-Check von Gratis-Tools wie WAVE oder Lighthouse?",
+    q: "Wie unterscheidet sich Barrierefrei-Prüfen von Gratis-Tools wie WAVE oder Lighthouse?",
     a: "Gratis-Tools liefern Rohdaten — hunderte Findings ohne Priorisierung, ohne Lösungs-Snippet, ohne Kontext. Wir kuratieren: jeder Mangel bekommt eine Priorität, einen konkreten Fix und landet im Umsetzungs-Fahrplan. Plus: Entwurf der Barrierefreiheitserklärung, fertig zum Veröffentlichen.",
   },
   {
@@ -423,7 +423,7 @@ export const FAQ_ITEMS = [
     a: "Nein. Der Report ist eine technische Vorprüfung nach WCAG 2.1 und deckt einen Großteil der häufigen Mängel ab. Für eine rechtsverbindliche Bewertung konsultieren Sie bitte einen Fachanwalt für IT- oder Wettbewerbsrecht.",
   },
   {
-    q: "Ist BFSG-Check DSGVO-konform?",
+    q: "Ist Barrierefrei-Prüfen DSGVO-konform?",
     a: "Ja. Wir hosten ausschließlich in Deutschland, übermitteln keine Daten in Drittländer, speichern nur das, was zur Vertragsabwicklung nötig ist (E-Mail, Rechnungsadresse, gescannte URL) und nutzen nur technisch notwendige Cookies ohne Consent. Details in der Datenschutzerklärung.",
   },
   {

@@ -1,9 +1,21 @@
-# Caddyfile — Phase 2 + Next.js-Cutover.
-# bfsg-fix.de routet: API/Webhook/Admin → app:8080, alles andere → landing-next:3000.
-# Alte .html-URLs werden 301-permanent auf Next.js-Routen weitergeleitet (SEO-Erhalt).
+# Caddyfile — Rebrand auf barrierefrei-pruefen.de als Primär-Domain.
+# bfsg-fix.de bleibt VOLLSTÄNDIG AKTIV (Stripe-Webhook, /health, laufender Traffic).
+#
+# CUTOVER-ABHÄNGIGKEIT: barrierefrei-pruefen.de + www. benötigen DNS A-Record
+# → 178.105.83.0, bevor Caddy das Let's-Encrypt-Cert ziehen kann.
+# Caddy versucht beim Start das Cert — schlägt es fehl (DNS noch nicht gesetzt),
+# crasht Caddy NICHT: unbekannte Domains werden mit "no route" abgewiesen,
+# bfsg-fix.de läuft weiter. Trotzdem empfehlenswert: DNS erst umstellen,
+# DANN dieses File deployen (Reihenfolge im CUTOVER-RUNBOOK unten).
+#
+# CANONICAL: Das Frontend setzt kanonische URLs auf barrierefrei-pruefen.de.
+# bfsg-fix.de liefert dieselbe App aus — KEIN harter 301, damit Stripe-Webhook
+# (bfsg-fix.de/webhook) und /health nicht brechen.
+#
+# Alter Alias-Block für barrierefrei-pruefen.de (301 → bfsg-fix.de) entfernt.
 
-# === Haupt-Domain ===
-bfsg-fix.de, www.bfsg-fix.de {
+# === Neue Primär-Domain ===
+barrierefrei-pruefen.de, www.barrierefrei-pruefen.de {
     encode gzip
 
     # Sicherheits-Header (Defense-in-Depth, ergänzt App-Header).
@@ -57,20 +69,70 @@ bfsg-fix.de, www.bfsg-fix.de {
     }
 }
 
-# === Alias-Domains: 301-Redirect auf Haupt-Domain ===
+# === Alte Haupt-Domain: bleibt aktiv, liefert dieselbe App aus ===
+# WICHTIG: Kein 301-Redirect — Stripe-Webhook + /health müssen auf bfsg-fix.de
+# antworten bis Stripe-Webhook-URL im Dashboard auf barrierefrei-pruefen.de umgestellt ist.
+# Nach Cutover (Stripe-Webhook + alle Bookmarks migriert) kann dieser Block auf
+# einen 301 → barrierefrei-pruefen.de{uri} reduziert werden.
+bfsg-fix.de, www.bfsg-fix.de {
+    encode gzip
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        Permissions-Policy "geolocation=(), microphone=(), camera=()"
+        Content-Security-Policy "default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://js.stripe.com; frame-src https://js.stripe.com https://hooks.stripe.com; connect-src 'self' https://api.stripe.com; font-src 'self' data: https://fonts.gstatic.com; object-src 'none'; base-uri 'self'; form-action 'self' https://checkout.stripe.com"
+        Cross-Origin-Opener-Policy "same-origin"
+        X-XSS-Protection "1; mode=block"
+        -Server
+    }
+
+    handle /webhook {
+        reverse_proxy app:8080 {
+            flush_interval -1
+        }
+    }
+    handle /api/* {
+        reverse_proxy app:8080
+    }
+    handle /admin/* {
+        reverse_proxy app:8080
+    }
+    handle /health {
+        reverse_proxy app:8080
+    }
+    handle /danke.html {
+        reverse_proxy app:8080
+    }
+
+    redir /widerruf.html /widerruf permanent
+    redir /kuendigen.html /kuendigen permanent
+    redir /datenschutz.html /datenschutz permanent
+    redir /agb.html /agb permanent
+    redir /impressum.html /impressum permanent
+    redir /widerrufsbelehrung.html /widerrufsbelehrung permanent
+
+    handle {
+        reverse_proxy landing-next:3000
+    }
+
+    log {
+        output stdout
+        format console
+        level INFO
+    }
+}
+
+# === Alias-Domains: 301-Redirect auf neue Primär-Domain ===
 bfsg-barrierecheck.de, www.bfsg-barrierecheck.de {
-    redir https://bfsg-fix.de{uri} permanent
+    redir https://barrierefrei-pruefen.de{uri} permanent
 }
 
 bfsg-sofortcheck.de, www.bfsg-sofortcheck.de {
-    redir https://bfsg-fix.de{uri} permanent
-}
-
-barrierefrei-pruefen.de, www.barrierefrei-pruefen.de {
-    redir https://bfsg-fix.de{uri} permanent
+    redir https://barrierefrei-pruefen.de{uri} permanent
 }
 
 # === Preview-Subdomain (für künftige Landing-Tests vor Cutover) ===
+# CUTOVER: preview.barrierefrei-pruefen.de anlegen sobald DNS umgestellt.
 preview.bfsg-fix.de {
     reverse_proxy landing-next:3000
     encode gzip
@@ -84,16 +146,16 @@ preview.bfsg-fix.de {
 
 # === Admin-Dashboard (admin-next) — DEAKTIVIERT bis Auth-Layer steht ===
 # Code-Review F7: admin-next hat noch KEINEN Auth-Layer. Ein öffentlich
-# erreichbarer admin.bfsg-fix.de wäre ein unauthentifizierter Proxy auf alle
+# erreichbarer Admin-Endpunkt wäre ein unauthentifizierter Proxy auf alle
 # Bestell-/Abo-PII. Block bleibt auskommentiert, bis admin-next entweder
 # next-auth (Magic-Link, Allowlist) ODER Caddy basicauth davor hat.
 # Reaktivieren in Welle 5 — dann z.B. mit:
-#   admin.bfsg-fix.de {
+#   admin.barrierefrei-pruefen.de {
 #       basicauth { matze $2a$14$<bcrypt-hash> }
 #       reverse_proxy admin-next:3001
 #       header Strict-Transport-Security "max-age=31536000; includeSubDomains"
 #   }
-# admin.bfsg-fix.de {
+# admin.barrierefrei-pruefen.de {
 #     reverse_proxy admin-next:3001
 #     encode gzip
 #     header Strict-Transport-Security "max-age=31536000; includeSubDomains"

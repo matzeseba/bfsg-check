@@ -195,7 +195,7 @@ Bei Fragen: info@matthias-seba.de
 
 Mit freundlichen Grüßen
 Matthias Seba
-BFSG-Check
+Barrierefrei-Prüfen
 ```
 
 ---

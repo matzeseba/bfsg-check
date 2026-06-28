@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: "BFSG-Checkliste 2026 für Online-Shops — 25 Prüfpunkte",
     description:
       "Seit 28.06.2025 gilt das BFSG. Prüfen Sie mit dieser Checkliste, ob Ihr Shop die WCAG-2.1-AA-Anforderungen erfüllt.",
-    url: "https://bfsg-fix.de/bfsg-checkliste-online-shop",
+    url: "https://barrierefrei-pruefen.de/bfsg-checkliste-online-shop",
     type: "article",
   },
 };
@@ -84,8 +84,8 @@ export default function BfsgChecklisteOnlineShopPage() {
     "@type": "Article",
     headline: "BFSG-Checkliste 2026: 25 Punkte, die jeder Online-Shop prüfen muss",
     description: "25-Punkte-Checkliste für BFSG- und WCAG-2.1-Anforderungen im Online-Shop.",
-    url: "https://bfsg-fix.de/bfsg-checkliste-online-shop",
-    publisher: { "@type": "Organization", name: "BFSG-Check", url: "https://bfsg-fix.de" },
+    url: "https://barrierefrei-pruefen.de/bfsg-checkliste-online-shop",
+    publisher: { "@type": "Organization", name: "Barrierefrei-Prüfen", url: "https://barrierefrei-pruefen.de" },
     dateModified: "2026-06-21",
   };
 

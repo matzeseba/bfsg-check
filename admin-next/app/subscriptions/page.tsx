@@ -13,7 +13,7 @@ import { mockSubscriptions } from "@/lib/mock-data";
 import { formatDateTime } from "@/lib/format";
 
 export const metadata = {
-  title: "Abonnements · BFSG-Check Admin",
+  title: "Abonnements · Barrierefrei-Prüfen Admin",
 };
 
 function statusBadge(status: Subscription["status"]) {

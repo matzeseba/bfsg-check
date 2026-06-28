@@ -84,7 +84,7 @@ sentry.io/legal/dpa). Datenübermittlung in die USA auf Basis
 Standardvertragsklauseln + EU-US Data Privacy Framework."
 ```
 
-**Wichtig:** Sentry wird oft mit PII-Filtern (`beforeSend`) konfiguriert. Bei BFSG-Check: pii-redaction in `scanner/lib/logger.js` aktiv lassen.
+**Wichtig:** Sentry wird oft mit PII-Filtern (`beforeSend`) konfiguriert. Bei Barrierefrei-Prüfen: pii-redaction in `scanner/lib/logger.js` aktiv lassen.
 
 ---
 

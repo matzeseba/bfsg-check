@@ -73,4 +73,4 @@ jobs:
             2. docs/BACKUP.md Setup-Schritte
             3. Live-Server: läuft cron @ /etc/cron.d/bfsg-backup?
           to: matze.seba@outlook.de
-          from: BFSG-Check Monitoring <no-reply@bfsg-fix.de>
+          from: Barrierefrei-Prüfen Monitoring <no-reply@bfsg-fix.de>

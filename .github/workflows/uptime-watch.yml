@@ -21,6 +21,9 @@ jobs:
         id: health
         run: |
           set +e
+          # CUTOVER-HINWEIS: URL auf barrierefrei-pruefen.de/health umstellen,
+          # sobald DNS für neue Domain propagiert + Stripe-Webhook migriert ist.
+          # Bis dahin bleibt bfsg-fix.de aktiv und wird hier geprüft.
           RESPONSE=$(curl -sS --max-time 15 -w "\nHTTP_STATUS=%{http_code}\nTIME_TOTAL=%{time_total}\n" https://bfsg-fix.de/health 2>&1)
           EXIT=$?
           set -e
@@ -60,9 +63,10 @@ jobs:
           server_port: 587
           username: ${{ secrets.SMTP_USER }}
           password: ${{ secrets.SMTP_PASS }}
-          subject: "[BFSG-ALERT] bfsg-fix.de DOWN"
+          subject: "[BARRIEREFREI-ALERT] bfsg-fix.de DOWN"
           body: |
             Health-Check für https://bfsg-fix.de/health fehlgeschlagen.
+            (Neue Primär-Domain: barrierefrei-pruefen.de — URL-Switch nach Cutover)
 
             Reason: ${{ steps.health.outputs.fail_reason }}
             Workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -74,4 +78,4 @@ jobs:
             3. Restart: docker compose restart app
             4. Falls dauerhaft kaputt: GitHub-Actions deploy.yml manuell triggern (Rebuild)
           to: matze.seba@outlook.de
-          from: BFSG-Check Uptime <no-reply@bfsg-fix.de>
+          from: Barrierefrei-Prüfen Uptime <no-reply@bfsg-fix.de>

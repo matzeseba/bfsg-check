@@ -8,6 +8,8 @@ const {
   NOTION_DB_ORDERS,
   NOTION_DB_SUBSCRIPTIONS,
   ADMIN_TOKEN,
+  // CUTOVER: BFSG_URL als GitHub-Secret setzen (https://barrierefrei-pruefen.de).
+  // Default bleibt bfsg-fix.de solange das Secret nicht gesetzt ist (kein Breaking Change).
   BFSG_URL = 'https://bfsg-fix.de'
 } = process.env;
 

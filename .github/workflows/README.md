@@ -1,4 +1,4 @@
-# GitHub Actions — CI/CD für BFSG-Check
+# GitHub Actions — CI/CD für Barrierefrei-Prüfen
 
 ## `deploy.yml` — Auto-Deploy auf Hetzner
 

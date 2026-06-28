@@ -1,5 +1,5 @@
 #!/bin/bash
-# BFSG-Check täglich Backup — GPG-verschlüsselt, via rclone zu BACKUP_TARGET.
+# Barrierefrei-Prüfen täglich Backup — GPG-verschlüsselt, via rclone zu BACKUP_TARGET.
 # Erwartet env: BACKUP_GPG_RECIPIENT (E-Mail des GPG-Pubkeys), BACKUP_TARGET (rclone-Remote z.B. "hetzner-storage:bfsg-backups").
 # Ohne BACKUP_TARGET → nur lokales Backup in /var/backups/bfsg/ (Retention 14 Tage).
 

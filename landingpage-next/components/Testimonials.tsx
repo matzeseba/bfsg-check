@@ -69,7 +69,7 @@ function DiffSnippet() {
   );
 }
 
-// "Warum BFSG-Check" — Anchoring gegen die drei Alternativen (Kanzlei,
+// "Warum Barrierefrei-Prüfen" — Anchoring gegen die drei Alternativen (Kanzlei,
 // Gratis-Tool, Beratung). Bewusst KEINE Fake-Testimonials.
 export function Testimonials() {
   return (
@@ -79,7 +79,7 @@ export function Testimonials() {
     >
       <div className="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-24">
         <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
-          <SectionKicker icon={SparklesIcon} label="Warum BFSG-Check" />
+          <SectionKicker icon={SparklesIcon} label="Warum Barrierefrei-Prüfen" />
           <h2
             id="why-heading"
             className="mt-4 font-display text-3xl font-semibold tracking-tight text-balance sm:text-[2.75rem] sm:leading-[1.05]"

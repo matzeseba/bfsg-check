@@ -21,32 +21,32 @@
 
 ### Branch-Name
 ```
-add-bfsg-check-de
+add-barrierefrei-pruefen-de
 ```
 
 ### Files anpassen
 In `README.md` unter Section „Testing Tools" oder „Online Tools" oder „BFSG/Accessibility":
 
 ```markdown
-- [BFSG-Check](https://bfsg-fix.de) - Automated WCAG 2.1 AA scanner with 
-  German-language reports, specifically built for BFSG (German Accessibility 
-  Strengthening Act) compliance. Free 60-second scan; full PDF report from 
-  €199. Made in Germany.
+- [Barrierefrei-Prüfen](https://barrierefrei-pruefen.de) - Automated WCAG 
+  2.1 AA scanner with German-language reports, specifically built for BFSG 
+  (German Accessibility Strengthening Act) compliance. Free 60-second scan; 
+  full PDF report from €199. Made in Germany.
 ```
 
 ### PR-Title
 ```
-Add: BFSG-Check (German WCAG 2.1 AA scanner with BFSG-specific rules)
+Add: Barrierefrei-Prüfen (German WCAG 2.1 AA scanner with BFSG-specific rules)
 ```
 
 ### PR-Body
 ```
 Hi 👋
 
-I'd like to propose adding BFSG-Check to your awesome list.
+I'd like to propose adding Barrierefrei-Prüfen to your awesome list.
 
 **What it is:**
-BFSG-Check is an automated WCAG 2.1 AA scanner with German-language 
+Barrierefrei-Prüfen is an automated WCAG 2.1 AA scanner with German-language 
 reports, specifically built for compliance with the German Accessibility 
 Strengthening Act (BFSG), which came into force on June 28, 2025.
 
@@ -83,8 +83,8 @@ File: `src/_data/resources.json` (oder ähnlich, je nach Stand)
 Snippet:
 ```json
 {
-  "title": "BFSG-Check",
-  "url": "https://bfsg-fix.de",
+  "title": "Barrierefrei-Prüfen",
+  "url": "https://barrierefrei-pruefen.de",
   "description": "Automated WCAG 2.1 AA scanner with German-language reports for BFSG (German Accessibility Strengthening Act) compliance.",
   "category": "Testing Tools",
   "tags": ["wcag", "bfsg", "germany", "scanner"],
@@ -94,8 +94,8 @@ Snippet:
 
 ### PR-Body
 ```
-Adding BFSG-Check, an automated WCAG 2.1 AA scanner specifically for 
-German BFSG compliance.
+Adding Barrierefrei-Prüfen, an automated WCAG 2.1 AA scanner specifically 
+for German BFSG compliance.
 
 What it provides:
 - 60-second free scan with score
@@ -154,8 +154,9 @@ Curated list of tools, resources, and reading material for BFSG
 - [BMAS Erläuterungen](https://www.bmas.de/...) - Auslegungshinweise
 
 ## Automated Scanners
-- [BFSG-Check](https://bfsg-fix.de) - Automated WCAG 2.1 AA scanner with 
-  BFSG-specific rules. Made in Germany. Free scan, paid PDF reports.
+- [Barrierefrei-Prüfen](https://barrierefrei-pruefen.de) - Automated WCAG 
+  2.1 AA scanner with BFSG-specific rules. Made in Germany. Free scan, 
+  paid PDF reports.
 - [eRecht24 Barrierefreiheits-Check](https://www.e-recht24.de/...) - 
   Free lead-magnet scanner
 - [BF-Check](https://bf-check.de) - Free quick check
@@ -175,7 +176,7 @@ Open a PR with the proposed addition. Maintained by @matzeseba.
 ```
 
 **Vorteil dieser Strategie:**
-- Du bist Maintainer einer authoritativen Liste → BFSG-Check kannst du natürlich oben listen
+- Du bist Maintainer einer authoritativen Liste → Barrierefrei-Prüfen kannst du natürlich oben listen
 - Andere Projekte fügen ihre Tools hinzu → mehr Backlinks zu deinem Repo → bessere DR für dein Repo
 - Repo wird Suchergebnis #1 für „awesome bfsg" → SEO-Asset
 

@@ -12,14 +12,14 @@
 ```
 § X Haftung
 
-(1) BFSG-Check haftet unbeschränkt
+(1) Barrierefrei-Prüfen haftet unbeschränkt
   a) bei Vorsatz und grober Fahrlässigkeit,
   b) bei Verletzung von Leben, Körper oder Gesundheit,
   c) im Rahmen einer übernommenen Garantie und
   d) nach den Bestimmungen des Produkthaftungsgesetzes.
 
 (2) Bei leicht fahrlässiger Verletzung wesentlicher Vertragspflichten 
-    (Kardinalpflichten) ist die Haftung von BFSG-Check der Höhe nach 
+    (Kardinalpflichten) ist die Haftung von Barrierefrei-Prüfen der Höhe nach 
     auf den vertragstypisch vorhersehbaren Schaden begrenzt, 
     höchstens jedoch auf den im jeweiligen Einzelauftrag durch den 
     Auftraggeber gezahlten Betrag (Vergütung).
@@ -27,12 +27,12 @@
 (3) Im Übrigen ist die Haftung für leichte Fahrlässigkeit ausgeschlossen.
 
 (4) Diese Haftungsbegrenzung gilt auch zugunsten der gesetzlichen 
-    Vertreter und Erfüllungsgehilfen von BFSG-Check.
+    Vertreter und Erfüllungsgehilfen von Barrierefrei-Prüfen.
 
 (5) Für Schäden aufgrund unrichtiger oder unvollständiger Angaben 
-    durch den Auftraggeber haftet BFSG-Check nicht.
+    durch den Auftraggeber haftet Barrierefrei-Prüfen nicht.
 
-(6) BFSG-Check übernimmt keine Haftung für 
+(6) Barrierefrei-Prüfen übernimmt keine Haftung für 
     Hard- oder Softwarefehler von Drittanbietern (insbesondere 
     Browser-Hersteller, Hosting-Provider, CDN, Zahlungsdienstleister).
 ```
@@ -44,14 +44,14 @@
 ```
 § Y Leistungsbeschreibung
 
-(1) BFSG-Check liefert eine automatisierte technische Analyse der 
+(1) Barrierefrei-Prüfen liefert eine automatisierte technische Analyse der 
     untersuchten Website auf Basis aktueller WCAG-2.1-AA-Kriterien 
     und BFSG-spezifischer Prüfregeln.
 
 (2) Die Analyse erfolgt mittels etablierter Open-Source-Engines 
     (insbesondere axe-core und Pa11y) und eigener Regelwerke.
 
-(3) BFSG-Check garantiert ausdrücklich NICHT:
+(3) Barrierefrei-Prüfen garantiert ausdrücklich NICHT:
   a) die rechtliche BFSG-Konformität der geprüften Website,
   b) das Auffinden sämtlicher Barrierefreiheits-Probleme,
   c) die Aktualität der Prüfregeln über den Zeitpunkt der 
@@ -62,7 +62,7 @@
   b) Nutzer-Tests mit Menschen mit Behinderungen,
   c) anwaltliche Endabnahme der Barrierefreiheitserklärung.
 
-(5) Die durch BFSG-Check gelieferten Empfehlungen sind Hilfestellungen 
+(5) Die durch Barrierefrei-Prüfen gelieferten Empfehlungen sind Hilfestellungen 
     für Entwickler und Website-Betreiber. Sie ersetzen keine 
     Rechtsberatung.
 ```
@@ -74,7 +74,7 @@
 ```
 § Z Zugang und Verfügbarkeit
 
-(1) BFSG-Check ist bemüht, eine ständige Verfügbarkeit des Online-
+(1) Barrierefrei-Prüfen ist bemüht, eine ständige Verfügbarkeit des Online-
     Dienstes zu gewährleisten. Eine 100%-ige Verfügbarkeit wird 
     nicht garantiert.
 
@@ -86,7 +86,7 @@
     Vergütung pro Rata.
 
 (4) Force-Majeure-Ereignisse (höhere Gewalt, DDoS-Angriffe, 
-    Ausfälle von Drittanbietern) entbinden BFSG-Check von der 
+    Ausfälle von Drittanbietern) entbinden Barrierefrei-Prüfen von der 
     Verfügbarkeits-Pflicht.
 ```
 

@@ -41,7 +41,7 @@ export function WiderrufForm() {
     } catch {
       setStatus("error");
       toast.error(
-        "Übermittlung fehlgeschlagen. Bitte E-Mail an widerruf@bfsg-fix.de senden.",
+        "Übermittlung fehlgeschlagen. Bitte E-Mail an widerruf@barrierefrei-pruefen.de senden.",
       );
     }
   }

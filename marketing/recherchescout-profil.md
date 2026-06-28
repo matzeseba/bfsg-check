@@ -17,11 +17,11 @@
 | Feld | Wert |
 |---|---|
 | Vorname / Nachname | Matthias Seba |
-| Firma | BFSG-Check (matthias-seba.de) |
+| Firma | Barrierefrei-Prüfen (matthias-seba.de) |
 | Tätigkeit | Gründer + Softwareentwickler |
-| E-Mail | info@matthias-seba.de |
+| E-Mail | info@barrierefrei-pruefen.de |
 | Telefon | (optional, weglassen wenn kein Festnetz) |
-| Webseite | https://bfsg-fix.de |
+| Webseite | https://barrierefrei-pruefen.de |
 | LinkedIn | (leer — er hat keinen) |
 
 ### Topic-Wahl (1 Topic im Basic-Plan)
@@ -36,10 +36,11 @@ Alternative falls noch nicht in Kategorien:
 ### Experten-Beschreibung (Profil-Bio)
 
 ```
-Matthias Seba ist Gründer von BFSG-Check (bfsg-fix.de), einem automatisierten 
-Compliance-Scanner für deutsche Websites. Sein Tool prüft Online-Shops und 
-B2C-Sites auf Konformität mit dem Barrierefreiheitsstärkungsgesetz (BFSG) 
-und liefert Vollreports mit konkreten Findings nach WCAG 2.1 AA.
+Matthias Seba ist Gründer von Barrierefrei-Prüfen (barrierefrei-pruefen.de), 
+einem automatisierten Compliance-Scanner für deutsche Websites. Sein Tool 
+prüft Online-Shops und B2C-Sites auf Konformität mit dem Barrierefreiheits-
+stärkungsgesetz (BFSG) und liefert Vollreports mit konkreten Findings nach 
+WCAG 2.1 AA.
 
 Themen-Expertise:
 - BFSG-Compliance & Abmahn-Risiken (UWG)
@@ -77,10 +78,10 @@ Erreichbarkeit: Mo-Fr 9-17 Uhr per E-Mail, Antwort meist <2h.
 |---|---|
 | First Name | Matthias |
 | Last Name | Seba |
-| Job Title | Founder, BFSG-Check (German Accessibility Compliance Scanner) |
-| Company | BFSG-Check |
-| Website | https://bfsg-fix.de |
-| Email | info@matthias-seba.de |
+| Job Title | Founder, Barrierefrei-Prüfen (German Accessibility Compliance Scanner) |
+| Company | Barrierefrei-Prüfen |
+| Website | https://barrierefrei-pruefen.de |
+| Email | info@barrierefrei-pruefen.de |
 | Location | Germany |
 
 ### Topic-Subscriptions (HARO)
@@ -94,9 +95,9 @@ Erreichbarkeit: Mo-Fr 9-17 Uhr per E-Mail, Antwort meist <2h.
 ### Expert-Bio (English)
 
 ```
-Matthias Seba is the founder of BFSG-Check (bfsg-fix.de), an automated 
-accessibility compliance scanner for German websites. The tool tests 
-online shops and B2C sites for compliance with the German Accessibility 
+Matthias Seba is the founder of Barrierefrei-Prüfen (barrierefrei-pruefen.de), 
+an automated accessibility compliance scanner for German websites. The tool 
+tests online shops and B2C sites for compliance with the German Accessibility 
 Strengthening Act (BFSG, effective June 2025), delivering WCAG 2.1 AA 
 audit reports in German language.
 
@@ -136,9 +137,9 @@ Hi [Journalist Name],
 
 Re: [Their Query Topic]
 
-I'm Matthias Seba, founder of BFSG-Check — an automated accessibility 
-scanner for German websites. I have aggregated data from 10,000+ scans 
-showing [konkrete Daten].
+I'm Matthias Seba, founder of Barrierefrei-Prüfen — an automated 
+accessibility scanner for German websites. I have aggregated data from 
+10,000+ scans showing [konkrete Daten].
 
 Quick answer to your question: [Direct, useful 2-sentence answer]
 
@@ -147,7 +148,7 @@ deeper context.
 
 Best,
 Matthias
-matthias-seba.de | bfsg-fix.de
+matthias-seba.de | barrierefrei-pruefen.de
 ```
 
 ### Beispiel-Pitches (Templates für häufige Themen)
@@ -172,9 +173,9 @@ manual fixes are the only sustainable path.
 
 **Thema: „Solo founder bootstrapping in compliance niche"**
 ```
-Built BFSG-Check solo in 6 weeks using Claude Code multi-agent sprints. 
-Bootstrapped to live with €0 marketing budget initially, now scaling 
-with €20/day Google Ads. Average B2B SaaS CAC in DACH for niche 
+Built Barrierefrei-Prüfen solo in 6 weeks using Claude Code multi-agent 
+sprints. Bootstrapped to live with €0 marketing budget initially, now 
+scaling with €20/day Google Ads. Average B2B SaaS CAC in DACH for niche 
 compliance: €150-400 (our data). Happy to share founder lessons learned.
 ```
 

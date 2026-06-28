@@ -1,5 +1,5 @@
 #cloud-config
-# BFSG-Check Server-Bootstrap (Hetzner Cloud, Ubuntu 24.04).
+# Barrierefrei-Prüfen Server-Bootstrap (Hetzner Cloud, Ubuntu 24.04).
 # Vollautomatisch beim ersten Boot — kein SSH nötig.
 # Schreibt nur SERVER-spezifische Files (.env, override) — der Code
 # kommt aus git und wird per GitHub-Actions-Deploy aktualisiert.
@@ -9,7 +9,7 @@ hostname: bfsg-fix
 users:
   - name: root
     ssh_authorized_keys:
-      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINWLfkNJJv0x1V/bKfIvJv3fg+J5OwSCDcT/tRTF5fdx claude-bfsg-deploy@bfsg-fix.de
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINWLfkNJJv0x1V/bKfIvJv3fg+J5OwSCDcT/tRTF5fdx claude-deploy@barrierefrei-pruefen.de
 
 write_files:
   - path: /opt/bfsg-bootstrap.sh
@@ -40,7 +40,7 @@ write_files:
       # --- .env (server-spezifisch, NICHT im Repo) ---
       # ACHTUNG: PLACEHOLDER ersetzen vor Server-Create im Hetzner-API-Call!
       cat > /opt/bfsg-check/deployment/.env <<'ENV'
-      PUBLIC_URL=https://bfsg-fix.de
+      PUBLIC_URL=https://barrierefrei-pruefen.de
       PORT=8080
       ENABLE_ABO=false
       MAX_CONCURRENT_SCANS=2
@@ -48,8 +48,8 @@ write_files:
       SMTP_PORT=587
       SMTP_USER=matthiasseba92@gmail.com
       SMTP_PASS=PLACEHOLDER_BREVO_KEY
-      FROM_EMAIL=no-reply@bfsg-fix.de
-      FROM_NAME=BFSG-Check
+      FROM_EMAIL=no-reply@barrierefrei-pruefen.de
+      FROM_NAME=Barrierefrei-Prüfen
       REPLY_TO=matthiasseba92@gmail.com
       ADMIN_EMAIL=matthiasseba92@gmail.com
       ENV

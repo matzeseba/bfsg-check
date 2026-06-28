@@ -61,7 +61,7 @@ sozialgesetz
 > **Regel:** Keine „BFSG-konform"-Garantien (UWG §5 Irreführung)! Stattdessen „Check", „Audit", „Prüfung".
 
 ### Headlines (30 Zeichen Max)
-1. `BFSG-Check in 60 Sekunden`
+1. `Barrierefrei prüfen in 60 Sek.`
 2. `WCAG 2.1 AA Audit ab 199 €`
 3. `Barrierefreiheit prüfen`
 4. `Vollreport mit Fix-Plan`
@@ -85,7 +85,7 @@ sozialgesetz
 4. `Cookie-Check + WCAG-Audit in einem PDF. Kein Abo, automatischer Scan, sofort.`
 
 ### Pinned Headlines
-- Headline 1 (immer pinnen): `BFSG-Check in 60 Sekunden`
+- Headline 1 (immer pinnen): `Barrierefrei prüfen in 60 Sek.`
 - Headline 2 (pinnen wenn Cookie-Sortiment): `Cookie-Check inklusive`
 
 ---
@@ -94,10 +94,10 @@ sozialgesetz
 
 | Sitelink | URL | Description |
 |---|---|---|
-| Gratis-Scan starten | `bfsg-fix.de/` | 60-Sek-Test mit Score-Ergebnis |
-| Pakete & Preise | `bfsg-fix.de/preise` | Basis 199 €, Profi 499 €, Re-Check 39 €/Mo |
-| Was prüft BFSG-Check? | `bfsg-fix.de/methodik` | WCAG-Kriterien + Cookie-Regeln |
-| Für Agenturen | `bfsg-fix.de/agenturen` | White-Label-Bundle ab 1.490 € |
+| Gratis-Scan starten | `barrierefrei-pruefen.de/` | 60-Sek-Test mit Score-Ergebnis |
+| Pakete & Preise | `barrierefrei-pruefen.de/preise` | Basis 199 €, Profi 499 €, Re-Check 39 €/Mo |
+| Was prüft Barrierefrei-Prüfen? | `barrierefrei-pruefen.de/methodik` | WCAG-Kriterien + Cookie-Regeln |
+| Für Agenturen | `barrierefrei-pruefen.de/agenturen` | White-Label-Bundle ab 1.490 € |
 
 ---
 
@@ -149,7 +149,7 @@ fetch('https://www.google-analytics.com/mp/collect?...', {
 ## Kampagnen-Struktur (1 Kampagne, 5 Ad-Groups)
 
 ```
-Campaign: BFSG-Check DE Intent-High
+Campaign: Barrierefrei-Prüfen DE Intent-High
 ├── Ad Group 1: BFSG-Brand
 │   └── Keywords: bfsg check, bfsg-check, bfsg-fix
 ├── Ad Group 2: BFSG-Pflicht-High-Intent

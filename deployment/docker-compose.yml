@@ -22,7 +22,7 @@ services:
       - FROM_EMAIL=${FROM_EMAIL}
       - FROM_NAME=${FROM_NAME}
       - REPLY_TO=${REPLY_TO}
-      - INVOICE_CONTACT_EMAIL=${INVOICE_CONTACT_EMAIL:-info@bfsg-fix.de}
+      - INVOICE_CONTACT_EMAIL=${INVOICE_CONTACT_EMAIL:-info@barrierefrei-pruefen.de}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - ENABLE_ABO=${ENABLE_ABO:-false}
       - MAX_CONCURRENT_SCANS=${MAX_CONCURRENT_SCANS:-2}
@@ -60,7 +60,7 @@ services:
       retries: 3
       start_period: 30s
 
-  # Next.js-Landingpage (löst alte statische HTML ab, Caddy routet bfsg-fix.de hierhin).
+  # Next.js-Landingpage (löst alte statische HTML ab, Caddy routet barrierefrei-pruefen.de + bfsg-fix.de hierhin).
   landing-next:
     build:
       context: ../landingpage-next
@@ -82,7 +82,7 @@ services:
     depends_on:
       - app
 
-  # Admin-Dashboard (admin.bfsg-fix.de, Auth-Layer in Welle 5).
+  # Admin-Dashboard (admin.barrierefrei-pruefen.de, Auth-Layer in Welle 5).
   admin-next:
     build:
       context: ../admin-next

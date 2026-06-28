@@ -29,9 +29,9 @@ Show HN: I built a WCAG 2.1 AA compliance scanner for German websites (BFSG law)
 ```
 Hi HN,
 
-I'm Matthias, a solo developer from northern Germany. I built bfsg-fix.de —
-an automated accessibility scanner for German websites, with German-language
-PDF reports and fix recommendations.
+I'm Matthias, a solo developer from northern Germany. I built 
+barrierefrei-pruefen.de — an automated accessibility scanner for German 
+websites, with German-language PDF reports and fix recommendations.
 
 **Why this exists:** Germany's BFSG (Barrierefreiheitsstärkungsgesetz /
 Accessibility Strengthening Act) came into force June 28, 2025. Every B2C
@@ -74,7 +74,7 @@ feedback on the scan results (the free scan requires no login).
 I'm the founder. Happy to answer questions about WCAG internals, the
 German compliance landscape, or building solo SaaS in Germany.
 
-https://bfsg-fix.de — free scan, no login required.
+https://barrierefrei-pruefen.de — free scan, no login required.
 ```
 
 ---
@@ -164,7 +164,7 @@ Erst dann: Title mit echter Zahl, Body mit echten Statistiken.
 | **Reddit r/de** | DE-version, focus on Daten-Story |
 | **Hacker News Show HN** | Original |
 | **Lobsters** (Tech Community) | Code-fokus, weniger Marketing |
-| **Mastodon @bfsg-check** | Karusell-Post mit Findings |
+| **Mastodon @barrierefrei-pruefen** | Karusell-Post mit Findings |
 
 **WICHTIG:** Auf jeder Plattform den Sub-Reddit / Community-Regeln respektieren. Bei Cross-Posting innerhalb 24h ALLEN Posts zeitlich versetzt für maximalen Reach.
 
@@ -174,7 +174,7 @@ Erst dann: Title mit echter Zahl, Body mit echten Statistiken.
 
 ✅ **Show HN ist transparent** (offizielles HN-Format für eigene Produkte) → keine Schleichwerbung
 ✅ **Reddit r/SaaS / r/selbststaendig:** ähnlich, ABER:
-- [ ] In Profil-Bio: „Founder of bfsg-fix.de" → Transparenz
+- [ ] In Profil-Bio: „Founder of barrierefrei-pruefen.de" → Transparenz
 - [ ] In Post: „my product" / „I built" → klare Offenlegung
 - [ ] Keine Sockpuppets in Kommentaren
 - [ ] Auf Folge-Posts: nicht öfter als alle 4-6 Wochen pushen

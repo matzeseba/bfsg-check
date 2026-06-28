@@ -1,9 +1,9 @@
 /**
- * Admin-API-Client für das BFSG-Check Backend.
+ * Admin-API-Client für das Barrierefrei-Prüfen Backend.
  *
  * Liest Bearer-Token aus `ADMIN_TOKEN` (Server-Side env, niemals
  * an Client ausliefern). Basis-URL aus `ADMIN_API_BASE_URL`,
- * Default: https://bfsg-fix.de
+ * Default: https://barrierefrei-pruefen.de
  *
  * Alle Funktionen sind Server-Only — niemals aus Client-Components
  * importieren.
@@ -11,7 +11,7 @@
 
 import "server-only";
 
-const DEFAULT_BASE_URL = "https://bfsg-fix.de";
+const DEFAULT_BASE_URL = "https://barrierefrei-pruefen.de";
 
 export type Order = {
   sessionId: string;

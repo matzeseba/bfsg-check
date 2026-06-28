@@ -11,7 +11,7 @@ import { mockHealth, mockWorkflowRuns } from "@/lib/mock-data";
 import { formatDateTime, formatUptime } from "@/lib/format";
 
 export const metadata = {
-  title: "Server-Status · BFSG-Check Admin",
+  title: "Server-Status · Barrierefrei-Prüfen Admin",
 };
 
 function statusBadge(state: "ok" | "down" | "degraded") {
@@ -54,7 +54,7 @@ export default function ServerPage() {
       <header>
         <h1 className="text-2xl font-semibold tracking-tight">Server-Status</h1>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          Live-Check auf <code>https://bfsg-fix.de/health</code> sowie letzte
+          Live-Check auf <code>https://barrierefrei-pruefen.de/health</code> sowie letzte
           GitHub-Workflow-Läufe.
         </p>
       </header>

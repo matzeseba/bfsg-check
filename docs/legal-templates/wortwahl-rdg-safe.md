@@ -11,7 +11,7 @@
 |---|---|
 | automatisierte technische Analyse | rechtliche Prüfung |
 | WCAG-2.1-AA-Audit | Konformitäts-Prüfung |
-| BFSG-Check | BFSG-Konformität |
+| Barrierefrei-Prüfen | BFSG-Konformität |
 | technische Findings | rechtliche Verstöße |
 | Empfehlungen zur Behebung | Anweisungen |
 | Best-Effort-Scan | garantierter Scan |
@@ -19,7 +19,7 @@
 | Compliance-Hilfe | Compliance-Garantie |
 | Audit-Bericht | Konformitäts-Zertifikat |
 | Score-Berechnung | Konformitäts-Score |
-| BFSG-Check unterstützt bei | BFSG-Check macht konform |
+| Barrierefrei-Prüfen unterstützt bei | Barrierefrei-Prüfen macht konform |
 | unsere Werkzeuge prüfen | unsere Anwälte prüfen |
 | nach WCAG 2.1 AA | nach geltendem Recht |
 | Findings nach BFSG-Methodik | rechtsverbindliche Findings |
@@ -81,12 +81,12 @@ grep -r "Anwalt.*geprüft\|geprüft.*Anwalt" --include="*.*" .
 ### Tagline (positiv-faktisch)
 ```
 ✅ „Automatisierte WCAG-Audits für deutsche Websites"
-✅ „BFSG-Check: Technische Analyse + PDF-Report"
+✅ „Barrierefrei-Prüfen: Technische Analyse + PDF-Report"
 ✅ „Compliance-Scan mit Findings + Umsetzungsplan"
 
 ❌ „BFSG-Konformität in 60 Sekunden" (unmöglich!)
 ❌ „Garantierte Abmahn-Sicherheit"
-❌ „Rechtssicherer BFSG-Check"
+❌ „Rechtssicherer Barrierefrei-Check"
 ```
 
 ### Pricing-Beschreibung

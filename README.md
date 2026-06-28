@@ -1,4 +1,4 @@
-# BFSG-Audit — Die „Compliance-Cash-Maschine"
+# Barrierefrei-Prüfen — Die „Compliance-Cash-Maschine"
 
 Automatisiertes Geschäftssystem, das deutsche Websites gegen das
 **Barrierefreiheitsstärkungsgesetz (BFSG)** prüft und den Mängel-Report als

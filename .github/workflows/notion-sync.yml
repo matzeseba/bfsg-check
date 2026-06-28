@@ -1,6 +1,7 @@
 name: Notion Dashboard Sync
 
-# Alle 15 Min: ruft /admin/orders + /admin/subscriptions auf bfsg-fix.de ab
+# Alle 15 Min: ruft /admin/orders + /admin/subscriptions auf barrierefrei-pruefen.de ab
+# (CUTOVER-HINWEIS: BFSG_URL-Secret auf https://barrierefrei-pruefen.de setzen nach DNS-Cutover)
 # und pusht Deltas in 2 Notion-DBs. Idempotent via Session-/Subscription-ID.
 #
 # Setup-Anleitung: docs/DASHBOARD-NOTION-SETUP.md
@@ -60,9 +61,9 @@ jobs:
             Workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
             Mögliche Ursachen:
-            - bfsg-fix.de down (siehe uptime-watch.yml-Alert?)
+            - barrierefrei-pruefen.de / bfsg-fix.de down (siehe uptime-watch.yml-Alert?)
             - ADMIN_TOKEN rotiert ohne Secret-Update
             - Notion-API-Rate-Limit
             - NOTION_DB_*-IDs falsch
           to: matze.seba@outlook.de
-          from: BFSG-Check Monitoring <no-reply@bfsg-fix.de>
+          from: Barrierefrei-Prüfen Monitoring <no-reply@bfsg-fix.de>

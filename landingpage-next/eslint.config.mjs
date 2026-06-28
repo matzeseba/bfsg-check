@@ -8,14 +8,14 @@ const eslintConfig = defineConfig([
   {
     files: ["app/**/*.{ts,tsx,js,jsx}", "components/**/*.{ts,tsx,js,jsx}", "lib/**/*.{ts,tsx,js,jsx}"],
     rules: {
-      // BFSG-Check Lint: Verbiete ASCII-Ersatz fuer Umlaute in deutschen Texten.
+      // Umlaut-Lint: Verbiete ASCII-Ersatz fuer Umlaute in deutschen Texten.
       "no-restricted-syntax": [
         "error",
         {
           selector:
             "Literal[value=/Pruef|Staerk|Loes|Maen|Bus[gks]eld|Auswaehl|fuehl/]",
           message:
-            "BFSG-Check Lint: Bitte echte Umlaute (ä/ö/ü/ß) nutzen statt ae/oe/ue/ss.",
+            "Umlaut-Lint: Bitte echte Umlaute (ä/ö/ü/ß) nutzen statt ae/oe/ue/ss.",
         },
       ],
     },

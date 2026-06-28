@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Datenschutzerklärung",
   description:
-    "Datenschutzerklärung von BFSG-Check — welche Daten wir verarbeiten, warum, und wie Sie Ihre Rechte ausüben.",
+    "Datenschutzerklärung von Barrierefrei-Prüfen — welche Daten wir verarbeiten, warum, und wie Sie Ihre Rechte ausüben.",
   alternates: { canonical: "/datenschutz" },
 };
 
@@ -23,7 +23,7 @@ export default function DatenschutzPage() {
       <h2 className="mt-10 text-xl font-semibold">1. Verantwortlicher</h2>
       <p className="mt-2 text-muted-foreground">
         Verantwortlich im Sinne der DSGVO ist der im Impressum genannte
-        Betreiber von BFSG-Check (siehe{" "}
+        Betreiber von Barrierefrei-Prüfen (siehe{" "}
         <Link href="/impressum" className="underline">
           Impressum
         </Link>
