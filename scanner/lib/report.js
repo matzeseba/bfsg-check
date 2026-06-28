@@ -69,7 +69,10 @@ export function renderReport(
     // Score-Beschriftung + Verdikt-Text überschreibbar, damit der Cookie-Report ein
     // TDDDG-neutrales Label/Verdikt nutzen kann statt der BFSG-„konform"-Aussage (SF13).
     scoreLabel = 'Konformitäts-Score',
-    verdictText = null
+    verdictText = null,
+    // Zusätzliche technische Hinweise (z. B. fehlerhaftes TLS-Zertifikat), die KEINE
+    // WCAG-Verstöße sind — eigener Abschnitt, fließen NICHT in Score/Erklärung ein.
+    notices = []
   } = {}
 ) {
   const { score, grade, verdict: gradeVerdict } = computeScore(scan.violations);
@@ -236,6 +239,18 @@ export function renderReport(
       : '<li>Keine automatisiert erkannten Punkte. Manuelle Prüfung empfohlen.</li>'
   }
   </ul>
+
+  ${notices && notices.length ? `
+  <h2 class="section">Weitere technische Hinweise</h2>
+  ${notices.map((n) => `
+      <div class="finding ${n.severity || 'moderate'}">
+        <div class="finding-head">
+          <span class="badge ${n.severity || 'moderate'}">Hinweis</span>
+          <h3>${esc(n.title)}</h3>
+        </div>
+        <p class="why">${esc(n.text)}</p>
+      </div>`).join('\n')}
+  ` : ''}
 
   <div class="legalbox">${legalHtml}</div>
 
