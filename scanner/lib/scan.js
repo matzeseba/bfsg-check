@@ -19,7 +19,9 @@ import { classifyScanError } from './scan-error.js';
 // Wichtig: das Rebinding-Verify steht VOR den Navigationen, darf NICHT verschluckt
 // werden (sonst SSRF-/Rebinding-Schutz umgangen).
 // Settle-Budget: max. 1/3 des Gesamt-Budgets, gedeckelt 6–8 s.
-async function gotoResilient(page, safeUrl, addresses, timeout) {
+// Exportiert für den Unit-Test (test/goto-resilient.test.js): ein 4xx/5xx-Status muss
+// werfen (HTTP-Fehlerseite/WAF-Interstitial ist KEIN verwertbarer Scan), 2xx/null nicht.
+export async function gotoResilient(page, safeUrl, addresses, timeout) {
   await verifyNoDnsRebinding(safeUrl, addresses);
   // Zuverlässiger Primärladevorgang. Wirft (z.B. TLS/DNS/Connection) wird durch
   // an den Aufrufer durchgereicht — dort greift der Retry / die Klassifizierung.
