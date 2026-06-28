@@ -1,12 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Geist, Geist_Mono } from "next/font/google";
+import { Hanken_Grotesk, JetBrains_Mono, Schibsted_Grotesk } from "next/font/google";
 import { MotionConfig } from "motion/react";
 
+import { AnnouncementBar } from "@/components/AnnouncementBar";
 import { CheckoutModal } from "@/components/CheckoutModal";
 import { CookieBanner } from "@/components/CookieBanner";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { MobileStickyCta } from "@/components/MobileStickyCta";
+import { ScrollProgress } from "@/components/ScrollProgress";
 import { SiteJsonLd } from "@/components/JsonLd";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "@/components/ui/sonner";
@@ -15,29 +17,28 @@ import { SITE } from "@/lib/config";
 
 import "./globals.css";
 
-// Body/UI: Geist (technisch-neutrale Grotesk, Vercel-Stack).
-const geistSans = Geist({
+// Body/UI: Hanken Grotesk — humanistische Grotesk aus dem neuen Claude-Design
+// (warm, gut lesbar). Variable Font → keine weight-Liste noetig.
+const hankenSans = Hanken_Grotesk({
   variable: "--font-sans",
   subsets: ["latin", "latin-ext"],
   display: "swap",
 });
 
-// Zahlen/Technik: Geist Mono fuer Scores, Preise, Report-IDs, Snippets.
-const geistMono = Geist_Mono({
+// Zahlen/Technik: JetBrains Mono fuer Scores, Preise, Report-IDs, Ticker, Snippets
+// (Design-Signatur: technische Mono-Akzente).
+const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono",
   subsets: ["latin", "latin-ext"],
   display: "swap",
 });
 
-// Display/Headlines: Fraunces — optischer Serif fuer editoriale Premium-Wirkung.
-// Variable Font (weight-Range + opsz/SOFT-Achsen) → next/font erlaubt `axes`
-// nur ohne explizite `weight`-Liste.
-const fraunces = Fraunces({
+// Display/Headlines: Schibsted Grotesk — kraftvolle, eng laufende Grotesk fuer
+// die grossen Headlines aus dem neuen Design. Variable Font (400–900).
+const schibstedDisplay = Schibsted_Grotesk({
   variable: "--font-display",
   subsets: ["latin", "latin-ext"],
   display: "swap",
-  style: ["normal", "italic"],
-  axes: ["opsz", "SOFT"],
 });
 
 export const metadata: Metadata = {
@@ -101,7 +102,7 @@ export const metadata: Metadata = {
 // color-scheme auf <html> beim Theme-Wechsel zusaetzlich dynamisch.
 export const viewport: Viewport = {
   colorScheme: "dark light",
-  themeColor: "#0d0e1a",
+  themeColor: "#07080d",
 };
 
 export default function RootLayout({
@@ -117,7 +118,7 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       // next-themes setzt .dark vor Hydration via Inline-Script.
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
+      className={`${hankenSans.variable} ${jetbrainsMono.variable} ${schibstedDisplay.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
         <ThemeProvider>
@@ -132,6 +133,10 @@ export default function RootLayout({
               Zum Hauptinhalt springen
             </a>
             <CheckoutProvider>
+              {/* Lese-Fortschrittsbalken (fixed, aria-hidden) + Ankuendigungs-Bar
+                  ueber dem sticky Header — Design-Signaturen. */}
+              <ScrollProgress />
+              <AnnouncementBar />
               <Header />
               <main
                 id="main"

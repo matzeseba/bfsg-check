@@ -87,6 +87,13 @@
   --animate-scan-beam: scan-beam 4.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   --animate-float: float 7s ease-in-out infinite;
   --animate-float-slow: float 11s ease-in-out infinite;
+  /* Neue Design-Animationen (Ticker, CTA-Glow, Scan-Equalizer, Ablauf-Lauflicht,
+     Empfehlungs-Puls). Alle dekorativ → via reduced-motion stillgestellt. */
+  --animate-ticker: marquee 42s linear infinite;
+  --animate-glow-pulse: glow-pulse 3s ease-in-out infinite;
+  --animate-bar-eq: bar-eq 1s ease-in-out infinite;
+  --animate-travel-dot: travel-dot 4.5s ease-in-out infinite;
+  --animate-warn-pulse: warn-pulse 2.4s ease-in-out infinite;
 }
 
 :root {
@@ -139,53 +146,68 @@
   --brand-amber: oklch(0.78 0.16 75);
   --brand-rose: oklch(0.62 0.22 25);
 
+  /* Light: Akzentwort in dunklem Indigo→Violet (auf weiss kontrastsicher).
+     Dark ueberschreibt das mit Mint (siehe .dark). */
+  --gradient-from: var(--brand-indigo);
+  --gradient-to: var(--brand-violet);
+
   color-scheme: light;
 }
 
 .dark {
-  --background: oklch(0.155 0.025 278);
-  --foreground: oklch(0.97 0.004 95);
-  --card: oklch(0.205 0.038 277);
-  --card-foreground: oklch(0.97 0.004 95);
-  --popover: oklch(0.205 0.038 277);
-  --popover-foreground: oklch(0.97 0.004 95);
-  --primary: oklch(0.78 0.16 158);
-  --primary-foreground: oklch(0.17 0.06 275);
-  --secondary: oklch(0.28 0.05 275);
-  --secondary-foreground: oklch(0.97 0.004 95);
-  --muted: oklch(0.26 0.04 275);
-  --muted-foreground: oklch(0.74 0.03 275);
-  --accent: oklch(0.78 0.16 158);
-  --accent-foreground: oklch(0.17 0.06 275);
-  --destructive: oklch(0.7 0.2 25);
-  --border: oklch(1 0 0 / 12%);
-  /* Karten-Kante im Dark: /12% ist auf card-nahen Flaechen grenzwertig unsichtbar.
-     /16% gibt der Kante Definition, ohne hart zu wirken. */
-  --border-card: oklch(1 0 0 / 16%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.78 0.16 158);
-  --chart-1: oklch(0.78 0.16 158);
-  --chart-2: oklch(0.7 0.17 275);
-  --chart-3: oklch(0.78 0.16 50);
-  --chart-4: oklch(0.7 0.18 320);
-  --chart-5: oklch(0.62 0.14 220);
-  --sidebar: oklch(0.18 0.04 275);
-  --sidebar-foreground: oklch(0.97 0.004 95);
-  --sidebar-primary: oklch(0.78 0.16 158);
-  --sidebar-primary-foreground: oklch(0.17 0.06 275);
-  --sidebar-accent: oklch(0.26 0.04 275);
-  --sidebar-accent-foreground: oklch(0.97 0.004 95);
-  --sidebar-border: oklch(1 0 0 / 12%);
-  --sidebar-ring: oklch(0.78 0.16 158);
+  /* Dark-Palette aus dem neuen Claude-Design (near-black Blau-Schwarz #07080d,
+     Mint #34d99a). Werte bewusst als Hex, um exakt das gelieferte Design zu
+     treffen; Token-basiert (nicht inline), damit der Light-Mode-Toggle erhalten
+     bleibt. Kontraste gegen #07080d/#11131e per Audit verifiziert. */
+  --background: #07080d;
+  --foreground: #f2f3f7;
+  --card: #11131e;
+  --card-foreground: #f2f3f7;
+  --popover: #11131e;
+  --popover-foreground: #f2f3f7;
+  --primary: #34d99a;
+  --primary-foreground: #06251a;
+  --secondary: #1b1e2e;
+  --secondary-foreground: #f2f3f7;
+  --muted: #13151f;
+  /* #9598ad: 7.0:1 auf #07080d, 6.5:1 auf #11131e (AA-sicher fuer Sekundaertext).
+     Bewusst nicht dunkler (die Design-Failfarben #6b6e82/#5d6076 sind verbannt). */
+  --muted-foreground: #9598ad;
+  --accent: #34d99a;
+  --accent-foreground: #06251a;
+  --destructive: #ff6b57;
+  --border: oklch(1 0 0 / 9%);
+  --border-card: oklch(1 0 0 / 13%);
+  --input: oklch(1 0 0 / 17%);
+  --ring: #34d99a;
+  --chart-1: #34d99a;
+  --chart-2: #5b73e8;
+  --chart-3: #f5b13d;
+  --chart-4: #b07cff;
+  --chart-5: #3a82f6;
+  --sidebar: #0a0b14;
+  --sidebar-foreground: #f2f3f7;
+  --sidebar-primary: #34d99a;
+  --sidebar-primary-foreground: #06251a;
+  --sidebar-accent: #13151f;
+  --sidebar-accent-foreground: #f2f3f7;
+  --sidebar-border: oklch(1 0 0 / 9%);
+  --sidebar-ring: #34d99a;
 
-  --brand-deeper: oklch(0.12 0.04 278);
-  --brand-deep: oklch(0.17 0.055 277);
-  --brand-indigo: oklch(0.42 0.15 275);
-  --brand-violet: oklch(0.55 0.18 295);
-  --brand-mint: oklch(0.8 0.16 158);
-  --brand-mint-soft: oklch(0.7 0.13 158);
-  --brand-amber: oklch(0.82 0.15 75);
-  --brand-rose: oklch(0.7 0.2 25);
+  --brand-deeper: #050609;
+  --brand-deep: #0b0d18;
+  --brand-indigo: #5b73e8;
+  --brand-violet: #9a7cff;
+  --brand-mint: #34d99a;
+  --brand-mint-soft: #7fe8bd;
+  --brand-amber: #f5b13d;
+  --brand-rose: #ff6b57;
+
+  /* Headline-Akzent: im Dark bright Mint (Design-Signatur), im Light dunkles
+     Indigo→Violet (siehe :root) — so bleibt das Akzentwort in BEIDEN Themes
+     kontrastsicher. */
+  --gradient-from: var(--brand-mint);
+  --gradient-to: var(--brand-mint-soft);
 
   color-scheme: dark;
 }
@@ -197,8 +219,8 @@
   html {
     @apply font-sans antialiased;
     scroll-behavior: smooth;
-    /* Geist + Fraunces: Ligaturen/Kontextformen fuer scharfe Typo. */
-    font-feature-settings: "ss01", "cv01", "cv11";
+    /* Schibsted/Hanken/JetBrains: Standard-Kerning + Ligaturen fuer scharfe Typo. */
+    font-feature-settings: "kern", "liga";
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
@@ -232,10 +254,18 @@
       mix-blend-mode: overlay;
     }
   }
-  /* Sichtbarer Fokus-Indikator für rohe Links (Buttons/Inputs haben eigene
-     focus-visible-Ringe). WCAG 2.4.7 — vorher fielen reine <a> auf den
-     UA-Default zurück. */
-  a:focus-visible {
+  /* Sichtbarer Fokus-Indikator fuer ROHE interaktive Elemente (shadcn-Buttons/
+     -Inputs haben eigene focus-visible-Ringe via Utilities, die diese @layer-base-
+     Regel ueberschreiben → kein Doppel-Ring). WCAG 2.4.7/2.4.11 — deckt jetzt auch
+     rohe <button>, [role=button] (Disclosure/FAQ), den Pricing-Range-Slider und
+     beliebige [tabindex]-Elemente ab, die im neuen Design sonst auf den teils
+     unsichtbaren UA-Default fielen. Mint-Ring (var(--ring)) ist auf #07080d ~11:1. */
+  a:focus-visible,
+  button:focus-visible,
+  [role="button"]:focus-visible,
+  summary:focus-visible,
+  input[type="range"]:focus-visible,
+  [tabindex]:focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 2px;
     border-radius: var(--radius-sm);
@@ -266,23 +296,24 @@
   .text-pretty {
     text-wrap: pretty;
   }
-  /* Mint→Violet Verlauf fuer betonte Headline-Woerter.
-     KONTRAST-REGEL: .gradient-text (Mint→Violet) NUR auf hellen/neutralen Flaechen
-     (bg-background / bg-muted / bg-card). Auf near-black Panels (brand-deep/-deeper:
-     StatsBar, CtaSection, Wow-Block-Kicker) faellt der Violet-Anteil unter WCAG AA →
-     dort stattdessen solid `text-brand-mint` nutzen (s. StatsBar/CtaSection).
-     CLIP-BOX-SCHUTZ: background-clip:text beschneidet sonst die Unterlaengen (g/j/ß/q,
-     padding-bottom) UND den rechtsseitigen Italic-Ueberhang des letzten Glyphs (z.B.
-     das „?" in „BFSG?", padding-right). Die negativen Margins neutralisieren die
-     zusaetzliche Box-Breite/-Hoehe → kein Textfluss-Shift, kein CLS. Gilt fuer ALLE
-     Gradient-Headlines. */
+  /* Akzent-Verlauf fuer betonte Headline-Woerter (Design-Signatur: leuchtendes
+     Mint auf dem Hero-Wort „BFSG").
+     THEME-SICHER: Die Stops kommen aus --gradient-from/--gradient-to. Dark = Mint→
+     Mint-soft (bright, hochkontrast auf #07080d). Light = Indigo→Violet (dunkel,
+     kontrastsicher auf Weiss). So ist das Akzentwort in BEIDEN Themes AA-konform —
+     der fruehere „Violet faellt auf near-black unter AA"-Vorbehalt entfaellt.
+     background-size:200% ermoeglicht den Shimmer (siehe .gradient-text-shimmer).
+     CLIP-BOX-SCHUTZ: background-clip:text beschneidet sonst Unterlaengen (g/j/ß/q,
+     padding-bottom) + den rechtsseitigen Glyph-Ueberhang (z.B. „?" in „BFSG?",
+     padding-right). Negative Margins neutralisieren die Box → kein Shift, kein CLS. */
   .gradient-text {
     background-image: linear-gradient(
       135deg,
-      var(--brand-mint) 0%,
-      color-mix(in oklch, var(--brand-mint), var(--brand-violet) 45%) 55%,
-      var(--brand-violet) 100%
+      var(--gradient-from) 0%,
+      var(--gradient-to) 50%,
+      var(--gradient-from) 100%
     );
+    background-size: 200% auto;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -290,6 +321,11 @@
     margin-bottom: -0.1em;
     padding-right: 0.09em;
     margin-right: -0.09em;
+  }
+  /* Shimmer-Sweep fuer das Hero-Akzentwort (bewegt die background-position).
+     Wird via @media (prefers-reduced-motion) stillgestellt. */
+  .gradient-text-shimmer {
+    animation: shimmer-text 5s linear infinite;
   }
   .gradient-text-soft {
     background-image: linear-gradient(
@@ -462,6 +498,32 @@
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-8px); }
 }
+/* Shimmer-Sweep ueber das Hero-Akzentwort (background-position). */
+@keyframes shimmer-text {
+  to { background-position: 200% center; }
+}
+/* Sanfter Mint-Ring-Puls am Haupt-CTA. */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--brand-mint), transparent 100%); }
+  50% { box-shadow: 0 0 0 5px color-mix(in oklch, var(--brand-mint), transparent 88%); }
+}
+/* Equalizer-Balken im Live-Scan-Fortschritt. */
+@keyframes bar-eq {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
+}
+/* Lauflicht auf der Ablauf-Fortschrittslinie. */
+@keyframes travel-dot {
+  0% { left: 0; opacity: 0; }
+  8% { opacity: 1; }
+  92% { opacity: 1; }
+  100% { left: 100%; opacity: 0; }
+}
+/* Dezenter Puls am Empfehlungs-Rahmen der Pricing-Karte. */
+@keyframes warn-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
 
 /* prefers-reduced-motion: alle dekorativen Endlos-Animationen ruhigstellen. */
 @media (prefers-reduced-motion: reduce) {
@@ -479,7 +541,13 @@
   .animate-float-slow,
   .animate-pulse-soft,
   .animate-shimmer,
-  .animate-marquee {
+  .animate-marquee,
+  .animate-ticker,
+  .animate-glow-pulse,
+  .animate-bar-eq,
+  .animate-travel-dot,
+  .animate-warn-pulse,
+  .gradient-text-shimmer {
     animation: none !important;
   }
 }
