@@ -225,8 +225,9 @@ async function handleCheckoutCompleted(event) {
     );
     // MF5: Den zahlenden Kunden NICHT im Schweigen lassen — Best-Effort-Eingangs-/
     // Verzögerungs-Notiz (kein PDF im FAILED-Fall). Eigener try/catch: ein Mail-Fehler
-    // hier darf den Handler nicht kippen, Status bleibt FAILED. Idempotenz-Flag schützt
-    // gegen erneutes Mailen bei Re-Runs.
+    // hier darf den Handler nicht kippen, Status bleibt FAILED. Gegen Doppelversand schützt
+    // bereits die Webhook-Idempotenz (claimEvent) — dieser Handler läuft pro Event genau
+    // einmal; customerNoticeSent ist nur eine sichtbare Markierung im Order-Record.
     try {
       if (isEmail(email)) {
         await sendDelayNotice({ to: email, company: meta.company || '' });
@@ -733,6 +734,15 @@ app.post('/api/resend/:sessionId', requireAdminAuth, async (req, res) => {
     const invoice = order.invoiceNumber
       ? null
       : await safeGenerateInvoice({ orderId: sessionId, email: recipient, company: order.company || '', pkg: order.pkg || 'basis', amount: order.amount });
+    // GoBD (CORR-1): die frisch vergebene Rechnungsnummer SOFORT persistieren — VOR dem
+    // Mailversand (spiegelt den INVOICED-Checkpoint des Haupt-Pfads, app.js handleCheckoutCompleted).
+    // Sonst verbrennt ein Mail-Fehler die Nummer: der SF1-Rollback schreibt sie nicht in den
+    // Order-Record, und der nächste Resend zöge eine ZWEITE Nummer für denselben Verkauf
+    // (übersprungene/doppelte GoBD-Nummer). markStatus merget gegen den persistierten Record,
+    // sodass die Nummer auch den anschließenden Rollback-Write übersteht.
+    if (invoice?.invoiceNumber) {
+      await markStatus(sessionId, 'INVOICED', { invoiceNumber: invoice.invoiceNumber, invoicePdfPath: invoice.pdfPath || null });
+    }
     await sendReportFor({
       to: recipient, company: order.company || '',
       pdfPath: result.pdfPath, stmtPath: result.stmtPath,
