@@ -14,8 +14,54 @@ const {
   FROM_EMAIL = 'no-reply@bfsg-check.de',
   FROM_NAME = 'BFSG-Check',
   REPLY_TO,
+  INVOICE_CONTACT_EMAIL = 'info@bfsg-fix.de',
   ADMIN_EMAIL
 } = process.env;
+
+// Rueckfragen sollen NICHT an die no-reply-Sendeadresse gehen: explizites REPLY_TO
+// gewinnt, sonst die Kontaktadresse (info@). So landet „antworten Sie auf diese E-Mail"
+// immer in einem echten Postfach. FROM_EMAIL (no-reply@) bleibt die Sende-Adresse.
+const REPLY_TO_ADDR = REPLY_TO || INVOICE_CONTACT_EMAIL;
+
+// --- Pflicht-Footer fuer transaktionale Mails (Anbieterkennzeichnung § 5 DDG +
+// Disclaimer-Kurzform). Anschrift aus Env, damit sie nicht hartkodiert ist. ---
+const INVOICE_FROM_NAME = process.env.INVOICE_FROM_NAME || FROM_NAME;
+const INVOICE_FROM_ADDRESS = process.env.INVOICE_FROM_ADDRESS || '';
+const PUBLIC_HOST = (process.env.PUBLIC_URL || 'https://bfsg-fix.de')
+  .replace(/^https?:\/\//, '').replace(/\/+$/, '');
+
+// Exportiert fuer Unit-Tests (reine Funktion, keine Seiteneffekte).
+export function legalFooter() {
+  const anschrift = INVOICE_FROM_ADDRESS
+    ? `${INVOICE_FROM_NAME} · ${INVOICE_FROM_ADDRESS}`
+    : INVOICE_FROM_NAME;
+  return `--
+${anschrift}
+Kontakt: ${REPLY_TO_ADDR} · ${PUBLIC_HOST}
+
+BFSG-Check liefert eine automatisierte technische Analyse nach WCAG 2.1 AA.
+Keine Rechtsberatung, keine Konformitätsgarantie. Empfehlungen ersetzen nicht
+die anwaltliche Prüfung.`;
+}
+
+// B2C-Widerrufs-Verzicht-Bestaetigung (§ 356 Abs. 5 BGB). Nur fuer Verbraucher
+// relevant; bei Unternehmern leerer String (kein Widerrufsrecht).
+// Exportiert fuer Unit-Tests (reine Funktion, keine Seiteneffekte).
+export function widerrufHinweis({ customerType = '', consentTs = '' } = {}) {
+  if (customerType !== 'consumer') return '';
+  let datum = '';
+  if (consentTs) {
+    const d = new Date(consentTs);
+    if (!Number.isNaN(d.getTime())) datum = d.toLocaleDateString('de-DE');
+  }
+  return `
+WIDERRUFSRECHT (Verbraucher)
+Sie haben vor dem Kauf${datum ? ` am ${datum}` : ''} ausdrücklich zugestimmt, dass die
+Ausführung sofort beginnt, und bestätigt, dass Ihr 14-tägiges Widerrufsrecht mit
+vollständiger Erbringung der Leistung erlischt (§ 356 Abs. 5 BGB). Der Report wurde
+sofort erstellt und mit dieser E-Mail bereitgestellt.
+`;
+}
 
 const enabled = !!(SMTP_HOST && SMTP_USER && SMTP_PASS);
 
@@ -81,17 +127,17 @@ async function pushOptionalAttachment(attachments, filePath, filename) {
 // Sendet die passende Variante (BFSG-Erstreport / Cookie-Report / Re-Check mit Diff)
 // auf Basis von emailKind aus PKG_CONFIG. invoicePdfPath (optional) wird als
 // zusätzlicher Rechnungs-Anhang mitgesendet.
-export async function sendReportFor({ to, company = '', pdfPath, stmtPath, emailKind = 'bfsg', diffText = '', invoicePdfPath = null, invoiceNumber = null }) {
+export async function sendReportFor({ to, company = '', pdfPath, stmtPath, emailKind = 'bfsg', diffText = '', invoicePdfPath = null, invoiceNumber = null, customerType = '', consentTs = '' }) {
   if (emailKind === 'cookie') {
-    return sendCookieReport({ to, company, pdfPath, invoicePdfPath, invoiceNumber });
+    return sendCookieReport({ to, company, pdfPath, invoicePdfPath, invoiceNumber, customerType, consentTs });
   }
   if (emailKind === 'recheck') {
-    return sendRecheckReport({ to, company, pdfPath, stmtPath, diffText, invoicePdfPath, invoiceNumber });
+    return sendRecheckReport({ to, company, pdfPath, stmtPath, diffText, invoicePdfPath, invoiceNumber, customerType, consentTs });
   }
-  return sendReport({ to, company, pdfPath, stmtPath, invoicePdfPath, invoiceNumber });
+  return sendReport({ to, company, pdfPath, stmtPath, invoicePdfPath, invoiceNumber, customerType, consentTs });
 }
 
-export async function sendReport({ to, company = '', pdfPath, stmtPath, invoicePdfPath = null, invoiceNumber = null }) {
+export async function sendReport({ to, company = '', pdfPath, stmtPath, invoicePdfPath = null, invoiceNumber = null, customerType = '', consentTs = '' }) {
   if (!isEmail(to)) throw new Error('Ungültige Empfängeradresse: ' + to);
   const subject = `Ihr BFSG-Barrierefreiheits-Report${company ? ' — ' + oneLine(company) : ''}`;
   const text = `Vielen Dank für Ihre Bestellung.
@@ -104,9 +150,11 @@ Dieser Report ist eine automatisierte technische Erstprüfung nach WCAG 2.1 und
 ersetzt keine vollständige manuelle Prüfung und keine Rechtsberatung.
 
 Bei Fragen antworten Sie einfach auf diese E-Mail.
-
+${widerrufHinweis({ customerType, consentTs })}
 Mit freundlichen Grüßen
-${FROM_NAME}`;
+${FROM_NAME}
+
+${legalFooter()}`;
 
   const attachments = [];
   if (pdfPath) attachments.push({ filename: 'BFSG-Report.pdf', content: await readFile(pdfPath) });
@@ -118,7 +166,7 @@ ${FROM_NAME}`;
   return deliver({ to, subject, text, attachments });
 }
 
-export async function sendCookieReport({ to, company = '', pdfPath, invoicePdfPath = null, invoiceNumber = null }) {
+export async function sendCookieReport({ to, company = '', pdfPath, invoicePdfPath = null, invoiceNumber = null, customerType = '', consentTs = '' }) {
   if (!isEmail(to)) throw new Error('Ungültige Empfängeradresse: ' + to);
   const subject = `Ihr Cookie- & Consent-Report (§ 25 TDDDG)${company ? ' — ' + oneLine(company) : ''}`;
   const text = `Vielen Dank für Ihre Bestellung.
@@ -132,9 +180,11 @@ Banner-Interaktion. Er ersetzt keine vollständige manuelle Prüfung und keine
 Rechtsberatung.
 
 Bei Fragen antworten Sie einfach auf diese E-Mail.
-
+${widerrufHinweis({ customerType, consentTs })}
 Mit freundlichen Grüßen
-${FROM_NAME}`;
+${FROM_NAME}
+
+${legalFooter()}`;
 
   const attachments = [];
   if (pdfPath) attachments.push({ filename: 'Cookie-Report.pdf', content: await readFile(pdfPath) });
@@ -142,7 +192,7 @@ ${FROM_NAME}`;
   return deliver({ to, subject, text, attachments });
 }
 
-export async function sendRecheckReport({ to, company = '', pdfPath, stmtPath = null, diffText = '', invoicePdfPath = null, invoiceNumber = null }) {
+export async function sendRecheckReport({ to, company = '', pdfPath, stmtPath = null, diffText = '', invoicePdfPath = null, invoiceNumber = null, customerType = '', consentTs = '' }) {
   if (!isEmail(to)) throw new Error('Ungültige Empfängeradresse: ' + to);
   const subject = `Ihr monatlicher BFSG-Re-Check${company ? ' — ' + oneLine(company) : ''}`;
   const text = `Hier ist Ihr aktueller Re-Check.
@@ -154,9 +204,11 @@ Im Anhang finden Sie:
 1. Den vollständigen Re-Check-Report (PDF) mit allen aktuellen Befunden und Lösungshinweisen.${stmtPath ? '\n2. Ihre auf den aktuellen Stand gebrachte Erklärung zur Barrierefreiheit (Vorlage).' : ''}${invoicePdfPath ? `\n${stmtPath ? '3' : '2'}. Ihre Rechnung (PDF).` : ''}
 
 Sie können Ihr Abo jederzeit über https://bfsg-fix.de/kuendigen beenden.
-
+${widerrufHinweis({ customerType, consentTs })}
 Mit freundlichen Grüßen
-${FROM_NAME}`;
+${FROM_NAME}
+
+${legalFooter()}`;
 
   const attachments = [];
   if (pdfPath) attachments.push({ filename: 'BFSG-Recheck.pdf', content: await readFile(pdfPath) });
@@ -283,10 +335,17 @@ async function deliver({ to, subject, text, attachments = [] }) {
     () => transporter.sendMail({
       from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
       to,
-      replyTo: REPLY_TO || undefined,
+      replyTo: REPLY_TO_ADDR || undefined,
       subject,
       text,
-      attachments
+      attachments,
+      // Deliverability: One-Click-List-Unsubscribe (RFC 8058). Verbessert die
+      // Zustellbarkeit (Gmail/Yahoo-Sender-Anforderungen). Unsubscribe geht an die
+      // Kontaktadresse (nicht no-reply). FROM_EMAIL bleibt die no-reply-Sendeadresse.
+      headers: {
+        'List-Unsubscribe': `<mailto:${REPLY_TO_ADDR}?subject=unsubscribe>`,
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+      }
     }),
     { to }
   );

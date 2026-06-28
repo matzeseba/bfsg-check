@@ -15,7 +15,7 @@ delete process.env.SMTP_HOST;
 delete process.env.SMTP_USER;
 delete process.env.SMTP_PASS;
 
-const { sendReportFor, sendReport, sendCookieReport, sendRecheckReport, isEmail } = await import('../lib/mailer.js');
+const { sendReportFor, sendReport, sendCookieReport, sendRecheckReport, isEmail, legalFooter, widerrufHinweis } = await import('../lib/mailer.js');
 
 const tmp = mkdtempSync(path.join(os.tmpdir(), 'bfsg-mailer-'));
 const reportPdf = path.join(tmp, 'report.pdf');
@@ -73,4 +73,36 @@ test('sendReport: fehlende Rechnungs-Datei wirft (Datei nicht lesbar)', async ()
 test('isEmail: Basis-Validierung', () => {
   assert.equal(isEmail('a@b.de'), true);
   assert.equal(isEmail('kaputt'), false);
+});
+
+test('legalFooter: Anbieterkennzeichnung + Disclaimer, keine verbotenen Claims', () => {
+  const f = legalFooter();
+  // Anbieterkennzeichnung (Name + Kontakt) vorhanden.
+  assert.match(f, /Kontakt:/);
+  // Disclaimer-Pflichtsprache vorhanden.
+  assert.match(f, /automatisierte technische Analyse/);
+  assert.match(f, /Keine Rechtsberatung/);
+  // Keine verbotenen Claims (CLAUDE.md-Compliance).
+  assert.doesNotMatch(f, /BFSG-konform/i);
+  assert.doesNotMatch(f, /rechtssicher/i);
+  assert.doesNotMatch(f, /garantiert/i);
+});
+
+test('widerrufHinweis: nur fuer Verbraucher, mit § 356 BGB; leer fuer Unternehmer', () => {
+  const consumer = widerrufHinweis({ customerType: 'consumer', consentTs: '2026-06-28T10:00:00Z' });
+  assert.match(consumer, /WIDERRUFSRECHT/);
+  assert.match(consumer, /§ 356 Abs\. 5 BGB/);
+  // de-DE Datum aus consentTs (Tages-/Monats-Padding ist locale-/ICU-abhaengig).
+  assert.match(consumer, /\b28\.0?6\.2026\b/);
+  // Unternehmer + leerer Typ → kein Hinweis.
+  assert.equal(widerrufHinweis({ customerType: 'business' }), '');
+  assert.equal(widerrufHinweis({}), '');
+});
+
+test('sendReport: Verbraucher-Mail laeuft mit customerType/consentTs durch (Dry-Run)', async () => {
+  const res = await sendReport({
+    to: 'kunde@beispiel.de', company: '', pdfPath: reportPdf,
+    customerType: 'consumer', consentTs: '2026-06-28T10:00:00Z'
+  });
+  assert.equal(res.dryRun, true);
 });
