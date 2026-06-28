@@ -106,6 +106,66 @@ test('renderInvoiceHtml: § 14 UStG — Rechnungs- UND Leistungsdatum ausgewiese
   assert.match(html, /Leistungsdatum:/);
 });
 
+test('renderInvoiceHtml: Empfaenger mit Name + Anschrift (Stripe billing) — kein 2x E-Mail', () => {
+  // Deckt die neue Empfaenger-Render-Logik ab: customer_details.{name,address} aus
+  // billing_address_collection landen als saubere Zeilen, nicht zweimal die E-Mail.
+  const html = renderInvoiceHtml({
+    invoiceNumber: 'RE-2026-0100',
+    date: '2026-06-28T12:00:00Z',
+    customer: {
+      company: 'Muster GmbH',
+      name: 'Max Mustermann',
+      line1: 'Lange Straße 1',
+      line2: '',
+      postalCode: '12345',
+      city: 'Berlin',
+      country: 'DE',
+      email: 'max@muster.de'
+    },
+    items: [{ description: 'BFSG-Report Profi', amount: 39900 }],
+    vatMode: 'kleinunternehmer'
+  });
+  assert.match(html, /Muster GmbH/);
+  assert.match(html, /Max Mustermann/);
+  assert.match(html, /Lange Straße 1/);
+  assert.match(html, /12345 Berlin/);
+  assert.match(html, /max@muster\.de/);
+  // Inland (DE) → Land wird NICHT gezeigt.
+  assert.doesNotMatch(html, /Deutschland/);
+  // E-Mail erscheint genau einmal (Bug-Regression: vorher 2x bei fehlender Firma).
+  const mailMatches = html.match(/max@muster\.de/g) || [];
+  assert.equal(mailMatches.length, 1, 'E-Mail darf nur einmal im Empfaenger-Block stehen');
+});
+
+test('renderInvoiceHtml: Empfaenger nur E-Mail (keine Adresse) → Privatkunde + E-Mail, keine Dopplung', () => {
+  // Altbestellung/Resend ohne Adresse: frueher stand die E-Mail zweimal untereinander.
+  const html = renderInvoiceHtml({
+    invoiceNumber: 'RE-2026-0101',
+    date: '2026-06-28T12:00:00Z',
+    customer: { company: '', name: '', email: 'solo@kunde.de' },
+    items: [{ description: 'BFSG-Report Basis', amount: 12900 }],
+    vatMode: 'kleinunternehmer'
+  });
+  assert.match(html, /Privatkunde/);
+  const mailMatches = html.match(/solo@kunde\.de/g) || [];
+  assert.equal(mailMatches.length, 1, 'E-Mail darf nur einmal erscheinen');
+});
+
+test('renderInvoiceHtml: auslaendischer Empfaenger zeigt Land', () => {
+  const html = renderInvoiceHtml({
+    invoiceNumber: 'RE-2026-0102',
+    date: '2026-06-28T12:00:00Z',
+    customer: {
+      name: 'Hans Huber', line1: 'Ringstr. 5', postalCode: '1010', city: 'Wien',
+      country: 'AT', email: 'hans@huber.at'
+    },
+    items: [{ description: 'BFSG-Report Basis', amount: 12900 }],
+    vatMode: 'kleinunternehmer'
+  });
+  assert.match(html, /1010 Wien/);
+  assert.match(html, /Österreich/);
+});
+
 test('nextInvoiceNumber: parallele Aufrufe vergeben eindeutige, lückenlose Nummern', async () => {
   // Race-Test: 20 gleichzeitige Allokationen dürfen NIE eine Nummer doppelt vergeben.
   const nums = await Promise.all(Array.from({ length: 20 }, () => nextInvoiceNumber()));

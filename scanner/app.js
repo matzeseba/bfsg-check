@@ -159,6 +159,10 @@ async function handleCheckoutCompleted(event) {
   const email = s.customer_details?.email || s.customer_email || meta.email;
   const pkg = PACKAGES[meta.pkg] ? meta.pkg : 'basis';
   const isSub = s.mode === 'subscription' && !!s.subscription;
+  // Rechnungsempfaenger-Daten aus dem Stripe-Checkout (billing_address_collection).
+  // name/address sind leer, falls Stripe sie (noch) nicht geliefert hat → der Renderer
+  // faellt dann defensiv auf company/email zurueck (keine Dopplung mehr).
+  const billing = buildBillingRecipient(s, meta);
 
   // Zahlung + Subscription wurden bereits in prePersistCheckout (vor der Quittung)
   // durabel festgehalten. Hier startet direkt die Erfüllung.
@@ -180,7 +184,7 @@ async function handleCheckoutCompleted(event) {
     );
     // Eigene Rechnung (§ 14 UStG) erzeugen — Fallback zur Stripe-Receipt-Mail.
     // Schlägt sie fehl, darf das die Report-Auslieferung NICHT blockieren.
-    invoice = await safeGenerateInvoice({ orderId: s.id, email, company: meta.company || '', pkg, amount: s.amount_total });
+    invoice = await safeGenerateInvoice({ orderId: s.id, email, company: meta.company || '', pkg, amount: s.amount_total, billing });
     // Rechnungsnummer SOFORT persistieren (vor Mailversand): schlägt der Versand
     // fehl oder crasht der Prozess zwischen Rechnung und Mail, kennt der Order-Record
     // die bereits vergebene fortlaufende GoBD-Nummer. Sonst zöge ein Resend eine
@@ -214,7 +218,9 @@ async function handleCheckoutCompleted(event) {
       emailKind,
       diffText: diffSummaryText(order.diff),
       invoicePdfPath: invoice?.pdfPath || null,
-      invoiceNumber: invoice?.invoiceNumber || null
+      invoiceNumber: invoice?.invoiceNumber || null,
+      customerType: meta.customerType || '',
+      consentTs: meta.consentTs || ''
     });
     await markStatus(s.id, 'MAILED', { pdfPath: order.pdfPath, invoiceNumber: invoice?.invoiceNumber || null });
     logger.info({ sessionId: s.id, pkg, amount: s.amount_total, invoiceNumber: invoice?.invoiceNumber || null }, 'Report ausgeliefert');
@@ -244,11 +250,30 @@ async function handleCheckoutCompleted(event) {
   }
 }
 
+// Baut den Rechnungsempfaenger aus der Stripe-Checkout-Session. customer_details.name +
+// .address sind gesetzt, sobald billing_address_collection:'required' im Checkout aktiv
+// ist. Felder, die Stripe nicht liefert, bleiben leer — invoice.js rendert nur die
+// vorhandenen Zeilen. company (Firmenname) kommt aus dem eigenen Checkout-Feld (Metadata).
+function buildBillingRecipient(session, meta = {}) {
+  const d = session.customer_details || {};
+  const a = d.address || {};
+  return {
+    company: (meta.company || '').trim(),
+    name: (d.name || '').trim(),
+    line1: (a.line1 || '').trim(),
+    line2: (a.line2 || '').trim(),
+    postalCode: (a.postal_code || '').trim(),
+    city: (a.city || '').trim(),
+    country: (a.country || '').trim(),
+    customerType: meta.customerType || ''
+  };
+}
+
 // Rechnungs-Generierung gekapselt: Fehler werden geloggt + gemeldet, aber
 // niemals propagiert — die Report-Auslieferung (das bezahlte Produkt) hat Vorrang.
-async function safeGenerateInvoice({ orderId, email, company, pkg, amount }) {
+async function safeGenerateInvoice({ orderId, email, company, pkg, amount, billing = null }) {
   try {
-    return await generateInvoicePdf({ orderId, email, company, pkg, amount });
+    return await generateInvoicePdf({ orderId, email, company, pkg, amount, billing });
   } catch (err) {
     logger.error({ orderId, err: err.message }, 'Rechnungs-Generierung fehlgeschlagen (Report wird trotzdem zugestellt)');
     sentry.captureException(err, { stage: 'invoice', order_id: orderId });
@@ -462,6 +487,10 @@ app.post('/api/checkout', rateLimit({ windowMs: 60_000, max: 10 }), async (req, 
         { price_data: { currency: 'eur', product_data: { name: p.name }, unit_amount: p.amount, ...recurring }, quantity: 1 }
       ],
       customer_email: cleanEmail || undefined,
+      // Name + Rechnungsanschrift erheben → landet in session.customer_details.{name,address}
+      // (§ 14 UStG: Profi 399 € > 250 € erfordert Empfänger-Name+Anschrift). 'required'
+      // erzwingt das Adressformular im Checkout fuer ALLE Pakete (einheitlich).
+      billing_address_collection: 'required',
       metadata: baseMeta,
       subscription_data,
       submit_type: p.mode === 'payment' ? 'pay' : undefined,

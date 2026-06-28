@@ -20,7 +20,8 @@ const INVOICE_DIR = process.env.INVOICE_DIR || path.join(__dirname, '..', 'out',
 const FROM = {
   name: process.env.INVOICE_FROM_NAME || process.env.FROM_NAME || 'BFSG-Check',
   address: process.env.INVOICE_FROM_ADDRESS || '[Anbieter-Adresse fehlt, siehe docs/LEGAL-PLACEHOLDERS.md]',
-  email: process.env.FROM_EMAIL || 'no-reply@bfsg-fix.de',
+  // Kontaktadresse fuer Rueckfragen (NICHT die no-reply-Sendeadresse). Default info@.
+  email: process.env.INVOICE_CONTACT_EMAIL || 'info@bfsg-fix.de',
   ustId: process.env.INVOICE_USTID || '',
   taxNumber: process.env.INVOICE_TAX_NUMBER || '',
   iban: process.env.INVOICE_IBAN || ''
@@ -32,6 +33,33 @@ function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, (c) =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
   );
+}
+
+// Baut den Empfaenger-Block: Firma (falls vorhanden) / Name / Strasse / Zusatz /
+// PLZ Ort / Land (nur falls != DE) / E-Mail. Leere Felder werden ausgelassen, sodass
+// keine Leerzeilen und keine Dopplungen entstehen (Bug: E-Mail erschien zweimal, wenn
+// kein Firmenname angegeben war). Land wird nur gezeigt, wenn es nicht Deutschland ist.
+const COUNTRY_NAMES = { DE: 'Deutschland', AT: 'Österreich', CH: 'Schweiz' };
+function recipientLines(c = {}) {
+  const cityLine = [c.postalCode, c.city].filter(Boolean).join(' ').trim();
+  const countryLine = c.country && String(c.country).toUpperCase() !== 'DE'
+    ? (COUNTRY_NAMES[String(c.country).toUpperCase()] || c.country)
+    : '';
+  const lines = [
+    c.company,
+    c.name,
+    c.line1,
+    c.line2,
+    cityLine,
+    countryLine,
+    c.email
+  ].map((v) => String(v ?? '').trim()).filter(Boolean);
+  // Dedupe direkt aufeinanderfolgender Gleichheit (Schutz gegen versehentliche Dopplung).
+  const out = lines.filter((v, i) => v !== lines[i - 1]);
+  // Fallback: nichts ausser evtl. E-Mail → mindestens „Privatkunde" + E-Mail zeigen.
+  if (out.length === 0) return esc('Privatkunde');
+  if (out.length === 1 && out[0] === c.email) return `${esc('Privatkunde')}<br>${esc(c.email)}`;
+  return out.map(esc).join('<br>');
 }
 
 // In-Process-Mutex: serialisiert die read-modify-write-Sequenz des Zählers, damit
@@ -113,8 +141,7 @@ export function renderInvoiceHtml({ invoiceNumber, date, customer, items, vatMod
 
 <div class="to">
   <strong>Rechnungsempfänger:</strong><br>
-  ${esc(customer.company || customer.name || 'Privatkunde')}<br>
-  ${esc(customer.email)}
+  ${recipientLines(customer)}
 </div>
 
 <h1>Leistungsbeschreibung</h1>
@@ -151,7 +178,7 @@ ${kleinUntHint}
 </body></html>`;
 }
 
-export async function generateInvoicePdf({ orderId, email, company, pkg, amount, vatMode = VAT_MODE }) {
+export async function generateInvoicePdf({ orderId, email, company, pkg, amount, vatMode = VAT_MODE, billing = null }) {
   const invoiceNumber = await nextInvoiceNumber();
   const date = new Date().toISOString();
   const items = [{
@@ -161,7 +188,16 @@ export async function generateInvoicePdf({ orderId, email, company, pkg, amount,
   const html = renderInvoiceHtml({
     invoiceNumber,
     date,
-    customer: { company, email, name: company || email },
+    customer: {
+      company: billing?.company || company || '',
+      name: billing?.name || '',
+      line1: billing?.line1 || '',
+      line2: billing?.line2 || '',
+      postalCode: billing?.postalCode || '',
+      city: billing?.city || '',
+      country: billing?.country || '',
+      email
+    },
     items,
     vatMode
   });
