@@ -11,7 +11,7 @@
 import './lib/sentry.js'; // Sentry früh initialisieren (no-op ohne SENTRY_DSN).
 import express from 'express';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import Stripe from 'stripe';
 import { scanUrl } from './lib/scan.js';
 import { classifyScanError } from './lib/scan-error.js';
@@ -41,14 +41,29 @@ const ENABLE_ABO = process.env.ENABLE_ABO === 'true'; // Abo standardmäßig AUS
 
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 
-// Fail-fast: Live-Stripe ohne SMTP würde bezahlte Reports stillschweigend nicht ausliefern.
-requireMailerOrExit();
+// Wird diese Datei direkt gestartet (`node app.js`, Produktion) oder nur importiert
+// (Test-Harness via supertest)? Nur im Direkt-Start die Start-Checks fahren + den
+// Server binden — sonst startet ein `import './app.js'` ungewollt einen Listener und
+// würde im Test mit requireMailerOrExit ggf. den Prozess beenden.
+const isMain = !!process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
 
-// MF3/SF6: Im Live-Betrieb müssen die Rechnungs-Pflichtangaben (§14 UStG: Anbieter-
-// Anschrift; §33/34a UStDV: Steuer-/USt-IdNr.) gesetzt sein. KEIN Fail-Fast (würde die
-// Auslieferung des bezahlten Reports blockieren), aber ein lauter Alarm + Log, damit
-// keine formfehlerhafte Rechnung still rausgeht.
-{
+// --- DI-Seam (Test-Naht) ---------------------------------------------------------
+// Die teuren, nebenwirkungsbehafteten Fulfillment-Bausteine (Headless-Browser-Scan,
+// PDF-Rechnung, SMTP-Versand) hinter einem austauschbaren Objekt bündeln. Produktion
+// nutzt die echten Implementierungen; die supertest-Harness (test/resend.api.test.js)
+// überschreibt einzelne Funktionen, um Webhook-/Resend-Handler ohne echten Browser,
+// SMTP oder PDF gegen die ECHTE Express-App zu testen. Aufrufer lesen services.X zur
+// Laufzeit (kein Capture beim Modul-Laden), daher wirkt eine Test-Überschreibung sofort.
+export const services = { fulfillOrder, sendReportFor, generateInvoicePdf };
+
+if (isMain) {
+  // Fail-fast: Live-Stripe ohne SMTP würde bezahlte Reports stillschweigend nicht ausliefern.
+  requireMailerOrExit();
+
+  // MF3/SF6: Im Live-Betrieb müssen die Rechnungs-Pflichtangaben (§14 UStG: Anbieter-
+  // Anschrift; §33/34a UStDV: Steuer-/USt-IdNr.) gesetzt sein. KEIN Fail-Fast (würde die
+  // Auslieferung des bezahlten Reports blockieren), aber ein lauter Alarm + Log, damit
+  // keine formfehlerhafte Rechnung still rausgeht.
   const invCfg = invoiceConfigStatus();
   if (isStripeLive() && !invCfg.ok) {
     logger.error({ missing: invCfg.missing }, 'Rechnungs-Pflichtangaben fehlen im Live-Betrieb (§14 UStG)');
@@ -200,7 +215,7 @@ async function handleCheckoutCompleted(event) {
     await assertPublicHttpUrl(meta.url);
     await markStatus(s.id, 'FULFILLING');
     order = await paidScanGate(() =>
-      fulfillOrder({ url: meta.url, company: meta.company || '', email: email || '', pkg })
+      services.fulfillOrder({ url: meta.url, company: meta.company || '', email: email || '', pkg })
     );
     // Eigene Rechnung (§ 14 UStG) erzeugen — Fallback zur Stripe-Receipt-Mail.
     // Schlägt sie fehl, darf das die Report-Auslieferung NICHT blockieren.
@@ -245,7 +260,7 @@ async function handleCheckoutCompleted(event) {
   // Subject/Anschreiben passend zum Paket (BFSG / Cookie / Re-Check).
   const emailKind = isSub ? PKG_CONFIG[pkg]?.emailKind || 'bfsg' : order.emailKind;
   try {
-    await sendReportFor({
+    await services.sendReportFor({
       to: email, company: meta.company || '',
       pdfPath: order.pdfPath, stmtPath: order.stmtPath,
       emailKind,
@@ -317,7 +332,7 @@ function buildBillingRecipient(session, meta = {}) {
 // niemals propagiert — die Report-Auslieferung (das bezahlte Produkt) hat Vorrang.
 async function safeGenerateInvoice({ orderId, email, company, pkg, amount, billing = null }) {
   try {
-    return await generateInvoicePdf({ orderId, email, company, pkg, amount, billing });
+    return await services.generateInvoicePdf({ orderId, email, company, pkg, amount, billing });
   } catch (err) {
     logger.error({ orderId, err: err.message }, 'Rechnungs-Generierung fehlgeschlagen (Report wird trotzdem zugestellt)');
     sentry.captureException(err, { stage: 'invoice', order_id: orderId });
@@ -329,19 +344,29 @@ async function safeGenerateInvoice({ orderId, email, company, pkg, amount, billi
   }
 }
 
+// MF4: Stripe hat Invoice.subscription (Top-Level) ab API 2025-03-31 (Basil) entfernt.
+// Die Subscription-ID kann seitdem an mehreren Stellen liegen. Diese reine, seiteneffekt-
+// freie Funktion zieht sie robust aus allen bekannten Pfaden (oder null, falls keine da
+// ist → handleInvoicePaid alarmiert dann statt still ins Leere zu laufen: Kunde wurde
+// abgebucht, bekäme aber keinen Re-Check). Exportiert für den Unit-Test
+// (test/resolve-subscription-id.test.js) gegen Basil-Fixtures.
+export function resolveSubscriptionId(inv) {
+  if (!inv) return null;
+  return inv.subscription
+    || inv.parent?.subscription_details?.subscription
+    || inv.lines?.data?.[0]?.parent?.subscription_item_details?.subscription
+    || null;
+}
+
 async function handleInvoicePaid(event) {
   const inv = event.data.object;
   // Erste Rechnung läuft bereits über checkout.session.completed — sonst Doppel-Scan.
   if (inv.billing_reason && inv.billing_reason !== 'subscription_cycle') {
     return;
   }
-  // MF4: Stripe hat Invoice.subscription (Top-Level) ab API 2025-03-31 (Basil) entfernt.
-  // Subscription-ID robust aus mehreren möglichen Stellen beziehen, sonst läuft jeder
+  // MF4: Subscription-ID robust aus mehreren möglichen Stellen beziehen, sonst läuft jeder
   // subscription_cycle bei neuer API-Version still ins Leere (Kunde abgebucht, kein Re-Check).
-  const subId = inv.subscription
-    || inv.parent?.subscription_details?.subscription
-    || inv.lines?.data?.[0]?.parent?.subscription_item_details?.subscription
-    || null;
+  const subId = resolveSubscriptionId(inv);
   if (!subId) {
     // NICHT still verschlucken — der Kunde wurde abgebucht, bekäme aber keinen Re-Check.
     await sendAlert(
@@ -365,7 +390,7 @@ async function handleInvoicePaid(event) {
   try {
     await assertPublicHttpUrl(sub.url);
     const order = await paidScanGate(() =>
-      fulfillOrder({
+      services.fulfillOrder({
         url: sub.url, company: sub.company || '', email: sub.email,
         pkg: sub.pkg || 'abo',
         prevSnapshot: sub.lastSnapshot || null
@@ -374,7 +399,7 @@ async function handleInvoicePaid(event) {
     // Monatsrechnung fürs Abo (§ 14 UStG) — Betrag aus der Stripe-Invoice.
     const cycleAmount = inv.amount_paid ?? inv.total ?? 0;
     const invoice = await safeGenerateInvoice({ orderId: inv.id || sub.subscriptionId, email: sub.email, company: sub.company || '', pkg: sub.pkg || 'abo', amount: cycleAmount });
-    await sendReportFor({
+    await services.sendReportFor({
       to: sub.email, company: sub.company || '',
       pdfPath: order.pdfPath,
       // Aktualisierte Erklärung zur Barrierefreiheit pro Monats-Re-Check mitsenden
@@ -710,7 +735,7 @@ app.post('/api/resend/:sessionId', requireAdminAuth, async (req, res) => {
     // Voll-Resend-Fallback.
     const mailOnly = order.status === 'READY_NOT_MAILED' && order.pdfPath;
     if (mailOnly) {
-      await sendReportFor({
+      await services.sendReportFor({
         to: recipient, company: order.company || '',
         pdfPath: order.pdfPath, stmtPath: order.stmtPath || null,
         emailKind: order.emailKind || 'bfsg',
@@ -728,7 +753,7 @@ app.post('/api/resend/:sessionId', requireAdminAuth, async (req, res) => {
     }
 
     const result = await paidScanGate(() =>
-      fulfillOrder({ url: order.url, company: order.company || '', email: recipient, pkg: order.pkg || 'basis' })
+      services.fulfillOrder({ url: order.url, company: order.company || '', email: recipient, pkg: order.pkg || 'basis' })
     );
     // Rechnung nachreichen, falls bei der fehlgeschlagenen Erst-Auslieferung noch keine erzeugt wurde.
     const invoice = order.invoiceNumber
@@ -743,7 +768,7 @@ app.post('/api/resend/:sessionId', requireAdminAuth, async (req, res) => {
     if (invoice?.invoiceNumber) {
       await markStatus(sessionId, 'INVOICED', { invoiceNumber: invoice.invoiceNumber, invoicePdfPath: invoice.pdfPath || null });
     }
-    await sendReportFor({
+    await services.sendReportFor({
       to: recipient, company: order.company || '',
       pdfPath: result.pdfPath, stmtPath: result.stmtPath,
       emailKind: result.emailKind || 'bfsg',
@@ -837,12 +862,18 @@ async function reconcileOnStartup() {
   }
 }
 
-const server = app.listen(PORT, () => {
-  logger.info(
-    { publicUrl: PUBLIC_URL, stripe: !!stripe, abo: ENABLE_ABO, mailer: mailerStatus() },
-    `BFSG-Audit-Server auf ${PUBLIC_URL}`
-  );
-  // Nicht-blockierend: Server ist sofort bereit, Reconcile läuft im Hintergrund.
-  reconcileOnStartup();
-});
-process.on('SIGTERM', () => server.close(() => process.exit(0)));
+// Export für die Test-Harness (supertest greift die echte App ab, ohne zu binden).
+export { app };
+
+// Nur im Direkt-Start (`node app.js`) den Listener binden — beim Import (Tests) nicht.
+if (isMain) {
+  const server = app.listen(PORT, () => {
+    logger.info(
+      { publicUrl: PUBLIC_URL, stripe: !!stripe, abo: ENABLE_ABO, mailer: mailerStatus() },
+      `BFSG-Audit-Server auf ${PUBLIC_URL}`
+    );
+    // Nicht-blockierend: Server ist sofort bereit, Reconcile läuft im Hintergrund.
+    reconcileOnStartup();
+  });
+  process.on('SIGTERM', () => server.close(() => process.exit(0)));
+}
