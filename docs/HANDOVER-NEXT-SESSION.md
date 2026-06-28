@@ -1,5 +1,39 @@
 # 🤝 Handover für die nächste Session
 
+---
+
+## 🔴 STAND 28.06.2026 (spätabends) — NÄCHSTE SESSION STARTET HIER
+
+> **Lies NUR diesen Block für den aktuellen Stand. Alles darunter ist Historie.**
+
+### ⚠️ EIN offener Blocker: bezahlter Scan / Report-Erzeugung scheitert (NICHT Mail!)
+Live-Testkauf (Paket **basis**, URL `https://matthias-seba.de/`, Session `cs_live_a1ugi6pE9jFGxGBfvBdedUPvUv6Gp0Q1swNKt6K9Hre7Uu6NNvKCOBNaB0`) endete mit **„ERFÜLLUNG FEHLGESCHLAGEN: Scan lieferte kein verwertbares Ergebnis (Seite blockiert/leer/nicht erreichbar)"**. Webhook + Order + **Alert-Mail kamen sauber an (Mail/DKIM funktioniert!)** — nur der **Scan** lieferte nichts → kein Report.
+
+**Starke Hypothese (verifizieren!):** Der **bezahlte** Scan-Pfad ist **strikt-TLS**. `SCAN_TEASER_LENIENT_TLS=true` (im Container gesetzt) greift NUR für den **Gratis-Teaser** (`/api/scan` → `scanUrl(url,{lenientTls})`), NICHT für den bezahlten `fulfillOrder`/`scanUrl`-Pfad. `matthias-seba.de` hat ein **Hostname-Mismatch-Cert** (`*.web-repository.com`) → Gratis-Check (lenient) scannt durch (Score 24), bezahlter Scan (strikt) scheitert.
+→ **HIER STARTEN:** `scanner/lib/scan.js` (`scanUrl`/`gotoResilient`, `ignoreHTTPSErrors`) + `scanner/app.js` (Webhook→`fulfillOrder`→`scanUrl`-Aufruf) prüfen; entscheiden, ob TLS-Toleranz auch für den bezahlten Pfad sinnvoll ist (**SSRF-/DNS-Rebinding-Schutz MUSS aktiv bleiben**), ODER ob ein anderes Problem vorliegt (Bot-Schutz/JS-lastig/leeres axe-Ergebnis). Diagnose: `ssh root@178.105.83.0` → `cd /opt/bfsg-check/deployment && docker compose logs app | grep -i scan`; ggf. strikten Scan von matthias-seba.de gegentesten.
+**Order recovern (NACH Scan-Fix):** `POST https://bfsg-fix.de/api/resend/cs_live_a1ugi6...` mit `Authorization: Bearer <ADMIN_TOKEN aus Server-.env>`. ACHTUNG: `/api/resend` re-scannt → erst Scan fixen, sonst scheitert es erneut. Danach Owner: Test-Kauf refunden. (Bonus-Bug aus letzter Session: `/api/resend?force=true` ist NICHT implementiert, app.js:588 → eigener Task-Chip.)
+
+### ✅ Diese Session erledigt (NICHT erneut anfassen — A/B/C/F + Mail-Infra fertig)
+- **A** Rechnungs-`.env` (INVOICE_FROM_NAME/ADDRESS, VAT_MODE=kleinunternehmer, ADMIN_TOKEN) ✓
+- **B** `SCAN_TEASER_LENIENT_TLS=true` + **docker-compose.yml-Mapping gefixt** (PR #74) → Gratischeck echter Score ✓
+- **C** Stripe-Live-Testkauf verifiziert → dabei **3 Live-Bugs gefunden+gefixt**:
+  - **DNS:** tote INWX-Park-IP `185.181.104.242` aus A-Records ALLER 4 Domains entfernt (Round-Robin killte ~50 % Webhooks + Besucher-Traffic) ✓
+  - **SMTP:** `SMTP_USER` → Brevo-Relay-Login `aedd19001@smtp-brevo.com` (war Account-Mail → 535 Auth failed) ✓
+  - **Mail-Zustellung:** bfsg-fix.de bei **Brevo DKIM-authentifiziert** (brevo-code-TXT + brevo1/brevo2-CNAMEs bei INWX) → Mails werden **zugestellt** (vorher „sender invalid", 0 zugestellt) ✓
+- **F** PRs #66–#69 waren bereits gemergt ✓ · **Preise** in CLAUDE.md auf Live-Stand (PR #80: Basis 129 / Profi 399 / Cookie 39/69 / Abo 24,99 €) ✓
+- **Rechnung/E-Mail-Politur (PR #81, deployt, Tests 92/92):** Rechnungsempfänger Firma/Name/Anschrift statt 2× E-Mail (Stripe `billing_address_collection:'required'`), Pflicht-Footer (Anbieterkennzeichnung), B2C-Widerruf-Bestätigung (§356 V BGB), `List-Unsubscribe`-Header, Kontakt/Reply-To = `info@bfsg-fix.de`. (Volle Empfänger-Anschrift erst bei NEUEN Käufen sichtbar; alte Rechnung RE-2026-0001 ist gecacht.)
+- **info@bfsg-fix.de** angelegt: INWX-Paket **„Mail Easy" (0,29 €/mo)** vom Owner gekauft, **Weiterleitung info@ → matze.seba@outlook.de** in Froxlor, MX `smtp-in0/in1.prod0.webspace.bz` gesetzt (SPF/DKIM intakt) ✓
+
+### 📍 Danach: Plan Punkt D
+Sobald Scan/Report-Bug gefixt + Order recovered → weiter in `docs/LAUNCH-PLAN-EINFACH.md` bei **D** (Google-Ads-Kampagne als **pausierter Entwurf** per Computer Use bauen, sobald Owner in ads.google.com eingeloggt), dann **E** (Bing-Ads).
+
+### 🔑 Zugänge / Fakten
+- Server-SSH von diesem Win-PC: `ssh root@178.105.83.0` (Operator-Key liegt drauf). Server-`.env`: `/opt/bfsg-check/deployment/.env`. Deploy = PR-Merge auf `main` (Auto-Deploy via GitHub Actions, ~20–40 s).
+- **Spam:** Mail-Auth ist sauber (DKIM/DMARC pass) — Restspam = **Cold-Start-Reputation** (Warm-up 3–6 Wochen; Owner soll Mail in Outlook als „kein Junk" markieren). KEIN Bug.
+- Memories (`memory/MEMORY.md`): u. a. [[email-infra-state]], [[dns-inwx-dead-ip-185]], [[brevo-smtp-relay-login]], [[compose-env-explicit-mapping]], [[server-ssh-from-windows]].
+
+---
+
 > **Lies das nach `CLAUDE.md` als ZWEITES.**
 > **Stand:** 27.06.2026 · **Neu (27.06.):** **Dark-Default-Redesign + Conversion-/Dynamik-Politur der Landingpage LIVE** (PR #76 — Dark als dauerhafter Standard, kiberatung-inspirierte Sektions-Rhythmik + Mini-Visuals, heller „Wow"-Counter, Hero-„?"-Clipping-Fix + vergrößerte Vorschau-Überschrift; Build grün, Deploy 43 s, `/health` ok). Details siehe Update-Sektion unten + `docs/redesign/`. · **Neu (25.06.):** Gratischeck-Backend-Reliability-Fix nach `main` gemergt (PR #63) — Owner-Aktion `SCAN_TEASER_LENIENT_TLS=true` offen, siehe GO-LIVE-CHECKLISTE A.4. Letzte Sessions: Conversion-Optimierung (PR #54) · lückenloser FE+BE-Launch-Readiness-Audit (100 verifizierte Funde, alle 6 P0 im Code gefixt, PR #55) · 4 Owner-Entscheidungen umgesetzt · Hero mobil-zentriert + Vorschau-Kasten als „Beispiel" gekennzeichnet (PRs #56–#61). **Alles gemergt + live.** Offene Go-Live-Aufgaben: **siehe direkt unten.**
 
