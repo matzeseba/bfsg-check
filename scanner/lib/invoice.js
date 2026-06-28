@@ -124,23 +124,27 @@ export function renderInvoiceHtml({ invoiceNumber, date, customer, items, vatMod
   // Bei Regelbesteuerung die enthaltene USt HERAUSRECHNEN, sodass der Rechnungs-
   // Gesamtbetrag exakt dem gezahlten Betrag entspricht (§14c UStG: kein zu hoher
   // USt-Ausweis). Kleinunternehmer: keine USt, brutto = netto = gezahlter Betrag.
-  const sum = items.reduce((s, i) => s + i.amount, 0);
-  let totalNet, totalVat, totalGross;
-  if (vatMode === 'regelbesteuerung') {
-    totalGross = sum;
-    totalNet = Math.round(sum / 1.19);
-    totalVat = totalGross - totalNet;
-  } else {
-    totalNet = sum;
-    totalVat = 0;
-    totalGross = sum;
-  }
+  // SF5b: Der Einzelpreis je Position wird im SELBEN Modus wie die Zwischensumme
+  // ausgewiesen — bei Regelbesteuerung also NETTO (it.amount / 1,19, gerundet). Die
+  // Zwischensumme (netto) ist die SUMME der gerundeten Positions-Netti (NICHT
+  // round(gesamt-brutto / 1,19)), damit Positions-Summe und Zwischensumme bei mehreren
+  // Positionen IMMER bitgenau übereinstimmen (keine Rundungsdrift). Die USt ergibt sich
+  // als Differenz Brutto − Netto, sodass der Gesamtbetrag exakt dem gezahlten Brutto
+  // entspricht. Kleinunternehmer: netto = brutto, USt = 0.
+  const regel = vatMode === 'regelbesteuerung';
+  const rows = items.map((it) => ({
+    ...it,
+    net: regel ? Math.round(it.amount / 1.19) : it.amount
+  }));
+  const totalGross = items.reduce((s, i) => s + i.amount, 0);
+  const totalNet = rows.reduce((s, r) => s + r.net, 0);
+  const totalVat = totalGross - totalNet;
   const fmt = (cents) => (cents / 100).toFixed(2).replace('.', ',') + ' €';
   const dateStr = new Date(date).toLocaleDateString('de-DE');
 
-  const kleinUntHint = vatMode === 'kleinunternehmer'
-    ? '<p style="margin-top:24px;font-size:11px;color:#555">Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.</p>'
-    : '';
+  const kleinUntHint = regel
+    ? ''
+    : '<p style="margin-top:24px;font-size:11px;color:#555">Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.</p>';
 
   return `<!doctype html>
 <html lang="de"><head><meta charset="utf-8"/>
@@ -185,13 +189,13 @@ export function renderInvoiceHtml({ invoiceNumber, date, customer, items, vatMod
 
 <h1>Leistungsbeschreibung</h1>
 <table>
-  <thead><tr><th>Pos.</th><th>Leistung</th><th class="amount">Einzelpreis</th></tr></thead>
+  <thead><tr><th>Pos.</th><th>Leistung</th><th class="amount">Einzelpreis${regel ? ' (netto)' : ''}</th></tr></thead>
   <tbody>
-    ${items.map((it, idx) => `
+    ${rows.map((it, idx) => `
       <tr>
         <td>${idx + 1}</td>
         <td>${esc(it.description)}</td>
-        <td class="amount">${fmt(it.amount)}</td>
+        <td class="amount">${fmt(it.net)}</td>
       </tr>`).join('')}
   </tbody>
 </table>
@@ -199,7 +203,7 @@ export function renderInvoiceHtml({ invoiceNumber, date, customer, items, vatMod
 <div class="totals">
   <table>
     <tr><td>Zwischensumme (netto)</td><td class="amount">${fmt(totalNet)}</td></tr>
-    ${vatMode === 'regelbesteuerung'
+    ${regel
       ? `<tr><td>USt. 19 %</td><td class="amount">${fmt(totalVat)}</td></tr>`
       : ''}
     <tr class="grand"><td>Gesamtbetrag</td><td class="amount">${fmt(totalGross)}</td></tr>
