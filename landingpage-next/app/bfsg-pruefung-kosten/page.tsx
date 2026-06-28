@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: "Was kostet eine BFSG-Prüfung? Marktpreise 2026 ehrlich verglichen",
     description:
       "Gratis-Tools, automatisierte Reports (129–399 €) und manuelle Audits (1.500–5.000 €) — welcher Ansatz lohnt sich wann?",
-    url: "https://bfsg-fix.de/bfsg-pruefung-kosten",
+    url: "https://barrierefrei-pruefen.de/bfsg-pruefung-kosten",
     type: "article",
   },
 };
@@ -56,8 +56,8 @@ export default function BfsgPruefungKostenPage() {
     "@type": "Article",
     headline: "Was kostet eine BFSG-Prüfung? Marktpreise 2026 ehrlich verglichen",
     description: "Überblick über BFSG-Audit-Kosten: Gratis-Tools, automatisierte Reports und manuelle Audits.",
-    url: "https://bfsg-fix.de/bfsg-pruefung-kosten",
-    publisher: { "@type": "Organization", name: "BFSG-Check", url: "https://bfsg-fix.de" },
+    url: "https://barrierefrei-pruefen.de/bfsg-pruefung-kosten",
+    publisher: { "@type": "Organization", name: "Barrierefrei-Prüfen", url: "https://barrierefrei-pruefen.de" },
     dateModified: "2026-06-21",
   };
 
@@ -103,7 +103,7 @@ export default function BfsgPruefungKostenPage() {
 
           <h3 className="mt-8 text-xl font-semibold">Weg 2: Automatisierter Scan mit Report (129–399 €)</h3>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            Spezialisierte Scan-Dienste wie BFSG-Check kombinieren automatisierte Prüfwerkzeuge (axe-core,
+            Spezialisierte Scan-Dienste wie Barrierefrei-Prüfen kombinieren automatisierte Prüfwerkzeuge (axe-core,
             eigene Regelwerke) mit menschlicher Sichtung vor Auslieferung. Das Ergebnis ist ein strukturierter
             PDF-Report mit priorisierten Mängeln, konkreten Lösungshinweisen und einem Entwurf der
             Barrierefreiheitserklärung.
@@ -196,7 +196,7 @@ export default function BfsgPruefungKostenPage() {
         <section className="mt-14">
           <h2 className="text-2xl font-semibold">Warum 129 € und 399 €?</h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            BFSG-Check positioniert sich bewusst zwischen Gratis-Tools und manuellen Kanzlei-Audits. Der Basis-Report
+            Barrierefrei-Prüfen positioniert sich bewusst zwischen Gratis-Tools und manuellen Kanzlei-Audits. Der Basis-Report
             zu 129 € deckt die häufigsten automatisch erkennbaren Mängel ab, liefert einen priorisierten Fix-Plan
             und einen Barrierefreiheitserklärung-Entwurf — alles, was ein mittelständischer Shop für einen ersten
             dokumentierten Nachweis braucht.

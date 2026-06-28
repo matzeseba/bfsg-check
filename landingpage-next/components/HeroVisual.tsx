@@ -71,7 +71,7 @@ export function HeroVisual() {
           </span>
           <div className="mx-auto flex min-w-0 items-center gap-2 rounded-lg bg-background/80 px-3 py-1 font-mono text-[11px] text-muted-foreground">
             <span className="inline-flex size-1.5 shrink-0 rounded-full bg-brand-mint" />
-            <span className="min-w-0 truncate">bfsg-fix.de/{v.reportPath}</span>
+            <span className="min-w-0 truncate">barrierefrei-pruefen.de/{v.reportPath}</span>
           </div>
         </div>
 

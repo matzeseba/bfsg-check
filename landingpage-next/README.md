@@ -1,6 +1,6 @@
 # landingpage-next
 
-Next.js-Skelett (App Router) für die neue BFSG-Check-Landingpage.
+Next.js-Skelett (App Router) für die Barrierefrei-Prüfen-Landingpage.
 Ablöser für die statische `landingpage/` — wird aktuell parallel ausgeliefert
 und stufenweise umgeschaltet (siehe Welle 5).
 
@@ -73,7 +73,7 @@ finale Asset-/Skript-Mix bekannt ist.
 - **FRONTEND-COMPONENTS-Welle:** Hero, Pricing, FAQ, Lead-Form, Trust-Bar,
   Cookie-Banner als richtige Komponenten ausbauen, Sonner-Toaster verdrahten.
 - **Welle 5:** PWA-Manifest, Service-Worker, Offline-Fallback, Lighthouse-Pass,
-  Umschaltung der bfsg-fix.de-Production-Auslieferung auf `landingpage-next`.
+  Umschaltung der barrierefrei-pruefen.de-Production-Auslieferung auf `landingpage-next`.
 
 Bis dahin ist diese App ein **Stub** — der Inhalt zeigt nur, dass Routing,
 Fonts, Tailwind, shadcn und der Umlaute-Lint korrekt laufen.

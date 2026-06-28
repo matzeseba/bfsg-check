@@ -1,7 +1,7 @@
 import { FAQ_ITEMS } from "@/lib/config";
 
-const siteUrl = "https://bfsg-fix.de";
-const organizationName = "BFSG-Check";
+const siteUrl = "https://barrierefrei-pruefen.de";
+const organizationName = "Barrierefrei-Prüfen";
 
 type JsonLdSchema = Record<string, unknown>;
 
@@ -14,7 +14,7 @@ const organizationSchema: JsonLdSchema = {
   // vorhanden — bis dahin auf das OG-Banner zeigen, das immerhin existiert).
   logo: `${siteUrl}/opengraph-image`,
   description:
-    "BFSG-Check ist der automatisierte Barrierefreiheits-Scanner für deutsche Websites mit verständlichem Fix-Plan und laufendem Monitoring.",
+    "Barrierefrei-Prüfen ist der automatisierte Barrierefreiheits-Scanner für deutsche Websites mit verständlichem Fix-Plan und laufendem Monitoring.",
 };
 
 const websiteSchema: JsonLdSchema = {
@@ -44,7 +44,7 @@ type ProductInput = {
 
 const products: ProductInput[] = [
   {
-    name: "BFSG-Check Basis",
+    name: "BFSG-Report Basis",
     description:
       "Einmaliger automatischer BFSG- und WCAG-2.1-AA-Scan Ihrer Website inklusive priorisiertem Fix-Plan mit Code-Snippets.",
     price: "129.00",
@@ -53,7 +53,7 @@ const products: ProductInput[] = [
     offerUrl: `${siteUrl}/#pakete`,
   },
   {
-    name: "BFSG-Check Profi",
+    name: "BFSG-Report Profi",
     description:
       "Tiefenscan mit manueller Prüfung kritischer Flows, ausführlichem Fix-Plan, Entwickler-Checkliste und 30 Tagen E-Mail-Support.",
     price: "399.00",

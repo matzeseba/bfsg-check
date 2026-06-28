@@ -1,4 +1,4 @@
-# Marketing-Strategie 2026 — BFSG-Check
+# Marketing-Strategie 2026 — Barrierefrei-Prüfen
 
 > **Stand:** 16.06.2026 · **Geltungsbereich:** DACH · **Verantwortlich:** Owner (Solo)
 > Aufbauend auf dem Produkt-Pivot aus `docs/REVIEW-PRE-MORTEM.md` (Section C):
@@ -31,7 +31,7 @@
 **Warum #2:** Long-Tail-Suchbegriffe (z. B. „barrierefreiheitserklärung muster shop") kosten ab Monat 3 nichts pro Klick und stützen Ads (höhere QS-Scores durch konsistenten Landing-Content).
 
 - **Cluster 1 — Ratgeber/Pillar:** 10 Artikel im Quartal, jeweils 1.500–2.500 Wörter, mit Schema-Markup (`Article`, `FAQ`, `HowTo`). Outline-Plan siehe `seo-content-plan.md`.
-- **Cluster 2 — Tool/Programmatic:** `bfsg-fix.de/check/<domain>` — automatisch generierte Mini-Berichts-Snapshots der Top-1000 deutschen Shops. Jeder Snapshot ist eine indexierbare Seite mit CTA „kompletter Report 199 €". Achtung: nur eigene Scans bekannter Shops, kein Massen-Spam, robots.txt-konform.
+- **Cluster 2 — Tool/Programmatic:** `barrierefrei-pruefen.de/check/<domain>` — automatisch generierte Mini-Berichts-Snapshots der Top-1000 deutschen Shops. Jeder Snapshot ist eine indexierbare Seite mit CTA „kompletter Report 199 €". Achtung: nur eigene Scans bekannter Shops, kein Massen-Spam, robots.txt-konform.
 - **Cluster 3 — Tools-Glossar:** Pages zu „axe vs Lighthouse", „BFSG-Checkliste PDF", „WCAG 2.1 vs 2.2" — fangen vergleichende Recherche ab.
 - **Backlinks:** Gastartikel auf Marketing-/Webdesign-Blogs (`drweb.de`, `t3n.de`, `kulturbanause.de`), HARO-DACH-Anfragen, IHK-Newsletter-Beiträge.
 
@@ -68,7 +68,7 @@
 │  Partner-Empfehlung                                                 │
 └─────────────────────────────────────────────────────────────────────┘
                               │
-                              ▼  Klick → bfsg-fix.de Landingpage
+                              ▼  Klick → barrierefrei-pruefen.de Landingpage
 ┌─────────────────────────────────────────────────────────────────────┐
 │  MOFU — Engagement                                                  │
 │  Gratis-Scan (URL-Eingabe) → 60-Sek-Ergebnis (Score + Anz. Mängel)  │

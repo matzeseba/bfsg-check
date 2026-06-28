@@ -9,7 +9,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const metadata = {
-  title: "Marketing · BFSG-Check Admin",
+  title: "Marketing · Barrierefrei-Prüfen Admin",
 };
 
 const notionSync = {

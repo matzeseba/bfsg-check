@@ -22,8 +22,8 @@ Konkret:
 
 ## 🏗️ Projekt-Kontext
 
-- **Produkt:** BFSG-Check — automatisierter Compliance-Scanner für deutsche Websites (BFSG/WCAG/TDDDG)
-- **Domain:** bfsg-fix.de (Server bei Hetzner Cloud CPX22, Nürnberg, Ubuntu 24.04)
+- **Produkt:** Barrierefrei-Prüfen — automatisierter Compliance-Scanner für deutsche Websites (BFSG/WCAG/TDDDG)
+- **Domain:** barrierefrei-pruefen.de (Hauptdomain; bfsg-fix.de = Redirect-Domain, bleibt erhalten) · Server bei Hetzner Cloud CPX22, Nürnberg, Ubuntu 24.04
 - **Owner:** Matthias Seba, Lange Straße 20, 27449 Kutenholz, info@matthias-seba.de
 - **Steuer:** § 19 UStG Kleinunternehmer
 - **Status:** Live (`/health` = `ok:true, stripe:true, live:true, mailer aktiv`)
@@ -52,8 +52,8 @@ scripts/          PDF-Generator + Helper-Scripts
 ## 🛠️ Deploy & Operations
 
 - **Deploy:** GitHub Actions auf `main`-Push → SSH zu Hetzner → `git pull && docker compose up -d --build`
-- **Health-Endpoint:** `https://bfsg-fix.de/health`
-- **Stripe-Webhook:** `https://bfsg-fix.de/webhook` (Signatur-validated)
+- **Health-Endpoint:** `https://barrierefrei-pruefen.de/health`
+- **Stripe-Webhook:** `https://barrierefrei-pruefen.de/webhook` (Signatur-validated)
 - **SSL:** Let's Encrypt via Caddy (auto-renewal)
 - **Backups:** noch nicht voll automatisiert (siehe `docs/BACKUP.md`)
 
@@ -70,7 +70,7 @@ scripts/          PDF-Generator + Helper-Scripts
 - **Niemals** Live-Keys in Chat — falls passiert: User aktiv zur Rotation auffordern
 - **Secrets-Quellen:**
   - GitHub Secrets (für CI): `HETZNER_SSH_KEY`, `STRIPE_*`, `SMTP_*`, `ADMIN_TOKEN`, etc.
-  - Server `.env` auf bfsg-fix.de unter `/opt/bfsg-check/deployment/.env`
+  - Server `.env` auf barrierefrei-pruefen.de unter `/opt/bfsg-check/deployment/.env`
 - **Stripe-Key-Prefix:** `rk_live_*` (Restricted, nicht `sk_live_*`) — Live-Flag-Check in `scanner/lib/mailer.js:43`
 
 ---

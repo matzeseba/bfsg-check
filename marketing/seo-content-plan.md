@@ -1,6 +1,6 @@
 # SEO-Content-Plan — 10 Artikel-Outlines (Q3/Q4 2026)
 
-> **Zielsetzung:** Long-Tail-Traffic einsammeln und Lead-Magneten (Gratis-Scan, Vorlagen-Downloads) bestücken. Jeder Artikel verlinkt mindestens 2× nach `bfsg-fix.de` (Scan-CTA + verwandter Artikel).
+> **Zielsetzung:** Long-Tail-Traffic einsammeln und Lead-Magneten (Gratis-Scan, Vorlagen-Downloads) bestücken. Jeder Artikel verlinkt mindestens 2× nach `barrierefrei-pruefen.de` (Scan-CTA + verwandter Artikel).
 > **Publish-Rhythmus:** 1 Artikel/Woche, 10 Artikel in 10–12 Wochen.
 > **Editor-Workflow:** Outline → Draft (KI-assistiert) → menschliche Review (Faktenprüfung + Quellen-Check) → Schema-Markup → Publish.
 

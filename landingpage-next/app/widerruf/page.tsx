@@ -5,7 +5,7 @@ import { WiderrufForm } from "@/components/WiderrufForm";
 export const metadata: Metadata = {
   title: "Vertrag widerrufen",
   description:
-    "Verbraucher-Widerruf nach §§ 355 ff. BGB für Bestellungen bei BFSG-Check.",
+    "Verbraucher-Widerruf nach §§ 355 ff. BGB für Bestellungen bei Barrierefrei-Prüfen.",
   alternates: { canonical: "/widerruf" },
   robots: { index: false, follow: true },
 };
@@ -20,8 +20,8 @@ export default function WiderrufPage() {
         Als Verbraucherin oder Verbraucher haben Sie das Recht, den Vertrag
         binnen 14 Tagen ohne Angabe von Gründen zu widerrufen. Bitte füllen Sie
         das folgende Formular aus — oder senden Sie eine formlose Erklärung an{" "}
-        <a href="mailto:widerruf@bfsg-fix.de" className="underline">
-          widerruf@bfsg-fix.de
+        <a href="mailto:widerruf@barrierefrei-pruefen.de" className="underline">
+          widerruf@barrierefrei-pruefen.de
         </a>
         .
       </p>

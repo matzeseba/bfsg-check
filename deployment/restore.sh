@@ -1,5 +1,5 @@
 #!/bin/bash
-# BFSG-Check Restore-Skript — entschlüsselt GPG-Archive + extrahiert in TARGET-Dir.
+# Barrierefrei-Prüfen Restore-Skript — entschlüsselt GPG-Archive + extrahiert in TARGET-Dir.
 # Aufruf: deployment/restore.sh <archive.tar.gz.gpg> [target-dir]
 # Voraussetzung: Privater GPG-Key des BACKUP_GPG_RECIPIENT muss im Schlüsselbund sein.
 

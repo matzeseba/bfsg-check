@@ -15,16 +15,16 @@
 
 **Headline:**
 ```
-BFSG-Check.de geht live: Automatischer WCAG-Audit-Service für deutsche 
+Barrierefrei-Prüfen geht live: Automatischer WCAG-Audit-Service für deutsche 
 Websites ab 199 Euro
 ```
 
 **Lead (W-Fragen in 2 Sätzen):**
 ```
-Matthias Seba launcht BFSG-Check (bfsg-fix.de), einen automatisierten 
-Compliance-Scanner für deutsche Online-Shops und B2C-Websites. Der Service 
-liefert in 60 Sekunden einen WCAG-2.1-AA-Score und einen Vollreport mit 
-konkreten Findings — ohne Beratungs-Mandat und ohne Abo-Zwang.
+Matthias Seba launcht Barrierefrei-Prüfen (barrierefrei-pruefen.de), einen 
+automatisierten Compliance-Scanner für deutsche Online-Shops und B2C-Websites. 
+Der Service liefert in 60 Sekunden einen WCAG-2.1-AA-Score und einen 
+Vollreport mit konkreten Findings — ohne Beratungs-Mandat und ohne Abo-Zwang.
 ```
 
 **Body:**
@@ -34,9 +34,9 @@ Seit dem 28. Juni 2025 verpflichtet das Barrierefreiheitsstärkungsgesetz
 Barrierefreiheit nach WCAG 2.1 AA. Erste Abmahnungen seit August 2025 
 zeigen den Handlungsbedarf in der Branche.
 
-BFSG-Check schließt die Lücke zwischen kostenlosen Browser-Tools wie axe 
-oder WAVE und mehrere tausend Euro teuren Beratungs-Mandanten. Der Service 
-liefert:
+Barrierefrei-Prüfen schließt die Lücke zwischen kostenlosen Browser-Tools 
+wie axe oder WAVE und mehrere tausend Euro teuren Beratungs-Mandanten. Der 
+Service liefert:
 
 - 60-Sekunden Gratis-Scan mit BFSG-Score (0-100)
 - Vollreport (Basis 199 €): WCAG-2.1-AA-Findings als PDF
@@ -55,26 +55,26 @@ Gründer Matthias Seba. "Es geht darum, in 5 Minuten zu wissen, wo Du
 stehst und einen konkreten Fix-Plan zu haben, statt 5.000 Euro für eine 
 Beratung auszugeben, die Dir das gleiche sagt."
 
-BFSG-Check positioniert sich bewusst gegen Overlay-Tools wie AccessiBe 
-und UserWay, die seit Jahren von deutschen Überwachungsstellen kritisiert 
-werden. Stattdessen liefert das Tool ehrliche Befunde mit Code-Snippets 
-zur tatsächlichen Behebung.
+Barrierefrei-Prüfen positioniert sich bewusst gegen Overlay-Tools wie 
+AccessiBe und UserWay, die seit Jahren von deutschen Überwachungsstellen 
+kritisiert werden. Stattdessen liefert das Tool ehrliche Befunde mit 
+Code-Snippets zur tatsächlichen Behebung.
 
-Verfügbarkeit: bfsg-fix.de — Gratis-Scan ohne Anmeldung möglich.
+Verfügbarkeit: barrierefrei-pruefen.de — Gratis-Scan ohne Anmeldung möglich.
 ```
 
 **Boilerplate:**
 ```
-Über BFSG-Check
-BFSG-Check (bfsg-fix.de) ist ein Service von Matthias Seba, Kutenholz. 
-Der Service liefert automatisierte Compliance-Scans deutscher Websites 
-nach BFSG, WCAG 2.1 AA und TDDDG. Made in Germany.
+Über Barrierefrei-Prüfen
+Barrierefrei-Prüfen (barrierefrei-pruefen.de) ist ein Service von Matthias 
+Seba, Kutenholz. Der Service liefert automatisierte Compliance-Scans 
+deutscher Websites nach BFSG, WCAG 2.1 AA und TDDDG. Made in Germany.
 ```
 
 **Pressekontakt:**
 ```
 Matthias Seba
-BFSG-Check · bfsg-fix.de
+Barrierefrei-Prüfen · barrierefrei-pruefen.de
 Lange Straße 20, 27449 Kutenholz
 E-Mail: info@matthias-seba.de
 ```
@@ -107,9 +107,9 @@ aus [N] automatisierten Scans
 **Lead:**
 ```
 Genau ein Jahr nach Inkrafttreten des Barrierefreiheitsstärkungsgesetzes 
-(BFSG) am 28. Juni 2025 zieht BFSG-Check (bfsg-fix.de) eine Daten-Bilanz 
-aus [N] durchgeführten automatisierten Scans [BELEG NÖTIG: tatsächliche 
-Scan-Anzahl aus System eintragen] deutscher Online-Shops.
+(BFSG) am 28. Juni 2025 zieht Barrierefrei-Prüfen (barrierefrei-pruefen.de) 
+eine Daten-Bilanz aus [N] durchgeführten automatisierten Scans [BELEG NÖTIG: 
+tatsächliche Scan-Anzahl aus System eintragen] deutscher Online-Shops.
 ```
 
 **Body:**
@@ -134,21 +134,21 @@ CLAIM Rechtsanwälte und Kanzlei MK in Welle ab — Forderungen zwischen
 nur verwenden wenn durch Medienberichte belegbar, sonst weglassen.]
 
 "Die meisten Shop-Betreiber wissen nicht einmal, dass sie betroffen sind", 
-sagt Matthias Seba, Gründer von BFSG-Check. "Der Test-Aufwand wäre 60 
-Sekunden — aber Compliance ist zur Top-Priorität geworden, sobald die 
-erste Abmahnung kommt."
+sagt Matthias Seba, Gründer von Barrierefrei-Prüfen. "Der Test-Aufwand 
+wäre 60 Sekunden — aber Compliance ist zur Top-Priorität geworden, sobald 
+die erste Abmahnung kommt."
 
 Forecast für Jahr 2 (Juni 2026 – Juni 2027):
 - Erste Abmahn-Urteile von Oberlandesgerichten antizipiert
 - WordPress-Plugin-Markt reagiert mit BFSG-Compliance-Features
-- BFSG-Check launcht im Q3 2026 eine Chrome-Extension und ein WordPress-
-  Plugin zur frühzeitigen Identifikation
+- Barrierefrei-Prüfen launcht im Q3 2026 eine Chrome-Extension und ein 
+  WordPress-Plugin zur frühzeitigen Identifikation
 
 [WENN Dataset public:] Anonymisierter Aggregat-Datensatz auf Anfrage 
 verfügbar — Journalisten können ihn unter info@matthias-seba.de anfordern.
 ```
 
-**Boilerplate + Pressekontakt:** wie Version 1.
+**Boilerplate + Pressekontakt:** wie Version 1 (Barrierefrei-Prüfen · barrierefrei-pruefen.de).
 
 ---
 
@@ -184,7 +184,7 @@ PM-Text + Datensatz auf Anfrage.
 
 Mit freundlichen Grüßen
 Matthias Seba
-BFSG-Check · bfsg-fix.de
+Barrierefrei-Prüfen · barrierefrei-pruefen.de
 ```
 
 **Rechtlich:** Das ist eine **redaktionelle Pressearbeit** an publizierte presse@-Adressen, NICHT eine Werbung. Tolerierter Graubereich (siehe `docs/LEGAL-REALITY-CHECK-2026.md` F5). Risiko niedrig wenn:
@@ -211,7 +211,7 @@ BFSG-Check · bfsg-fix.de
 ## Tracking
 
 Erfolgs-Metriken:
-- Erwähnungen in Online-Medien (Mention.com Free-Tier oder Google Alerts auf "BFSG-Check")
+- Erwähnungen in Online-Medien (Mention.com Free-Tier oder Google Alerts auf "Barrierefrei-Prüfen")
 - Backlinks (Search Console + Ahrefs Free)
 - Direkter Traffic-Spike um Veröffentlichungs-Datum (GA4)
 - Stripe-Sales mit utm_source=press

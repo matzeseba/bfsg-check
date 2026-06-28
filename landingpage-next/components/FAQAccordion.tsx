@@ -43,7 +43,7 @@ export function FAQAccordion() {
             beantwortet.
           </h2>
           <p className="mt-4 text-base text-muted-foreground text-pretty">
-            Nichts dabei? Schreiben Sie uns: hallo@bfsg-fix.de
+            Nichts dabei? Schreiben Sie uns: info@barrierefrei-pruefen.de
           </p>
         </div>
 

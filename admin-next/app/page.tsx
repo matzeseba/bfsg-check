@@ -8,7 +8,7 @@ import { mockKpis } from "@/lib/mock-data";
 import { formatCents } from "@/lib/format";
 
 export const metadata = {
-  title: "Übersicht · BFSG-Check Admin",
+  title: "Übersicht · Barrierefrei-Prüfen Admin",
 };
 
 type KpiCard = {
@@ -88,7 +88,7 @@ export default function DashboardPage() {
         <p>
           Hinweis: Die Werte stammen aktuell aus Mock-Daten. In Welle 5 werden
           sie über <code className="rounded bg-zinc-100 px-1 dark:bg-zinc-800">lib/api.ts</code>{" "}
-          aus dem Backend (<code>bfsg-fix.de/admin/*</code>) gezogen.
+          aus dem Backend (<code>barrierefrei-pruefen.de/admin/*</code>) gezogen.
         </p>
       </section>
     </div>

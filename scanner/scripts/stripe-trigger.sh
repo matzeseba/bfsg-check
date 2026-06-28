@@ -16,7 +16,7 @@ fi
 case "$EVENT" in
   help|--help|-h|"")
     cat <<USAGE
-Stripe-Trigger-Helper für BFSG-Check Webhook-Tests.
+Stripe-Trigger-Helper für Barrierefrei-Prüfen Webhook-Tests.
 
 Aufruf: $0 <event>
 

@@ -12,10 +12,10 @@ const {
   SMTP_PORT = '587',
   SMTP_USER,
   SMTP_PASS,
-  FROM_EMAIL = 'no-reply@bfsg-check.de',
-  FROM_NAME = 'BFSG-Check',
+  FROM_EMAIL = 'no-reply@barrierefrei-pruefen.de',
+  FROM_NAME = 'Barrierefrei-Prüfen',
   REPLY_TO,
-  INVOICE_CONTACT_EMAIL = 'info@bfsg-fix.de',
+  INVOICE_CONTACT_EMAIL = 'info@barrierefrei-pruefen.de',
   ADMIN_EMAIL
 } = process.env;
 
@@ -28,7 +28,7 @@ const REPLY_TO_ADDR = REPLY_TO || INVOICE_CONTACT_EMAIL;
 // Disclaimer-Kurzform). Anschrift aus Env, damit sie nicht hartkodiert ist. ---
 const INVOICE_FROM_NAME = process.env.INVOICE_FROM_NAME || FROM_NAME;
 const INVOICE_FROM_ADDRESS = process.env.INVOICE_FROM_ADDRESS || '';
-const PUBLIC_HOST = (process.env.PUBLIC_URL || 'https://bfsg-fix.de')
+const PUBLIC_HOST = (process.env.PUBLIC_URL || 'https://barrierefrei-pruefen.de')
   .replace(/^https?:\/\//, '').replace(/\/+$/, '');
 
 // Exportiert fuer Unit-Tests (reine Funktion, keine Seiteneffekte).
@@ -40,7 +40,7 @@ export function legalFooter() {
 ${anschrift}
 Kontakt: ${REPLY_TO_ADDR} · ${PUBLIC_HOST}
 
-BFSG-Check liefert eine automatisierte technische Analyse nach WCAG 2.1 AA.
+Barrierefrei-Prüfen liefert eine automatisierte technische Analyse nach WCAG 2.1 AA.
 Keine Rechtsberatung, keine Konformitätsgarantie. Empfehlungen ersetzen nicht
 die anwaltliche Prüfung.`;
 }
@@ -212,7 +212,7 @@ ${diffText || 'Keine Veränderungen erkannt.'}
 Im Anhang finden Sie:
 1. Den vollständigen Re-Check-Report (PDF) mit allen aktuellen Befunden und Lösungshinweisen.${stmtPath ? '\n2. Ihre auf den aktuellen Stand gebrachte Erklärung zur Barrierefreiheit (Vorlage).' : ''}${invoicePdfPath ? `\n${stmtPath ? '3' : '2'}. Ihre Rechnung (PDF).` : ''}
 
-Sie können Ihr Abo jederzeit über https://bfsg-fix.de/kuendigen beenden.
+Sie können Ihr Abo jederzeit über https://barrierefrei-pruefen.de/kuendigen beenden.
 ${widerrufHinweis({ customerType, consentTs })}
 Mit freundlichen Grüßen
 ${FROM_NAME}
@@ -275,7 +275,7 @@ export async function sendDsgvoToken({ to, action, link, expiresAt }) {
   if (!isEmail(to)) return { dryRun: true, skipped: 'invalid-recipient' };
   const aktion = action === 'delete' ? 'Löschung' : 'Auskunft';
   const subject = `Ihre DSGVO-Anfrage (${aktion}) — Bestätigung erforderlich`;
-  const text = `Sie haben eine ${aktion} Ihrer bei BFSG-Check gespeicherten Daten angefragt.
+  const text = `Sie haben eine ${aktion} Ihrer bei Barrierefrei-Prüfen gespeicherten Daten angefragt.
 
 Bitte bestätigen Sie die Anfrage über folgenden Link (gültig bis ${expiresAt}):
 

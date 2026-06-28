@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BFSG-Check Admin",
-  description: "Admin-Dashboard für BFSG-Check (Umsätze, Aufträge, Abos, Server-Status)",
+  title: "Barrierefrei-Prüfen Admin",
+  description: "Admin-Dashboard für Barrierefrei-Prüfen (Umsätze, Aufträge, Abos, Server-Status)",
 };
 
 const navItems = [
@@ -42,7 +42,7 @@ export default function RootLayout({
           <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
             <div className="flex items-center gap-3">
               <span className="text-lg font-semibold tracking-tight">
-                BFSG-Check Admin
+                Barrierefrei-Prüfen Admin
               </span>
               <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-200">
                 Pre-Launch
@@ -65,7 +65,7 @@ export default function RootLayout({
           {children}
         </main>
         <footer className="border-t bg-white py-4 text-center text-xs text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400">
-          BFSG-Check · interne Übersicht · nur für Admin-Zugänge
+          Barrierefrei-Prüfen · interne Übersicht · nur für Admin-Zugänge
         </footer>
         <Toaster />
       </body>

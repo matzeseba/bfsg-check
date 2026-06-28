@@ -3,7 +3,7 @@ import { ImageResponse } from "next/og";
 export const runtime = "nodejs";
 
 export const alt =
-  "BFSG-Check — Barrierefreiheit für Ihre Website prüfen. Automatischer Scan mit Fix-Plan.";
+  "Barrierefrei-Prüfen — Barrierefreiheit für Ihre Website prüfen. Automatischer Scan mit Fix-Plan.";
 
 export const size = {
   width: 1200,
@@ -64,7 +64,7 @@ export default async function OpengraphImage() {
                 letterSpacing: "-0.01em",
               }}
             >
-              BFSG-Check
+              Barrierefrei-Prüfen
             </span>
             <span
               style={{
@@ -72,7 +72,7 @@ export default async function OpengraphImage() {
                 color: "#94a3b8",
               }}
             >
-              bfsg-fix.de
+              barrierefrei-pruefen.de
             </span>
           </div>
         </div>
@@ -132,7 +132,7 @@ export default async function OpengraphImage() {
         >
           <span>WCAG 2.1 AA · Fix-Plan · Re-Check-Abo</span>
           <span style={{ color: "#22d3ee", fontWeight: 600 }}>
-            bfsg-fix.de
+            barrierefrei-pruefen.de
           </span>
         </div>
       </div>

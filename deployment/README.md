@@ -1,11 +1,11 @@
-# Deployment — BFSG-Check auf Hetzner
+# Deployment — Barrierefrei-Prüfen auf Hetzner
 
 ## Was liegt hier
 
 | Datei | Zweck |
 |---|---|
 | `docker-compose.yml` | App-Container (Node+Chromium) + Caddy (Auto-HTTPS) |
-| `Caddyfile` | Reverse-Proxy mit Let's-Encrypt-SSL für bfsg-fix.de + 301 für die 3 Alias-Domains |
+| `Caddyfile` | Reverse-Proxy mit Let's-Encrypt-SSL für barrierefrei-pruefen.de + bfsg-fix.de (beide aktiv) + 301 für die 2 Alias-Domains |
 | `dns-records.md` | INWX-DNS-Eintragsvorlage (A/SPF/DKIM/DMARC) |
 | `.env.example` | Vorlage für die Server-Env-Vars |
 
@@ -72,6 +72,8 @@ docker run --rm -v deployment_bfsg_data:/data -v ~/backups:/backup alpine \
 ## Health-Check
 
 ```bash
-curl https://bfsg-fix.de/health
+curl https://barrierefrei-pruefen.de/health
 # Erwartet: {"ok":true,"stripe":true,...}
+# Alte Domain weiterhin aktiv (Stripe-Webhook):
+curl https://bfsg-fix.de/health
 ```

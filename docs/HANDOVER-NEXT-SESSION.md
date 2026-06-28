@@ -2,7 +2,13 @@
 
 ---
 
-## 🔴 STAND 28.06.2026 (spätabends) — NÄCHSTE SESSION STARTET HIER
+## 🔵 STAND 28.06.2026 (Rebrand) — NÄCHSTE SESSION STARTET HIER
+
+> **Rebrand vorbereitet** (Branch `rebrand/barrierefrei-pruefen`, PR offen): Marke „BFSG-Check" → **„Barrierefrei-Prüfen"**, Hauptdomain → **barrierefrei-pruefen.de**. Grund: Wettbewerber `bfsg-check.de` (Fast Forward IT GmbH) führt identische Marke „BFSG CHECK" → Marken-/Abmahnrisiko. Code fertig + verifiziert (scanner 142/142, `next build` grün, legal-grep Baseline unverändert, 71 Dateien). `bfsg-fix.de` **bleibt** als Redirect-Domain. „BFSG" als Gesetz/Keyword überall erhalten. **Live-Umstellung (DNS, Brevo-DKIM, Server-`.env`, Stripe-Webhook) macht NUR der Owner** → vollständiges Schritt-für-Schritt: **`docs/REBRAND-CUTOVER-RUNBOOK.md`**. **PR NICHT vor DNS-Cutover mergen.**
+
+---
+
+## 🔴 STAND 28.06.2026 (spätabends) — Scan-/TLS-Blocker (weiter offen, vom Rebrand unabhängig)
 
 > **Lies NUR diesen Block für den aktuellen Stand. Alles darunter ist Historie.**
 

@@ -45,7 +45,7 @@ Keywords (Phrase/Exact):
 
 *Lösungs-Variante:*
 4. WCAG 2.1 AA Erstprüfung mit Fix-Plan
-5. BFSG-Check: Mängel finden bevor andere es tun
+5. Barrierefrei-Prüfen: Mängel finden bevor andere es tun
 6. Priorisierter Report inkl. Erklärungs-Vorlage
 
 *Geschwindigkeits-Variante:*

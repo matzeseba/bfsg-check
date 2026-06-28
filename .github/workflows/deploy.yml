@@ -68,7 +68,7 @@ jobs:
             docker compose exec -T caddy sh -c 'wget -qO- --timeout=5 http://landing-next:3000/ | head -c 300' || echo "(landing-next unreachable from caddy)"
             echo ""
             echo "=== DIAGNOSE: Was liefert / via Caddy lokal? ==="
-            curl -sS --max-time 5 -H "Host: bfsg-fix.de" http://localhost/ | head -c 300 || true
+            curl -sS --max-time 5 -H "Host: barrierefrei-pruefen.de" http://localhost/ | head -c 300 || true
             echo ""
 
             echo "=== Health-Check ==="

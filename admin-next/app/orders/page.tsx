@@ -13,7 +13,7 @@ import { mockOrders } from "@/lib/mock-data";
 import { formatCents, formatDateTime } from "@/lib/format";
 
 export const metadata = {
-  title: "Bestellungen · BFSG-Check Admin",
+  title: "Bestellungen · Barrierefrei-Prüfen Admin",
 };
 
 function statusBadge(status: Order["status"]) {

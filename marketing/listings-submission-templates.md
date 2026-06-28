@@ -8,25 +8,25 @@
 
 | Feld | Wert |
 |---|---|
-| Product Name | BFSG-Check |
+| Product Name | Barrierefrei-Prüfen |
 | Tagline (50 chars) | Compliance-Scans für deutsche Websites |
-| Website | https://bfsg-fix.de |
-| Pricing-Page | https://bfsg-fix.de/preise |
+| Website | https://barrierefrei-pruefen.de |
+| Pricing-Page | https://barrierefrei-pruefen.de/preise |
 | Category | Accessibility Testing, Compliance, Website Audit |
 | Founded | 2026 |
 | Headquarters | Kutenholz, Germany |
 | Founder | Matthias Seba |
-| Contact | info@matthias-seba.de |
+| Contact | info@barrierefrei-pruefen.de |
 | Logo | (von landingpage-next/public/logo.png) |
-| Cover-Image | bfsg-fix.de/og-image.png |
+| Cover-Image | barrierefrei-pruefen.de/og-image.png |
 
 ---
 
 ## Short Description (250 Zeichen)
 
 ```
-BFSG-Check ist ein automatisierter Compliance-Scanner für deutsche Websites. 
-In 60 Sekunden erhalten Sie einen Score und Vollreport mit konkreten 
+Barrierefrei-Prüfen ist ein automatisierter Compliance-Scanner für deutsche 
+Websites. In 60 Sekunden erhalten Sie einen Score und Vollreport mit konkreten 
 Findings nach WCAG 2.1 AA und BFSG. Vollreport ab 199 €, ohne Abo-Zwang. 
 Hosting in Deutschland, DSGVO-konform.
 ```
@@ -34,8 +34,8 @@ Hosting in Deutschland, DSGVO-konform.
 ## Long Description (1000 Zeichen)
 
 ```
-BFSG-Check liefert automatisierte Compliance-Scans für deutsche Online-Shops, 
-Buchungsplattformen und B2C-Websites. Seit dem Barrierefreiheitsstärkungs-
+Barrierefrei-Prüfen liefert automatisierte Compliance-Scans für deutsche 
+Online-Shops, Buchungsplattformen und B2C-Websites. Seit dem Barrierefreiheitsstärkungs-
 Gesetz (BFSG) am 28.06.2025 sind alle B2C-Websites mit über 10 Mitarbeitern 
 zur Barrierefreiheit verpflichtet.
 
@@ -81,9 +81,9 @@ made-in-germany
 **Why SaaSHub first:** DR 74, **dofollow Backlink** (selten!), schnelle Approval.
 
 ```
-Name: BFSG-Check
+Name: Barrierefrei-Prüfen
 Tagline: Compliance-Scans für deutsche Websites
-URL: https://bfsg-fix.de
+URL: https://barrierefrei-pruefen.de
 Category: Accessibility Testing → Website Audit Tools
 Pricing: Freemium (Gratis-Scan + Pakete ab 199 €)
 
@@ -110,7 +110,7 @@ Alternatives to: Eye-Able, axe DevTools, AccessiBe, UserWay, eRecht24 BFSG-Check
 **Why G2:** B2B-Trust-Signal, Acquired Capterra/GetApp/Software Advice Feb 2026.
 
 ```
-Product Name: BFSG-Check
+Product Name: Barrierefrei-Prüfen
 Vendor: Matthias Seba
 Vendor Website: https://matthias-seba.de
 Product Category: Web Accessibility Testing
@@ -154,8 +154,8 @@ Pricing Tiers:
 **Why:** Long-Tail "Alternative to" SEO, dofollow auf Product-Pages.
 
 ```
-Title: BFSG-Check
-URL: https://bfsg-fix.de
+Title: Barrierefrei-Prüfen
+URL: https://barrierefrei-pruefen.de
 License: Commercial (Freemium)
 Platform: Web/SaaS
 
@@ -186,10 +186,10 @@ Features:
 ### 5. TrustRadius (URL: https://solutions.trustradius.com/claim-your-profile/)
 
 ```
-Company: Matthias Seba (BFSG-Check)
-Product: BFSG-Check
+Company: Matthias Seba (Barrierefrei-Prüfen)
+Product: Barrierefrei-Prüfen
 Category: Web Accessibility & Compliance
-URL: https://bfsg-fix.de
+URL: https://barrierefrei-pruefen.de
 
 Description (paste Long Description)
 
@@ -207,9 +207,9 @@ Worst For: Enterprise (we don't replace Eye-Able's enterprise features)
 ### 6. SaaSworthy (URL: https://www.saasworthy.com)
 
 ```
-Product Name: BFSG-Check
+Product Name: Barrierefrei-Prüfen
 Tagline: Compliance-Scans für deutsche Websites
-URL: https://bfsg-fix.de
+URL: https://barrierefrei-pruefen.de
 Category: Web Accessibility Testing → Compliance Tools
 
 Pricing: Freemium starting at $199 (one-time Vollreport)
@@ -225,9 +225,9 @@ Description (paste Long Description)
 **Why:** Stärkste DACH-B2B-Review-Brand. Free-Tier reicht.
 
 ```
-Software Name: BFSG-Check
+Software Name: Barrierefrei-Prüfen
 Anbieter: Matthias Seba
-Webseite: https://bfsg-fix.de
+Webseite: https://barrierefrei-pruefen.de
 Kategorie: Barrierefreiheit & Compliance Tools
 
 Beschreibung (paste Long Description in German)
@@ -254,9 +254,9 @@ DSGVO: Vollständig konform
 **Why:** Globale Accessibility-Tools-Liste, höchste Authority.
 
 ```
-Tool Name: BFSG-Check
+Tool Name: Barrierefrei-Prüfen
 Vendor: Matthias Seba, Germany
-URL: https://bfsg-fix.de
+URL: https://barrierefrei-pruefen.de
 License: Commercial (Freemium)
 
 Description:
@@ -280,7 +280,7 @@ Languages of Reports: German
 
 **Wo:** Email an Editor von https://barrierefreie-agenturen.de/ratgeber/barrierefreiheit-testen/
 
-**Subject:** Vorschlag: BFSG-Check als deutsches Audit-Tool in Ihrer Liste
+**Subject:** Vorschlag: Barrierefrei-Prüfen als deutsches Audit-Tool in Ihrer Liste
 
 **Body:**
 ```
@@ -289,8 +289,8 @@ Sehr geehrtes Team von barrierefreie-agenturen.de,
 Ihre Ratgeber-Seite "Barrierefreiheit testen" listet bereits sehr gute 
 internationale Tools (axe DevTools, Eye-Able, BITV-Test). 
 
-Ich möchte BFSG-Check (https://bfsg-fix.de) als deutsches, BFSG-
-spezifisches Audit-Tool für Ihre Übersicht vorschlagen:
+Ich möchte Barrierefrei-Prüfen (https://barrierefrei-pruefen.de) als 
+deutsches, BFSG-spezifisches Audit-Tool für Ihre Übersicht vorschlagen:
 
 - Automatischer WCAG 2.1 AA Scan in 60 Sekunden
 - Deutsche Sprache + BFSG-spezifische Auslegung
@@ -304,8 +304,8 @@ Hintergrund.
 
 Mit freundlichen Grüßen
 Matthias Seba
-info@matthias-seba.de
-BFSG-Check · bfsg-fix.de
+info@barrierefrei-pruefen.de
+Barrierefrei-Prüfen · barrierefrei-pruefen.de
 ```
 
 **Wichtig:** Das ist eine Anfrage an einen ÖFFENTLICH-PUBLIZIERTEN Editor mit DIREKTEM Branchen-Bezug → tolerierte presse@-ähnliche Kommunikation. KEIN Cold-Mail-Verstoß.
@@ -316,15 +316,15 @@ BFSG-Check · bfsg-fix.de
 
 **Wo:** https://www.barrierefrei-kommunizieren.de/ → Kontakt
 
-**Subject:** Vorschlag: BFSG-Check in Ihrer Werkzeug-Datenbank
+**Subject:** Vorschlag: Barrierefrei-Prüfen in Ihrer Werkzeug-Datenbank
 
 ```
 Sehr geehrtes Team der Stiftung barrierefrei kommunizieren,
 
 Ihre Datenbank listet 719+ Hilfsmittel rund um Barrierefreiheit. 
 
-Ich möchte BFSG-Check (https://bfsg-fix.de) als deutsches Audit-Tool für 
-Website-Betreiber vorschlagen:
+Ich möchte Barrierefrei-Prüfen (https://barrierefrei-pruefen.de) als 
+deutsches Audit-Tool für Website-Betreiber vorschlagen:
 
 [gleicher Body wie oben, angepasst]
 ```
@@ -336,7 +336,7 @@ Website-Betreiber vorschlagen:
 **Wo:** Email an `barrierefreiheit@dbsv.org`
 
 ```
-Subject: Vorschlag: BFSG-Check als Audit-Tool für die Anbieterliste
+Subject: Vorschlag: Barrierefrei-Prüfen als Audit-Tool für die Anbieterliste
 
 [Body wie oben — WICHTIG: keine Overlay-Sprache, klare Positionierung 
 als Audit/Scanner, NICHT als Overlay-Lösung. DBSV ist explizit Anti-Overlay.]
