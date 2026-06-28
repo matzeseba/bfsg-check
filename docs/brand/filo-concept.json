@@ -1,0 +1,136 @@
+{
+  "decision": {
+    "verdict": "CONDITIONAL_GO",
+    "confidence": "hoch",
+    "winningDomain": "bfsg-fuchs.de",
+    "winningMascot": "Fuchs",
+    "brandArchitecture": "Architektur B (Descriptive-Primary + Mascot-as-Figure): barrierefrei-pruefen.de bleibt unveraendert Haupt-/Money-Domain und faengt die generische Buyer-Intent-Suche ab (Exact-Match-SEO-Vorteil). Der Fuchs ist der distinktive Marken-LAYER OBENDRAUF (Logo-Figur + Phantasie-Eigenname, NICHT \"BFSG-Fuchs\") und liefert ueber das Bild-Element das schuetzbare Wort-/Bildmarken-Asset, das dem rein beschreibenden Namen fehlt. KRITISCHE KORREKTUR: Der Figur-/Markenname traegt KEIN \"BFSG\" im Wortzeichen — sonst Regression in den ueberfuellten Look-alike-Namensraum + reaktivierte Naehe zu bfsg-check.de (Fast Forward IT). bfsg-fix.de (live 200), bfsg-held.de und bfsg-fuchs.de werden ausschliesslich als 301-/Kampagnen-/Defensiv-Redirects auf barrierefrei-pruefen.de gefuehrt, niemals als kommunizierte Zweitmarke. Hierarchie: barrierefrei-pruefen.de = canonical Primaer; alle bfsg-*-Domains = 301 darauf; Tippfehler-Domains der finalen Brand-Domain mitsichern und buendeln.",
+    "rationale": [
+      "VERIFIZIERTER White-Space: Kein DE-BFSG-/Accessibility-Anbieter (eye-able, checkbarriere.de, bfsg-check.de, AccessGo, eRecht24 etc.) nutzt ein Maskottchen — alle branden uniform technisch/sachlich. Eine warm-kompetente Figur ist der schnellste Weg zu Wiedererkennung im uniformen Wortmarken-Feld.",
+      "STRATEGISCHER KERN-HEBEL (IP): Das Maskottchen ist die EINZIGE billige Loesung fuer die echte Schwaeche der letzten Session — 'Barrierefrei-Pruefen' ist rein beschreibend = schwacher Schutz. Ein distinktives Bild-Element macht laut DPMA-Praxis die Wort-/Bildmarke eintragbar. Verifiziert: KEINE eingetragene 'BFSG Check'-Marke existiert (DPMA/EUIPO) → Kollisionsrisiko zu bfsg-check.de ist UWG-/Domain-Thema, kein Registerkonflikt; senkt Dringlichkeit, kein Freibrief.",
+      "FUCHS schlaegt HELD in JEDER Linse (Fuchs 7-8 vs Held 4-5): konkrete, ownable Silhouette = markenrechtlich staerker schuetzbar + einpraegsamer; semantisch sauber zum Produkt ('findet jede Luecke, die du uebersiehst'); vermeidet die Ableismus-/Retter-Landmine und die Generik-Inflation des 'Held'-Namensraums (UnternehmerHeld, IT-Held, Software-Helden) komplett.",
+      "Angst-Kauf-Fit: Im angst-getriebenen Compliance-Markt ist die emotionale Achse 'Verbuendeter/Lotse — ich navigiere dich da durch' voellig unbesetzt. GEICO-Gecko-Praezedenz belegt: Figur humanisiert Risiko-Produkt und hebt Conversion — ABER nur als kompetenter Guide neben hard proofs, nie als Clown.",
+      "Das Rote Team schlaegt NICHT durch: jeder Killer (Infantilisierung, Ableismus, Asset-Last, Fehl-Diagnose) ist durch dokumentierte, verbindliche Mitigations entschaerft (erwachsener Guide, Kunde=Held, hard-proof-Kopplung, AI-Pipeline-Budget-Cap, A/B vor Vollproduktion, Reihenfolge nach den echten Engpaessen). Deshalb CONDITIONAL_GO statt blankem GO: die Chance ist real, der Wert haengt aber STRIKT an der Ausfuehrungsdisziplin."
+    ],
+    "topRisks": [
+      {
+        "risk": "Trickster-/List-Fehlwahrnehmung des Fuchses ('trickst der mich/das Gesetz aus?') — fatal in einem Rechtssicherheits-Produkt.",
+        "mitigation": "Verbindliche Charakter-Charta mit No-Go-Liste (kein Zwinkern/Grinsen/Eckzahn/Schlitzohr-Pose). Erlaubt: aufmerksam, schlau, loyal, fuehrend (Spuerhund-/Foerster-Vibe). Voice-Guideline 'Verbuendeter, nicht Schlitzohr'. legal-copy-grep auch auf Maskottchen-Copy anwenden."
+      },
+      {
+        "risk": "Regression in den 'BFSG-'-Look-alike-Namensraum, wenn bfsg-fuchs.de/'BFSG-Fuchs' zur Hauptmarke wird — reaktiviert die Naehe zu bfsg-check.de, die der Rebrand gerade verlassen hat.",
+        "mitigation": "Guardrail im Brand-Guide: 'Kein BFSG im Figuren-/Markennamen — BFSG nur als SEO-Keyword in Content/Titles.' Figur-Eigenname keyword-frei. bfsg-*-Domains technisch als reine 301 konfigurieren."
+      },
+      {
+        "risk": "Gesetz-Verharmlosung durch die Figur ('kein Problem, ich regel das') untergraebt den Kauf-Trigger UND erzeugt UWG-Haftung (CLAUDE.md verbietet 'rechtssicher/garantiert').",
+        "mitigation": "Tonalitaets-Regel fixieren: Narrativ-Pfeil immer Risiko->Sicherheit, Figur entdramatisiert den WEG, nie das Gesetz ('ernst, aber machbar — ich zeig dir den Weg'). Disclaimer-Wortlaut bleibt unangetastet sichtbar, Figur immer neben WCAG-Score/Report-Sample."
+      },
+      {
+        "risk": "Solo-Founder-Asset-Last + Bikeshedding waehrend echte Engpaesse offen sind (DNS-Cutover, bezahlter-Scan-TLS-Bug, erste Sales).",
+        "mitigation": "Budget-Cap explizit setzen, AI-Bildpipeline + einmaliges Brand-Kit statt Agentur-Retainer; kleines robustes Set (1 Master-Pose + 3-4 Kontext-Posen). Zeitlich NACH Cutover/TLS-Fix/erste Sales. Erst A/B-Test (Fuchs-Hero vs nuechtern) bevor Vollintegration."
+      },
+      {
+        "risk": "IP-Luecke: DPMA prueft keine aelteren Rechte; Schwaebisch-Hall-Fuchs (Klasse 36, ~90% Bekanntheit) als bekannte Fuchs-Marke.",
+        "mitigation": "Vor Design-Invest Pflicht-Eigenrecherche DPMAregister + EUIPO/TMview auf Fuchs-Bildmarken (Wiener-Klasse 03.01) in Klasse 42+35+41. Eigene Fuchs-Grafik bewusst von SH abgrenzen (Pose/Farbe/Reduktion). Designer-Vertrag mit voller Rechteuebertragung. Optional 1h Fachanwalt-Eintragungsprognose. Phantasie-Eigenname fuer Wortschutz."
+      }
+    ],
+    "relationToBarrierefreiPruefen": "Kein Widerspruch, sondern Vollendung. Die letzte Session ging weg von der KOLLIDIERENDEN MARKE bfsg-check.de, nicht weg vom BFSG-Keyword (das als SEO-Anker/Paketname/Title erhalten bleibt). 'Barrierefrei-Pruefen' + barrierefrei-pruefen.de bleiben Hauptmarke/Haupt-/Conversion-Domain unveraendert; der Fuchs setzt als distinktiver Bild-/Charakter-Layer DARUEBER und loest genau die beschreibend-schwache Schutzfaehigkeit, ohne den SEO-Exact-Match-Vorteil anzutasten. Der Fuchs NEUTRALISIERT die Verwechslung mit bfsg-check.de (Differenzierung ueber Bild statt Keyword) — solange sein Name kein 'BFSG' traegt. bfsg-fix.de (live) + bfsg-held.de + bfsg-fuchs.de bleiben reine 301-Redirects/Defensiv-Netz.",
+    "prNoteForPR92": "PR #92 STRIKT ENTKOPPELN und unveraendert auf dem geplanten Pfad mergen — NACH DNS-Cutover (Runbook docs/REBRAND-CUTOVER-RUNBOOK.md). Die Maskottchen-Entscheidung aendert an PR #92 NICHTS: nicht blockieren, nicht erweitern, nicht zurueckrollen. PR #92 (Domain-/Code-Rebrand) ist das saubere Fundament, auf dem die Figur erst sinnvoll aufsetzt. Das Maskottchen kommt als SEPARATER, nachgelagerter Branding-PR in eigenem Branch mit eigenem Merge-Trigger, damit der DNS-abhaengige Cutover nicht an einer Design-Entscheidung haengt. Verifiziert: PR #92 = OPEN, isDraft=true, headRefName=rebrand/barrierefrei-pruefen; barrierefrei-pruefen.de liefert bereits 301, bfsg-fix.de 200, beide Maskottchen-Domains tot (000) — Domain-Fundament steht, Cutover-Reihenfolge bleibt: erst PR #92, dann Fuchs-Layer.",
+    "fuchsVsHeld": "FUCHS gewinnt klar. Pro Fuchs: konkrete, sofort wiedererkennbare Silhouette = markenrechtlich deutlich staerker schuetzbar (Bild-Element traegt die Unterscheidungskraft, genau der gesuchte IP-Hebel); semantisch praezise zum Scanner-Nutzen ('schlau/aufmerksam/flink — findet die Barriere, die du uebersiehst'); vermeidet die accessibility-spezifische Ableismus-Falle. HELD verliert aus drei harten Gruenden: (1) ABLEISMUS-LANDMINE — 'Held/Retter' im Behinderungs-Kontext kollidiert frontal mit dem dokumentierten 'disability saviorism'/'inspiration porn'-Diskurs (Stella Young), reputationell radioaktiv genau bei den BFSG-Durchsetzungs-Multiplikatoren; (2) GENERIK/INFLATION — der 'Held'-Namensraum im DE-Tool-Markt ist ueberfuellt (UnternehmerHeld, IT-Held, Software-Helden, held.de), das Gegenteil von 'herausstechen'; (3) SCHWACHER BILD-SCHUTZ — abstrakter Superheld (Cape/Maske) ist generisches, schwer monopolisierbares Bildvokabular, also schwach auf genau der Dimension, die den Maskottchen-Weg ueberhaupt rechtfertigt. Zusatz: 'Held' ist semantisch schief (gesetzlicher Mindeststandard als 'Heldentat' = Verharmlosung). Das einzig saubere Held-Framing (Kunde=Held, Tool=Mentor) macht den Figur-Namen 'Held' selbst-widerspruechlich. Dieses Empowerment gehoert in den Claim/das Narrativ (Kunde=Held), nicht in die Figur. bfsg-held.de nur als guenstige Defensiv-/Redirect-Domain parken.",
+    "recommendation": "GO auf den Fuchs als Marken-Layer — aber bedingt an Ausfuehrungsdisziplin. Der Fuchs als erwachsener, kompetenter LOTSE (nicht Trickster, nicht Clown): Kunde=Held, Fuchs=Mentor/Spuernase, immer neben hard proofs (WCAG-Score, Report-Sample), Gesetz nie verharmlosend. Architektur: barrierefrei-pruefen.de bleibt Haupt-/SEO-Domain, der Fuchs traegt einen keyword-freien Phantasie-Eigennamen (KEIN 'BFSG-Fuchs') und wird als Wort-/Bildmarke (Klasse 42+35+41) angemeldet, sobald final designt — das ist der eigentliche Return. Reihenfolge zwingend: PR #92 unveraendert nach DNS-Cutover mergen, dann erst A/B-Test des Fuchses, dann Vollintegration; bfsg-*-Domains nur als 301-Redirects."
+  },
+  "concept": {
+    "mascotName": "Filo",
+    "altNames": [
+      "Vero",
+      "Audi-Fuchs (nur intern, NIE extern - Audi-Markenkollision)",
+      "Max",
+      "Nivo",
+      "Lux"
+    ],
+    "archetype": "Der kompetente Guide / aufmerksame Verbündete (Mentor-Archetyp, NICHT Held). Filo ist der ruhige, vorausschauende Begleiter, der den Kunden sicher durch ein unübersichtliches Gesetz navigiert - die Rolle ist Mentor/Lotse, der Kunde bleibt der Handelnde. Bewusst gegen das Fuchs-Trickster-Klischee gebaut: kein listiger Schelm, sondern ein wacher, gewissenhafter Spürsinn-Profi, der Dinge findet, die andere übersehen.",
+    "personality": [
+      "Aufmerksam & gründlich - sieht, was übersehen wird (der positive Kern der Fuchs-Konnotation: Spürsinn, nicht List)",
+      "Ruhig & souverän - nie hektisch, nie alarmistisch; senkt den Angst-Puls des Käufers statt ihn zu schüren",
+      "Ehrlich & klar - benennt Risiken nüchtern, beschönigt das Gesetz nie, verspricht keine Garantien",
+      "Verbündet & zugewandt - 'ich gehe das mit dir durch', auf Augenhöhe, kein belehrender Experte",
+      "Erwachsen & kompetent - seriöser Berufs-Habitus, kein kindlich-niedliches Maskottchen",
+      "Pragmatisch & lösungsorientiert - übersetzt 200 Seiten Norm in den nächsten konkreten Schritt"
+    ],
+    "dosAndDonts": {
+      "dos": [
+        "Filo als ruhigen, aufmerksamen GUIDE inszenieren, der neben dem Kunden steht und auf einen Befund deutet - Haltung 'Schau, das hier sollten wir uns ansehen'",
+        "Erwachsene, schlanke, moderne Vektor-Proportionen verwenden (aufrechter, kompetenter Stand) - Anmutung wie ein Fachberater, nicht wie ein Plüschtier",
+        "Mint (#34d99a) sparsam als Akzent/Signal-Farbe einsetzen (Augen, Schal/Kragen, Scan-Beam-Linie), Körper im warmen, gedämpften Fuchs-Ton, eingebettet ins dunkle Indigo-Layout",
+        "Den bestehenden Scan-Beam (--animate-scan-beam) als Filos Werkzeug nutzen: er führt eine mint-leuchtende Prüf-Linie über eine Website - verbindet Figur direkt mit dem Produktnutzen",
+        "Mimik dezent halten: wacher, freundlicher, fokussierter Blick; ein zugewandtes leichtes Lächeln statt breitem Grinsen (Grinsen triggert das Trickster-Klischee)",
+        "Hard proofs IMMER neben die Figur stellen (echte WCAG-Scores, Beispiel-Reports, Norm-Referenzen) - Charme trägt das Vertrauen, Belege beweisen es",
+        "Klare, geometrische Ohren/Schweif als Wiedererkennungs-Silhouette designen, die auch als 16px-Favicon und einfarbig funktioniert",
+        "Pflicht-Sprache in jeder Sprechblase: 'automatisierte technische Analyse', 'WCAG-2.1-AA-Audit', 'wir zeigen dir, wo du stehst'"
+      ],
+      "donts": [
+        "KEIN schelmisches Zwinkern, kein verschlagener Seitenblick, keine 'schlauer-Fuchs'-Pose mit erhobenem Finger - reaktiviert exakt die Trickster/List-Konnotation, die im Compliance-Kontext Misstrauen sät",
+        "KEINE Held-/Retter-Inszenierung (Cape, Faust in die Hüfte, Superhelden-Pose) - paternalistisch/ableistisch im Accessibility-Kontext und framt einen gesetzlichen Mindeststandard fälschlich als Heldentat; der KUNDE ist der Held, Filo ist der Mentor",
+        "KEINE kindlich-niedliche, großäugige Chibi-/Kawaii-Ausführung - untergräbt die B2B-Seriosität und bagatellisiert das Gesetz",
+        "KEINE Sprechblasen mit 'BFSG-konform', 'rechtssicher', 'garantiert', '100% sicher', 'Abmahnung ausgeschlossen' - UWG-§5-Irreführung",
+        "KEINE Siegel/Plaketten an der Figur, die TÜV/DEKRA/amtliche Zertifizierung suggerieren (Schild, Stempel, Wappen mit Prüf-Anmutung)",
+        "KEIN 'BFSG' oder anderer beschreibender Begriff im Figur-/Wortzeichen-Namen - Regression in den überfüllten Look-alike-Namensraum + reaktivierte Nähe zu bfsg-check.de (Fast Forward IT)",
+        "KEINE Angst-Verstärkung über die Figur (Filo als Mahn-/Droh-Figur, rotes Alarm-Maskottchen) - widerspricht der Risiko-zu-Sicherheit-Erzählung und der Verbündeten-Rolle",
+        "Mint NICHT als Vollflächen-Körperfarbe - Mint ist die Signal-/Akzentfarbe des Systems, nicht die Fellfarbe; sonst verliert die Figur Wärme und Erkennbarkeit als Fuchs"
+      ]
+    },
+    "visualSpec": {
+      "style": "Moderner, flacher Vektor-Mascot mit minimalem 'soft 2.5D'-Volumen (sanfte Schattierung an Übergängen, keine Comic-Outline-Dicke, keine fotorealistische Fell-Textur). Geometrisch reduzierte, erwachsene Proportionen - schlank und aufrecht, nicht knuddelig-rundlich. Anmutung: seriöser Fachberater als Figur, skalierbar von Favicon (16px, einfarbig) bis Hero-Illustration. Logo-Tauglichkeit hat Vorrang vor Detailreichtum.",
+      "palette": [
+        "Körper/Fell warmes gedämpftes Fuchs-Orange-Terrakotta (NICHT grell): ~#C8703C bis #B25E32, abgestimmt aufs dunkle Layout, gesättigt genug für Wiedererkennung aber ruhiger/erwachsener als Signalorange",
+        "Bauch/Wangen/Schweifspitze warmes Off-White ~#F4EDE2 (passt zum LP-Background oklch 0.987)",
+        "Akzent Mint #34d99a (Augen-Glanz, Kragen/Schal, Scan-Beam-Linie, Prüf-Häkchen) - die Signatur-Verbindung zum Produkt",
+        "Mint-Soft #7fe8bd für weiche Glow-/Beam-Verläufe (nutzt bestehendes --shadow-glow-mint)",
+        "Tiefes Indigo/Near-Black #0b0d18 + #050609 als Umgebung/Konturen/Schatten - Figur sitzt im bestehenden dunklen Brand-Raum",
+        "Indigo #5b73e8 / Violet #9a7cff sparsam für sekundäre UI-Elemente um die Figur (Aurora-Hintergrund)",
+        "Amber #f5b13d und Rose #ff6b57 NUR für Befund-/Status-Markierungen in der Szene (Warnung/Fehler), NIE als Filos Stimmungs-/Körperfarbe"
+      ],
+      "form": "Aufrecht stehender, anthropomorpher Fuchs in schlanker, erwachsener Statur (kein vierbeiniges Tier, kein dicker Knuddel-Body). Klare Wiedererkennungs-Silhouette aus: spitze, wache (nicht zurückgelegt-listige) Ohren leicht nach vorn/aufmerksam, schlanke Schnauze in neutraler Ruhe, ein voller Schweif mit hellem Spitzen-Akzent als Marken-Signatur-Element. Trägt ein dezentes, modernes Erkennungs-Accessoire in Mint (schmaler Schal oder Kragen/Rollkragen-Andeutung) - signalisiert 'im Dienst/professionell' ohne Kostümierung. Hände/Gesten fähig zu 'zeigen/deuten' und 'begleiten'. Optionales schlankes Werkzeug-Motiv: eine mint-leuchtende Scan-Linie/Lupe-als-Lichtkante (kein klobiges Detektiv-Lupen-Klischee).",
+      "keyFeatures": [
+        "Aufmerksame, nach vorn gerichtete Ohren = Wachheit/Spürsinn (der entschärfte, positive Fuchs-Kern)",
+        "Mint-Schweifspitze als einfarbig reproduzierbares Marken-Erkennungszeichen (funktioniert als Icon/Favicon allein)",
+        "Mint Scan-Beam als Filos Signatur-Werkzeug, direkt aus dem bestehenden --animate-scan-beam der LP abgeleitet",
+        "Dezenter Mint-Kragen/Schal als 'Profi-im-Dienst'-Marker statt Kostüm oder Held-Cape",
+        "Erwachsene, aufrechte Körperhaltung mit 'deutender/begleitender' Gestik-Fähigkeit für Report-/Onboarding-Posen",
+        "Reduzierte, logo-fähige Geometrie - eine Silhouette, die in 16px und in einfarbig erkennbar bleibt"
+      ],
+      "expressions": [
+        "Ruhig-aufmerksam (Default/Hero): wacher fokussierter Blick, leichtes zugewandtes Lächeln, Kopf minimal geneigt - 'ich hab das im Blick'",
+        "Deutend-erklärend (Report/Onboarding): zeigt auf einen Befund/Score, ruhig-sachlich, Augenkontakt zum Nutzer - 'hier stehst du, das ist der nächste Schritt'",
+        "Konzentriert-prüfend (Scan-Ladezustand): Blick entlang der Mint-Scan-Linie, sachlich-fokussiert, kein Drama",
+        "Ernst-zugewandt (Fehler/Warnung): ruhige, ehrliche Mimik, gesenkte Ohren leicht - signalisiert 'ernst, aber wir lösen das', NIE Panik/Alarm",
+        "Bestätigend-ermutigend (Erfolg/Verbesserung): ruhiges Nicken-Lächeln, dezentes Mint-Häkchen - Anerkennung ohne Garantie-Versprechen",
+        "Begrüßend-einladend (404/E-Mail/Leerzustand): offene, freundliche Geste, einladend - senkt die Hemmschwelle ohne kindlich zu wirken"
+      ]
+    },
+    "voiceTone": "Ruhig, klar, erwachsen, verbündet. Filo spricht wie ein erfahrener Berater, der dich beruhigt statt unter Druck setzt: kurze, konkrete Sätze, Du-Ansprache, nüchterne Ehrlichkeit über Risiko UND über die Grenzen der Aussage. Senkt den Angst-Puls des Käufers ('ich zeige dir genau, wo du stehst - Schritt für Schritt'), ohne das Gesetz zu verharmlosen und ohne je Garantien, Rechtssicherheit oder 'BFSG-konform' zu behaupten. Verwendet die Pflicht-Sprache ('automatisierte technische Analyse', 'WCAG-2.1-AA-Audit', 'Hinweis, keine Rechtsberatung'). Nie marktschreierisch, nie schelmisch-augenzwinkernd, nie heroisch-pathetisch. Grundhaltung: 'Das ist machbar, ich gehe es mit dir durch.'",
+    "useCases": [
+      "Hero-Sektion der Landingpage: Filo neben dem Scan-Visual, ruhig-aufmerksame Pose, führt die Mint-Scan-Linie über eine Beispiel-Website (knüpft an --animate-scan-beam an)",
+      "Scan-Ladeanimation: Filo im konzentriert-prüfenden Zustand, während die Mint-Scan-Linie läuft - macht die Wartezeit zur Marken-Erfahrung (positiver Reddit-belegter Onboarding-Effekt)",
+      "Report-/Ergebnis-Guide: Filo in deutend-erklärender Pose neben den WCAG-Scores, übersetzt Befunde in nächste Schritte (Mentor-Rolle)",
+      "Fehler-/Warnzustand (Scan fehlgeschlagen, TLS-Problem, kein Treffer): Filo ernst-zugewandt, ruhiger Hinweis-Ton statt Alarm",
+      "404- und Leerzustände: Filo begrüßend-einladend, senkt Frust",
+      "Transaktions-/Onboarding-E-Mails (Brevo): Filo als Absender-Persona-Visual im Header, baut Wiedererkennung über Touchpoints",
+      "Erfolgs-/Verbesserungs-Zustand: Filo bestätigend-ermutigend mit Mint-Häkchen (kein Garantie-Siegel)",
+      "Favicon / App-Icon / Social-Avatar: reduzierte Filo-Silhouette bzw. Mint-Schweifspitze als einfarbiges Marken-Mal",
+      "Wort-/Bildmarken-Anmeldung beim DPMA: Filo-Logo-Lockup liefert das unterscheidungskräftige Bild-Element, das den beschreibenden Namen 'Barrierefrei-Prüfen' schützbar macht",
+      "Defensiv-/Kampagnen-Redirects (bfsg-fuchs.de, bfsg-held.de, bfsg-fix.de): leiten 301 auf barrierefrei-pruefen.de - Filo erscheint NUR auf der Zielseite, die Redirect-Domains werden nie als Zweitmarke kommuniziert"
+    ],
+    "claimOptions": [
+      "Wir zeigen dir, wo deine Website steht.",
+      "Automatisierte technische Analyse nach WCAG 2.1 AA - klar, nachvollziehbar, mit Bericht.",
+      "Dein aufmerksamer Begleiter durch die Barrierefreiheit.",
+      "Schritt für Schritt zu mehr Barrierefreiheit - ich gehe es mit dir durch.",
+      "Sieht, was übersehen wird. Erklärt, was zu tun ist.",
+      "Klarheit statt Unsicherheit: dein WCAG-2.1-AA-Audit mit verständlichem Report.",
+      "Barrierefreiheit ist machbar. Wir fangen beim ersten Befund an.",
+      "Verständlicher Report statt 200 Seiten Norm."
+    ],
+    "imageGenPrompt": "Modern flat vector mascot logo of an adult, professional anthropomorphic fox named Filo, standing upright in a calm, attentive hero pose, three-quarter view, head slightly tilted with an alert forward-facing gaze and a subtle warm closed-mouth smile - confident competent guide, NOT cute, NOT chibi, NOT a sly trickster, no winking, no grin. Slim grown-up proportions, clean geometric reduced shapes, soft 2.5D shading with no thick comic outline. Fur in a muted warm terracotta-orange (#C8703C to #B25E32), off-white belly and tail tip (#F4EDE2). One hand gently gesturing forward as if guiding or pointing at something just off-frame. Wears a thin modern mint scarf/collar (#34d99a) signalling a professional on duty. A subtle glowing mint scan-line of light (#34d99a fading to #7fe8bd) sweeps horizontally beside the fox like a website-checking beam, with a faint mint glow. Deep near-black indigo background (#0b0d18 to #050609) with a very subtle indigo-violet aurora (#5b73e8, #9a7cff). Trustworthy, serious-friendly, calm, adult, premium tech-startup brand mascot. Clean, crisp, scalable vector illustration, centered, generous negative space, suitable as a logo and as a hero illustration. No text, no letters, no badges, no seals, no shields, no superhero cape, no magnifying-glass cliche, no alarm colors."
+  }
+}
