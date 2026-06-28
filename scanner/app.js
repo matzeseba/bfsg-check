@@ -713,6 +713,19 @@ app.post('/api/resend/:sessionId', requireAdminAuth, async (req, res) => {
   if (order.status === 'MAILED' || order.status === 'RESENT') {
     return res.status(409).json({ error: `Order Status ${order.status} — bereits ausgeliefert.` });
   }
+  // Optionale, admin-korrigierte Ziel-URL (analog overrideEmail): liefert eine bezahlte
+  // Bestellung aus, deren bestellte URL kaputt ist (z. B. Apex 404/Cert-Fehler, echte
+  // Seite www.*). SSRF-PFLICHT: über assertPublicHttpUrl validieren. BEWUSST VOR dem
+  // Lock-Claim — schlägt die Validierung fehl, gibt es kein 400 mit gehaltenem Lock.
+  let overrideUrl = null;
+  if (req.body && req.body.url) {
+    try {
+      const safe = await assertPublicHttpUrl(String(req.body.url));
+      overrideUrl = safe.url;
+    } catch (e) {
+      return res.status(400).json({ error: 'Korrigierte URL nicht erlaubt: ' + e.message });
+    }
+  }
   // Atomarer Claim: check-then-add OHNE await dazwischen ist im Single-Thread-Eventloop
   // atomar → zwei parallele Resends können nicht beide den Lock bekommen.
   if (resendInFlight.has(sessionId)) {
@@ -733,7 +746,9 @@ app.post('/api/resend/:sessionId', requireAdminAuth, async (req, res) => {
     // Rechnungsnummer. Alle nötigen Artefakt-Pfade liegen am Order-Record. Fällt ein
     // Pfad (z. B. nach Server-Neustart mit verlorenem out/-Volume), greift unten der
     // Voll-Resend-Fallback.
-    const mailOnly = order.status === 'READY_NOT_MAILED' && order.pdfPath;
+    // Bei korrigierter URL den mail-only-Fastpath erzwingen-überspringen: der vorhandene
+    // Report gilt für die falsche/kaputte URL → voller Re-Scan gegen die neue URL.
+    const mailOnly = !overrideUrl && order.status === 'READY_NOT_MAILED' && order.pdfPath;
     if (mailOnly) {
       await services.sendReportFor({
         to: recipient, company: order.company || '',
@@ -753,7 +768,7 @@ app.post('/api/resend/:sessionId', requireAdminAuth, async (req, res) => {
     }
 
     const result = await paidScanGate(() =>
-      services.fulfillOrder({ url: order.url, company: order.company || '', email: recipient, pkg: order.pkg || 'basis' })
+      services.fulfillOrder({ url: overrideUrl || order.url, company: order.company || '', email: recipient, pkg: order.pkg || 'basis' })
     );
     // Rechnung nachreichen, falls bei der fehlgeschlagenen Erst-Auslieferung noch keine erzeugt wurde.
     const invoice = order.invoiceNumber
@@ -779,7 +794,7 @@ app.post('/api/resend/:sessionId', requireAdminAuth, async (req, res) => {
       customerType: order.customerType || '',
       consentTs: order.consentTs || ''
     });
-    await markStatus(sessionId, 'RESENT', { pdfPath: result.pdfPath, invoiceNumber: invoice?.invoiceNumber || order.invoiceNumber || null, resentTo: overrideEmail || undefined });
+    await markStatus(sessionId, 'RESENT', { pdfPath: result.pdfPath, invoiceNumber: invoice?.invoiceNumber || order.invoiceNumber || null, resentTo: overrideEmail || undefined, correctedUrl: overrideUrl || undefined });
     return res.json({ ok: true, sessionId, email: recipient, status: 'RESENT' });
   } catch (err) {
     // SF1: Status NICHT in RESENDING hängen lassen — auf den fachlich korrekten

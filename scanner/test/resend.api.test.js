@@ -152,6 +152,65 @@ test('MF6: ungültige Override-E-Mail → Fallback auf order.email', async () =>
   assert.equal(res.body.email, 'alt@kunde.de');
 });
 
+// --- Korrigierte Ziel-URL: optionaler req.body.url (analog overrideEmail) ---
+test('URL-Override: gültige korrigierte URL → voller Re-Scan mit NEUER URL, correctedUrl persistiert', async () => {
+  // READY_NOT_MAILED (hätte sonst mail-only ausgelöst) — die korrigierte URL muss den
+  // Fastpath überspringen und einen vollen Re-Scan gegen die neue URL erzwingen.
+  const id = await seedOrder({
+    sessionId: sid(), status: 'READY_NOT_MAILED', url: 'https://kaputt.example.com',
+    extra: { pdfPath: '/tmp/alt.pdf', emailKind: 'bfsg' }
+  });
+  let scannedUrl;
+  services.fulfillOrder = async ({ url }) => {
+    scannedUrl = url;
+    return { pdfPath: '/tmp/neu.pdf', stmtPath: null, emailKind: 'bfsg', diff: { firstScan: true, score: 90 } };
+  };
+  services.generateInvoicePdf = async () => ({ invoiceNumber: 'RE-2026-0042', pdfPath: '/tmp/RE-2026-0042.pdf', date: '2026-06-28' });
+  services.sendReportFor = async () => ({ dryRun: true });
+
+  const res = await authPost(id).send({ url: 'https://example.com/korrigiert' });
+  assert.equal(res.status, 200);
+  assert.equal(scannedUrl, 'https://example.com/korrigiert', 'fulfillOrder lief mit der korrigierten URL (nicht order.url, kein mail-only)');
+  const order = await orders.getOrder(id);
+  assert.equal(order.status, 'RESENT');
+  assert.equal(order.correctedUrl, 'https://example.com/korrigiert', 'korrigierte URL nachvollziehbar persistiert');
+});
+
+test('URL-Override: interne/ungültige URL → 400, kein fulfillOrder, Lock sauber freigegeben', async () => {
+  const id = await seedOrder({ sessionId: sid(), status: 'FAILED', extra: { error: 'erster Versuch' } });
+  let fulfillCalls = 0;
+  services.fulfillOrder = async () => { fulfillCalls += 1; throw new Error('darf nicht laufen'); };
+
+  const res = await authPost(id).send({ url: 'http://169.254.169.254/' });
+  assert.equal(res.status, 400, 'interne Cloud-Metadaten-IP wird abgelehnt');
+  assert.equal(fulfillCalls, 0, 'kein Scan bei abgelehnter URL');
+
+  // Lock-Beweis: ein Folge-Resend darf NICHT 409 „läuft bereits" bekommen.
+  services.fulfillOrder = async () => ({ pdfPath: '/tmp/r.pdf', stmtPath: null, emailKind: 'bfsg', diff: { firstScan: true, score: 90 } });
+  services.generateInvoicePdf = async () => ({ invoiceNumber: 'RE-2026-0043', pdfPath: '/tmp/RE-2026-0043.pdf', date: '2026-06-28' });
+  services.sendReportFor = async () => ({ dryRun: true });
+  const res2 = await authPost(id).send({});
+  assert.notEqual(res2.status, 409, 'Lock wurde auf dem 400-Pfad nicht geleakt');
+  assert.equal(res2.status, 200);
+});
+
+test('URL-Override: ohne url → bestehendes Verhalten unverändert (mail-only, kein correctedUrl)', async () => {
+  const id = await seedOrder({
+    sessionId: sid(), status: 'READY_NOT_MAILED',
+    extra: { pdfPath: '/tmp/r.pdf', emailKind: 'bfsg' }
+  });
+  let fulfillCalls = 0;
+  services.fulfillOrder = async () => { fulfillCalls += 1; throw new Error('mail-only → kein Scan'); };
+  services.sendReportFor = async () => ({ dryRun: true });
+
+  const res = await authPost(id).send({});
+  assert.equal(res.status, 200);
+  assert.equal(res.body.mode, 'mail-only', 'ohne Override greift weiterhin der mail-only-Fastpath');
+  assert.equal(fulfillCalls, 0, 'kein Re-Scan ohne Override');
+  const order = await orders.getOrder(id);
+  assert.equal(order.correctedUrl, undefined, 'ohne Override keine correctedUrl im Record');
+});
+
 // --- CORR-1: GoBD-Rechnungsnummer VOR Mailversand persistieren + Reuse ---
 test('CORR-1: Nummer wird VOR sendReportFor persistiert + vom Folge-Resend wiederverwendet', async () => {
   const id = await seedOrder({ sessionId: sid(), status: 'FAILED', extra: { error: 'erster Versuch' } });
