@@ -43,16 +43,17 @@ export function Hero() {
         aria-hidden
         className="absolute inset-x-0 top-0 -z-10 hidden h-[120%] grid-bg-dark opacity-[0.5] mask-fade-y dark:block"
       />
-      {/* Spotlight statt freischwebender Blobs — wirkt intentionaler. */}
+      {/* Aurora-Spots mit langsamer Drift (Design-Signatur; animate-aurora/float
+          sind reduced-motion-gated). */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-[-30%] -z-10 size-[80vw] max-w-5xl -translate-x-1/2 rounded-full bg-brand-mint/10 blur-[70px]"
+        className="pointer-events-none absolute left-1/2 top-[-30%] -z-10 size-[80vw] max-w-5xl -translate-x-1/2 rounded-full bg-brand-mint/10 blur-[70px] animate-aurora"
       />
       {/* Zweiter Glow nur ab md+: zwei gestapelte Großradius-Blur-Layer hinter
           dem LCP-Element sind auf Mobile ein teurer GPU-Blur-Pass. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute right-[-10%] top-[-10%] -z-10 hidden size-[45vw] rounded-full bg-brand-violet/15 blur-[70px] md:block"
+        className="pointer-events-none absolute right-[-10%] top-[-10%] -z-10 hidden size-[45vw] rounded-full bg-brand-violet/15 blur-[70px] animate-float-slow md:block"
       />
 
       <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-5 pt-14 pb-20 sm:px-6 sm:pt-20 sm:pb-28 lg:grid-cols-2 lg:gap-12">
@@ -90,14 +91,13 @@ export function Hero() {
               Animationsdauer verzögern (relevant für paid-Ads-Quality-Score). */}
           <h1 className="mt-6 font-display text-[clamp(2.05rem,6.7vw,4.6rem)] leading-[1.05] font-semibold tracking-[-0.025em] text-balance">
             <span className="block gradient-text-soft">{HERO.headlineLead}</span>
-            {/* Unterlängen-Schutz (g/j/ß) + rechtsseitiger Italic-Überhang sitzen
-                zentral in der .gradient-text-Utility (padding-bottom/-right). Das
-                Fragezeichen liegt als NICHT-kursives Kind im selben Gradient-Span:
-                so läuft der Mint→Violet-Verlauf durchgehend bis zum "?", aber das
-                "?" hat keinen Italic-Überhang mehr → kein Clipping am rechten Rand. */}
-            <span className="block italic gradient-text">
-              {HERO.headlineEmph}
-              <span className="not-italic">?</span>
+            {/* Design-Signatur: das Akzentwort „BFSG" leuchtet im Mint-Verlauf und
+                shimmert sanft (gradient-text-shimmer). Nicht-kursiv (entspricht dem
+                neuen Design). Unterlängen-/Glyph-Überhang-Schutz (g/j/ß, „?") sitzt
+                in .gradient-text (padding-/margin-right) → kein Clipping, kein CLS.
+                Shimmer wird bei prefers-reduced-motion stillgestellt. */}
+            <span className="block gradient-text gradient-text-shimmer">
+              {HERO.headlineEmph}?
             </span>
             <span className="mt-1 block font-sans text-[0.4em] font-medium tracking-tight text-muted-foreground not-italic">
               {HERO.headlineTail}
@@ -164,24 +164,8 @@ export function Hero() {
             ))}
           </motion.ul>
 
-          {/* Mini-Trust-Bar */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.55 }}
-            className="mt-9 grid w-full grid-cols-2 gap-4 border-t border-border/60 pt-6 sm:grid-cols-4"
-          >
-            {HERO.trust.map((item) => (
-              <div key={item.label} className="text-center lg:text-left">
-                <p className="font-mono text-xl font-bold tracking-tight tabular-nums text-foreground">
-                  {item.label}
-                </p>
-                <p className="mt-0.5 text-xs text-muted-foreground">
-                  {item.sub}
-                </p>
-              </div>
-            ))}
-          </motion.div>
+          {/* Mini-Trust-Bar entfaellt: die 4 Kennzahlen stehen jetzt im eigenen
+              Trust-Strip-Band (StatsBar) direkt unter dem Hero (Design-Aufbau). */}
         </div>
 
         {/* Rechte Spalte: Audit-Report-Visual. min-w-0 laesst die Spalte unter

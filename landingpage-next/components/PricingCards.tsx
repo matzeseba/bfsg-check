@@ -5,6 +5,7 @@ import * as motion from "motion/react-client";
 import {
   ArrowRightIcon,
   CheckIcon,
+  ScaleIcon,
   ShieldCheckIcon,
   SparklesIcon,
   TagIcon,
@@ -13,7 +14,13 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { PACKAGES, type PackageConfig } from "@/lib/config";
+import {
+  PACKAGES,
+  PLAN_FINDER,
+  PRICING_ANCHOR,
+  type PackageConfig,
+  type PackageId,
+} from "@/lib/config";
 import { cn } from "@/lib/utils";
 import { useCheckout } from "@/lib/checkout-context";
 
@@ -139,6 +146,11 @@ export function PricingCards({
           )}
         </div>
 
+        {/* „Welches Paket passt?"-Slider (nur Hauptpakete, nicht eingebettet bei
+            Cookie). Reine Kaufhilfe — die echte Auswahl/der Kauf laeuft ueber den
+            Checkout (openCheckout), nichts wird umgangen. */}
+        {!embedded && <PlanFinder packages={packages} />}
+
         <div className="mt-12 grid items-stretch gap-6 md:grid-cols-3">
           {packages.map((pkg, i) => (
             <motion.div
@@ -158,6 +170,22 @@ export function PricingCards({
           ))}
         </div>
 
+        {/* Preis-Anker: faktisch + hedged („meist") — keine Garantie/Drohung. */}
+        {!embedded && (
+          <div className="mx-auto mt-12 flex max-w-3xl items-center gap-4 rounded-2xl border border-brand-amber/20 bg-brand-amber/[0.06] px-5 py-4">
+            <ScaleIcon
+              aria-hidden
+              className="size-6 shrink-0 text-brand-amber"
+            />
+            <p className="text-sm text-foreground/85">
+              {PRICING_ANCHOR.text}{" "}
+              <span className="font-medium text-foreground">
+                {PRICING_ANCHOR.emph}
+              </span>
+            </p>
+          </div>
+        )}
+
         <p className="mx-auto mt-10 max-w-2xl text-center text-xs text-muted-foreground">
           Alle Preise sind Gesamtpreise (keine USt-Ausweisung gem. § 19 UStG) ·
           Stripe-Checkout (Karte, SEPA, Apple/Google Pay) · Rechnung automatisch
@@ -165,6 +193,78 @@ export function PricingCards({
         </p>
       </div>
     </section>
+  );
+}
+
+// „Welches Paket passt?"-Slider. Empfehlung leitet sich aus den Seiten-Limits ab
+// (Basis ≤5, Profi ≤25, darueber Profi + Re-Check-Hinweis). Der CTA oeffnet den
+// echten Checkout fuer das empfohlene Paket (openCheckout) — keine erfundenen
+// Preise: alle Werte kommen aus PACKAGES/config.ts.
+function PlanFinder({ packages }: { packages: PackageConfig[] }) {
+  const { openCheckout } = useCheckout();
+  const [pages, setPages] = React.useState<number>(PLAN_FINDER.default);
+
+  const basis = packages.find((p) => p.id === "basis");
+  const profi = packages.find((p) => p.id === "profi");
+  const isBasis = pages <= 5;
+  const rec = isBasis ? (basis ?? profi) : profi;
+  const recName = rec?.name ?? "BFSG-Report Profi";
+  const recId = (rec?.id ?? "profi") as PackageId;
+  const recSub = isBasis
+    ? `Bis 5 Unterseiten · ${basis?.price ?? "129 €"} einmalig`
+    : pages <= 25
+      ? `Bis 25 Unterseiten · ${profi?.price ?? "399 €"} einmalig`
+      : "Profi (25 Seiten) + Re-Check fürs laufende Monitoring";
+
+  return (
+    <div className="mx-auto mt-10 grid max-w-3xl gap-6 rounded-3xl border border-border/70 bg-card/70 p-6 shadow-card-soft backdrop-blur sm:grid-cols-[1.5fr_1fr] sm:items-center sm:gap-8 dark:ring-1 dark:ring-white/5">
+      <div>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <label
+            htmlFor="plan-finder"
+            className="font-display text-base font-semibold tracking-tight"
+          >
+            {PLAN_FINDER.kicker}
+          </label>
+          <span className="rounded-md bg-brand-mint/10 px-2.5 py-1 font-mono text-xs font-medium text-brand-indigo tabular-nums dark:text-brand-mint">
+            {pages}
+            {pages >= PLAN_FINDER.max ? "+" : ""} {PLAN_FINDER.unit}
+          </span>
+        </div>
+        <input
+          id="plan-finder"
+          type="range"
+          min={PLAN_FINDER.min}
+          max={PLAN_FINDER.max}
+          value={pages}
+          onChange={(e) => setPages(Number(e.target.value))}
+          aria-valuetext={`${pages} ${PLAN_FINDER.unit} — Empfehlung: ${recName}`}
+          className="mt-4 h-1.5 w-full cursor-pointer appearance-none rounded-full bg-muted accent-brand-mint"
+        />
+        <div className="mt-2 flex justify-between font-mono text-[11px] text-muted-foreground">
+          <span>1</span>
+          <span>20</span>
+          <span>40+</span>
+        </div>
+      </div>
+      <div className="sm:border-l sm:border-border/60 sm:pl-8">
+        <p className="font-mono text-[11px] tracking-[0.06em] text-muted-foreground uppercase">
+          {PLAN_FINDER.recommendationLabel}
+        </p>
+        <p className="mt-1 font-display text-lg font-semibold tracking-tight text-brand-indigo dark:text-brand-mint">
+          {recName}
+        </p>
+        <p className="mt-0.5 text-xs text-muted-foreground">{recSub}</p>
+        <Button
+          onClick={() => openCheckout(recId)}
+          size="sm"
+          className="mt-3 h-10 w-full gap-1.5 rounded-xl bg-brand-mint text-sm font-semibold text-brand-deep hover:bg-brand-mint/85 focus-visible:ring-brand-deep/70 focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+        >
+          {recName} wählen
+          <ArrowRightIcon className="size-4" />
+        </Button>
+      </div>
+    </div>
   );
 }
 

@@ -65,18 +65,52 @@ export const HERO = {
     "Wir scannen Ihre Seite nach über 80 WCAG-2.1-AA-Regeln und liefern jeden Mangel priorisiert — mit Copy-Paste-Fix und menschlicher Sichtung. Premium-Audit ohne Kanzlei-Honorar.",
   cta: "Kostenlos prüfen",
   ctaSecondary: "Pakete ansehen",
-  placeholder: "https://ihre-website.de",
+  placeholder: "ihre-website.de",
   badges: [
-    "Ergebnis in 60 Sek.",
     "KI-gestützt + menschlich geprüft",
-    "WCAG 2.1 / EN 301 549",
+    "Hosting in Deutschland",
   ],
+  // Mini-Trust-Bar im Hero entfaellt im neuen Design zugunsten des eigenstaendigen
+  // Trust-Strip-Bands (STATS) direkt unter dem Hero — Werte dort gepflegt.
   trust: [
     { label: "80+", sub: "Prüfregeln (EN 301 549)" },
     { label: "DSGVO", sub: "konform" },
     { label: "DE", sub: "Hosting" },
     { label: "60 Sek.", sub: "bis Ergebnis" },
   ],
+} as const;
+
+// Ankündigungs-Bar (oberster Streifen). Faktisch + bereits in HERO.pill gepruefter
+// Wortlaut — keine Garantie-/Spitzenstellungs-Aussage.
+export const ANNOUNCEMENT = {
+  text: "BFSG seit 28.06.2025 in Kraft · erste Abmahnungen rollen an",
+  cta: "jetzt prüfen",
+  href: "/#risiko",
+} as const;
+
+// Live-Ticker der WCAG-Kriterien, die der Scanner prueft (wahrheitsgemaesse
+// Pruef-Checkliste — bewusst NICHT als "live an Ihrer Seite geprueft" framen).
+export const RULE_TICKER = {
+  label: "Geprüfte WCAG-Kriterien",
+  rules: [
+    "1.4.3 Kontrast (Minimum)",
+    "1.1.1 Nicht-Text-Inhalt",
+    "2.1.1 Tastatur",
+    "2.4.7 Fokus sichtbar",
+    "4.1.2 Name, Rolle, Wert",
+    "3.3.2 Beschriftungen",
+    "1.3.1 Info & Beziehungen",
+    "2.4.4 Linkzweck",
+    "1.4.11 Nicht-Text-Kontrast",
+    "3.1.1 Sprache der Seite",
+  ],
+} as const;
+
+// BFSG-Stichtag — der Countdown zaehlt die seither verstrichene Zeit (reine
+// faktische Angabe, keine Drohung).
+export const DEADLINE = {
+  date: "2025-06-28T00:00:00",
+  kicker: "Verstrichen seit dem Stichtag",
 } as const;
 
 // Daten fuer das Hero-Audit-Report-Visual (rein illustrativ, kein echter Scan).
@@ -153,20 +187,15 @@ export type StatItem = {
   label: string;
 };
 
+// Trust-Strip-Band direkt unter dem Hero (Design: 4 Kennzahlen mit Count-up).
 export const STATS: StatItem[] = [
-  {
-    value: "60 Sek.",
-    num: 60,
-    suffix: " Sek.",
-    label: "bis zum ersten Ergebnis",
-  },
-  // num:null → statisch rendern. Eine Versionsnummer ("2.1") darf NICHT über
-  // toLocaleString("de-DE") laufen, sonst wird daraus das Dezimalkomma "2,1".
-  { value: "WCAG 2.1", num: null, label: "Prüfung nach AA-Standard" },
-  { value: "EN 301 549", num: null, label: "Audit-Methodik" },
-  // Eigenschaft, keine Mess-Quote: statisch "DE" statt "100 %" (eine Prozentzahl
-  // suggeriert ein gemessenes Ergebnis, hier ist es ein fixes Hosting-Merkmal).
+  // "80+" Pruefregeln (EN 301 549) — Count-up von 0 auf 80, danach das "+".
+  { value: "80+", num: 80, suffix: "+", label: "Prüfregeln (EN 301 549)" },
+  // num:null → statisch. Selbst-Tatsachenangabe (DE-Hosting, nur notwendige Daten,
+  // TLS-1.3-Transport) — keine Mess-Quote, kein "100 %".
+  { value: "DSGVO", num: null, label: "konform · TLS 1.3" },
   { value: "DE", num: null, label: "Hosting in Deutschland" },
+  { value: "60 Sek.", num: 60, suffix: " Sek.", label: "bis zum Ergebnis" },
 ] as const;
 
 // Ehrliches Normen-/Standards-Band statt erfundener Presse-Logos.
@@ -288,6 +317,81 @@ export const DIFFERENTIATORS = [
     desc: "Sie zahlen einmalig 129 € oder 399 € — kein Tagessatz, keine offene Rechnung. Sie wissen vorab auf den Euro genau, was es kostet.",
   },
 ] as const;
+
+// Direktvergleich — UWG-§5/§6-sauber umformuliert: qualitativer, sachlicher
+// Vergleich OHNE erfundene Score-Zahlen, OHNE "Bester"-Superlativ, OHNE herabsetzende
+// Wertung der Wettbewerber. Jede Zeile ist eine objektiv-pruefbare Eigenschaft.
+export type CompareAttr = { label: string; value: string; strong?: boolean };
+export type CompareColumn = {
+  name: string;
+  sub: string;
+  highlight?: boolean;
+  attrs: CompareAttr[];
+  note: string;
+};
+export const COMPARISON = {
+  kicker: "Im Direktvergleich",
+  title: "Wo sich BFSG-Check einordnet",
+  titleAccent: "einordnet",
+  columns: [
+    {
+      name: "Gratis-Tools",
+      sub: "z. B. WAVE · Lighthouse",
+      highlight: false,
+      attrs: [
+        { label: "Ergebnis", value: "sofort & kostenlos" },
+        { label: "Priorisierung", value: "keine — Rohdaten" },
+        { label: "Menschliche Sichtung", value: "nein" },
+        { label: "Fix-Plan & Erklärung", value: "nein" },
+      ],
+      note: "Gut für einen ersten technischen Überblick.",
+    },
+    {
+      name: "BFSG-Check",
+      sub: "automatisiert + menschliche Sichtung",
+      highlight: true,
+      attrs: [
+        { label: "Ergebnis", value: "typischerweise in Stunden", strong: true },
+        { label: "Priorisierung", value: "ja — nach Risiko sortiert", strong: true },
+        { label: "Menschliche Sichtung", value: "ja, vor Auslieferung", strong: true },
+        { label: "Fix-Plan & Erklärung", value: "Copy-Paste-Fix + Entwurf", strong: true },
+      ],
+      note: "Fester Preis, schnelle Lieferung, kuratierter Fix-Plan.",
+    },
+    {
+      name: "Anwaltskanzlei",
+      sub: "externes Vollaudit",
+      highlight: false,
+      attrs: [
+        { label: "Ergebnis", value: "meist Wochen Vorlauf" },
+        { label: "Priorisierung", value: "ja, individuell" },
+        { label: "Menschliche Sichtung", value: "ja" },
+        { label: "Fix-Plan & Erklärung", value: "rechtsverbindliche Einordnung" },
+      ],
+      note: "Sinnvoll, wenn Sie eine rechtsverbindliche Bewertung brauchen.",
+    },
+  ] as CompareColumn[],
+  footnote:
+    "Sachliche Einordnung nach Tempo, Prüftiefe und Kosten — keine Wertung der Anbieter. Jeder Befund in unserem Report ist belegbar.",
+} as const;
+
+// Pricing-„Welches Paket passt?"-Slider. Rein clientseitige Kaufhilfe; die echte
+// Auswahl/der Kauf laeuft weiter ueber den Checkout (openCheckout). Schwellen
+// spiegeln die Seiten-Limits aus PACKAGES (Basis ≤5, Profi ≤25).
+export const PLAN_FINDER = {
+  kicker: "Welches Paket passt?",
+  min: 1,
+  max: 40,
+  default: 8,
+  unit: "Unterseiten",
+  recommendationLabel: "Unsere Empfehlung",
+} as const;
+
+// Preis-Anker (Pricing-Sektion). Faktisch + hedged: KEINE Garantie, „meist".
+export const PRICING_ANCHOR = {
+  text: "Eine Abmahnung kostet schnell ein Vielfaches eines Reports — zuzüglich Anwalts- und Nachbesserungskosten unter Zeitdruck.",
+  emph: "Vorab prüfen ist meist die günstigere Variante.",
+} as const;
 
 export const FAQ_ITEMS = [
   {

@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { RISK_BAND } from "@/lib/config";
 
+import { DeadlineCounter } from "./DeadlineCounter";
 import { SectionKicker } from "./SectionKicker";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -69,6 +70,9 @@ export function RiskBand() {
           </Button>
         </motion.div>
 
+        <div className="grid gap-4">
+        {/* Live-Countdown der seit dem Stichtag verstrichenen Zeit (Design-Signatur). */}
+        <DeadlineCounter />
         <motion.ul
           initial="hidden"
           whileInView="show"
@@ -122,6 +126,7 @@ export function RiskBand() {
             );
           })}
         </motion.ul>
+        </div>
       </div>
     </section>
   );
