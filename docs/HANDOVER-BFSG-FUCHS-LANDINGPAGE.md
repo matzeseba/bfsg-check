@@ -39,8 +39,10 @@
 - **Geht sofort live auf bfsg-fix.de — KEIN Domain-Wechsel nötig.**
 
 ### 1. Domain bfsg-fuchs.de scharf schalten (eigentlicher Marken-Cutover)
-- [ ] **Besitz:** bfsg-fuchs.de registriert? (INWX) — sonst registrieren. IDN `barrierefrei-prüfen.de`/`-pruefen.de` als Redirect sichern.
-- [ ] **DNS (INWX):** A-Record `bfsg-fuchs.de` + `www` → `178.105.83.0`. KEINE tote Park-IP (vgl. dns-inwx-dead-ip-185).
+- ✅ **Besitz geprüft (29.06.):** `bfsg-fuchs.de` ist BEREITS bei INWX registriert (NS = ns.inwx.de / ns2.inwx.de / ns3.inwx.eu). Keine Registrierung nötig.
+- 🔴 **DNS-Befund (29.06.):** A-Record `bfsg-fuchs.de` zeigt aktuell auf **`185.181.104.242`** — das ist die **tote INWX-Park-IP**, die am 28.06. bei den anderen Domains entfernt wurde (vgl. `dns-inwx-dead-ip-185`, killte ~50 % Traffic/Webhooks). Muss auf **`178.105.83.0`** (Hetzner) geändert werden.
+- [ ] **DNS (INWX):** A-Record `bfsg-fuchs.de` + `www` → `178.105.83.0` (Park-IP 185.181.104.242 entfernen). IDN `barrierefrei-prüfen.de`/`-pruefen.de` als Redirect sichern.
+- ⚠️ **Reihenfolge wichtig:** DNS NICHT isoliert flippen — ohne passenden Caddy-Site-Block (TLS) + Stripe-/Frontend-Flip entsteht ein kaputter Zwischenzustand. Als EINE koordinierte Aktion fahren (DNS → Caddy → SITE.url → Stripe → Brevo). Den DNS-Teil bei INWX kann Claude per Computer Use übernehmen, sobald du den Cutover startest + den Stripe-Teil (deine Ausnahme) freigibst.
 - [ ] **Caddy (Server):** `bfsg-fuchs.de` als neue Primär (TLS auto); `bfsg-fix.de`/`bfsg-held.de`/`barrierefrei-pruefen.de` → 301.
 - [ ] **Frontend-Flip:** `lib/config.ts` `SITE.url` → `https://bfsg-fuchs.de` (+ `sitemap.ts`/`robots.ts` `siteUrl`). 1–3 Konstanten.
 
