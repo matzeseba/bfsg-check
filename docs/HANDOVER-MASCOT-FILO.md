@@ -51,9 +51,9 @@ PR #92 hat die Marke auf „Barrierefrei-Prüfen" + Domain `barrierefrei-pruefen
 - **Wortmarke (Vektor):** `docs/brand/bfsg-fuchs-wordmark.svg` — „BFSG-" (Navy) + „FUCHS" (Orange); **vor Produktion in Pfade umwandeln**.
 - **Favicon (Mono):** `docs/brand/bfsg-fuchs-favicon-mono.svg` (+ Invers/Weiß für dunkle Hintergründe).
 - **Maskottchen:** Owner-eigene **Polo-Version** (navy Polo + graue Chino + braune Schuhe; Tablet „BFSG-FUCHS / Gratis-Check / Umsetzungsplan / Re-Check-Abo"; grüner Brust-Haken). ⚠️ **Datei noch ins Repo legen** unter `docs/brand/bfsg-fuchs-mascot-final.png` (ist ein Owner-Upload — Chat-Anhänge lassen sich nicht automatisch speichern).
-- **Akzentfarbe:** grün/„geprüft" — beim Umbau LP-**Mint** und Logo-**Grün** auf EINEN Ton vereinheitlichen.
+- **Akzentfarbe (ENTSCHIEDEN, Owner 29.06.):** Maskottchen-/Logo-Farben sind FINAL und **bleiben unverändert** — NICHT umfärben. Die überarbeitete Landingpage (Owner präsentiert sie in der neuen Session) macht **Mint weniger prägnant** → die **Seite** wird an die Maskottchen-Palette (Navy/Orange/Grün) angeglichen, nicht das Maskottchen an die LP.
 
-**Explorationen (nicht final, optional nach `docs/brand/explorations/` archivierbar):** `bfsg-fuchs-logo-1/2.png`, `bfsg-fuchs-mascot-1/2.png`, `filo-concept-1/2.png`.
+**Explorationen (verworfen, archiviert unter `docs/brand/explorations/`):** `bfsg-fuchs-logo-1/2.png`, `bfsg-fuchs-mascot-1/2.png`, `filo-concept-1/2.png`.
 
 - 6-Linsen-Berichte: `docs/brand/domain-fox-3way-reports.md` · Charakter-Konzept: `docs/brand/filo-concept.json` (**Architektur-Teil überholt**; Voice/Visual/Charta weiter gültig).
 - Memory: [[mascot-filo-decision]], [[rebrand-barrierefrei-pruefen]]. PR #93 (Branch `brand/filo-mascot-concept`) trägt Entscheidung + diesen Handover.
