@@ -25,13 +25,13 @@ export type PackageConfig = {
   available?: boolean;
 };
 
-// HINWEIS Domain/Rebrand: Die Marke ist "BFSG-Fuchs". Die produktive Domain ist
-// bis zum vom Owner gesteuerten DNS-/Stripe-/Brevo-Cutover weiterhin bfsg-fix.de
-// (DNS+TLS+Stripe-Redirects+Mail laufen dort). `url` steuert nur canonical/OG/
-// sitemap — die Stripe-success/cancel-URLs liegen im Scanner-Backend. Beim Cutover
-// nur diese eine Konstante auf https://bfsg-fuchs.de umstellen (+ Backend-.env).
+// HINWEIS Domain/Rebrand (Cutover 29.06.2026): Marke + Primär-Domain = "bfsg-fuchs.de".
+// `url` steuert canonical/OG/sitemap → jetzt bfsg-fuchs.de. bfsg-fix.de läuft im selben
+// Caddy-Block PARALLEL weiter (zeigt damit canonical → bfsg-fuchs.de = SEO-Konsolidierung)
+// und bleibt voll funktional, bis der Stripe-Webhook umgezogen ist. Die Stripe-success/
+// cancel-URLs kommen aus dem Backend (Server-.env PUBLIC_URL → ebenfalls bfsg-fuchs.de).
 export const SITE = {
-  url: "https://bfsg-fix.de",
+  url: "https://bfsg-fuchs.de",
   name: "BFSG-Fuchs",
   // Ziel-Marken-Domain nach Cutover (rein dokumentarisch, NICHT funktional verlinkt,
   // solange sie nicht aufgelöst/TLS-gesichert ist).

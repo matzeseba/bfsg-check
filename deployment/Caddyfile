@@ -1,9 +1,13 @@
 # Caddyfile — Phase 2 + Next.js-Cutover.
-# bfsg-fix.de routet: API/Webhook/Admin → app:8080, alles andere → landing-next:3000.
-# Alte .html-URLs werden 301-permanent auf Next.js-Routen weitergeleitet (SEO-Erhalt).
+# bfsg-fix.de + bfsg-fuchs.de routen identisch: API/Webhook/Admin → app:8080,
+# alles andere → landing-next:3000. Alte .html-URLs → 301 auf Next.js-Routen (SEO).
+# Marken-Cutover (29.06.2026): bfsg-fuchs.de wird neue Marken-Primär, läuft aber im
+# SELBEN Block wie bfsg-fix.de → beide voll funktional (inkl. /webhook), Caddy holt
+# automatisch Let's-Encrypt-Certs für alle vier Hostnames. bfsg-fix.de bleibt aktiv,
+# bis der Stripe-Webhook auf bfsg-fuchs.de umgezogen ist (dann optional 301).
 
-# === Haupt-Domain ===
-bfsg-fix.de, www.bfsg-fix.de {
+# === Haupt-Domain (Marke: bfsg-fuchs.de · bfsg-fix.de bleibt parallel aktiv) ===
+bfsg-fix.de, www.bfsg-fix.de, bfsg-fuchs.de, www.bfsg-fuchs.de {
     encode gzip
 
     # Sicherheits-Header (Defense-in-Depth, ergänzt App-Header).
