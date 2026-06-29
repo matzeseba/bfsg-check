@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="BFSG-Fuchs">
+  <title>BFSG-Fuchs Favicon (Mono)</title>
+  <desc>Einfarbige, auf 16px lesbare Fuchskopf-Silhouette mit ausgesparten Augen. Navy auf transparent; fuer dunkle Hintergruende #ffffff verwenden.</desc>
+  <!-- Mono-Marke: vereinfachter geometrischer Fuchskopf (Ohrspitzen + verjuengtes Kinn), Augen als Negativ-Aussparung (fill-rule evenodd).
+       Bewusst reduziert fuer Favicon/App-Icon/1-Farb-Druck. Vor finalem Einsatz an die finale Logo-Schnauze angleichen. -->
+  <path fill="#13294a" fill-rule="evenodd"
+        d="M10 12 L23 23 L32 19 L41 23 L54 12 L49 33 L40 47 L32 57 L24 47 L15 33 Z
+           M22 31 L30 34 L23 36 Z
+           M42 31 L34 34 L41 36 Z"/>
+</svg>
