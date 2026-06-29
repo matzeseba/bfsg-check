@@ -1,88 +1,53 @@
-# Handover — Marken-Maskottchen „Filo" (Fuchs) · Roll-out-Plan
+# Handover — Marken-Vollumbau auf „BFSG-Fuchs" (Option B) · Roll-out-Plan
 
-> **Stand:** 29.06.2026 · Erstellt aus der 10-Agenten-Workflow-Analyse (Run `wf_f7ad724d-f45`).
-> **Zweck:** sauberer Start in den Marken-Vollumbau in der nächsten Session.
+> **Stand:** 29.06.2026 · **ERSETZT** die frühere Empfehlung „Architektur B = Fuchs nur als Layer auf barrierefrei-pruefen.de". Owner-Entscheid ist jetzt **Option B**: die Figur IST die Marke.
 > **Lies zuerst** `CLAUDE.md` + `docs/HANDOVER-NEXT-SESSION.md`, dann diese Datei.
 
 ---
 
-## 1. Entscheidung (verifiziert, hohe Konfidenz)
+## 1. Finale Entscheidung (vom Owner getroffen, 29.06.2026)
 
-- **Verdikt: CONDITIONAL_GO** — eine Markenfigur ist die richtige Wette, ihr Wert hängt aber **strikt an Ausführungsdisziplin** (Kill-the-Mascot-Red-Team: 3,5/10, Reconciliation: 8/10, IP-Linse: 9/10).
-- **Gewinner: der Fuchs** (`bfsg-fuchs.de`). Alle Linsen Fuchs 7–8 vs. Held 4–5.
-  - **Held verliert** an: (1) **Ableismus-Landmine** — „Retter/Held" im Behinderungs-Kontext kollidiert mit dem „disability saviorism"-Diskurs; (2) **Generik/Inflation** — „IT-Held/Software-Helden/UnternehmerHeld" ist überfüllt; (3) **schwacher Bildschutz** — abstrakter Superheld ist generisches Bildvokabular.
-  - **`bfsg-held.de`** wird nur **Defensiv-/Redirect-Domain**.
-- **Figurname: „Filo"** (Phantasiename) — **bewusst keyword-frei, KEIN „BFSG-Fuchs"** (sonst Rückfall in den überfüllten „BFSG-…"-Look-alike-Namensraum + reaktivierte Nähe zum Wettbewerber bfsg-check.de).
-- **Strategischer Kern-Hebel (IP):** Das Maskottchen ist die **einzige günstige Lösung** für die echte Schwäche des letzten Rebrands — „Barrierefrei-Prüfen" ist rein beschreibend = schwacher Markenschutz. Ein distinktives **Bild-Element macht die Wort-/Bildmarke eintragbar** (DPMA-Praxis). **Das ist der eigentliche Return.**
+- **Marke = „BFSG-Fuchs"** (mit Fuchs-Werbefigur). **Hauptdomain = `bfsg-fuchs.de`.**
+- **`barrierefrei-pruefen.de` bleibt erhalten** als **301-Redirect + SEO-/Lead-Kanal** auf bfsg-fuchs.de (der „barrierefrei prüfen"-Such-Match geht nicht verloren, er wird auf die Marke gebündelt).
+- `bfsg-held.de` + `bfsg-fix.de` = reine Defensiv-/Redirect-Domains.
+- „BFSG" im Markennamen ist **erlaubt** — nur die exakte Kombination „BFSG-Check" war zu meiden (Wettbewerber `bfsg-check.de` / Fast Forward IT). „Fuchs" liefert die arbiträre, schützbare Unterscheidungskraft.
+- Grundlage: unvoreingenommene **6-Linsen-Analyse** (3:3 A/B, C abgeschlagen) → `docs/brand/domain-fox-3way-reports.md`. Owner wählte B (stärkste eigenständige, markenrechtlich schützbare, empfehlbare Marke).
 
-## 2. Marken-Architektur (Architektur B: Descriptive-Primary + Mascot-as-Figure)
+## 2. Konsequenz für PR #92 (wichtig!)
 
-| Element | Rolle |
-|---|---|
-| **barrierefrei-pruefen.de** | bleibt **Haupt-/Money-/Canonical-Domain** (Exact-Match-SEO für Buyer-Intent). Unverändert. |
-| **„Filo" (Fuchs)** | distinktiver **Marken-Layer obendrauf** (Logo-Figur + Bildmarke). Erscheint nur auf der Zielseite. |
-| **bfsg-fuchs.de / bfsg-held.de / bfsg-fix.de** | **ausschließlich 301-Redirects** auf barrierefrei-pruefen.de. NIE als Zweitmarke kommuniziert. |
+PR #92 hat die Marke auf „Barrierefrei-Prüfen" + Domain `barrierefrei-pruefen.de` umbenannt — als **Markenname jetzt überholt** (Marke = „BFSG-Fuchs"). **ABER** die Datei-/Stellen-Landkarte + Such-Ersetzen-Mechanik von PR #92 ist 1:1 wiederverwendbar.
+**Plan:** PR #92 **nicht so mergen**. Stattdessen denselben Rebrand mit identischem Mapping auf das neue Ziel **„BFSG-Fuchs" / `bfsg-fuchs.de`** ausführen (nur das Ersetzungs-Ziel tauschen). `barrierefrei-pruefen.de` wird Redirect statt Primär. „BFSG" als Gesetz/Keyword bleibt überall erhalten — nur **Marke + Primärdomain** ändern.
 
-> **Kein Widerspruch zur letzten Session:** Wir sind weg von der *kollidierenden Marke* bfsg-check.de, nicht weg vom *BFSG-Keyword* (bleibt SEO-Anker/Paketname/Title). Filo neutralisiert die Verwechslung über das **Bild** statt über das Keyword.
+## 3. Design-Entscheidungen (verbindlich)
 
-## 3. Reihenfolge — ZWINGEND (nicht vermischen)
+- **Outfit: Business-Casual** — navy Polo + dunkle Anthrazit-Chino + braune Lederschuhe. **KEIN Anzug/Krawatte** (Anzug = „Kanzlei/teuer" gegen unsere Positionierung „ohne Kanzlei-Honorar" + Fuchs-im-Anzug = Schlitzohr-Trope = Trust-Killer).
+- **Figur = erwachsener, kompetenter Lotse/Verbündeter** (Mentor, nicht Held, nicht Clown): warm-aufmerksame Augen (NIE listig/verengt), ruhiges Lächeln, hält Tablet („ich zeig dir, wo du stehst").
+- **Mint `#34d99a`** als Akzent (Haken, Tablet-UI, Schweifspitze) → Tie-in zur Live-LP (dunkles Indigo + Mint).
+- **Accessibility-Mal = Mint-Haken / a11y-Mark statt Rollstuhl-Piktogramm** (Rollstuhl = zu enge A11y-Darstellung + Paternalismus-Risiko bei den BFSG-Multiplikatoren).
+- **Tablet-UI auf Deutsch:** „Barrierefreiheits-Score", „Report", „Umsetzungsplan", „Re-Check-Abo" (= unsere Pakete). Keine „BFSG-konform/garantiert"-Claims (UWG §5).
+- **Logo:** Kunden-Lockup = Fuchs-Emblem + klare Wortmarke **„BFSG-Fuchs"**; „a11y" nur als sekundäres Insider-/Favicon-Mark (für KMU-Käufer opak); Esports-Stil entschärft → korporativ-vertrauenswürdig; warme Augen.
+- **Referenz-Renders** (diese Session, Higgsfield): `docs/brand/bfsg-fuchs-logo-*.png` + `docs/brand/bfsg-fuchs-mascot-*.png`. **Generator-Text ist nur indikativ** — finale Typografie/Tablet-UI im Vektor-/Design-Tool sauber setzen.
+- **Optionaler Eigenname** der Figur: „Filo, der BFSG-Fuchs" (für die Voice; optional).
 
-1. **PR #92 unverändert zuerst mergen** (nach DNS-Cutover, siehe `docs/REBRAND-CUTOVER-RUNBOOK.md`). Die Maskottchen-Entscheidung **ändert an PR #92 NICHTS** — nicht blockieren, nicht erweitern, nicht zurückrollen. Filo kommt als **separater, nachgelagerter Branding-PR** in eigenem Branch mit eigenem Merge-Trigger.
-2. **Priorität ehrlich:** Erst die echten Engpässe — DNS-Cutover (PR #92), der offene **bezahlte-Scan-TLS-Bug** ([[paid-scan-strict-tls]]) und **erste Sales**. Filo ist hoch-hebelnd, aber **nicht** vor diesen Punkten. Budget-Cap setzen (KI-Bildpipeline + einmaliges Brand-Kit, **kein** Agentur-Retainer).
-3. **A/B-Test vor Vollintegration:** Filo-Hero vs. nüchterne Variante messen, bevor flächig integriert wird.
+## 4. Reihenfolge (zwingend)
 
-## 4. Roll-out-Schritte (für den Branding-PR)
+1. **Erst der echte Engpass:** bezahlter-Scan-TLS-Bug ([[paid-scan-strict-tls]]) + erste Sales. Branding blockiert das nicht, ist aber nachrangig.
+2. **Markenrecht-Pflichtcheck:** DPMA/EUIPO auf „BFSG-Fuchs" (Wortmarke Klassen **42/35/41**) + Fuchs-Bildmarke (Wiener-Bildklasse **03.01**); Abgrenzung Schwäbisch-Hall-Fuchs (Kl. 36); Kollision vs. „BFSG CHECK" (gering, da „BFSG" kennzeichnungsschwach — anwaltlich bestätigen). DPMA prüft ältere Rechte NICHT.
+3. **ü/ue-IDN-Domain** (`barrierefrei-prüfen.de` mit Umlaut) Besitz klären/sichern → Redirect.
+4. **Rebrand-Code-Umbau:** PR-#92-Mechanik retargeten auf „BFSG-Fuchs" / `bfsg-fuchs.de`. „BFSG" als Gesetz bleibt; nur Marke + Primärdomain + Mail-Domain ändern.
+5. **DNS/Caddy/Infra (Owner):** `bfsg-fuchs.de` = neue Primär (TLS); `barrierefrei-pruefen.de` + `bfsg-held.de` + `bfsg-fix.de` → 301 auf bfsg-fuchs.de. Brevo-Sender-Domain `bfsg-fuchs.de` (DKIM). Stripe success/cancel + Webhook → neue Domain. Server-`.env` (`PUBLIC_URL`/`FROM_*`/`INVOICE_CONTACT_EMAIL` → bfsg-fuchs.de). Catch-all `*@bfsg-fuchs.de → matze.seba@outlook.de`.
+6. **Mascot-Integration** (`landingpage-next/`, eigener Branch): Logo + Filo-Figur (Hero, Scan-Lade-Animation, Report-Guide, Fehler/404, Mail-Header). **A/B-Test** (Fuchs-Hero vs. nüchtern) vor Vollintegration. `legal-copy-grep` auch auf Mascot-Copy.
+7. **Wort-/Bildmarke anmelden** (BFSG-Fuchs + Fuchs-Logo, Kl. 42/35/41) — das schützbare Asset.
 
-**Schritt 0 — Markenrecht-Pflichtcheck (vor Design-Invest):**
-- DPMAregister + EUIPO/TMview auf **Fuchs-Bildmarken** (Wiener-Bildklasse **03.01**) in **Nizza-Klassen 42 (SaaS/Analyse) + 35 (Werbung) + 41 (Schulung)**.
-- Bewusste Abgrenzung zum **Schwäbisch-Hall-Fuchs** (Klasse 36 Finanz, ~90 % Bekanntheit) über Pose/Farbe/Reduktion. Optional 1 h Fachanwalt-Eintragungsprognose.
-- Designer-Vertrag mit **voller Rechteübertragung**. Phantasie-Eigenname „Filo" auf Wortschutz prüfen.
+## 5. Guardrails
 
-**Schritt 1 — Design finalisieren:**
-- Aus dem Konzept + den KI-Renders dieser Session 1 **Master-Pose** + 3–4 Kontext-Posen ableiten (Hero / Scan-Lade / Report-Guide / Fehler / Erfolg / Leerzustand).
-- Liefern als **SVG (logo-tauglich) + PNG-Set**, inkl. **Favicon/einfarbige Silhouette** (Mint-Schweifspitze als Marken-Mal, funktioniert in 16 px).
+- Fuchs IMMER erwachsener, kompetenter Guide — nie verspielt/listig (Trickster-Risiko im Rechtsthema). Immer **neben harten Proofs** (WCAG-Score, Beispiel-Report). Gesetz nie verharmlosen. Pflicht-Sprache (keine „BFSG-konform"/„rechtssicher"/„garantiert"/Siegel).
+- Kein blindes Suchen-Ersetzen: „BFSG" (Gesetz/Keyword, Paketnamen „BFSG-Report") bleibt; nur die Marke + Domain wechseln.
 
-**Schritt 2 — Charakter-Charta committen** (`docs/brand/filo-charter.md`): Persönlichkeit, Do's/Don'ts, Voice (siehe Abschnitt 6). Verbindlich für alle Copy/Assets.
+## 6. Assets / Status
 
-**Schritt 3 — Domain-Redirects** (Owner-Infra): bfsg-fuchs.de / bfsg-held.de / bfsg-fix.de → **301** auf barrierefrei-pruefen.de (Caddy-Block + DNS A-Records auf 178.105.83.0). DNS-abhängig → nach Cutover.
-
-**Schritt 4 — Landingpage-Integration** (`landingpage-next/`, eigener Branch):
-- Hero (Filo neben Scan-Visual, mint Scan-Beam = bestehendes `--animate-scan-beam`), Scan-Ladeanimation, Report-Guide, Fehler-/404-Zustände, Erfolgszustand.
-- Brevo-Mail-Header-Visual (Filo als Absender-Persona).
-- **A/B-Test** (Schritt 3 oben) zuerst. `legal-copy-grep` auch auf Maskottchen-Copy.
-
-**Schritt 5 — Wort-/Bildmarke anmelden** (DPMA, Klassen 42/35/41), sobald Design final — **das schützbare Asset**, das den beschreibenden Namen absichert.
-
-**Schritt 6 — Asset-Pipeline:** KI-Bild-Pipeline + manuelle Nachbearbeitung; kleines robustes Set statt Agentur. Budget-Cap einhalten.
-
-## 5. Top-Risiken & Mitigations
-
-| Risiko | Mitigation |
-|---|---|
-| **Trickster-/List-Fehlwahrnehmung** des Fuchses (fatal im Rechtssicherheits-Produkt) | Charakter-Charta mit No-Go-Liste: kein Zwinkern/Grinsen/Eckzahn/Schlitzohr. Erlaubt: aufmerksam, loyal, führend (Spürsinn-Profi). Voice „Verbündeter, nicht Schlitzohr". |
-| **Regression in den „BFSG-…"-Namensraum** (wenn Figurname „BFSG" trägt) | Guardrail: kein „BFSG" im Figur-/Markennamen. bfsg-*-Domains nur als 301. |
-| **Gesetz-Verharmlosung** durch die Figur (UWG §5) | Narrativ immer Risiko→Sicherheit; Filo entdramatisiert den *Weg*, nie das Gesetz. Disclaimer bleibt sichtbar, Filo immer **neben** WCAG-Score/Report-Sample. |
-| **Solo-Founder-Asset-Last / Bikeshedding** | Budget-Cap, KI-Pipeline, Timing NACH Cutover/TLS-Fix/erste Sales. |
-| **IP-Lücke** (DPMA prüft keine älteren Rechte; Schwäbisch-Hall-Fuchs) | Pflicht-Eigenrecherche (Schritt 0) + bewusste grafische Abgrenzung. |
-
-## 6. Charakter-Charta „Filo" (Kurzfassung)
-
-- **Archetyp:** kompetenter **Guide / aufmerksamer Verbündeter** (Mentor — NICHT Held). Kunde = Held, Filo = Lotse/Spürsinn.
-- **Persönlichkeit:** aufmerksam & gründlich · ruhig & souverän (senkt den Angst-Puls) · ehrlich & klar (beschönigt das Gesetz nie) · verbündet auf Augenhöhe · erwachsen & kompetent · pragmatisch-lösungsorientiert.
-- **Voice:** ruhig, klar, erwachsen, Du-Ansprache, kurze konkrete Sätze. „Das ist machbar, ich gehe es mit dir durch." Pflicht-Sprache: „automatisierte technische Analyse", „WCAG-2.1-AA-Audit", „keine Rechtsberatung". Nie marktschreierisch/schelmisch/pathetisch.
-- **DON'Ts:** kein Zwinkern/Schlitzohr-Pose; keine Held-/Cape-/Retter-Inszenierung; kein Chibi/Kawaii; keine Sprechblasen mit „BFSG-konform/rechtssicher/garantiert"; keine Siegel/Plaketten; kein „BFSG" im Namen; keine Angst-/Alarm-Figur; Mint nie als Vollflächen-Fellfarbe.
-- **Visual:** moderner flacher Vektor, „soft 2.5D", erwachsene schlanke Proportionen, logo-tauglich (16 px/einfarbig). **Palette:** Fell warmes gedämpftes Terrakotta-Orange `#C8703C–#B25E32`; Bauch/Schweifspitze Off-White `#F4EDE2`; Akzent **Mint `#34d99a`** (Augen-Glanz, Kragen/Schal, Scan-Beam, Häkchen); Umgebung Indigo/Near-Black `#0b0d18/#050609`. Signatur: **Mint-Schweifspitze** + mint Scan-Beam als Filos Werkzeug.
-
-## 7. Claim-Optionen (Pflicht-Sprache-konform)
-
-- „Wir zeigen dir, wo deine Website steht."
-- „Sieht, was übersehen wird. Erklärt, was zu tun ist."
-- „Barrierefreiheit ist machbar. Wir fangen beim ersten Befund an."
-- „Verständlicher Report statt 200 Seiten Norm."
-- „Dein aufmerksamer Begleiter durch die Barrierefreiheit."
-
-## 8. Assets aus dieser Session
-
-- Vollständige Analyse + Konzept (JSON): Workflow-Output `tasks/wse9h62va.output` (Run `wf_f7ad724d-f45`).
-- KI-Renders „Filo" (nano_banana_pro, 2 Varianten) — in dieser Session erzeugt; für den Branding-PR als Design-Referenz exportieren.
-- Diese Handover-Datei + Eintrag im Memory ([[mascot-filo-decision]]).
+- 6-Linsen-Berichte (Entscheidungsgrundlage): `docs/brand/domain-fox-3way-reports.md`
+- Referenz-Renders (refined, Option B): `docs/brand/bfsg-fuchs-logo-*.png`, `docs/brand/bfsg-fuchs-mascot-*.png`
+- Charakter-Konzept (Charta/Visual/Voice/Claims): `docs/brand/filo-concept.json` — **Architektur-Teil darin überholt** (galt für die Layer-Variante), Charakter-/Voice-/Visual-Teil weiter gültig.
+- Memory: [[mascot-filo-decision]], [[rebrand-barrierefrei-pruefen]].
+- PR #93 (Branch `brand/filo-mascot-concept`) trägt Entscheidung + diesen Handover.
