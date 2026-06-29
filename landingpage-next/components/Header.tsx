@@ -1,13 +1,9 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import Link from "next/link";
-import {
-  AccessibilityIcon,
-  ArrowRightIcon,
-  MenuIcon,
-  XIcon,
-} from "lucide-react";
+import { ArrowRightIcon, MenuIcon, XIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { NAV_LINKS, SITE } from "@/lib/config";
@@ -74,21 +70,26 @@ export function Header() {
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-6 px-5 sm:px-6">
         <Link
           href="/"
-          className="group/logo -my-2 flex min-h-11 items-center gap-2.5 py-2 font-display text-lg font-semibold tracking-tight"
+          className="group/logo -my-2 flex min-h-11 items-center gap-2.5 py-2 font-display text-lg font-bold tracking-tight"
           aria-label={`${SITE.name} Startseite`}
         >
-          <span
-            aria-hidden
-            className="relative inline-flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-brand-indigo to-brand-deep text-on-deep shadow-glow-mint"
-          >
-            <AccessibilityIcon className="size-4.5" />
-            <span className="pointer-events-none absolute -right-1 -bottom-1 size-2.5 rounded-full bg-brand-mint ring-2 ring-background" />
-          </span>
-          <span className="flex items-baseline gap-1">
+          {/* Fuchs-Wappen-Logo (Design-Signatur), dekorativ → leeres alt, da die
+              nebenstehende Wortmarke den Namen traegt. Orange Drop-Shadow wie im
+              gelieferten Design. */}
+          <Image
+            src="/logo-fox.png"
+            alt=""
+            width={32}
+            height={48}
+            priority
+            className="h-10 w-auto shrink-0 [filter:drop-shadow(0_4px_12px_color-mix(in_oklch,var(--brand-orange),transparent_60%))]"
+          />
+          <span className="flex items-baseline gap-0.5">
             <span>BFSG</span>
-            <span className="text-muted-foreground">·</span>
-            <span className="italic text-brand-indigo dark:text-brand-mint">
-              Check
+            <span className="text-brand-orange">·</span>
+            <span>Fuchs</span>
+            <span className="text-[0.78em] font-semibold text-muted-foreground">
+              .de
             </span>
           </span>
         </Link>
@@ -116,7 +117,7 @@ export function Header() {
                 <span
                   aria-hidden
                   className={cn(
-                    "absolute inset-x-3 -bottom-px h-px origin-left bg-brand-mint transition-transform duration-300",
+                    "absolute inset-x-3 -bottom-px h-px origin-left bg-brand-orange transition-transform duration-300",
                     isActive ? "scale-x-100" : "scale-x-0",
                   )}
                 />

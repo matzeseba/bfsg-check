@@ -21,7 +21,7 @@ export function LogoCloud() {
         <ul className="mt-7 flex flex-wrap items-center justify-center gap-3">
           {LOGO_CLOUD.logos.map((norm) => (
             <li key={norm.name}>
-              <span className="inline-flex items-center rounded-full border border-border/70 bg-background/60 px-4 py-1.5 font-display text-sm font-semibold tracking-tight text-foreground/80 shadow-card-soft backdrop-blur transition-colors hover:border-brand-mint/50 hover:text-foreground">
+              <span className="inline-flex items-center rounded-full border border-border/70 bg-background/60 px-4 py-1.5 font-display text-sm font-semibold tracking-tight text-foreground/80 shadow-card-soft backdrop-blur transition-colors hover:border-brand-orange/50 hover:text-foreground">
                 {norm.name}
               </span>
             </li>

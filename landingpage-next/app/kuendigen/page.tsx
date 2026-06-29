@@ -5,7 +5,7 @@ import { KuendigungForm } from "@/components/KuendigungForm";
 export const metadata: Metadata = {
   title: "Abo kündigen",
   description:
-    "Re-Check-Abo bei BFSG-Check jederzeit ohne Angabe von Gründen kündigen.",
+    "Re-Check-Abo bei BFSG-Fuchs jederzeit ohne Angabe von Gründen kündigen.",
   alternates: { canonical: "/kuendigen" },
   robots: { index: false, follow: true },
 };

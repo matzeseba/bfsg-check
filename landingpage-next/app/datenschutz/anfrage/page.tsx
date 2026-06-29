@@ -5,7 +5,7 @@ import { DsgvoForm } from "@/components/DsgvoForm";
 export const metadata: Metadata = {
   title: "DSGVO-Anfrage stellen",
   description:
-    "Datenauskunft oder Löschung nach Art. 15 / 17 DSGVO bei BFSG-Check beantragen.",
+    "Datenauskunft oder Löschung nach Art. 15 / 17 DSGVO bei BFSG-Fuchs beantragen.",
   alternates: { canonical: "/datenschutz/anfrage" },
   robots: { index: false, follow: true },
 };

@@ -10,7 +10,9 @@ export function CookieSection() {
     <section
       id="cookie"
       aria-labelledby="cookie-heading"
-      className="relative overflow-hidden bg-muted/40"
+      // Dunklere Alt-Sektion (Design: Cookie-Block sitzt auf brand-deeper
+      // #0b0807 mit warmen creme-Hairlines oben/unten — „Pflicht-Baustelle Nr. 2").
+      className="relative overflow-hidden border-y border-border bg-brand-deeper"
     >
       <div className="mx-auto max-w-6xl px-5 pt-20 sm:px-6 sm:pt-24">
         <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
@@ -41,6 +43,9 @@ export function CookieSection() {
         subtitle="Welche Tracker feuern wirklich vor Consent? Was setzt Cookies? Wir prüfen mit echtem Browser und liefern Belege."
         kicker="Cookie-Check"
         showAnnualToggle={false}
+        // Cookie-Featured-Karte (Cookie-Profi) in Amber statt Orange —
+        // „Pflicht-Baustelle Nr. 2"-Signatur des Designs (Rahmen, Pill, CTA amber).
+        accent="amber"
         embedded
       />
       <p className="mx-auto mt-12 max-w-2xl px-6 pb-20 text-center text-xs text-muted-foreground sm:pb-24">

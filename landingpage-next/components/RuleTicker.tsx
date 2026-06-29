@@ -10,16 +10,18 @@ export function RuleTicker() {
   return (
     <div
       aria-hidden
-      className="relative z-[2] flex h-12 items-center overflow-hidden border-y border-border/60 bg-[var(--brand-deeper)]"
+      className="relative z-[2] flex h-12 items-center overflow-hidden border-y border-border/60 bg-[var(--brand-deepest)]"
     >
-      {/* Kanten-Masken links/rechts (weiches Ein-/Ausblenden). */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 z-[3] w-24 bg-gradient-to-r from-[var(--brand-deeper)] to-transparent" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-[3] w-24 bg-gradient-to-l from-[var(--brand-deeper)] to-transparent" />
+      {/* Kanten-Masken links/rechts (weiches Ein-/Ausblenden, Design: ~130px). */}
+      <div className="pointer-events-none absolute inset-y-0 left-0 z-[3] w-32 bg-gradient-to-r from-[var(--brand-deepest)] via-[var(--brand-deepest)]/90 to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 z-[3] w-32 bg-gradient-to-l from-[var(--brand-deepest)] via-[var(--brand-deepest)]/90 to-transparent" />
 
-      {/* Festes Label (ueberdeckt den Loop-Anfang mit eigenem Hintergrund). */}
-      <div className="absolute left-5 z-[4] flex h-full items-center gap-2 bg-[var(--brand-deeper)] pr-4">
+      {/* Festes "Live geprüft"-Label mit pulsierendem Mint-Punkt (Action-/Erfolgs-
+          farbe → der Ticker zeigt erfolgreich abgehakte WCAG-Kriterien). Überdeckt
+          den Loop-Anfang mit eigenem Hintergrund. */}
+      <div className="absolute left-5 z-[4] flex h-full items-center gap-2 bg-[var(--brand-deepest)] pr-4">
         <span className="inline-flex size-1.5 rounded-full bg-brand-mint shadow-[0_0_8px_var(--brand-mint)] animate-pulse-soft" />
-        <span className="font-mono text-[11px] tracking-[0.16em] text-brand-mint uppercase">
+        <span className="font-mono text-[11px] tracking-[0.08em] text-brand-mint-soft uppercase">
           {RULE_TICKER.label}
         </span>
       </div>

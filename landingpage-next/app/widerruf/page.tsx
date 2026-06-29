@@ -5,7 +5,7 @@ import { WiderrufForm } from "@/components/WiderrufForm";
 export const metadata: Metadata = {
   title: "Vertrag widerrufen",
   description:
-    "Verbraucher-Widerruf nach §§ 355 ff. BGB für Bestellungen bei BFSG-Check.",
+    "Verbraucher-Widerruf nach §§ 355 ff. BGB für Bestellungen bei BFSG-Fuchs.",
   alternates: { canonical: "/widerruf" },
   robots: { index: false, follow: true },
 };

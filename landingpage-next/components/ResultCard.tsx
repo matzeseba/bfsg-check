@@ -2,13 +2,7 @@
 
 import * as motion from "motion/react-client";
 import Link from "next/link";
-import {
-  AlertTriangleIcon,
-  ArrowRightIcon,
-  CheckCircle2Icon,
-  ShieldAlertIcon,
-  ShieldCheckIcon,
-} from "lucide-react";
+import { AlertTriangleIcon, ArrowRightIcon, CheckCircle2Icon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -67,7 +61,6 @@ export function ResultCard({ result }: { result: ScanResult }) {
   const { score, totalIssues, topIssues } = result;
   const { grade, variant, verdict, tone } = gradeFor(score);
   const { openCheckout } = useCheckout();
-  const positive = score >= 75;
 
   return (
     <motion.div
@@ -88,20 +81,21 @@ export function ResultCard({ result }: { result: ScanResult }) {
               : "bg-brand-rose/8",
         )}
       >
+        {/* Noten-Kachel im Fox-Report-Stil (statt Shield-Icon): großer Buchstabe,
+            getönt nach Tonalität (mint/amber/rose). Dekorativ → aria-hidden,
+            die Note steht zusätzlich als Text rechts. */}
         <span
           aria-hidden
           className={cn(
-            "inline-flex size-10 items-center justify-center rounded-xl",
-            positive
-              ? "bg-brand-mint/20 text-brand-mint"
-              : "bg-brand-rose/15 text-brand-rose",
+            "grid size-11 shrink-0 place-items-center rounded-xl border font-display text-xl font-extrabold",
+            tone === "good"
+              ? "border-brand-mint/30 bg-brand-mint/15 text-brand-mint"
+              : tone === "warn"
+                ? "border-brand-amber/30 bg-brand-amber/15 text-brand-amber"
+                : "border-brand-rose/30 bg-brand-rose/15 text-brand-rose",
           )}
         >
-          {positive ? (
-            <ShieldCheckIcon className="size-5" />
-          ) : (
-            <ShieldAlertIcon className="size-5" />
-          )}
+          {grade}
         </span>
         <div className="flex-1">
           <p className="font-display text-lg font-semibold tracking-tight">

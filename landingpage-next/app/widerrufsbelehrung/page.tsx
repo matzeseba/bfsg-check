@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Widerrufsbelehrung",
   description:
-    "Widerrufsbelehrung und Muster-Widerrufsformular für Verbraucher-Bestellungen bei BFSG-Check gemäß §§ 355 ff. BGB.",
+    "Widerrufsbelehrung und Muster-Widerrufsformular für Verbraucher-Bestellungen bei BFSG-Fuchs gemäß §§ 355 ff. BGB.",
   alternates: { canonical: "/widerrufsbelehrung" },
 };
 

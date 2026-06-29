@@ -1,7 +1,9 @@
-import { FAQ_ITEMS } from "@/lib/config";
+import { FAQ_ITEMS, SITE } from "@/lib/config";
 
-const siteUrl = "https://bfsg-fix.de";
-const organizationName = "BFSG-Check";
+// canonical/OG-Domain bleibt bis zum DNS-Cutover bfsg-fix.de (SITE.url);
+// die MARKE ist "BFSG-Fuchs" (SITE.name) — single source of truth aus lib/config.ts.
+const siteUrl = SITE.url;
+const organizationName = SITE.name;
 
 type JsonLdSchema = Record<string, unknown>;
 
@@ -12,9 +14,9 @@ const organizationSchema: JsonLdSchema = {
   url: siteUrl,
   // TODO: dediziertes quadratisches Logo (kein quadratisches Asset in public/
   // vorhanden — bis dahin auf das OG-Banner zeigen, das immerhin existiert).
-  logo: `${siteUrl}/opengraph-image`,
+  logo: `${siteUrl}/logo-fox.png`,
   description:
-    "BFSG-Check ist der automatisierte Barrierefreiheits-Scanner für deutsche Websites mit verständlichem Fix-Plan und laufendem Monitoring.",
+    "Der BFSG-Fuchs ist der automatisierte Barrierefreiheits-Scanner für deutsche Websites mit verständlichem Fix-Plan und laufendem Monitoring.",
 };
 
 const websiteSchema: JsonLdSchema = {
@@ -44,7 +46,7 @@ type ProductInput = {
 
 const products: ProductInput[] = [
   {
-    name: "BFSG-Check Basis",
+    name: "BFSG-Report Basis",
     description:
       "Einmaliger automatischer BFSG- und WCAG-2.1-AA-Scan Ihrer Website inklusive priorisiertem Fix-Plan mit Code-Snippets.",
     price: "129.00",
@@ -53,7 +55,7 @@ const products: ProductInput[] = [
     offerUrl: `${siteUrl}/#pakete`,
   },
   {
-    name: "BFSG-Check Profi",
+    name: "BFSG-Report Profi",
     description:
       "Tiefenscan mit manueller Prüfung kritischer Flows, ausführlichem Fix-Plan, Entwickler-Checkliste und 30 Tagen E-Mail-Support.",
     price: "399.00",
@@ -80,7 +82,7 @@ const products: ProductInput[] = [
     offerUrl: `${siteUrl}/#cookie`,
   },
   {
-    name: "BFSG-Re-Check-Abo",
+    name: "Fuchs Re-Check Abo",
     description:
       "Monatliches Re-Audit Ihrer Website mit Veränderungs-Report. Sofortige Warnung, wenn neue Inhalte Sie aus der Compliance werfen.",
     price: "24.99",

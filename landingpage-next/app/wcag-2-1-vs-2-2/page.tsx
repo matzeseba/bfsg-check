@@ -110,8 +110,8 @@ const FAQ = [
     a: "Ja, ein Kriterium wurde entfernt: 4.1.1 (Parsing). Dieses Kriterium war ursprünglich für ältere Browser relevant, die bei fehlendem HTML-Parsing scheiterten. Moderne Browser sind robust genug, sodass das Kriterium entfiel. Es hat aber keinen Einfluss auf BFSG-Anforderungen, da BFSG auf WCAG 2.1 verweist.",
   },
   {
-    q: "Prüft BFSG-Check auch WCAG-2.2-Kriterien?",
-    a: "Ja, BFSG-Check prüft auf Basis von axe-core 4.x, das bereits WCAG-2.2-Kriterien einschließt. Der Report gibt an, welche Findings WCAG-2.1- und welche WCAG-2.2-Kriterien betreffen, damit Sie Prioritäten setzen können.",
+    q: "Prüft BFSG-Fuchs auch WCAG-2.2-Kriterien?",
+    a: "Ja, BFSG-Fuchs prüft auf Basis von axe-core 4.x, das bereits WCAG-2.2-Kriterien einschließt. Der Report gibt an, welche Findings WCAG-2.1- und welche WCAG-2.2-Kriterien betreffen, damit Sie Prioritäten setzen können.",
   },
 ];
 
@@ -132,7 +132,7 @@ export default function Wcag21vs22Page() {
     headline: "WCAG 2.1 vs. 2.2: Die 9 neuen Erfolgskriterien einfach erklärt",
     description: "Was hat sich von WCAG 2.1 zu 2.2 geändert? Alle Neuerungen und BFSG-Relevanz erklärt.",
     url: "https://bfsg-fix.de/wcag-2-1-vs-2-2",
-    publisher: { "@type": "Organization", name: "BFSG-Check", url: "https://bfsg-fix.de" },
+    publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fix.de" },
     dateModified: "2026-06-21",
   };
 
@@ -252,7 +252,7 @@ export default function Wcag21vs22Page() {
         <section className="mt-14 rounded-2xl border border-border bg-card/60 px-6 py-8">
           <h2 className="text-xl font-semibold">WCAG-2.1-Stand Ihrer Website prüfen lassen</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            BFSG-Check prüft auf Basis von axe-core 4.x, das WCAG 2.1 AA vollständig und ausgewählte
+            BFSG-Fuchs prüft auf Basis von axe-core 4.x, das WCAG 2.1 AA vollständig und ausgewählte
             WCAG-2.2-Kriterien abdeckt. Der Basis-Report (129 €) zeigt klar, welche Mängel BFSG-Pflicht
             sind und welche WCAG-2.2-Empfehlungen drüber hinaus gehen.
           </p>
@@ -309,7 +309,7 @@ export default function Wcag21vs22Page() {
 
         <aside className="mt-12 rounded-xl border border-border bg-muted/30 px-5 py-4 text-xs leading-relaxed text-muted-foreground">
           <strong>Wichtiger Hinweis:</strong> Dieser Artikel ist ein technischer Informationsartikel und
-          stellt keine Rechtsberatung dar. BFSG-Check liefert automatisierte technische Analysen nach
+          stellt keine Rechtsberatung dar. BFSG-Fuchs liefert automatisierte technische Analysen nach
           WCAG 2.1 AA. Keine Garantie für Vollständigkeit, Aktualität oder rechtliche BFSG-Konformität.
           Bei rechtlichen Fragen wenden Sie sich an einen Fachanwalt für IT-Recht.
         </aside>

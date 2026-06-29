@@ -85,7 +85,7 @@ export default function BfsgChecklisteOnlineShopPage() {
     headline: "BFSG-Checkliste 2026: 25 Punkte, die jeder Online-Shop prüfen muss",
     description: "25-Punkte-Checkliste für BFSG- und WCAG-2.1-Anforderungen im Online-Shop.",
     url: "https://bfsg-fix.de/bfsg-checkliste-online-shop",
-    publisher: { "@type": "Organization", name: "BFSG-Check", url: "https://bfsg-fix.de" },
+    publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fix.de" },
     dateModified: "2026-06-21",
   };
 

@@ -48,8 +48,8 @@ const FAQ = [
     a: "Ein Lighthouse-Score allein reicht nicht als BFSG-Dokumentationsgrundlage. Der Accessibility-Score in Lighthouse misst eine begrenzte Auswahl von WCAG-Kriterien und keine vollständige BFSG-Prüfung nach EN 301 549. Für eine dokumentierte BFSG-Prüfung brauchen Sie einen strukturierten Bericht mit Mangel-Priorisierung und Bezug zu den WCAG-Erfolgskriterien.",
   },
   {
-    q: "Wie unterscheidet sich BFSG-Check von diesen kostenlosen Tools?",
-    a: "BFSG-Check kombiniert automatisierte Prüfwerkzeuge (axe-core, eigene Regelwerke für über 80 WCAG-Regeln) mit menschlicher Sichtung vor Auslieferung. Das Ergebnis ist ein strukturierter PDF-Report mit priorisierten Mängeln, konkreten Fix-Hinweisen und einem Entwurf der Barrierefreiheitserklärung — kein Rohdaten-Dump, sondern eine umsetzbare Grundlage.",
+    q: "Wie unterscheidet sich BFSG-Fuchs von diesen kostenlosen Tools?",
+    a: "BFSG-Fuchs kombiniert automatisierte Prüfwerkzeuge (axe-core, eigene Regelwerke für über 80 WCAG-Regeln) mit menschlicher Sichtung vor Auslieferung. Das Ergebnis ist ein strukturierter PDF-Report mit priorisierten Mängeln, konkreten Fix-Hinweisen und einem Entwurf der Barrierefreiheitserklärung — kein Rohdaten-Dump, sondern eine umsetzbare Grundlage.",
   },
 ];
 
@@ -70,7 +70,7 @@ export default function AxeLighthouseWaveVergleichPage() {
     headline: "axe vs. Lighthouse vs. WAVE: Welches A11y-Tool findet die meisten Mängel?",
     description: "Detaillierter Vergleich der drei wichtigsten kostenlosen Accessibility-Tools.",
     url: "https://bfsg-fix.de/axe-lighthouse-wave-vergleich",
-    publisher: { "@type": "Organization", name: "BFSG-Check", url: "https://bfsg-fix.de" },
+    publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fix.de" },
     dateModified: "2026-06-21",
   };
 
@@ -200,11 +200,11 @@ export default function AxeLighthouseWaveVergleichPage() {
           </p>
         </section>
 
-        {/* Wie BFSG-Check Tools kombiniert */}
+        {/* Wie BFSG-Fuchs Tools kombiniert */}
         <section className="mt-14">
-          <h2 className="text-2xl font-semibold">Wie BFSG-Check die Tools kombiniert</h2>
+          <h2 className="text-2xl font-semibold">Wie BFSG-Fuchs die Tools kombiniert</h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            BFSG-Check setzt axe-core als Primär-Engine ein und ergänzt eigene Prüfregeln für über 80
+            BFSG-Fuchs setzt axe-core als Primär-Engine ein und ergänzt eigene Prüfregeln für über 80
             WCAG-2.1-Kriterien. Vor Auslieferung des Reports sichtet ein Mensch die Ergebnisse: False
             Positives werden herausgefiltert, kritische Mängel werden priorisiert und mit konkreten
             Fix-Hinweisen versehen. Das Ergebnis ist kein Rohdaten-Dump, sondern ein umsetzbarer Plan.
@@ -273,7 +273,7 @@ export default function AxeLighthouseWaveVergleichPage() {
         <aside className="mt-12 rounded-xl border border-border bg-muted/30 px-5 py-4 text-xs leading-relaxed text-muted-foreground">
           <strong>Wichtiger Hinweis:</strong> Dieser Artikel ist ein technischer Informationsartikel ohne
           Rechtsberatungscharakter. Abdeckungsraten sind Schätzungen auf Basis veröffentlichter
-          Forschungsdaten — tatsächliche Werte variieren je nach Website. BFSG-Check liefert automatisierte
+          Forschungsdaten — tatsächliche Werte variieren je nach Website. BFSG-Fuchs liefert automatisierte
           technische Analysen nach WCAG 2.1 AA, keine Rechtsberatung und keine Konformitätsgarantie.
         </aside>
       </article>

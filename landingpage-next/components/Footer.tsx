@@ -1,16 +1,13 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import Link from "next/link";
-import {
-  AccessibilityIcon,
-  ArrowRightIcon,
-  MailIcon,
-} from "lucide-react";
+import { ArrowRightIcon, MailIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { LEGAL_NOTE, SITE } from "@/lib/config";
+import { BRAND, LEGAL_NOTE, SITE } from "@/lib/config";
 
 import { resetConsent } from "./CookieBanner";
 
@@ -81,10 +78,10 @@ export function Footer() {
   }
 
   return (
-    <footer className="relative border-t border-border/60 bg-card/40">
+    <footer className="relative border-t border-border/60 bg-brand-deeper">
       <div
         aria-hidden
-        className="absolute inset-x-0 top-0 -z-10 h-32 bg-gradient-to-b from-brand-mint/5 to-transparent"
+        className="absolute inset-x-0 top-0 -z-10 h-32 bg-gradient-to-b from-brand-orange/5 to-transparent"
       />
 
       <div className="mx-auto max-w-6xl px-5 py-14 sm:px-6">
@@ -93,24 +90,30 @@ export function Footer() {
           <div className="flex flex-col items-center lg:items-start">
             <Link
               href="/"
-              className="inline-flex min-h-11 items-center gap-2.5 py-2 font-display text-lg font-semibold tracking-tight"
+              className="inline-flex min-h-11 items-center gap-2.5 py-2 font-display text-lg font-bold tracking-tight"
+              aria-label={`${SITE.name} Startseite`}
             >
-              <span
-                aria-hidden
-                className="relative inline-flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-brand-indigo to-brand-deep text-on-deep shadow-glow-mint"
-              >
-                <AccessibilityIcon className="size-4.5" />
-                <span className="pointer-events-none absolute -right-1 -bottom-1 size-2.5 rounded-full bg-brand-mint ring-2 ring-card" />
-              </span>
-              <span className="flex items-baseline gap-1">
+              {/* Fuchs-Wappen-Logo (dekorativ → leeres alt, Wortmarke traegt den
+                  Namen). */}
+              <Image
+                src="/logo-fox.png"
+                alt=""
+                width={27}
+                height={40}
+                loading="lazy"
+                className="h-10 w-auto shrink-0"
+              />
+              <span className="flex items-baseline gap-0.5">
                 <span>BFSG</span>
-                <span className="text-muted-foreground">·</span>
-                <span className="text-brand-indigo dark:text-brand-mint">Check</span>
+                <span className="text-brand-orange">·</span>
+                <span>Fuchs</span>
+                <span className="text-[0.78em] font-semibold text-muted-foreground">
+                  .de
+                </span>
               </span>
             </Link>
             <p className="mt-3 max-w-sm text-sm text-muted-foreground">
-              Automatisierte Barrierefreiheits-Prüfung nach WCAG 2.1 / EN 301
-              549. Premium-Audit ohne Kanzlei-Honorar.
+              {BRAND.tagline}. {BRAND.promise}.
             </p>
 
             <form
@@ -138,7 +141,7 @@ export function Footer() {
                 type="submit"
                 size="lg"
                 disabled={status === "sending"}
-                className="h-11 gap-1 rounded-xl bg-brand-deep px-4 text-sm font-semibold text-on-deep hover:bg-brand-indigo"
+                className="h-11 gap-1 rounded-xl bg-brand-deep px-4 text-sm font-semibold text-on-deep hover:bg-brand-indigo hover:text-brand-deep"
               >
                 {status === "sending" ? "Sende…" : "Abonnieren"}
                 <ArrowRightIcon className="size-3.5" />

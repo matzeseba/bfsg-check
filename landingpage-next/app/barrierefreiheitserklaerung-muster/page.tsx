@@ -143,7 +143,7 @@ E-Mail: info@schlichtungsstelle-bfit.de
 6. METHODE DER BEURTEILUNG
 
 Diese Erklärung wurde auf Grundlage einer [Selbstbewertung / externen Prüfung] erstellt.
-Eingesetztes Verfahren: [automatisierte technische Analyse nach WCAG 2.1 AA mittels BFSG-Check]
+Eingesetztes Verfahren: [automatisierte technische Analyse nach WCAG 2.1 AA mittels BFSG-Fuchs]
 Datum der Prüfung: [DATUM]
 
 Diese Erklärung wurde zuletzt aktualisiert am: [DATUM]`;
@@ -270,7 +270,7 @@ export default function BarrierefreiheitserklaerungMusterPage() {
         <section className="mt-14 rounded-2xl border border-border bg-card/60 px-6 py-8">
           <h2 className="text-xl font-semibold">Ihren Scan-basierten Erklärungsentwurf erhalten</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            BFSG-Check erstellt im Rahmen des Basis-Reports (129 €) einen Entwurf Ihrer
+            BFSG-Fuchs erstellt im Rahmen des Basis-Reports (129 €) einen Entwurf Ihrer
             Barrierefreiheitserklärung — auf Basis der gefundenen Mängel aus dem WCAG-2.1-Scan. Sie müssen
             die Erklärung dann noch mit eigenen Kontaktdaten ergänzen und veröffentlichen.
           </p>
@@ -343,7 +343,7 @@ export default function BarrierefreiheitserklaerungMusterPage() {
 
         <aside className="mt-12 rounded-xl border border-border bg-muted/30 px-5 py-4 text-xs leading-relaxed text-muted-foreground">
           <strong>Wichtiger Hinweis:</strong> Das Muster in diesem Artikel dient der Orientierung und ersetzt
-          keine anwaltliche Prüfung. BFSG-Check liefert automatisierte technische Analysen, keine
+          keine anwaltliche Prüfung. BFSG-Fuchs liefert automatisierte technische Analysen, keine
           Rechtsberatung. Lassen Sie Ihre Barrierefreiheitserklärung von einem Fachanwalt für IT-Recht
           prüfen, bevor Sie sie veröffentlichen.
         </aside>

@@ -47,24 +47,19 @@ export function HowItWorks() {
         </div>
 
         <div className="relative mt-14">
-          {/* Scan-Pfad-Track (statisch, gestrichelt) + animierte Fortschrittslinie
-              darüber (origin-left scaleX, nur Desktop, reduced-motion-safe). */}
+          {/* Ablauf-Linie (Design-Signatur): warmer Orange-Verlauf mit Lauflicht-
+              Punkt, der von links nach rechts wandert (animate-travel-dot, reduced-
+              motion-gated). Markiert visuell den Fortschritt URL → Scan → Fix-Plan.
+              Nur Desktop (md+); aria-hidden, rein dekorativ. */}
           <div
             aria-hidden
-            className="absolute top-14 right-[12%] left-[12%] hidden h-px md:block"
-            style={{
-              backgroundImage:
-                "repeating-linear-gradient(to right, color-mix(in oklch, var(--brand-mint), transparent 55%) 0 6px, transparent 6px 14px)",
-            }}
-          />
-          <motion.div
-            aria-hidden
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 1.1, delay: 0.2, ease: EASE }}
-            className="absolute top-14 right-[12%] left-[12%] hidden h-px origin-left bg-gradient-to-r from-brand-mint via-brand-violet to-transparent md:block"
-          />
+            className="absolute top-14 right-[12%] left-[12%] hidden h-0.5 overflow-visible rounded-full bg-gradient-to-r from-brand-orange/10 via-brand-orange/40 to-brand-orange/10 md:block"
+          >
+            <span
+              aria-hidden
+              className="absolute top-1/2 size-2.5 -translate-y-1/2 rounded-full bg-brand-orange shadow-[0_0_16px_2px_var(--brand-orange)] animate-travel-dot"
+            />
+          </div>
 
           <ol className="relative grid gap-6 md:grid-cols-3">
             {HOW_IT_WORKS.map((step, i) => {
@@ -87,20 +82,23 @@ export function HowItWorks() {
                   <div className="flex w-full items-center justify-center md:justify-between">
                     <span
                       aria-hidden
-                      className="font-mono text-xs font-bold tracking-[0.2em] text-brand-indigo dark:text-brand-mint"
+                      className="font-mono text-xs font-bold tracking-[0.2em] text-brand-orange"
                     >
                       {step.step}
                     </span>
                     <span
                       aria-hidden
-                      className="hidden h-px flex-1 mx-3 bg-gradient-to-r from-brand-mint/40 to-transparent md:block"
+                      className="hidden h-px flex-1 mx-3 bg-gradient-to-r from-brand-orange/40 to-transparent md:block"
                     />
                   </div>
-                  <div className="relative mt-5 flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-indigo to-brand-deep text-on-deep shadow-glow-mint transition-transform duration-300 group-hover/step:scale-110">
+                  {/* Step-Badge (Design): Kreis mit warmem Orange-Glow + Orange-
+                      Rahmen, Icon im Marken-Orange. Mint bleibt Action/Erfolg → die
+                      Schritt-Marker tragen den dekorativen Marken-Akzent (Orange). */}
+                  <div className="relative mt-5 flex size-12 items-center justify-center rounded-2xl border border-brand-orange/45 bg-gradient-to-br from-brand-orange/15 to-brand-deep text-brand-orange shadow-glow-orange transition-transform duration-300 group-hover/step:scale-110">
                     {/* Dezent pulsierender Ring → "live"-Anmutung, gestaffelt. */}
                     <span
                       aria-hidden
-                      className="absolute inset-0 rounded-2xl ring-1 ring-brand-mint/40 animate-pulse-soft"
+                      className="absolute inset-0 rounded-2xl ring-1 ring-brand-orange/40 animate-pulse-soft"
                       style={{ animationDelay: `${i * 0.4}s` }}
                     />
                     {Icon ? <Icon className="relative size-5" /> : null}
