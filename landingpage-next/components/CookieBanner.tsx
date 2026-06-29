@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 
@@ -159,30 +160,45 @@ export function CookieBanner() {
       // "dialog", das Screenreadern eine Fokusführung verspricht, die es nicht gibt).
       role="region"
       aria-labelledby="cookie-banner-title"
-      className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-3xl rounded-xl border border-border bg-popover p-5 shadow-xl ring-1 ring-foreground/10"
+      // Fox-Theme: warme Card-Fläche, creme Hairline-Border, weicher Card-Schatten
+      // + dezenter Amber-Akzent oben (greift die Cookie-/Consent-Sektion auf, ohne
+      // eine der beiden Aktionen optisch zu bevorzugen). Tokens statt Hex.
+      className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-3xl overflow-hidden rounded-2xl border border-border-card bg-card/95 p-5 shadow-card-hover ring-1 ring-brand-amber/15 backdrop-blur-md before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-brand-amber/50 before:to-transparent"
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex-1">
-          <h2
-            id="cookie-banner-title"
-            ref={headingRef}
-            tabIndex={-1}
-            className="font-semibold outline-none"
-          >
-            Cookies &amp; Tracking
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Wir verwenden ausschließlich technisch notwendige Cookies
-            (Session/Sicherheit). Marketing- und Analytics-Tools laden wir erst
-            nach Ihrer Einwilligung. Mehr in der{" "}
-            <a
-              href="/datenschutz"
-              className="underline underline-offset-2 hover:text-foreground"
+        <div className="flex flex-1 items-start gap-3.5">
+          {/* Marken-Fuchs-Wappen (rein dekorativ → alt="" + aria-hidden, der Titel
+              trägt die Bedeutung). Kein Layout-Shift dank fixer width/height. */}
+          <Image
+            src="/logo-fox.png"
+            alt=""
+            aria-hidden="true"
+            width={24}
+            height={36}
+            className="mt-0.5 hidden h-9 w-auto shrink-0 select-none sm:block"
+          />
+          <div>
+            <h2
+              id="cookie-banner-title"
+              ref={headingRef}
+              tabIndex={-1}
+              className="font-display font-semibold text-foreground outline-none"
             >
-              Datenschutzerklärung
-            </a>
-            .
-          </p>
+              Cookies &amp; Tracking
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Wir verwenden ausschließlich technisch notwendige Cookies
+              (Session/Sicherheit). Marketing- und Analytics-Tools laden wir erst
+              nach Ihrer Einwilligung. Mehr in der{" "}
+              <a
+                href="/datenschutz"
+                className="text-brand-orange underline underline-offset-2 transition-colors hover:text-brand-orange-soft"
+              >
+                Datenschutzerklärung
+              </a>
+              .
+            </p>
+          </div>
         </div>
         {/* § 25 TDDDG / Dark-Pattern-Verbot: "Ablehnen" und "Akzeptieren" müssen
             gleichwertig sein (gleiche Größe, gleiches visuelles Gewicht, keine

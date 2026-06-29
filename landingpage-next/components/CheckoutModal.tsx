@@ -180,7 +180,7 @@ export function CheckoutModal() {
                         <span className="text-sm font-medium leading-tight">
                           {p.name}
                           {p.featured && !isDisabled && (
-                            <span className="ml-1.5 text-xs font-semibold uppercase tracking-wide text-brand-indigo dark:text-brand-mint">
+                            <span className="ml-1.5 text-xs font-semibold uppercase tracking-wide text-brand-orange">
                               · Empfohlen
                             </span>
                           )}

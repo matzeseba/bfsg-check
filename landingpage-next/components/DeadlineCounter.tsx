@@ -35,14 +35,26 @@ export function DeadlineCounter() {
   const [el, setEl] = React.useState<Elapsed>(PLACEHOLDER);
 
   React.useEffect(() => {
+    // Client-only nach Mount (Start = PLACEHOLDER): der Live-Countdown haengt von
+    // Date.now() ab → Server-Prerender wuerde beim Hydrate abweichen (Sekundentakt).
+    // Legitime Ausnahme von set-state-in-effect (gewollter Tick, kein Cascading-Bug).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setEl(compute());
     const id = window.setInterval(() => setEl(compute()), 1000);
     return () => window.clearInterval(id);
   }, []);
 
   return (
-    <div className="rounded-2xl border border-brand-amber/25 bg-card/80 p-5 shadow-card-soft backdrop-blur dark:ring-1 dark:ring-white/5">
-      <div className="mb-4 flex items-center gap-2 font-mono text-[11px] tracking-[0.12em] text-brand-amber uppercase">
+    <div className="relative overflow-hidden rounded-2xl border border-brand-amber/25 bg-card/80 p-5 shadow-card-soft backdrop-blur dark:ring-1 dark:ring-white/5">
+      {/* Amber-Shimmer-Linie am oberen Rand (Design-Signatur): wandernder Verlauf,
+          reduced-motion-gated (.animate-shimmer steht in der globalen Regel). */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-[linear-gradient(90deg,transparent,var(--brand-amber),transparent)] bg-[length:200%_100%] animate-shimmer"
+      />
+      {/* Kicker-TEXT light-mode-AA: dunkles Burnt-Amber auf hell, helles Amber im
+          Dark (analog CtaSection-Urgency-Pill). Puls-Punkt bleibt dekorativ. */}
+      <div className="mb-4 flex items-center gap-2 font-mono text-[11px] tracking-[0.12em] text-[oklch(0.5_0.13_70)] dark:text-brand-amber uppercase">
         <span
           aria-hidden
           className="inline-flex size-1.5 rounded-full bg-brand-rose shadow-[0_0_8px_var(--brand-rose)] animate-pulse-soft"

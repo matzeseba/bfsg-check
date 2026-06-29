@@ -1,6 +1,7 @@
 "use client";
 
 import * as motion from "motion/react-client";
+import Image from "next/image";
 import { ArrowRightIcon, CheckCircle2Icon } from "lucide-react";
 
 import { HERO, HERO_VISUAL } from "@/lib/config";
@@ -69,15 +70,18 @@ export function Hero() {
             transition={{ duration: 0.5, ease: EASE }}
             className="inline-flex"
           >
+            {/* Fox-Design: Pill ist die Marken-Akzent-Fläche (orange). Dot +
+                Flag-Wort in brand-orange, Hover-Kante orange. Mint bleibt der
+                Action-/CTA-Farbe vorbehalten. */}
             <a
               href="#risiko"
-              className="group/pill inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/70 px-3 py-1.5 text-xs font-medium text-foreground/80 shadow-card-soft backdrop-blur transition-all hover:border-brand-mint/60 hover:text-foreground"
+              className="group/pill inline-flex items-center gap-2 rounded-full border border-brand-orange/26 bg-brand-orange/[0.09] px-3 py-1.5 font-mono text-xs font-medium tracking-[0.01em] text-foreground/80 shadow-card-soft backdrop-blur transition-all hover:border-brand-orange/55 hover:text-foreground"
             >
               <span
                 aria-hidden
-                className="inline-flex size-1.5 rounded-full bg-brand-mint animate-pulse-soft"
+                className="inline-flex size-1.5 rounded-full bg-brand-orange animate-pulse-soft"
               />
-              <span className="font-semibold text-brand-indigo dark:text-brand-mint">
+              <span className="font-semibold text-brand-orange">
                 {HERO.pillFlag}
               </span>
               <span>{HERO.pill}</span>
@@ -89,19 +93,26 @@ export function Hero() {
               Bewusst OHNE Entrance-Animation: die H1 ist das LCP-Element — ein
               opacity:0-Start würde den Largest Contentful Paint künstlich um die
               Animationsdauer verzögern (relevant für paid-Ads-Quality-Score). */}
+          {/* EIN fließender Textfluss (kein erzwungener block-Umbruch): der Browser
+              bricht via text-balance natürlich um, sodass „bereit fürs BFSG?"
+              zusammenbleibt (Design: „Schlau wie ein Fuchs — bereit fürs BFSG?").
+              Lead inline in gradient-text-soft, gefolgt von Space + Akzent-Span.
+              Design-Signatur: das Akzentwort „BFSG" leuchtet im Orange-Verlauf und
+              shimmert sanft (gradient-text-shimmer). Unterlängen-/Glyph-Überhang-
+              Schutz (g/j/ß, „?") sitzt in .gradient-text → kein Clipping, kein CLS.
+              Shimmer wird bei prefers-reduced-motion stillgestellt. */}
           <h1 className="mt-6 font-display text-[clamp(2.05rem,6.7vw,4.6rem)] leading-[1.05] font-semibold tracking-[-0.025em] text-balance">
-            <span className="block gradient-text-soft">{HERO.headlineLead}</span>
-            {/* Design-Signatur: das Akzentwort „BFSG" leuchtet im Mint-Verlauf und
-                shimmert sanft (gradient-text-shimmer). Nicht-kursiv (entspricht dem
-                neuen Design). Unterlängen-/Glyph-Überhang-Schutz (g/j/ß, „?") sitzt
-                in .gradient-text (padding-/margin-right) → kein Clipping, kein CLS.
-                Shimmer wird bei prefers-reduced-motion stillgestellt. */}
-            <span className="block gradient-text gradient-text-shimmer">
+            <span className="gradient-text-soft">{HERO.headlineLead}</span>{" "}
+            <span className="gradient-text gradient-text-shimmer">
               {HERO.headlineEmph}?
             </span>
-            <span className="mt-1 block font-sans text-[0.4em] font-medium tracking-tight text-muted-foreground not-italic">
-              {HERO.headlineTail}
-            </span>
+            {/* Tail-Guard: nur rendern, wenn nicht leer — sonst kein leeres
+                Block-Element mit Margin. */}
+            {HERO.headlineTail && (
+              <span className="mt-1 block font-sans text-[0.4em] font-medium tracking-tight text-muted-foreground not-italic">
+                {HERO.headlineTail}
+              </span>
+            )}
           </h1>
 
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground text-pretty">
@@ -204,6 +215,24 @@ export function Hero() {
               )}
               {pvPost}
             </motion.p>
+          </div>
+
+          {/* Fox-Maskottchen (Design): sitzt ÜBER der Report-Card und überlappt
+              sie leicht (negativer unterer Rand). next/image mit priority (nahe
+              LCP, rechte Hero-Spalte), feste width/height aus der intrinsischen
+              800×1073-Ratio → kein CLS. Dekorativ ergänzend zum Report, aber mit
+              aussagekräftigem deutschem alt (kein leeres alt: das Maskottchen ist
+              Marken-Inhalt, kein reines Schmuck-Icon). z-10 hält es über der Card. */}
+          <div className="relative z-10 -mb-6 flex justify-center sm:-mb-8 lg:justify-start lg:pl-2">
+            <Image
+              src="/mascot-fox.png"
+              alt="Der BFSG-Fuchs präsentiert den Accessibility-Report auf dem Tablet"
+              width={300}
+              height={402}
+              priority
+              sizes="(max-width: 1024px) 240px, 300px"
+              className="h-auto w-[220px] drop-shadow-[0_18px_30px_rgba(0,0,0,0.5)] sm:w-[260px] lg:w-[300px]"
+            />
           </div>
           <HeroVisual />
         </motion.div>

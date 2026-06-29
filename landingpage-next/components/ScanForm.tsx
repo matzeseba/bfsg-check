@@ -8,8 +8,24 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { HERO } from "@/lib/config";
 import { useCheckout } from "@/lib/checkout-context";
+import { usePrefersReducedMotion } from "@/lib/use-reduced-motion";
 
 import { ResultCard, type ScanResult } from "./ResultCard";
+
+// Dekorative „Der Fuchs schnüffelt"-Phasen für den Scan-Lauf-Zustand. Rein
+// kosmetisch (der echte Scan ist ein einzelner Fetch ohne Fortschritts-Stream);
+// die verbindliche Statusansage für Screenreader läuft über die sr-only
+// Live-Region ("Prüfung läuft…"), NICHT über diese rotierenden Labels.
+const SCAN_PHASES = [
+  "Farbkontraste beschnuppern",
+  "Alt-Texte aufspüren",
+  "Tastatur-Fokus erschnüffeln",
+  "Formular-Labels",
+  "Überschriften-Fährte",
+  "ARIA-Rollen",
+  "Link-Bezeichnungen",
+  "Sprach-Attribut",
+] as const;
 
 export type ScanFormProps = {
   initialUrl?: string;
@@ -44,6 +60,7 @@ export function ScanForm({ initialUrl = "" }: ScanFormProps) {
   const [result, setResult] = React.useState<ScanResult | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const { setUrl: pushUrl } = useCheckout();
+  const reduced = usePrefersReducedMotion();
 
   async function runScan(target: string) {
     if (!target) return;
@@ -150,7 +167,7 @@ export function ScanForm({ initialUrl = "" }: ScanFormProps) {
               </>
             ) : (
               <>
-                <span>{HERO.cta}</span>
+                <span>{HERO.scanCta}</span>
                 <ArrowRightIcon className="size-4" />
               </>
             )}
@@ -160,6 +177,11 @@ export function ScanForm({ initialUrl = "" }: ScanFormProps) {
       <p className="px-1 text-xs text-muted-foreground">
         Kostenlos · ohne Anmeldung · ohne Tracker. Bei Bestellung Stripe-Checkout.
       </p>
+      {/* Scan-Lauf-Zustand (Fox-Design): oranger Spinner + animierte orange
+          Progress-Bar + bar-eq-Equalizer. Dekorativ (aria-hidden) — die
+          verbindliche Ansage läuft über die sr-only Live-Region oben. Alle
+          Animationen sind reduced-motion-gated (CSS @media + reduced-Flag). */}
+      {loading && <ScanningPanel reduced={reduced} />}
       {/* Ehrlicher Fehlerzustand: klare Meldung + "Erneut versuchen". KEINE
           erfundenen Demo-Score-Zahlen. Die Ansage für Screenreader erfolgt über
           die einzige Live-Region oben (hier nur visuell). */}
@@ -179,6 +201,78 @@ export function ScanForm({ initialUrl = "" }: ScanFormProps) {
         </div>
       )}
       {result && <ResultCard result={result} />}
+    </div>
+  );
+}
+
+// Oranger Scan-Lauf-Panel im Fox-Design. Vollständig dekorativ (aria-hidden):
+// kein konkurrierender Live-Status, kein eigener role. Zeigt einen rotierenden
+// „Fuchs schnüffelt"-Phasenhinweis + eine sanft pulsierende Progress-Bar +
+// einen Equalizer. Bei prefers-reduced-motion stehen Spinner/Equalizer still
+// und die Phase bleibt auf der ersten stehen (kein Auto-Wechsel).
+function ScanningPanel({ reduced }: { reduced: boolean }) {
+  const [phase, setPhase] = React.useState(0);
+
+  React.useEffect(() => {
+    if (reduced) return;
+    const id = window.setInterval(
+      () => setPhase((p) => (p + 1) % SCAN_PHASES.length),
+      850,
+    );
+    return () => window.clearInterval(id);
+  }, [reduced]);
+
+  return (
+    <div
+      aria-hidden
+      className="overflow-hidden rounded-2xl border border-brand-orange/25 bg-card/85 p-4 shadow-card-soft backdrop-blur"
+    >
+      <div className="flex items-center gap-3">
+        {/* Oranger Lauf-Ring (Design: 3px-Ring, top in Marken-Orange). */}
+        <span
+          className={
+            "size-9 shrink-0 rounded-full border-[3px] border-brand-orange/25 border-t-brand-orange " +
+            (reduced ? "" : "animate-spin")
+          }
+        />
+        <div className="min-w-0 flex-1">
+          <p className="font-display text-base font-semibold tracking-tight">
+            Der Fuchs schnüffelt…
+          </p>
+          <p className="truncate font-mono text-xs text-muted-foreground">
+            {SCAN_PHASES[phase]}
+          </p>
+        </div>
+      </div>
+
+      {/* Orange Progress-Bar (indeterminate: füllt + pulst, da der echte Scan
+          keinen Fortschritts-Stream liefert). */}
+      <div className="relative mt-4 h-2 overflow-hidden rounded-full bg-brand-orange/12">
+        <div
+          className={
+            "h-full w-2/3 rounded-full bg-gradient-to-r from-brand-orange to-brand-orange-soft shadow-glow-orange " +
+            (reduced ? "" : "animate-pulse-soft")
+          }
+        />
+      </div>
+
+      {/* bar-eq-Equalizer (7 Balken, gestaffelte Verzögerung). */}
+      <div className="mt-4 flex h-7 items-end gap-1">
+        {[0, 0.15, 0.3, 0.45, 0.6, 0.75, 0.9].map((delay, i) => (
+          <span
+            key={i}
+            className={
+              "flex-1 origin-bottom rounded-sm bg-brand-orange/40 " +
+              (reduced ? "h-1/2" : "h-full animate-bar-eq")
+            }
+            style={reduced ? undefined : { animationDelay: `${delay}s` }}
+          />
+        ))}
+      </div>
+
+      <p className="mt-3 font-mono text-xs text-muted-foreground">
+        › Kontraste, Alt-Texte, Fokus-Reihenfolge, Labels…
+      </p>
     </div>
   );
 }

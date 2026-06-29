@@ -57,7 +57,7 @@ Lange Straße 20
 
       <h2 className="mt-8 text-xl font-semibold">Haftungs-Disclaimer</h2>
       <p className="mt-2 text-muted-foreground">
-        BFSG-Check liefert eine automatisierte technische Erstprüfung. Wir
+        BFSG-Fuchs liefert eine automatisierte technische Erstprüfung. Wir
         geben keine Konformitätsgarantie und ersetzen keine Rechtsberatung. Bei
         rechtlichen Fragen konsultieren Sie einen Fachanwalt für IT- und
         Wettbewerbsrecht.

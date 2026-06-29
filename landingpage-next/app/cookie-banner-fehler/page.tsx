@@ -84,11 +84,11 @@ const FAQ = [
   },
   {
     q: "Wie prüfe ich, ob mein Cookie-Banner korrekt implementiert ist?",
-    a: "Technisch: Öffnen Sie die Browser-DevTools (Network-Tab), laden Sie die Seite neu ohne Consent zu geben und prüfen Sie, ob externe Requests zu Google Analytics, Meta oder ähnlichen Diensten gesendet werden. Falls ja, feuern Scripts vor Consent. Rechtlich: Prüfen Sie, ob Ablehnen-Button und Akzeptieren-Button gleichwertig auf der ersten Ebene sichtbar sind. Der Cookie-Check von BFSG-Check prüft diese Aspekte automatisiert.",
+    a: "Technisch: Öffnen Sie die Browser-DevTools (Network-Tab), laden Sie die Seite neu ohne Consent zu geben und prüfen Sie, ob externe Requests zu Google Analytics, Meta oder ähnlichen Diensten gesendet werden. Falls ja, feuern Scripts vor Consent. Rechtlich: Prüfen Sie, ob Ablehnen-Button und Akzeptieren-Button gleichwertig auf der ersten Ebene sichtbar sind. Der Cookie-Check von BFSG-Fuchs prüft diese Aspekte automatisiert.",
   },
   {
     q: "Was kostet ein Cookie-Banner-Check?",
-    a: "Der kostenlose Gratis-Check von BFSG-Check gibt einen ersten Überblick. Der Cookie-Basis-Check (39 €) prüft, welche Tracker vor Consent feuern, welche Cookies gesetzt werden und ob Google Fonts oder US-Drittland-Transfers ohne Einwilligung stattfinden — mit konkreter Handlungsempfehlung pro Fund.",
+    a: "Der kostenlose Gratis-Check von BFSG-Fuchs gibt einen ersten Überblick. Der Cookie-Basis-Check (39 €) prüft, welche Tracker vor Consent feuern, welche Cookies gesetzt werden und ob Google Fonts oder US-Drittland-Transfers ohne Einwilligung stattfinden — mit konkreter Handlungsempfehlung pro Fund.",
   },
 ];
 
@@ -109,7 +109,7 @@ export default function CookieBannerFehlerPage() {
     headline: "Cookie-Banner 2026: Die 7 häufigsten Fehler, die Abmahnungen auslösen",
     description: "§ 25 TDDDG, EuGH Planet49, gleichwertige Buttons: Cookie-Banner-Fehler mit Abmahn-Risiko.",
     url: "https://bfsg-fix.de/cookie-banner-fehler",
-    publisher: { "@type": "Organization", name: "BFSG-Check", url: "https://bfsg-fix.de" },
+    publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fix.de" },
     dateModified: "2026-06-21",
   };
 
@@ -231,7 +231,7 @@ export default function CookieBannerFehlerPage() {
         <section className="mt-14 rounded-2xl border border-border bg-card/60 px-6 py-8">
           <h2 className="text-xl font-semibold">Cookie-Banner jetzt technisch prüfen lassen</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Der BFSG-Check Cookie-Basis-Check (39 €) prüft automatisiert, welche Tracker vor Consent feuern,
+            Der BFSG-Fuchs Cookie-Basis-Check (39 €) prüft automatisiert, welche Tracker vor Consent feuern,
             welche Cookies ohne Einwilligung gesetzt werden, ob Google Fonts oder US-Drittland-Transfers
             stattfinden — mit konkreter Handlungsempfehlung je Fund. Der Cookie-Profi-Check (69 €) enthält
             zusätzlich eine manuelle Sichtung der CMP-Konfiguration.
@@ -289,7 +289,7 @@ export default function CookieBannerFehlerPage() {
 
         <aside className="mt-12 rounded-xl border border-border bg-muted/30 px-5 py-4 text-xs leading-relaxed text-muted-foreground">
           <strong>Wichtiger Hinweis:</strong> Dieser Artikel ist ein Informationsartikel ohne Rechtsberatungscharakter.
-          BFSG-Check liefert automatisierte technische Analysen nach WCAG 2.1 AA. Keine Garantie für
+          BFSG-Fuchs liefert automatisierte technische Analysen nach WCAG 2.1 AA. Keine Garantie für
           Vollständigkeit, Aktualität oder rechtliche Korrektheit. Bei rechtlichen Fragen rund um
           DSGVO, TDDDG oder Cookie-Banner konsultieren Sie einen Fachanwalt für IT-Recht oder Datenschutzrecht.
         </aside>

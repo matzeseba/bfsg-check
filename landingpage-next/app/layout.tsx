@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
     default: SITE.title,
-    template: "%s | BFSG-Check",
+    template: `%s | ${SITE.name}`,
   },
   description: SITE.description,
   applicationName: SITE.name,
@@ -102,7 +102,8 @@ export const metadata: Metadata = {
 // color-scheme auf <html> beim Theme-Wechsel zusaetzlich dynamisch.
 export const viewport: Viewport = {
   colorScheme: "dark light",
-  themeColor: "#07080d",
+  // BFSG-Fuchs Dark-Default: warmes Braun-Schwarz der Marken-Palette.
+  themeColor: "#0f0b09",
 };
 
 export default function RootLayout({

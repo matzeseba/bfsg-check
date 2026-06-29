@@ -10,9 +10,12 @@ import { cn } from "@/lib/utils";
 // Pendant — auf Mobile sitzt die CTA sonst nur im eingeklappten Menü). Blendet
 // nach dem Hero ein. Reine fixed-Leiste, kein Dauer-Blur-Layer, kein Pulsieren.
 //
-// Erscheint ERST, wenn der Cookie-Banner weg ist (Consent gesetzt): solange der
-// Banner (fixed bottom-4 z-50) sichtbar ist, würde die Bar darunter hervorpeeken.
-// Der Banner dispatcht beim Setzen/Zurücksetzen die Events unten — wir folgen.
+// Sichtbarkeit ist von Consent ENTKOPPELT (Conversion-Leck behoben): die Bar
+// erscheint sobald gescrollt wird — auch ohne Consent, damit Paid-Mobile-Nutzer
+// die Haupt-CTA immer sehen. Damit sie den Cookie-Banner (fixed bottom-4 z-50)
+// nicht überlappt, sitzt die Bar bei fehlendem Consent über dem Banner (größerer
+// Bottom-Offset); ist Consent gesetzt (Banner weg), normaler Offset am Rand. Der
+// Banner dispatcht beim Setzen/Zurücksetzen die Events unten — wir folgen.
 const CONSENT_KEY = "bfsg-consent-v1";
 
 function hasConsent(): boolean {
@@ -52,14 +55,19 @@ export function MobileStickyCta() {
     };
   }, []);
 
-  const show = scrolled && consented;
+  const show = scrolled;
 
   return (
     <div
       aria-hidden={!show}
       className={cn(
-        "fixed inset-x-0 bottom-0 z-40 border-t border-border/60 bg-background/90 px-4 pt-3 backdrop-blur-md transition-all duration-300 md:hidden",
-        "pb-[max(0.75rem,env(safe-area-inset-bottom))]",
+        "fixed inset-x-0 z-40 border-t border-border/60 bg-background/90 px-4 pt-3 backdrop-blur-md transition-all duration-300 md:hidden",
+        // Ohne Consent steht der Cookie-Banner (fixed bottom-4) noch da → Bar mit
+        // großem Bottom-Offset darüber platzieren (kein Overlap). Mit Consent
+        // (Banner weg) sitzt die Bar normal am unteren Rand mit Safe-Area-Padding.
+        consented
+          ? "bottom-0 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+          : "bottom-[calc(7.5rem+env(safe-area-inset-bottom))] pb-3",
         show
           ? "translate-y-0 opacity-100"
           : "pointer-events-none translate-y-full opacity-0",

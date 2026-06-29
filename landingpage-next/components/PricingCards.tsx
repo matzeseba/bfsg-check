@@ -26,6 +26,13 @@ import { useCheckout } from "@/lib/checkout-context";
 
 import { SectionKicker } from "./SectionKicker";
 
+// Marken-Akzent der Featured-Karte/Highlights (rein optisch):
+//  - "orange" = Haupt-Pricing (Profi) — Marken-Akzentfarbe.
+//  - "amber"  = Cookie-Sektion (Cookie-Profi) — Pflicht-Baustelle-Nr.-2-Signatur.
+// Die Action-CTA der Featured-Karte folgt: orange-Theme → Mint-CTA,
+// amber-Theme → Amber-CTA (gemäß Design). Steuert NUR Klassen, keine Logik.
+type AccentTone = "orange" | "amber";
+
 type PricingCardsProps = {
   packages?: PackageConfig[];
   title?: string;
@@ -40,6 +47,8 @@ type PricingCardsProps = {
   // true = innerhalb einer Sektion mit eigenem Header gerendert (z.B. CookieSection).
   // Dann kein eigenes Top-Padding, damit der Vertikalrhythmus symmetrisch bleibt.
   embedded?: boolean;
+  // Optischer Marken-Akzent der Featured-Karte (siehe AccentTone). Default Orange.
+  accent?: AccentTone;
 };
 
 export function PricingCards({
@@ -56,6 +65,7 @@ export function PricingCards({
   // echtes Jahres-Abo im Stripe-Checkout gibt.
   showAnnualToggle = false,
   embedded = false,
+  accent = "orange",
 }: PricingCardsProps) {
   const { openCheckout } = useCheckout();
   const [annual, setAnnual] = React.useState(false);
@@ -92,7 +102,15 @@ export function PricingCards({
         )}
       >
         <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
-          <SectionKicker icon={kickerIcon} label={kicker} />
+          {/* Kicker im Marken-Akzent. Orange-Theme: tone="on-light" rendert
+              Icon+Text in brand-indigo (auf die Orange-Familie remapped → orange
+              in BEIDEN Themes, ohne dark: auf Mint zu kippen). Amber-Theme
+              (Cookie): tone="warn" = Amber-Akzent. */}
+          <SectionKicker
+            icon={kickerIcon}
+            label={kicker}
+            tone={accent === "amber" ? "warn" : "on-light"}
+          />
           <h2
             id={`${id}-heading`}
             className="mt-4 font-display text-3xl font-semibold tracking-tight text-balance sm:text-[2.75rem] sm:leading-[1.05]"
@@ -151,7 +169,15 @@ export function PricingCards({
             Checkout (openCheckout), nichts wird umgangen. */}
         {!embedded && <PlanFinder packages={packages} />}
 
-        <div className="mt-12 grid items-stretch gap-6 md:grid-cols-3">
+        {/* Spaltenzahl folgt der Paketanzahl: 2 Pakete (Cookie) → zentriertes 2er-
+            Grid (statt linksbuendig im 3er-Raster), 3 Pakete → volles 3er-Grid. */}
+        <div
+          className={`mt-12 grid items-stretch gap-6 ${
+            packages.length === 2
+              ? "mx-auto max-w-3xl md:grid-cols-2"
+              : "md:grid-cols-3"
+          }`}
+        >
           {packages.map((pkg, i) => (
             <motion.div
               key={pkg.id}
@@ -164,6 +190,7 @@ export function PricingCards({
               <PricingCard
                 pkg={pkg}
                 annual={annual}
+                accent={accent}
                 onSelect={() => openCheckout(pkg.id)}
               />
             </motion.div>
@@ -217,7 +244,9 @@ function PlanFinder({ packages }: { packages: PackageConfig[] }) {
       : "Profi (25 Seiten) + Re-Check fürs laufende Monitoring";
 
   return (
-    <div className="mx-auto mt-10 grid max-w-3xl gap-6 rounded-3xl border border-border/70 bg-card/70 p-6 shadow-card-soft backdrop-blur sm:grid-cols-[1.5fr_1fr] sm:items-center sm:gap-8 dark:ring-1 dark:ring-white/5">
+    // Plan-Finder-Panel im Marken-Orange (Design: orange-getoenter Verlauf +
+    // orange Hairline). bg via brand-orange/[0.06] auf der Card-Flaeche.
+    <div className="mx-auto mt-10 grid max-w-3xl gap-6 rounded-3xl border border-brand-orange/20 bg-gradient-to-br from-brand-orange/[0.08] to-card/70 p-6 shadow-card-soft backdrop-blur sm:grid-cols-[1.5fr_1fr] sm:items-center sm:gap-8 dark:ring-1 dark:ring-brand-orange/10">
       <div>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <label
@@ -226,7 +255,8 @@ function PlanFinder({ packages }: { packages: PackageConfig[] }) {
           >
             {PLAN_FINDER.kicker}
           </label>
-          <span className="rounded-md bg-brand-mint/10 px-2.5 py-1 font-mono text-xs font-medium text-brand-indigo tabular-nums dark:text-brand-mint">
+          {/* „N Unterseiten"-Chip in Orange (Design-Akzent, nicht Action). */}
+          <span className="rounded-md border border-brand-orange/30 bg-brand-orange/10 px-2.5 py-1 font-mono text-xs font-medium text-brand-orange tabular-nums">
             {pages}
             {pages >= PLAN_FINDER.max ? "+" : ""} {PLAN_FINDER.unit}
           </span>
@@ -239,7 +269,7 @@ function PlanFinder({ packages }: { packages: PackageConfig[] }) {
           value={pages}
           onChange={(e) => setPages(Number(e.target.value))}
           aria-valuetext={`${pages} ${PLAN_FINDER.unit} — Empfehlung: ${recName}`}
-          className="mt-4 h-1.5 w-full cursor-pointer appearance-none rounded-full bg-muted accent-brand-mint"
+          className="mt-4 h-1.5 w-full cursor-pointer appearance-none rounded-full bg-muted accent-brand-orange"
         />
         <div className="mt-2 flex justify-between font-mono text-[11px] text-muted-foreground">
           <span>1</span>
@@ -247,11 +277,12 @@ function PlanFinder({ packages }: { packages: PackageConfig[] }) {
           <span>40+</span>
         </div>
       </div>
-      <div className="sm:border-l sm:border-border/60 sm:pl-8">
+      <div className="sm:border-l sm:border-brand-orange/15 sm:pl-8">
         <p className="font-mono text-[11px] tracking-[0.06em] text-muted-foreground uppercase">
           {PLAN_FINDER.recommendationLabel}
         </p>
-        <p className="mt-1 font-display text-lg font-semibold tracking-tight text-brand-indigo dark:text-brand-mint">
+        {/* Empfohlener Paketname in Marken-Orange (Design: rec in #ED6A33). */}
+        <p className="mt-1 font-display text-lg font-semibold tracking-tight text-brand-orange">
           {recName}
         </p>
         <p className="mt-0.5 text-xs text-muted-foreground">{recSub}</p>
@@ -271,10 +302,12 @@ function PlanFinder({ packages }: { packages: PackageConfig[] }) {
 function PricingCard({
   pkg,
   annual,
+  accent,
   onSelect,
 }: {
   pkg: PackageConfig;
   annual: boolean;
+  accent: AccentTone;
   onSelect: () => void;
 }) {
   // Annual-Toggle ist nur fuer Subscriptions relevant — kosmetischer Rabatt.
@@ -290,14 +323,57 @@ function PricingCard({
       : (pkg.priceSuffix ?? "/Monat")
     : pkg.priceSuffix;
 
+  // Marken-Akzent-Klassen pro Tone (rein optisch). Orange = Haupt-Pricing,
+  // Amber = Cookie. Die Featured-Action-CTA folgt dem Design: Orange-Theme →
+  // Mint-CTA (Profi), Amber-Theme → Amber-CTA (Cookie-Profi).
+  const isAmber = accent === "amber";
+  const A = isAmber
+    ? {
+        tag: "text-brand-amber",
+        price: "text-brand-amber",
+        border: "border-[1.5px] border-brand-amber/40",
+        gradient: "bg-gradient-to-b from-brand-amber/[0.08] to-card",
+        glow: "bg-brand-amber/20",
+        ring: "border-brand-amber",
+        pill: "bg-brand-amber text-brand-deep",
+        check: "bg-brand-amber/15 text-brand-amber",
+        cta: "bg-brand-amber text-brand-deep hover:bg-brand-amber/85 focus-visible:ring-brand-deep/70 focus-visible:ring-offset-2 focus-visible:ring-offset-card",
+      }
+    : {
+        tag: "text-brand-orange",
+        price: "text-brand-orange",
+        border: "border-[1.5px] border-brand-orange/40",
+        gradient: "bg-gradient-to-b from-brand-orange/10 to-card",
+        glow: "bg-brand-orange/20",
+        ring: "border-brand-orange",
+        pill: "bg-brand-orange text-brand-deep",
+        // Haken bleiben Mint (Erfolgsfarbe) auch in der Featured-Karte.
+        check: "bg-brand-mint/20 text-brand-mint",
+        cta: "bg-brand-mint text-brand-deep hover:bg-brand-mint/85 focus-visible:ring-brand-deep/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+      };
+
   return (
-    // Aeusserer Wrapper OHNE overflow-hidden, damit die "Meistgewaehlt"-Badge
-    // oben ueberstehen darf. Die Card selbst clippt (overflow-hidden) nur ihre
-    // dekorativen Inneren (Glow + Border-Gradient).
+    // Aeusserer Wrapper OHNE overflow-hidden, damit die "Empfohlen"-Pill + der
+    // Warn-Puls-Ring oben/aussen ueberstehen duerfen. Die Card selbst clippt
+    // (overflow-hidden) nur ihre dekorativen Inneren (Glow + Verlaufskante).
     <div className="relative h-full">
+      {/* Warn-Puls-Ring um die Featured-Karte (Design-Signatur, dekorativ →
+          reduced-motion stellt animate-warn-pulse still). */}
+      {pkg.featured && (
+        <div
+          aria-hidden
+          className={cn(
+            "pointer-events-none absolute inset-[-2px] z-10 rounded-[calc(var(--radius-3xl)+2px)] border-2 opacity-70 animate-warn-pulse",
+            A.ring,
+          )}
+        />
+      )}
       {pkg.featured && (
         <Badge
-          className="absolute -top-3 left-1/2 z-20 -translate-x-1/2 gap-1 bg-brand-mint px-3 py-1 text-[11px] font-bold tracking-wide text-brand-deep uppercase shadow-glow-mint"
+          className={cn(
+            "absolute -top-3 left-1/2 z-20 -translate-x-1/2 gap-1 px-3 py-1 text-[11px] font-bold tracking-wide uppercase shadow-card-soft",
+            A.pill,
+          )}
           variant="default"
         >
           <SparklesIcon className="size-3" />
@@ -306,27 +382,38 @@ function PricingCard({
       )}
       <div
         className={cn(
-          "group/card relative flex h-full flex-col overflow-hidden rounded-3xl p-7 backdrop-blur transition-all duration-300",
+          "group/card relative flex h-full flex-col overflow-hidden rounded-3xl p-7 backdrop-blur transition-all duration-300 hover:-translate-y-1.5",
           pkg.featured
-            ? "border-gradient bg-card shadow-elevated hover:-translate-y-1.5 hover:shadow-elevated"
-            : "border border-border/70 bg-card/85 shadow-card-soft hover:-translate-y-1.5 hover:shadow-card-hover",
+            ? cn(A.border, A.gradient, "shadow-elevated hover:shadow-elevated")
+            : "border border-border/70 bg-card/85 shadow-card-soft hover:shadow-card-hover",
         )}
       >
         {pkg.featured && (
           <>
             <div
               aria-hidden
-              className="pointer-events-none absolute -top-24 -right-24 size-64 rounded-full bg-brand-mint/20 blur-[70px]"
+              className={cn(
+                "pointer-events-none absolute -top-24 -right-24 size-64 rounded-full blur-[70px]",
+                A.glow,
+              )}
             />
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-mint/60 to-transparent"
+              className={cn(
+                "pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent",
+                isAmber ? "via-brand-amber/60" : "via-brand-orange/60",
+              )}
             />
           </>
         )}
 
         <div className="relative">
-        <p className="font-mono text-xs font-semibold tracking-[0.18em] text-brand-indigo uppercase dark:text-brand-mint">
+        <p
+          className={cn(
+            "font-mono text-xs font-semibold tracking-[0.18em] uppercase",
+            pkg.featured ? A.tag : "text-muted-foreground",
+          )}
+        >
           {pkg.tag}
         </p>
         <h3 className="mt-2 font-display text-xl font-semibold tracking-tight">
@@ -335,7 +422,12 @@ function PricingCard({
         <p className="mt-1 text-sm text-muted-foreground">{pkg.description}</p>
 
         <div className="mt-6 flex items-baseline gap-1">
-          <span className="font-display text-5xl font-bold tracking-tight tabular-nums text-foreground">
+          <span
+            className={cn(
+              "font-display text-5xl font-bold tracking-tight tabular-nums",
+              pkg.featured ? A.price : "text-foreground",
+            )}
+          >
             {displayedPrice}
           </span>
           {displayedSuffix && (
@@ -345,7 +437,7 @@ function PricingCard({
           )}
         </div>
         {isSub && annual && (
-          <p className="mt-1 text-xs font-medium text-brand-indigo dark:text-brand-mint">
+          <p className="mt-1 text-xs font-medium text-brand-orange">
             Spart {monthly * 12 - yearly} € im Vergleich zur Monatszahlung
           </p>
         )}
@@ -364,8 +456,8 @@ function PricingCard({
               className={cn(
                 "mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full",
                 pkg.featured
-                  ? "bg-brand-mint/20 text-brand-mint"
-                  : "bg-brand-indigo/10 text-brand-indigo dark:bg-brand-mint/15 dark:text-brand-mint",
+                  ? A.check
+                  : "bg-brand-mint/15 text-brand-mint",
               )}
             >
               <CheckIcon className="size-3" strokeWidth={3} />
@@ -393,8 +485,10 @@ function PricingCard({
             className={cn(
               "h-11 w-full gap-1.5 rounded-xl text-sm font-semibold transition-transform hover:scale-[1.015]",
               pkg.featured
-                ? "bg-brand-mint text-brand-deep hover:bg-brand-mint/85 focus-visible:ring-brand-deep/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                : "bg-brand-deep text-on-deep hover:bg-brand-indigo",
+                ? A.cta
+                : // Nicht-Featured: creme-getoenter Outline-Button (Design:
+                  // dezente Sekundaer-Aktion, kein Mint-/Orange-Vollton).
+                  "border border-[oklch(0.97_0.004_95)]/12 bg-[oklch(0.97_0.004_95)]/[0.06] text-foreground hover:bg-[oklch(0.97_0.004_95)]/10 focus-visible:ring-offset-2 focus-visible:ring-offset-card",
             )}
           >
             {isSub ? "Abo starten" : "Paket kaufen"}

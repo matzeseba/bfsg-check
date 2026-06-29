@@ -1,4 +1,4 @@
-// Zentrale Konfiguration für BFSG-Check Landingpage.
+// Zentrale Konfiguration fuer die BFSG-Fuchs Landingpage.
 // Preise und Pakete spiegeln scanner/app.js Z40-48 (Quelle der Wahrheit).
 
 export type PackageId =
@@ -25,17 +25,25 @@ export type PackageConfig = {
   available?: boolean;
 };
 
+// HINWEIS Domain/Rebrand: Die Marke ist "BFSG-Fuchs". Die produktive Domain ist
+// bis zum vom Owner gesteuerten DNS-/Stripe-/Brevo-Cutover weiterhin bfsg-fix.de
+// (DNS+TLS+Stripe-Redirects+Mail laufen dort). `url` steuert nur canonical/OG/
+// sitemap — die Stripe-success/cancel-URLs liegen im Scanner-Backend. Beim Cutover
+// nur diese eine Konstante auf https://bfsg-fuchs.de umstellen (+ Backend-.env).
 export const SITE = {
   url: "https://bfsg-fix.de",
-  name: "BFSG-Check",
-  title: "BFSG-Check — Ist Ihre Website bereit fürs BFSG? | Kostenloser WCAG-Sofort-Check",
+  name: "BFSG-Fuchs",
+  // Ziel-Marken-Domain nach Cutover (rein dokumentarisch, NICHT funktional verlinkt,
+  // solange sie nicht aufgelöst/TLS-gesichert ist).
+  brandDomain: "bfsg-fuchs.de",
+  title: "BFSG-Fuchs — Ist Ihre Website bereit fürs BFSG? | Kostenloser WCAG-Sofort-Check",
   description:
-    "Prüfen Sie in 60 Sekunden, wo Ihre Website die Anforderungen des Barrierefreiheitsstärkungsgesetzes (BFSG) noch verfehlt — automatisierte WCAG-2.1-AA-Analyse, ausführlicher Report auf Wunsch.",
-  email: "hallo@bfsg-fix.de",
+    "Der BFSG-Fuchs prüft in 60 Sekunden, wo Ihre Website die Anforderungen des Barrierefreiheitsstärkungsgesetzes (BFSG) noch verfehlt — automatisierte WCAG-2.1-AA-Analyse mit menschlicher Sichtung, ausführlicher Report auf Wunsch.",
+  email: "info@bfsg-fix.de",
 } as const;
 
 export const BRAND = {
-  tagline: "BFSG- & WCAG-Audit für mittelständische Website-Betreiber",
+  tagline: "Die schlaue Spürnase für Barrierefreiheit nach WCAG 2.1 / EN 301 549",
   productKicker: "Compliance-Scan-Plattform",
   promise: "Premium-Audit ohne Kanzlei-Honorar",
   hostingNote: "Gehostet in Deutschland · DSGVO-konform",
@@ -53,21 +61,27 @@ export const NAV_LINKS = [
 export const HERO = {
   pillFlag: "DE",
   pill: "BFSG seit 28.06.2025 in Kraft · Erste Abmahnungen rollen an",
-  headlineLead: "Ist Ihre Website",
-  // "bereit fürs BFSG" bringt den vom Owner gewünschten BFSG-Hook zurück, ohne
-  // die laut CLAUDE.md/UWG §5 verbotene Konformitäts-Aussage "BFSG-konform"
-  // (= Garantie-Behauptung). Eine Bereitschafts-FRAGE behauptet keine Konformität.
-  // Das "?" wird in Hero.tsx als eigenes NICHT-kursives Gradient-Span gerendert —
-  // sonst beschneidet background-clip:text den Italic-Überhang des "?" (Owner-Bug).
-  headlineEmph: "bereit fürs BFSG",
-  headlineTail: "In 60 Sekunden wissen Sie es — bevor es eine Kanzlei tut.",
+  // Fox-Headline (Design "BFSG-Fuchs"): "Schlau wie ein Fuchs — bereit fürs BFSG?"
+  // Nur das Akzentwort "BFSG" leuchtet im Orange-Verlauf (headlineEmph); der Rest
+  // bleibt creme (headlineLead). "bereit fürs BFSG?" ist eine Bereitschafts-FRAGE,
+  // KEINE verbotene Konformitäts-/Garantie-Aussage ("BFSG-konform", UWG §5).
+  // Das "?" wird in Hero.tsx an das Akzentwort gehängt; Clip-Schutz sitzt in
+  // .gradient-text (padding-/margin-right) → kein Glyph-Clipping, kein CLS.
+  headlineLead: "Schlau wie ein Fuchs — bereit fürs",
+  headlineEmph: "BFSG",
+  // Tail leer: die Pointe "bevor es eine Kanzlei tut" steht in der Subline.
+  // Hero.tsx rendert das Tail-Span nur, wenn der String nicht leer ist.
+  headlineTail: "",
   subline:
-    "Wir scannen Ihre Seite nach über 80 WCAG-2.1-AA-Regeln und liefern jeden Mangel priorisiert — mit Copy-Paste-Fix und menschlicher Sichtung. Premium-Audit ohne Kanzlei-Honorar.",
+    "Der BFSG-Fuchs schnüffelt in 60 Sekunden über 80 WCAG-2.1-AA-Regeln durch und legt jeden Mangel priorisiert offen — mit Copy-Paste-Fix und menschlicher Sichtung. Premium-Audit ohne Kanzlei-Honorar.",
   cta: "Kostenlos prüfen",
+  // Aktionsspezifisches Label am Scan-Feld (Design: "Gratis-Check starten") —
+  // verb-getrieben auf die Mikro-Conversion gemünzt; cta bleibt für Header/Final-CTA.
+  scanCta: "Gratis-Check starten",
   ctaSecondary: "Pakete ansehen",
   placeholder: "ihre-website.de",
   badges: [
-    "KI-gestützt + menschlich geprüft",
+    "KI-Spürnase + menschlich geprüft",
     "Hosting in Deutschland",
   ],
   // Mini-Trust-Bar im Hero entfaellt im neuen Design zugunsten des eigenstaendigen
@@ -76,7 +90,7 @@ export const HERO = {
     { label: "80+", sub: "Prüfregeln (EN 301 549)" },
     { label: "DSGVO", sub: "konform" },
     { label: "DE", sub: "Hosting" },
-    { label: "60 Sek.", sub: "bis Ergebnis" },
+    { label: "60 Sek.", sub: "bis zur Fuchs-Fährte" },
   ],
 } as const;
 
@@ -84,7 +98,7 @@ export const HERO = {
 // Wortlaut — keine Garantie-/Spitzenstellungs-Aussage.
 export const ANNOUNCEMENT = {
   text: "BFSG seit 28.06.2025 in Kraft · erste Abmahnungen rollen an",
-  cta: "jetzt prüfen",
+  cta: "der Fuchs prüft kostenlos",
   href: "/#risiko",
 } as const;
 
@@ -145,9 +159,9 @@ export const RISK_BAND = {
   kicker: "Seit 28.06.2025 in Kraft",
   // Stichtag steht bereits im Kicker → Titel verschlankt + GENAU EIN Italic-
   // Akzentwort (titleAccent) für den Editorial-Rhythmus (RiskBand.tsx splittet).
-  title: "Die BFSG-Frist ist verstrichen — und die ersten Abmahnungen sind da.",
+  title: "Die BFSG-Frist ist verstrichen — und die ersten Abmahnungen schnappen zu.",
   titleAccent: "verstrichen",
-  desc: "Betroffene Unternehmen müssen ihre digitalen Angebote barrierefrei anbieten. Wettbewerber, Verbände und abmahnende Kanzleien dürfen Verstöße verfolgen. Wer jetzt prüft, behebt Mängel in Ruhe statt unter Abmahn-Druck. In 60 Sekunden sehen Sie, wo Sie stehen — kostenlos und ohne Anmeldung.",
+  desc: "Betroffene Unternehmen müssen ihre digitalen Angebote barrierefrei anbieten. Wettbewerber, Verbände und abmahnende Kanzleien dürfen Verstöße verfolgen. Wer den Fuchs jetzt losschickt, behebt Mängel in Ruhe statt unter Abmahn-Druck. In 60 Sekunden sehen Sie, wo Sie stehen — kostenlos und ohne Anmeldung.",
   points: [
     { value: "28.06.2025", label: "Stichtag bereits überschritten" },
     { value: "WCAG 2.1 AA", label: "geforderter Mindeststandard" },
@@ -159,13 +173,13 @@ export const HOW_IT_WORKS = [
   {
     step: "01",
     title: "Website-URL eingeben",
-    desc: "Adresse einfügen, Branche optional angeben — wir bereiten Crawler & Audit-Regeln vor.",
+    desc: "Adresse einfügen, Branche optional angeben — der Fuchs spitzt die Ohren und bereitet Crawler & Audit-Regeln vor.",
     icon: "globe",
   },
   {
     step: "02",
     title: "Automatisierter WCAG-Scan",
-    desc: "Kontraste, Alt-Texte, Tastatur-Fokus, Labels, Strukturen — über 80 Regeln nach EN 301 549.",
+    desc: "Kontraste, Alt-Texte, Tastatur-Fokus, Labels, Strukturen — über 80 Regeln nach EN 301 549 werden durchschnüffelt.",
     icon: "scan",
   },
   {
@@ -195,7 +209,7 @@ export const STATS: StatItem[] = [
   // TLS-1.3-Transport) — keine Mess-Quote, kein "100 %".
   { value: "DSGVO", num: null, label: "konform · TLS 1.3" },
   { value: "DE", num: null, label: "Hosting in Deutschland" },
-  { value: "60 Sek.", num: 60, suffix: " Sek.", label: "bis zum Ergebnis" },
+  { value: "60 Sek.", num: 60, suffix: " Sek.", label: "bis zur Fuchs-Fährte" },
 ] as const;
 
 // Ehrliches Normen-/Standards-Band statt erfundener Presse-Logos.
@@ -247,7 +261,7 @@ export const PACKAGES: PackageConfig[] = [
   },
   {
     id: "abo",
-    name: "BFSG Re-Check Abo",
+    name: "Fuchs Re-Check Abo",
     tag: "Abo",
     price: "24,99 €",
     priceSuffix: "/Monat",
@@ -331,7 +345,7 @@ export type CompareColumn = {
 };
 export const COMPARISON = {
   kicker: "Im Direktvergleich",
-  title: "Wo sich BFSG-Check einordnet",
+  title: "Wo sich der BFSG-Fuchs einordnet",
   titleAccent: "einordnet",
   columns: [
     {
@@ -347,8 +361,8 @@ export const COMPARISON = {
       note: "Gut für einen ersten technischen Überblick.",
     },
     {
-      name: "BFSG-Check",
-      sub: "automatisiert + menschliche Sichtung",
+      name: "BFSG-Fuchs",
+      sub: "KI-Spürnase + menschliche Sichtung",
       highlight: true,
       attrs: [
         { label: "Ergebnis", value: "typischerweise in Stunden", strong: true },
@@ -379,12 +393,12 @@ export const COMPARISON = {
 // Auswahl/der Kauf laeuft weiter ueber den Checkout (openCheckout). Schwellen
 // spiegeln die Seiten-Limits aus PACKAGES (Basis ≤5, Profi ≤25).
 export const PLAN_FINDER = {
-  kicker: "Welches Paket passt?",
+  kicker: "Welches Paket passt zu Ihnen?",
   min: 1,
   max: 40,
   default: 8,
   unit: "Unterseiten",
-  recommendationLabel: "Unsere Empfehlung",
+  recommendationLabel: "Empfehlung des Fuchses",
 } as const;
 
 // Preis-Anker (Pricing-Sektion). Faktisch + hedged: KEINE Garantie, „meist".
@@ -399,7 +413,7 @@ export const FAQ_ITEMS = [
     a: "Betroffen sind insbesondere Online-Shops und Dienstleister im elektronischen Geschäftsverkehr. Kleinstunternehmen (unter 10 Mitarbeitende und unter 2 Mio. Euro Jahresumsatz) sind bei reinen Dienstleistungen teils ausgenommen. Der kostenlose Check gibt eine erste Einordnung.",
   },
   {
-    q: "Wie unterscheidet sich BFSG-Check von Gratis-Tools wie WAVE oder Lighthouse?",
+    q: "Wie unterscheidet sich der BFSG-Fuchs von Gratis-Tools wie WAVE oder Lighthouse?",
     a: "Gratis-Tools liefern Rohdaten — hunderte Findings ohne Priorisierung, ohne Lösungs-Snippet, ohne Kontext. Wir kuratieren: jeder Mangel bekommt eine Priorität, einen konkreten Fix und landet im Umsetzungs-Fahrplan. Plus: Entwurf der Barrierefreiheitserklärung, fertig zum Veröffentlichen.",
   },
   {
@@ -423,7 +437,7 @@ export const FAQ_ITEMS = [
     a: "Nein. Der Report ist eine technische Vorprüfung nach WCAG 2.1 und deckt einen Großteil der häufigen Mängel ab. Für eine rechtsverbindliche Bewertung konsultieren Sie bitte einen Fachanwalt für IT- oder Wettbewerbsrecht.",
   },
   {
-    q: "Ist BFSG-Check DSGVO-konform?",
+    q: "Ist der BFSG-Fuchs DSGVO-konform?",
     a: "Ja. Wir hosten ausschließlich in Deutschland, übermitteln keine Daten in Drittländer, speichern nur das, was zur Vertragsabwicklung nötig ist (E-Mail, Rechnungsadresse, gescannte URL) und nutzen nur technisch notwendige Cookies ohne Consent. Details in der Datenschutzerklärung.",
   },
   {

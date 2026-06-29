@@ -31,7 +31,7 @@ export function WowCounter() {
         >
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-mint/70 to-transparent"
+            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-indigo/70 to-transparent"
           />
           <SectionKicker
             icon={GaugeIcon}
@@ -46,12 +46,15 @@ export function WowCounter() {
           </h2>
 
           <div className="mt-8 flex flex-col items-center">
-            <p className="font-display text-[clamp(3.5rem,12vw,8rem)] leading-none font-bold tracking-tight tabular-nums">
+            {/* Die Leitzahl "80+" leuchtet im Marken-Orange (brand-indigo ist auf
+                die Orange-Familie remapped, hier dunkles Burnt-Orange → AA-sicher
+                auf Creme). Konsistent mit der Trust-Strip-Leitkennzahl. */}
+            <p className="font-display text-[clamp(3.5rem,12vw,8rem)] leading-none font-bold tracking-tight tabular-nums text-brand-indigo">
               <CountUp value={80} suffix="+" />
             </p>
             <span
               aria-hidden
-              className="mt-4 block h-1 w-16 rounded-full bg-brand-mint"
+              className="mt-4 block h-1 w-16 rounded-full bg-brand-indigo"
             />
             {/* /85 statt /75: im erzwungenen Dark-Theme lösen die Tokens zu ihren
                 Dark-Werten auf — brand-deep/75 auf Creme wäre nur 3,42:1 (sub-AA

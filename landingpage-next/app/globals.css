@@ -49,11 +49,17 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
 
-  /* Brand-Token-Familie fuer Kompositionen */
+  /* Brand-Token-Familie fuer Kompositionen (BFSG-Fuchs-Palette: warmes
+     Braun-Schwarz, Orange = Markenakzent, Mint = Action/CTA). */
+  --color-brand-deepest: var(--brand-deepest);
   --color-brand-deep: var(--brand-deep);
   --color-brand-deeper: var(--brand-deeper);
+  /* brand-indigo/violet sind auf die Fox-Orange-Familie remapped (Alt-Namen
+     bleiben fuer Bestands-Komposition/Glows erhalten → kein Massen-Rename). */
   --color-brand-indigo: var(--brand-indigo);
   --color-brand-violet: var(--brand-violet);
+  --color-brand-orange: var(--brand-orange);
+  --color-brand-orange-soft: var(--brand-orange-soft);
   --color-brand-mint: var(--brand-mint);
   --color-brand-mint-soft: var(--brand-mint-soft);
   --color-brand-amber: var(--brand-amber);
@@ -70,6 +76,10 @@
   /* Brand-Shadow-Tokens: indigo-tinted statt neutral-schwarz */
   --shadow-glow-mint: 0 0 0 1px color-mix(in oklch, var(--brand-mint), transparent 70%),
     0 8px 30px -8px color-mix(in oklch, var(--brand-mint), transparent 55%);
+  /* Orange-Glow fuer Marken-Akzent-Flaechen (Hero-Report-Card, Risk-Band, Step-
+     Badges) — Pendant zum Mint-Glow, in der Fox-Markenfarbe. */
+  --shadow-glow-orange: 0 0 0 1px color-mix(in oklch, var(--brand-orange), transparent 68%),
+    0 10px 34px -10px color-mix(in oklch, var(--brand-orange), transparent 50%);
   --shadow-card-soft: 0 1px 2px color-mix(in oklch, var(--brand-deep), transparent 92%),
     0 8px 24px -10px color-mix(in oklch, var(--brand-deep), transparent 80%);
   --shadow-card-hover: 0 2px 4px color-mix(in oklch, var(--brand-deep), transparent 88%),
@@ -97,117 +107,142 @@
 }
 
 :root {
-  /* Light: warmes Off-White, Deep-Indigo-Primary, Mint-Accent */
-  --background: oklch(0.987 0.004 95);
-  --foreground: oklch(0.2 0.04 270);
+  /* Light (BFSG-Fuchs): warmes Creme-Off-White, Mint-Action-Primary, Orange-Akzent.
+     Das Maskottchen/Logo ist FINAL und wird nicht umgefaerbt — die SEITE folgt der
+     Fox-Palette (Navy/Braun-Schwarz + Orange + Mint). Dark ist der erzwungene
+     Standard; dieser Light-Mode ist die kontrastsichere Tag-Variante derselben Marke. */
+  --background: oklch(0.985 0.006 75);
+  --foreground: oklch(0.21 0.025 55);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2 0.04 270);
+  --card-foreground: oklch(0.21 0.025 55);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2 0.04 270);
-  --primary: oklch(0.27 0.12 275);
-  --primary-foreground: oklch(0.985 0.004 95);
-  --secondary: oklch(0.96 0.012 270);
-  --secondary-foreground: oklch(0.27 0.12 275);
-  --muted: oklch(0.962 0.008 90);
-  --muted-foreground: oklch(0.46 0.022 270);
+  --popover-foreground: oklch(0.21 0.025 55);
+  /* Primary = Mint (Action/CTA) in beiden Themes; dunkelgruener Text darauf. */
+  --primary: oklch(0.72 0.18 158);
+  --primary-foreground: oklch(0.24 0.06 162);
+  --secondary: oklch(0.96 0.012 70);
+  --secondary-foreground: oklch(0.27 0.06 50);
+  --muted: oklch(0.965 0.01 75);
+  /* Warmgrauer Sekundaertext, AA-sicher (>=4.5:1) auf Creme/Weiss. */
+  --muted-foreground: oklch(0.46 0.022 55);
   --accent: oklch(0.72 0.18 158);
-  --accent-foreground: oklch(0.18 0.04 270);
-  --destructive: oklch(0.585 0.22 25);
-  --border: oklch(0.9 0.012 270);
+  --accent-foreground: oklch(0.24 0.06 162);
+  --destructive: oklch(0.55 0.2 28);
+  --border: oklch(0.88 0.014 70);
   --border-card: var(--border);
-  /* Input-Rahmen dunkler: vorher ~1.3:1 → unsichtbare Feldgrenze (WCAG 1.4.11).
-     Jetzt ≥3:1 gegen das weiße Feld. */
-  --input: oklch(0.78 0.02 275);
-  /* Fokus-Ring im Light-Mode auf Indigo statt Mint: Mint auf Weiß war ~2.2:1 →
-     Tastatur-Fokus faktisch unsichtbar (WCAG 2.4.7/1.4.11). Indigo ist hochkontrast.
-     Dark-Mode-Ring bleibt Mint (dort kontrastreich). */
-  --ring: oklch(0.42 0.17 280);
+  /* Input-Rahmen dunkel genug fuer sichtbare Feldgrenze als EINZIGE Abgrenzung
+     (WCAG 1.4.11, >=3:1 gegen Weiss/Creme — verifiziert: L~0.27 → ~3.3:1). */
+  --input: oklch(0.58 0.03 60);
+  /* Fokus-Ring im Light-Mode = dunkles Burnt-Orange (Orange #ED6A33 auf Weiss waere
+     ~3.4:1; diese dunklere Variante ist hochkontrast fuer Tastatur-Fokus). Im Dark
+     ist der Ring Mint (dort hochkontrast). WCAG 2.4.7/1.4.11. */
+  --ring: oklch(0.52 0.17 42);
   --chart-1: oklch(0.72 0.18 158);
-  --chart-2: oklch(0.55 0.18 275);
-  --chart-3: oklch(0.72 0.16 50);
-  --chart-4: oklch(0.62 0.18 320);
-  --chart-5: oklch(0.45 0.12 220);
+  --chart-2: oklch(0.62 0.19 42);
+  --chart-3: oklch(0.74 0.15 70);
+  --chart-4: oklch(0.6 0.2 28);
+  --chart-5: oklch(0.5 0.12 50);
   --radius: 0.8rem;
-  --sidebar: oklch(0.985 0.004 95);
-  --sidebar-foreground: oklch(0.2 0.04 270);
-  --sidebar-primary: oklch(0.27 0.12 275);
-  --sidebar-primary-foreground: oklch(0.985 0.004 95);
-  --sidebar-accent: oklch(0.96 0.012 270);
-  --sidebar-accent-foreground: oklch(0.27 0.12 275);
-  --sidebar-border: oklch(0.9 0.012 270);
-  --sidebar-ring: oklch(0.72 0.18 158);
+  --sidebar: oklch(0.985 0.006 75);
+  --sidebar-foreground: oklch(0.21 0.025 55);
+  --sidebar-primary: oklch(0.72 0.18 158);
+  --sidebar-primary-foreground: oklch(0.24 0.06 162);
+  --sidebar-accent: oklch(0.96 0.012 70);
+  --sidebar-accent-foreground: oklch(0.27 0.06 50);
+  --sidebar-border: oklch(0.88 0.014 70);
+  --sidebar-ring: oklch(0.52 0.17 42);
 
-  --brand-deeper: oklch(0.14 0.055 278);
-  --brand-deep: oklch(0.18 0.07 275);
-  --brand-indigo: oklch(0.32 0.14 275);
-  --brand-violet: oklch(0.45 0.17 295);
-  --brand-mint: oklch(0.72 0.18 158);
-  --brand-mint-soft: oklch(0.82 0.12 158);
-  --brand-amber: oklch(0.78 0.16 75);
-  --brand-rose: oklch(0.62 0.22 25);
+  /* "deep"-Surfaces bleiben in BEIDEN Themes dunkel (Fox-Braun-Schwarz) —
+     z. B. invertierte Bloecke, Skip-Link, Schatten-Toenung. */
+  --brand-deepest: #0a0705;
+  --brand-deeper: #0b0807;
+  --brand-deep: #0f0b09;
+  /* indigo/violet remapped auf Orange-Familie (kontrastsicher auf Weiss = dunkler). */
+  --brand-indigo: oklch(0.55 0.18 42);
+  --brand-violet: oklch(0.62 0.17 35);
+  --brand-orange: oklch(0.55 0.18 42);
+  --brand-orange-soft: oklch(0.64 0.17 38);
+  --brand-mint: oklch(0.6 0.16 160);
+  --brand-mint-soft: oklch(0.72 0.16 158);
+  --brand-amber: oklch(0.66 0.15 70);
+  --brand-rose: oklch(0.55 0.2 28);
 
-  /* Light: Akzentwort in dunklem Indigo→Violet (auf weiss kontrastsicher).
-     Dark ueberschreibt das mit Mint (siehe .dark). */
-  --gradient-from: var(--brand-indigo);
-  --gradient-to: var(--brand-violet);
+  /* Light: Akzentwort in dunklem Burnt-Orange (auf Weiss kontrastsicher >=4.5:1).
+     Dark ueberschreibt das mit hellem Orange (siehe .dark). */
+  --gradient-from: oklch(0.55 0.18 42);
+  --gradient-to: oklch(0.62 0.17 35);
 
   color-scheme: light;
 }
 
 .dark {
-  /* Dark-Palette aus dem neuen Claude-Design (near-black Blau-Schwarz #07080d,
-     Mint #34d99a). Werte bewusst als Hex, um exakt das gelieferte Design zu
-     treffen; Token-basiert (nicht inline), damit der Light-Mode-Toggle erhalten
-     bleibt. Kontraste gegen #07080d/#11131e per Audit verifiziert. */
-  --background: #07080d;
-  --foreground: #f2f3f7;
-  --card: #11131e;
-  --card-foreground: #f2f3f7;
-  --popover: #11131e;
-  --popover-foreground: #f2f3f7;
+  /* BFSG-Fuchs Dark-Palette (gelieferter Design-Stand "BFSG-Fuchs Landingpage.dc.html"):
+     warmes Braun-Schwarz #0f0b09, Orange #ED6A33 = Markenakzent, Mint #34d99a =
+     Action/CTA, Amber #f5b13d, Rot #F8554B. Werte bewusst als Hex/rgba, um exakt das
+     gelieferte Design zu treffen; token-basiert, damit der Light-Toggle erhalten bleibt.
+     Kontraste gegen #0f0b09 / #171009 per A11y-Audit verifiziert (Eigen-Dogfood). */
+  --background: #0f0b09;
+  --foreground: #f7f1ea;
+  --card: #171009;
+  --card-foreground: #f7f1ea;
+  --popover: #16110e;
+  --popover-foreground: #f7f1ea;
+  /* Primary = Mint (CTA/Action). Dunkelgruener Text darauf (#06251a). */
   --primary: #34d99a;
   --primary-foreground: #06251a;
-  --secondary: #1b1e2e;
-  --secondary-foreground: #f2f3f7;
-  --muted: #13151f;
-  /* #9598ad: 7.0:1 auf #07080d, 6.5:1 auf #11131e (AA-sicher fuer Sekundaertext).
-     Bewusst nicht dunkler (die Design-Failfarben #6b6e82/#5d6076 sind verbannt). */
-  --muted-foreground: #9598ad;
+  --secondary: #1d1611;
+  --secondary-foreground: #f7f1ea;
+  --muted: #120d0a;
+  /* #b6a89d: warmgrauer Sekundaertext, ~8.5:1 auf #0f0b09 / ~7.5:1 auf #171009
+     (AA-sicher). Dimmere Toene (#a99f93/#9a8d80) nur fuer Tertiaer-Labels mit
+     ausreichendem Kontrast einsetzen. */
+  --muted-foreground: #b6a89d;
   --accent: #34d99a;
   --accent-foreground: #06251a;
-  --destructive: #ff6b57;
-  --border: oklch(1 0 0 / 9%);
-  --border-card: oklch(1 0 0 / 13%);
-  --input: oklch(1 0 0 / 17%);
+  --destructive: #F8554B;
+  /* Warme creme-getoente Hairlines (Design: rgba(255,228,205,X)). border/border-card
+     sind dekorative Karten-Hairlines (Begrenzung wird zusaetzlich durch Flaechen-
+     kontrast getragen). --input ist die EINZIGE Abgrenzung eigenstaendiger Felder
+     (CheckoutModal/Footer/FAQ) → solider warmer Ton mit >=3:1 gegen #0f0b09/#171009
+     (WCAG 1.4.11; #7a6a59: L~0.15 → ~3.5:1) statt der zu schwachen Creme-16%-Hairline. */
+  --border: rgba(255, 228, 205, 0.09);
+  --border-card: rgba(255, 228, 205, 0.12);
+  --input: #7a6a59;
+  /* Fokus-Ring = Mint (auf #0f0b09 ~9:1, hochkontrast). Mint-Buttons setzen lokal
+     einen dunklen Ring + Offset (kein Mint-auf-Mint). */
   --ring: #34d99a;
   --chart-1: #34d99a;
-  --chart-2: #5b73e8;
+  --chart-2: #ED6A33;
   --chart-3: #f5b13d;
-  --chart-4: #b07cff;
-  --chart-5: #3a82f6;
-  --sidebar: #0a0b14;
-  --sidebar-foreground: #f2f3f7;
+  --chart-4: #FF8149;
+  --chart-5: #F8554B;
+  --sidebar: #0d0a08;
+  --sidebar-foreground: #f7f1ea;
   --sidebar-primary: #34d99a;
   --sidebar-primary-foreground: #06251a;
-  --sidebar-accent: #13151f;
-  --sidebar-accent-foreground: #f2f3f7;
-  --sidebar-border: oklch(1 0 0 / 9%);
+  --sidebar-accent: #120d0a;
+  --sidebar-accent-foreground: #f7f1ea;
+  --sidebar-border: rgba(255, 228, 205, 0.09);
   --sidebar-ring: #34d99a;
 
-  --brand-deeper: #050609;
-  --brand-deep: #0b0d18;
-  --brand-indigo: #5b73e8;
-  --brand-violet: #9a7cff;
+  --brand-deepest: #0a0705;
+  --brand-deeper: #0b0807;
+  --brand-deep: #0f0b09;
+  /* indigo/violet remapped auf die Orange-Familie → Bestands-Glows/Border-Gradient
+     werden ohne Massen-Rename orange (Design-Signatur). */
+  --brand-indigo: #ED6A33;
+  --brand-violet: #FF8149;
+  --brand-orange: #ED6A33;
+  --brand-orange-soft: #FFB07A;
   --brand-mint: #34d99a;
   --brand-mint-soft: #7fe8bd;
   --brand-amber: #f5b13d;
-  --brand-rose: #ff6b57;
+  --brand-rose: #F8554B;
 
-  /* Headline-Akzent: im Dark bright Mint (Design-Signatur), im Light dunkles
-     Indigo→Violet (siehe :root) — so bleibt das Akzentwort in BEIDEN Themes
-     kontrastsicher. */
-  --gradient-from: var(--brand-mint);
-  --gradient-to: var(--brand-mint-soft);
+  /* Headline-Akzent: im Dark leuchtendes Orange (Fox-Signatur, Hero-Wort "BFSG"),
+     im Light dunkles Burnt-Orange (siehe :root) — kontrastsicher in BEIDEN Themes. */
+  --gradient-from: var(--brand-orange);
+  --gradient-to: var(--brand-orange-soft);
 
   color-scheme: dark;
 }
@@ -227,8 +262,8 @@
   body {
     @apply bg-background text-foreground;
     background-image:
-      radial-gradient(at 12% 0%, color-mix(in oklch, var(--brand-mint), transparent 92%) 0px, transparent 50%),
-      radial-gradient(at 92% 6%, color-mix(in oklch, var(--brand-indigo), transparent 90%) 0px, transparent 55%);
+      radial-gradient(at 12% 0%, color-mix(in oklch, var(--brand-orange), transparent 90%) 0px, transparent 50%),
+      radial-gradient(at 92% 6%, color-mix(in oklch, var(--brand-mint), transparent 92%) 0px, transparent 55%);
     /* Kein background-attachment: fixed — erzwingt auf Mobile Full-Viewport-Repaint
        pro Scroll-Frame (INP-/Jank-Killer auf paid-Ads-Traffic). Der Wash sitzt oben
        im Hero, wo er sichtbar ist; mitscrollen ist optisch unkritisch. */
@@ -259,7 +294,7 @@
      Regel ueberschreiben → kein Doppel-Ring). WCAG 2.4.7/2.4.11 — deckt jetzt auch
      rohe <button>, [role=button] (Disclosure/FAQ), den Pricing-Range-Slider und
      beliebige [tabindex]-Elemente ab, die im neuen Design sonst auf den teils
-     unsichtbaren UA-Default fielen. Mint-Ring (var(--ring)) ist auf #07080d ~11:1. */
+     unsichtbaren UA-Default fielen. Mint-Ring (var(--ring)) ist auf #0f0b09 ~11:1. */
   a:focus-visible,
   button:focus-visible,
   [role="button"]:focus-visible,
@@ -271,11 +306,12 @@
     border-radius: var(--radius-sm);
   }
   ::selection {
-    background-color: color-mix(in oklch, var(--brand-mint), transparent 65%);
-    color: var(--brand-deep);
+    background-color: color-mix(in oklch, var(--brand-orange), transparent 55%);
+    color: var(--foreground);
   }
   .dark ::selection {
-    color: oklch(0.12 0.04 278);
+    background-color: var(--brand-orange);
+    color: #1c0d04;
   }
   h1, h2, h3, h4 {
     @apply font-display;
@@ -299,7 +335,7 @@
   /* Akzent-Verlauf fuer betonte Headline-Woerter (Design-Signatur: leuchtendes
      Mint auf dem Hero-Wort „BFSG").
      THEME-SICHER: Die Stops kommen aus --gradient-from/--gradient-to. Dark = Mint→
-     Mint-soft (bright, hochkontrast auf #07080d). Light = Indigo→Violet (dunkel,
+     Mint-soft (bright, hochkontrast auf #0f0b09). Light = Indigo→Violet (dunkel,
      kontrastsicher auf Weiss). So ist das Akzentwort in BEIDEN Themes AA-konform —
      der fruehere „Violet faellt auf near-black unter AA"-Vorbehalt entfaellt.
      background-size:200% ermoeglicht den Shimmer (siehe .gradient-text-shimmer).
@@ -405,6 +441,9 @@
   .shadow-glow-mint {
     box-shadow: var(--shadow-glow-mint);
   }
+  .shadow-glow-orange {
+    box-shadow: var(--shadow-glow-orange);
+  }
   .shadow-elevated {
     box-shadow: var(--shadow-elevated);
   }
@@ -420,7 +459,9 @@
   .card-lift:hover {
     transform: translateY(-0.25rem);
     box-shadow: var(--shadow-card-hover);
-    border-color: color-mix(in oklch, var(--brand-mint), transparent 58%);
+    /* Hover-Rahmen in Marken-Orange (Design: Karten heben mit orange-getoenter
+       Kante an). */
+    border-color: color-mix(in oklch, var(--brand-orange), transparent 60%);
   }
   /* Border-Gradient via mask-composite: echter Verlaufs-Rahmen statt 1px-Flaeche. */
   .border-gradient {

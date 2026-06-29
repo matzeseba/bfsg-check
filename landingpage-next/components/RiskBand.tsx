@@ -1,6 +1,7 @@
 "use client";
 
 import * as motion from "motion/react-client";
+import Image from "next/image";
 import Link from "next/link";
 import {
   AlertTriangleIcon,
@@ -31,13 +32,17 @@ export function RiskBand() {
     <section
       id="risiko"
       aria-labelledby="risk-heading"
-      className="relative isolate overflow-hidden border-y border-border/60 bg-background"
+      className="relative isolate overflow-hidden bg-background"
     >
       <div
         aria-hidden
         className="pointer-events-none absolute -left-20 top-1/2 -z-10 size-72 -translate-y-1/2 rounded-full bg-brand-amber/10 blur-[80px]"
       />
-      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-20 sm:px-6 sm:py-24 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:gap-14">
+      {/* Warmes Amber→Rosé-Gradient-Panel (Design-Signatur Risiko-Sektion): die
+          gesamte Sektion sitzt in EINEM Panel mit amber-getönter Kante. */}
+      <div className="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-24">
+        <div className="relative overflow-visible rounded-3xl border border-brand-amber/20 bg-gradient-to-br from-brand-amber/[0.07] to-brand-rose/[0.05] p-6 sm:p-10 lg:p-12">
+        <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:gap-14">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -70,7 +75,18 @@ export function RiskBand() {
           </Button>
         </motion.div>
 
-        <div className="grid gap-4">
+        <div className="relative grid gap-4">
+        {/* Fuchs-Logo oben rechts angeschnitten (Design): lugt über die Kante der
+            Countdown-Karte. Dekorativ → alt="" (der Fuchs ist hier reine Marken-
+            Signatur, keine Information). Lazy: nicht LCP-relevant. */}
+        <Image
+          src="/logo-fox.png"
+          alt=""
+          width={116}
+          height={116}
+          aria-hidden
+          className="pointer-events-none absolute -top-12 right-2 z-10 h-20 w-auto drop-shadow-[0_12px_22px_rgba(0,0,0,0.6)] sm:-top-16 sm:h-28"
+        />
         {/* Live-Countdown der seit dem Stichtag verstrichenen Zeit (Design-Signatur). */}
         <DeadlineCounter />
         <motion.ul
@@ -126,6 +142,8 @@ export function RiskBand() {
             );
           })}
         </motion.ul>
+        </div>
+        </div>
         </div>
       </div>
     </section>
