@@ -2,6 +2,14 @@
 
 ---
 
+## 🟠 OFFEN (30.06.2026): E-Mails landen im SPAM — überarbeiten
+
+Real getestet (outlook.de): **DOI-Bestätigungsmails (Lead + Newsletter), der bezahlte Report und Transaktionsmails landen aktuell im Spam-Ordner** (Absender `no-reply@bfsg-fuchs.de` via Brevo). Brevo zeigt `bfsg-fuchs.de` als DKIM-authentifiziert + DMARC konfiguriert — Hauptursache ist daher die **Cold-Start-Reputation der jungen Sende-Domain** (Warm-up 3–6 Wochen). **Vollständige Diagnose + priorisierte Rework-To-dos** (DNS-Auth für bfsg-fuchs.de hart verifizieren, mail-tester ≥9/10, Warm-up, „Kein Junk" markieren, text/plain + List-Unsubscribe) stehen in **`docs/EMAIL-DELIVERABILITY.md` → Abschnitt „⚠️ OFFEN (Stand 30.06.2026)"**. *Zwischenzeitlich:* erhaltene Mails in Outlook als „Kein Junk" markieren.
+
+> Kontext same day: Value-first-Lead-Capture (PR #98) + Deploy-Fix (PR #99) live; `/api/lead` + `/api/newsletter` = `ok:true`; Brevo 5-Mail-Nurture-Automation aktiv (Trigger Liste 7) + Footer-Newsletter scharf. Siehe Memory [[marketing-strategy-2026]].
+
+---
+
 ## 🔴 STAND 28.06.2026 (spätabends) — NÄCHSTE SESSION STARTET HIER
 
 > **Lies NUR diesen Block für den aktuellen Stand. Alles darunter ist Historie.**
