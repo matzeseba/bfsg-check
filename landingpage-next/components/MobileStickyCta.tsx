@@ -76,7 +76,7 @@ export function MobileStickyCta() {
       <Link
         href="/#scan"
         tabIndex={show ? undefined : -1}
-        className="flex min-h-12 w-full items-center justify-center gap-1.5 rounded-xl bg-brand-mint text-base font-semibold text-brand-deep shadow-glow-mint transition-transform active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-deep/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        className="btn-cta min-h-12 w-full rounded-xl text-base"
       >
         Kostenlos prüfen
         <ArrowRightIcon className="size-4" aria-hidden />

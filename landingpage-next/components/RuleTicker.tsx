@@ -20,7 +20,7 @@ export function RuleTicker() {
           farbe → der Ticker zeigt erfolgreich abgehakte WCAG-Kriterien). Überdeckt
           den Loop-Anfang mit eigenem Hintergrund. */}
       <div className="absolute left-5 z-[4] flex h-full items-center gap-2 bg-[var(--brand-deepest)] pr-4">
-        <span className="inline-flex size-1.5 rounded-full bg-brand-mint shadow-[0_0_8px_var(--brand-mint)] animate-pulse-soft" />
+        <span className="inline-flex size-1.5 rounded-full bg-brand-orange shadow-[0_0_8px_var(--brand-orange)] animate-pulse-soft" />
         <span className="font-mono text-[11px] tracking-[0.08em] text-brand-mint-soft uppercase">
           {RULE_TICKER.label}
         </span>

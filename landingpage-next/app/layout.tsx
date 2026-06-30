@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Hanken_Grotesk, JetBrains_Mono, Schibsted_Grotesk } from "next/font/google";
+import { Fredoka, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import { MotionConfig } from "motion/react";
 
 import { AnnouncementBar } from "@/components/AnnouncementBar";
@@ -33,11 +33,12 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-// Display/Headlines: Schibsted Grotesk — kraftvolle, eng laufende Grotesk fuer
-// die grossen Headlines aus dem neuen Design. Variable Font (400–900).
-const schibstedDisplay = Schibsted_Grotesk({
+// Display/Headlines: Fredoka — die runde, kräftige Headline-Schrift aus dem
+// gelieferten Design "BFSG-Fuchs.dc.html". Variable Font (Achse wght 300–700);
+// ohne weight-Liste wird die volle variable Achse geladen (wir nutzen 600/700).
+const fredokaDisplay = Fredoka({
   variable: "--font-display",
-  subsets: ["latin", "latin-ext"],
+  subsets: ["latin"],
   display: "swap",
 });
 
@@ -119,7 +120,7 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       // next-themes setzt .dark vor Hydration via Inline-Script.
       suppressHydrationWarning
-      className={`${hankenSans.variable} ${jetbrainsMono.variable} ${schibstedDisplay.variable} h-full antialiased`}
+      className={`${hankenSans.variable} ${jetbrainsMono.variable} ${fredokaDisplay.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
         <ThemeProvider>

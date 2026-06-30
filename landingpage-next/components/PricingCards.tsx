@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import * as motion from "motion/react-client";
 import {
   ArrowRightIcon,
@@ -113,7 +114,7 @@ export function PricingCards({
           />
           <h2
             id={`${id}-heading`}
-            className="mt-4 font-display text-3xl font-semibold tracking-tight text-balance sm:text-[2.75rem] sm:leading-[1.05]"
+            className="mt-4 font-display text-3xl font-bold tracking-tight text-balance sm:text-[2.75rem] sm:leading-[1.05]"
           >
             {accentIdx >= 0 ? (
               <>
@@ -286,14 +287,14 @@ function PlanFinder({ packages }: { packages: PackageConfig[] }) {
           {recName}
         </p>
         <p className="mt-0.5 text-xs text-muted-foreground">{recSub}</p>
-        <Button
+        <button
+          type="button"
           onClick={() => openCheckout(recId)}
-          size="sm"
-          className="mt-3 h-10 w-full gap-1.5 rounded-xl bg-brand-mint text-sm font-semibold text-brand-deep hover:bg-brand-mint/85 focus-visible:ring-brand-deep/70 focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+          className="btn-cta mt-3 h-10 w-full text-sm"
         >
           {recName} wählen
           <ArrowRightIcon className="size-4" />
-        </Button>
+        </button>
       </div>
     </div>
   );
@@ -324,8 +325,8 @@ function PricingCard({
     : pkg.priceSuffix;
 
   // Marken-Akzent-Klassen pro Tone (rein optisch). Orange = Haupt-Pricing,
-  // Amber = Cookie. Die Featured-Action-CTA folgt dem Design: Orange-Theme →
-  // Mint-CTA (Profi), Amber-Theme → Amber-CTA (Cookie-Profi).
+  // Amber = Cookie. Die Featured-Action-CTA ist jetzt der orange 3D-.btn-cta
+  // (in BEIDEN Tones) — daher kein eigener cta-Eintrag mehr im A-Objekt.
   const isAmber = accent === "amber";
   const A = isAmber
     ? {
@@ -337,7 +338,6 @@ function PricingCard({
         ring: "border-brand-amber",
         pill: "bg-brand-amber text-brand-deep",
         check: "bg-brand-amber/15 text-brand-amber",
-        cta: "bg-brand-amber text-brand-deep hover:bg-brand-amber/85 focus-visible:ring-brand-deep/70 focus-visible:ring-offset-2 focus-visible:ring-offset-card",
       }
     : {
         tag: "text-brand-orange",
@@ -346,10 +346,11 @@ function PricingCard({
         gradient: "bg-gradient-to-b from-brand-orange/10 to-card",
         glow: "bg-brand-orange/20",
         ring: "border-brand-orange",
-        pill: "bg-brand-orange text-brand-deep",
+        // Empfohlen-Badge = Amber (Design Z.459: #ffb454) — dunkler Text darauf ist
+        // in BEIDEN Themes AA (orange-Fläche wäre im Light-Mode nur 3.7:1).
+        pill: "bg-brand-amber text-brand-deep",
         // Haken bleiben Mint (Erfolgsfarbe) auch in der Featured-Karte.
         check: "bg-brand-mint/20 text-brand-mint",
-        cta: "bg-brand-mint text-brand-deep hover:bg-brand-mint/85 focus-visible:ring-brand-deep/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
       };
 
   return (
@@ -357,6 +358,22 @@ function PricingCard({
     // Warn-Puls-Ring oben/aussen ueberstehen duerfen. Die Card selbst clippt
     // (overflow-hidden) nur ihre dekorativen Inneren (Glow + Verlaufskante).
     <div className="relative h-full">
+      {/* Schwebendes Fuchs-Wappen oben rechts (dekorativ). Ragt leicht über die
+          Kartenkante, sitzt rechts → überlappt NICHT die zentrale „Empfohlen"-
+          Badge. Featured-Karte etwas größer. animate-float-slow ist
+          reduced-motion-gated. */}
+      <Image
+        src="/logo-fox.png"
+        alt=""
+        aria-hidden
+        width={96}
+        height={144}
+        loading="lazy"
+        className={cn(
+          "pointer-events-none absolute -top-5 right-4 z-20 h-auto animate-float-slow drop-shadow-[0_8px_14px_rgba(0,0,0,0.5)]",
+          pkg.featured ? "w-16 sm:w-20" : "w-14 sm:w-16",
+        )}
+      />
       {/* Warn-Puls-Ring um die Featured-Karte (Design-Signatur, dekorativ →
           reduced-motion stellt animate-warn-pulse still). */}
       {pkg.featured && (
@@ -478,18 +495,23 @@ function PricingCard({
           >
             Bald verfügbar
           </Button>
+        ) : pkg.featured ? (
+          // Featured-Karte: orange 3D-Haupt-CTA (.btn-cta).
+          <button
+            type="button"
+            onClick={onSelect}
+            className="btn-cta h-11 w-full text-sm"
+          >
+            {isSub ? "Abo starten" : "Paket kaufen"}
+            <ArrowRightIcon className="size-4" />
+          </button>
         ) : (
+          // Nicht-Featured: creme-getoenter Outline-Button (Design: dezente
+          // Sekundaer-Aktion, kein Mint-/Orange-Vollton).
           <Button
             onClick={onSelect}
             size="lg"
-            className={cn(
-              "h-11 w-full gap-1.5 rounded-xl text-sm font-semibold transition-transform hover:scale-[1.015]",
-              pkg.featured
-                ? A.cta
-                : // Nicht-Featured: creme-getoenter Outline-Button (Design:
-                  // dezente Sekundaer-Aktion, kein Mint-/Orange-Vollton).
-                  "border border-[oklch(0.97_0.004_95)]/12 bg-[oklch(0.97_0.004_95)]/[0.06] text-foreground hover:bg-[oklch(0.97_0.004_95)]/10 focus-visible:ring-offset-2 focus-visible:ring-offset-card",
-            )}
+            className="h-11 w-full gap-1.5 rounded-xl border border-[oklch(0.97_0.004_95)]/12 bg-[oklch(0.97_0.004_95)]/[0.06] text-sm font-semibold text-foreground transition-transform hover:scale-[1.015] hover:bg-[oklch(0.97_0.004_95)]/10 focus-visible:ring-offset-2 focus-visible:ring-offset-card"
           >
             {isSub ? "Abo starten" : "Paket kaufen"}
             <ArrowRightIcon className="size-4" />

@@ -24,7 +24,7 @@ export function CookieSection() {
           {/* Bewusst kleiner als die Haupt-Sektionen (Cross-Sell, nicht Kernangebot). */}
           <h2
             id="cookie-heading"
-            className="mt-4 font-display text-2xl font-semibold tracking-tight text-balance sm:text-3xl sm:leading-[1.12]"
+            className="mt-4 font-display text-2xl font-bold tracking-tight text-balance sm:text-3xl sm:leading-[1.12]"
           >
             Cookie &amp; Consent — die{" "}
             <span className="italic gradient-text">zweite</span> Abmahn-Front.

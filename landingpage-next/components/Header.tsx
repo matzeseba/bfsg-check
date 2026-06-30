@@ -70,19 +70,19 @@ export function Header() {
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-6 px-5 sm:px-6">
         <Link
           href="/"
-          className="group/logo -my-2 flex min-h-11 items-center gap-2.5 py-2 font-display text-lg font-bold tracking-tight"
+          className="group/logo -my-2 flex min-h-11 items-center gap-2.5 py-2 font-display text-xl font-bold tracking-tight"
           aria-label={`${SITE.name} Startseite`}
         >
           {/* Fuchs-Wappen-Logo (Design-Signatur), dekorativ → leeres alt, da die
-              nebenstehende Wortmarke den Namen traegt. Orange Drop-Shadow wie im
-              gelieferten Design. */}
+              nebenstehende Wortmarke den Namen traegt. Gut sichtbar wie in der
+              Vorlage, mit orangem Drop-Shadow. */}
           <Image
             src="/logo-fox.png"
             alt=""
-            width={32}
-            height={48}
+            width={56}
+            height={84}
             priority
-            className="h-10 w-auto shrink-0 [filter:drop-shadow(0_4px_12px_color-mix(in_oklch,var(--brand-orange),transparent_60%))]"
+            className="h-12 w-auto shrink-0 lg:h-14 [filter:drop-shadow(0_4px_12px_color-mix(in_oklch,var(--brand-orange),transparent_60%))]"
           />
           <span className="flex items-baseline gap-0.5">
             <span>BFSG</span>
@@ -131,14 +131,10 @@ export function Header() {
           <Button variant="ghost" size="lg" render={<a href="/kuendigen" />}>
             Konto verwalten
           </Button>
-          <Button
-            size="lg"
-            className="bg-brand-mint text-brand-deep hover:bg-brand-mint/85 focus-visible:ring-brand-deep/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-            render={<Link href="/#scan" />}
-          >
+          <Link href="/#scan" className="btn-cta h-11 px-4 text-sm">
             Kostenlos prüfen
             <ArrowRightIcon className="ml-0.5 size-4" />
-          </Button>
+          </Link>
         </div>
 
         <div className="ml-auto flex items-center gap-2 md:hidden">
@@ -179,14 +175,14 @@ export function Header() {
               >
                 Konto verwalten
               </Button>
-              <Button
-                size="lg"
-                className="bg-brand-mint text-brand-deep hover:bg-brand-mint/85 focus-visible:ring-brand-deep/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                render={<Link href="/#scan" onClick={() => setOpen(false)} />}
+              <Link
+                href="/#scan"
+                onClick={() => setOpen(false)}
+                className="btn-cta h-11 px-4 text-base"
               >
                 Kostenlos prüfen
                 <ArrowRightIcon className="ml-0.5 size-4" />
-              </Button>
+              </Link>
             </div>
           </nav>
         </div>

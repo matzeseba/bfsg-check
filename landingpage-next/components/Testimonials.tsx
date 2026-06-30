@@ -51,7 +51,7 @@ function DiffSnippet() {
       ))}
       <span
         aria-hidden
-        className="mt-1 inline-block h-3 w-1.5 animate-pulse-soft bg-brand-mint align-middle"
+        className="mt-1 inline-block h-3 w-1.5 animate-pulse-soft bg-brand-orange align-middle"
       />
     </motion.div>
   );
@@ -72,7 +72,7 @@ export function Testimonials() {
           <SectionKicker icon={SparklesIcon} label="Warum der BFSG-Fuchs" />
           <h2
             id="why-heading"
-            className="mt-4 font-display text-3xl font-semibold tracking-tight text-balance sm:text-[2.75rem] sm:leading-[1.05]"
+            className="mt-4 font-display text-3xl font-bold tracking-tight text-balance sm:text-[2.75rem] sm:leading-[1.05]"
           >
             Schneller als die Kanzlei.{" "}
             <span className="italic gradient-text">Tiefer</span> als Gratis-Tools.

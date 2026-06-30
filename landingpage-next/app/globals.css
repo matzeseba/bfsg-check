@@ -60,6 +60,8 @@
   --color-brand-violet: var(--brand-violet);
   --color-brand-orange: var(--brand-orange);
   --color-brand-orange-soft: var(--brand-orange-soft);
+  /* Dunkle Unterkante des 3D-CTA-Buttons (Design: box-shadow 0 5px 0 #b8430e). */
+  --color-brand-orange-press: var(--brand-orange-press);
   --color-brand-mint: var(--brand-mint);
   --color-brand-mint-soft: var(--brand-mint-soft);
   --color-brand-amber: var(--brand-amber);
@@ -117,16 +119,20 @@
   --card-foreground: oklch(0.21 0.025 55);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.21 0.025 55);
-  /* Primary = Mint (Action/CTA) in beiden Themes; dunkelgruener Text darauf. */
-  --primary: oklch(0.72 0.18 158);
-  --primary-foreground: oklch(0.24 0.06 162);
+  /* Primary = Fox-ORANGE (Action/CTA) in beiden Themes — Buttons sind jetzt orange
+     (Design "BFSG-Fuchs.dc.html": #f4641e mit dunkelbraunem Text). Mint bleibt als
+     Erfolgs-/Success-Akzent (Haken, "konform", "nachher ✓") über --brand-mint erhalten,
+     ist aber NICHT mehr die Button-Farbe. #2b1206 auf #f4641e ≈ 4.9:1 (AA) in beiden
+     Themes. */
+  --primary: #f4641e;
+  --primary-foreground: #2b1206;
   --secondary: oklch(0.96 0.012 70);
   --secondary-foreground: oklch(0.27 0.06 50);
   --muted: oklch(0.965 0.01 75);
   /* Warmgrauer Sekundaertext, AA-sicher (>=4.5:1) auf Creme/Weiss. */
   --muted-foreground: oklch(0.46 0.022 55);
-  --accent: oklch(0.72 0.18 158);
-  --accent-foreground: oklch(0.24 0.06 162);
+  --accent: #f4641e;
+  --accent-foreground: #2b1206;
   --destructive: oklch(0.55 0.2 28);
   --border: oklch(0.88 0.014 70);
   --border-card: var(--border);
@@ -162,6 +168,7 @@
   --brand-violet: oklch(0.62 0.17 35);
   --brand-orange: oklch(0.55 0.18 42);
   --brand-orange-soft: oklch(0.64 0.17 38);
+  --brand-orange-press: #b8430e;
   --brand-mint: oklch(0.6 0.16 160);
   --brand-mint-soft: oklch(0.72 0.16 158);
   --brand-amber: oklch(0.66 0.15 70);
@@ -187,9 +194,10 @@
   --card-foreground: #f7f1ea;
   --popover: #16110e;
   --popover-foreground: #f7f1ea;
-  /* Primary = Mint (CTA/Action). Dunkelgruener Text darauf (#06251a). */
-  --primary: #34d99a;
-  --primary-foreground: #06251a;
+  /* Primary = Fox-ORANGE (CTA/Action) — Buttons sind orange (Design #f4641e mit
+     dunkelbraunem Text #2b1206). Mint bleibt Erfolgs-Akzent über --brand-mint. */
+  --primary: #f4641e;
+  --primary-foreground: #2b1206;
   --secondary: #1d1611;
   --secondary-foreground: #f7f1ea;
   --muted: #120d0a;
@@ -197,8 +205,8 @@
      (AA-sicher). Dimmere Toene (#a99f93/#9a8d80) nur fuer Tertiaer-Labels mit
      ausreichendem Kontrast einsetzen. */
   --muted-foreground: #b6a89d;
-  --accent: #34d99a;
-  --accent-foreground: #06251a;
+  --accent: #f4641e;
+  --accent-foreground: #2b1206;
   --destructive: #F8554B;
   /* Warme creme-getoente Hairlines (Design: rgba(255,228,205,X)). border/border-card
      sind dekorative Karten-Hairlines (Begrenzung wird zusaetzlich durch Flaechen-
@@ -234,6 +242,7 @@
   --brand-violet: #FF8149;
   --brand-orange: #ED6A33;
   --brand-orange-soft: #FFB07A;
+  --brand-orange-press: #b8430e;
   --brand-mint: #34d99a;
   --brand-mint-soft: #7fe8bd;
   --brand-amber: #f5b13d;
@@ -261,9 +270,11 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Warmer Fox-Wash: Orange + Amber (KEIN Grün/Mint mehr im Hintergrund —
+       Design-Vorgabe: grünen Hintergrund vollständig entfernen). */
     background-image:
-      radial-gradient(at 12% 0%, color-mix(in oklch, var(--brand-orange), transparent 90%) 0px, transparent 50%),
-      radial-gradient(at 92% 6%, color-mix(in oklch, var(--brand-mint), transparent 92%) 0px, transparent 55%);
+      radial-gradient(at 12% 0%, color-mix(in oklch, var(--brand-orange), transparent 88%) 0px, transparent 50%),
+      radial-gradient(at 92% 6%, color-mix(in oklch, var(--brand-amber), transparent 92%) 0px, transparent 55%);
     /* Kein background-attachment: fixed — erzwingt auf Mobile Full-Viewport-Repaint
        pro Scroll-Frame (INP-/Jank-Killer auf paid-Ads-Traffic). Der Wash sitzt oben
        im Hero, wo er sichtbar ist; mitscrollen ist optisch unkritisch. */
@@ -313,8 +324,11 @@
     background-color: var(--brand-orange);
     color: #1c0d04;
   }
+  /* Fredoka ist die Headline-Schrift (Design "BFSG-Fuchs"): rund, kräftig, 700er
+     Gewicht als Standard-Dicke. Komponenten dürfen lokal feiner/fetter setzen. */
   h1, h2, h3, h4 {
     @apply font-display;
+    font-weight: 700;
     letter-spacing: -0.015em;
   }
   .tabular-nums {
@@ -498,6 +512,56 @@
       transparent 1px,
       transparent 4px
     );
+  }
+}
+
+/* Orange 3D-CTA-Button (Design-Signatur "BFSG-Fuchs.dc.html"): voll-oranger
+   Knopf mit solider dunkler Unterkante (haptisch/drückbar) + Fredoka-Beschriftung.
+   Ersetzt die bisherigen Mint-CTAs. Caller setzt Größe (h-*, px-*, text-*) und ggf.
+   rounded-* (Utility gewinnt über die Component-Layer-Radius). KEINE bg-/shadow-
+   Utilities daneben setzen. Fokus-Ring kommt aus der globalen @layer-base-Regel
+   (a/button:focus-visible → 2px var(--ring) Offset 2px) = AA in beiden Themes. */
+@layer components {
+  .btn-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    color: var(--primary-foreground);
+    background-color: var(--primary);
+    border: none;
+    border-radius: var(--radius-lg);
+    box-shadow:
+      0 5px 0 var(--brand-orange-press),
+      0 12px 26px -8px color-mix(in oklab, var(--brand-orange-press), transparent 45%);
+    transition:
+      transform 0.08s ease,
+      box-shadow 0.08s ease,
+      background-color 0.15s ease;
+  }
+  .btn-cta:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      0 6px 0 var(--brand-orange-press),
+      0 16px 30px -8px color-mix(in oklab, var(--brand-orange-press), transparent 40%);
+  }
+  .btn-cta:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 var(--brand-orange-press);
+  }
+  .btn-cta:disabled,
+  .btn-cta[aria-disabled="true"] {
+    opacity: 0.6;
+    box-shadow: none;
+    transform: none;
+    cursor: not-allowed;
   }
 }
 

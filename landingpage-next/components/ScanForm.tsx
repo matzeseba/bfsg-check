@@ -129,7 +129,7 @@ export function ScanForm({ initialUrl = "" }: ScanFormProps) {
       </p>
       <form
         onSubmit={onSubmit}
-        className="group/scan relative rounded-2xl border border-border/70 bg-card/85 p-1.5 shadow-card-soft backdrop-blur transition-all focus-within:border-brand-mint/60 focus-within:shadow-glow-mint"
+        className="group/scan relative rounded-2xl border border-border/70 bg-card/85 p-1.5 shadow-card-soft backdrop-blur transition-all focus-within:border-brand-orange/60 focus-within:shadow-glow-orange"
         noValidate
       >
         <div className={inputWrapper}>
@@ -154,11 +154,10 @@ export function ScanForm({ initialUrl = "" }: ScanFormProps) {
               autoComplete="url"
             />
           </div>
-          <Button
+          <button
             type="submit"
-            size="lg"
             disabled={loading || !url}
-            className="h-12 shrink-0 gap-1.5 rounded-xl bg-brand-mint px-5 text-base font-semibold text-brand-deep shadow-glow-mint transition-transform hover:bg-brand-mint/85 hover:scale-[1.015] focus-visible:ring-brand-deep/70 focus-visible:ring-offset-2 focus-visible:ring-offset-card disabled:opacity-60 disabled:shadow-none"
+            className="btn-cta h-12 shrink-0 rounded-xl px-5 text-base"
           >
             {loading ? (
               <>
@@ -171,7 +170,7 @@ export function ScanForm({ initialUrl = "" }: ScanFormProps) {
                 <ArrowRightIcon className="size-4" />
               </>
             )}
-          </Button>
+          </button>
         </div>
       </form>
       <p className="px-1 text-xs text-muted-foreground">

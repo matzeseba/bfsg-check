@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRightIcon, MailIcon } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BRAND, LEGAL_NOTE, SITE } from "@/lib/config";
 
@@ -78,13 +77,25 @@ export function Footer() {
   }
 
   return (
-    <footer className="relative border-t border-border/60 bg-brand-deeper">
+    <footer className="relative overflow-hidden border-t border-border/60 bg-brand-deeper">
+      {/* Riesiges, sehr blasses Hintergrund-Maskottchen (Ganzkörper Lupe) in der
+          unteren Ecke. Dekorativ → aria-hidden, pointer-events-none, liegt HINTER
+          dem Inhalt (z-0). */}
+      <Image
+        src="/mascot-full.png"
+        alt=""
+        aria-hidden
+        width={680}
+        height={1329}
+        loading="lazy"
+        className="pointer-events-none absolute -bottom-10 -left-10 z-0 h-auto w-72 opacity-[0.05] sm:w-96 dark:opacity-[0.07]"
+      />
       <div
         aria-hidden
         className="absolute inset-x-0 top-0 -z-10 h-32 bg-gradient-to-b from-brand-orange/5 to-transparent"
       />
 
-      <div className="mx-auto max-w-6xl px-5 py-14 sm:px-6">
+      <div className="relative z-10 mx-auto max-w-6xl px-5 py-14 sm:px-6">
         <div className="grid gap-10 text-center lg:grid-cols-[1.2fr_2fr] lg:text-left">
           {/* Brand + Newsletter */}
           <div className="flex flex-col items-center lg:items-start">
@@ -137,15 +148,14 @@ export function Footer() {
                   disabled={status === "sending"}
                 />
               </div>
-              <Button
+              <button
                 type="submit"
-                size="lg"
                 disabled={status === "sending"}
-                className="h-11 gap-1 rounded-xl bg-brand-deep px-4 text-sm font-semibold text-on-deep hover:bg-brand-indigo hover:text-brand-deep"
+                className="btn-cta h-11 px-4 text-sm"
               >
                 {status === "sending" ? "Sende…" : "Abonnieren"}
                 <ArrowRightIcon className="size-3.5" />
-              </Button>
+              </button>
             </form>
             {/* Persistente Live-Region: existiert dauerhaft im DOM, damit der
                 Statuswechsel von Screenreadern angesagt wird (WCAG 4.1.3). */}
