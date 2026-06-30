@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { useCheckout } from "@/lib/checkout-context";
 import { cn } from "@/lib/utils";
 
+import { LeadCapture } from "./LeadCapture";
+
 export type ScanResult = {
   score: number;
   totalIssues: number;
@@ -152,6 +154,9 @@ export function ResultCard({ result }: { result: ScanResult }) {
           </div>
         )}
       </div>
+      {/* Value-first-Lead-Capture: erweiterte Befund-Übersicht gegen E-Mail
+          (Double-Opt-in), sitzt zwischen ungated Befunden und Kauf-CTA. */}
+      <LeadCapture score={score} totalIssues={totalIssues} />
       <div className="flex flex-col items-stretch gap-3 border-t border-border/60 bg-muted/40 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
         {/* Personalisiert auf das echte Ergebnis — KEINE erfundenen Zahlen.
             Mit Funden: konkrete Fund-Zahl + Fix-Versprechen. Ohne Funde: das
