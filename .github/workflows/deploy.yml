@@ -57,19 +57,21 @@ jobs:
             cd /opt/bfsg-check/deployment
 
             # BREVO_API_KEY aus GitHub-Secret in die .env upserten (nur falls Secret gesetzt).
-            # Das Eintragen des Secrets erfolgt hier durch den CI-Runner, nicht im Chat;
-            # GitHub maskiert den Wert in den Actions-Logs. Andere BREVO_*-Vars (Listen-/
-            # Template-IDs) sind nicht geheim und liegen bereits in der Server-.env.
+            # Das Eintragen erfolgt durch den CI-Runner, nicht im Chat; GitHub maskiert den
+            # Wert in den Logs. Andere BREVO_*-Vars (IDs, nicht geheim) liegen schon in .env.
+            # set +e: dieser Schritt darf den Deploy NIE abbrechen (kein grep-in-if -> kein
+            # script_stop-Abbruch bei Exit 1). Whitespace im Secret wird entfernt.
+            set +e
             if [ -n "${BREVO_API_KEY:-}" ]; then
-              if grep -q '^BREVO_API_KEY=' .env; then
-                sed -i "s|^BREVO_API_KEY=.*|BREVO_API_KEY=${BREVO_API_KEY}|" .env
-              else
-                echo "BREVO_API_KEY=${BREVO_API_KEY}" >> .env
-              fi
-              echo "BREVO_API_KEY aus GitHub-Secret in .env gesetzt (Wert maskiert)."
+              KEY_CLEAN=$(printf '%s' "$BREVO_API_KEY" | tr -d '[:space:]')
+              grep -v '^BREVO_API_KEY=' .env > .env.brevo.tmp
+              printf 'BREVO_API_KEY=%s\n' "$KEY_CLEAN" >> .env.brevo.tmp
+              mv .env.brevo.tmp .env
+              echo "BREVO_API_KEY in .env gesetzt (Laenge ${#KEY_CLEAN})."
             else
               echo "Kein BREVO_API_KEY-Secret gesetzt — .env unveraendert."
             fi
+            set -e
 
             # Immer bauen (Docker-Layer-Cache macht unveränderte Images schnell).
             echo "=== docker compose up -d --build ==="
