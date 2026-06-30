@@ -34,7 +34,7 @@ export function Comparison() {
           <SectionKicker icon={GitCompareArrowsIcon} label={COMPARISON.kicker} />
           <h2
             id="compare-heading"
-            className="mt-4 font-display text-3xl font-semibold tracking-tight text-balance sm:text-[2.75rem] sm:leading-[1.05]"
+            className="mt-4 font-display text-3xl font-bold tracking-tight text-balance sm:text-[2.75rem] sm:leading-[1.05]"
           >
             {pre}
             {accentIdx >= 0 && (
@@ -57,14 +57,14 @@ export function Comparison() {
               className={cn(
                 "relative flex flex-col rounded-3xl p-7 backdrop-blur",
                 col.highlight
-                  ? // Highlight-Spalte: Mint-Rahmen (border-gradient) + mint-getoenter
-                    // Hintergrund + Elevation (Design: hervorgehobene Fuchs-Spalte).
-                    "border-gradient bg-brand-mint/[0.04] shadow-elevated"
+                  ? // Highlight-Spalte: border-gradient bleibt + orange-getoenter
+                    // Hintergrund + Elevation (Design: hervorgehobene Fuchs-Spalte, orange).
+                    "border-gradient bg-brand-orange/[0.05] shadow-elevated"
                   : "border border-border/70 bg-card/80 shadow-card-soft dark:ring-1 dark:ring-white/5",
               )}
             >
               {col.highlight && (
-                <span className="absolute -top-3 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full bg-brand-mint px-3 py-1 font-mono text-[10px] font-bold tracking-wide text-brand-deep uppercase shadow-glow-mint">
+                <span className="absolute -top-3 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full bg-brand-amber px-3 py-1 font-mono text-[10px] font-bold tracking-wide text-brand-deep uppercase shadow-glow-orange">
                   <span aria-hidden>★</span>
                   Unser Ansatz
                 </span>
@@ -72,7 +72,7 @@ export function Comparison() {
               <h3
                 className={cn(
                   "font-display text-lg font-semibold tracking-tight",
-                  col.highlight && "text-brand-mint",
+                  col.highlight && "text-foreground",
                 )}
               >
                 {col.name}

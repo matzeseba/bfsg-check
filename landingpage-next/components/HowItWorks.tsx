@@ -35,7 +35,7 @@ export function HowItWorks() {
           <SectionKicker icon={ScanLineIcon} label="Wie es funktioniert" />
           <h2
             id="how-heading"
-            className="mt-4 font-display text-3xl font-semibold tracking-tight text-balance sm:text-[2.75rem] sm:leading-[1.05]"
+            className="mt-4 font-display text-3xl font-bold tracking-tight text-balance sm:text-[2.75rem] sm:leading-[1.05]"
           >
             Drei Schritte vom Verdacht zum{" "}
             <span className="italic gradient-text">Fix-Plan</span>.

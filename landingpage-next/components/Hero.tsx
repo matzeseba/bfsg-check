@@ -48,7 +48,7 @@ export function Hero() {
           sind reduced-motion-gated). */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-[-30%] -z-10 size-[80vw] max-w-5xl -translate-x-1/2 rounded-full bg-brand-mint/10 blur-[70px] animate-aurora"
+        className="pointer-events-none absolute left-1/2 top-[-30%] -z-10 size-[80vw] max-w-5xl -translate-x-1/2 rounded-full bg-brand-orange/10 blur-[70px] animate-aurora"
       />
       {/* Zweiter Glow nur ab md+: zwei gestapelte Großradius-Blur-Layer hinter
           dem LCP-Element sind auf Mobile ein teurer GPU-Blur-Pass. */}
@@ -101,7 +101,7 @@ export function Hero() {
               shimmert sanft (gradient-text-shimmer). Unterlängen-/Glyph-Überhang-
               Schutz (g/j/ß, „?") sitzt in .gradient-text → kein Clipping, kein CLS.
               Shimmer wird bei prefers-reduced-motion stillgestellt. */}
-          <h1 className="mt-6 font-display text-[clamp(2.05rem,6.7vw,4.6rem)] leading-[1.05] font-semibold tracking-[-0.025em] text-balance">
+          <h1 className="mt-6 font-display text-[clamp(2.05rem,6.7vw,4.6rem)] leading-[1.05] font-bold tracking-[-0.025em] text-balance">
             <span className="gradient-text-soft">{HERO.headlineLead}</span>{" "}
             <span className="gradient-text gradient-text-shimmer">
               {HERO.headlineEmph}?
@@ -217,21 +217,28 @@ export function Hero() {
             </motion.p>
           </div>
 
-          {/* Fox-Maskottchen (Design): sitzt ÜBER der Report-Card und überlappt
-              sie leicht (negativer unterer Rand). next/image mit priority (nahe
-              LCP, rechte Hero-Spalte), feste width/height aus der intrinsischen
-              800×1073-Ratio → kein CLS. Dekorativ ergänzend zum Report, aber mit
-              aussagekräftigem deutschem alt (kein leeres alt: das Maskottchen ist
-              Marken-Inhalt, kein reines Schmuck-Icon). z-10 hält es über der Card. */}
-          <div className="relative z-10 -mb-6 flex justify-center sm:-mb-8 lg:justify-start lg:pl-2">
+          {/* Fox-Maskottchen als großer, transparenter Backdrop HINTER dem
+              Report-Visual (Design-Wunsch: groß + dezent im Hintergrund, NICHT als
+              knallige Vollfarb-Figur im Vordergrund — wirkt professioneller). Rein
+              dekorativ → aria-hidden + leeres alt. next/image mit priority (rechte
+              Hero-Spalte, nahe LCP), feste width/height (Lupen-Pose-Ratio 680×904)
+              → kein CLS. -z-10 hält es hinter der Report-Card; opacity niedrig
+              (Hellmodus dezenter für AA-Lesbarkeit des darüberliegenden Texts,
+              Dunkelmodus etwas präsenter). animate-float-slow ist reduced-motion-
+              gated. pointer-events-none → kein Klick-Fang. Eltern-Section hat
+              overflow-hidden → kein horizontaler Overflow auf Mobile. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -inset-x-8 -top-4 -bottom-10 -z-10 flex items-end justify-center lg:justify-end"
+          >
             <Image
-              src="/mascot-fox.png"
-              alt="Der BFSG-Fuchs präsentiert den Accessibility-Report auf dem Tablet"
-              width={300}
-              height={402}
+              src="/mascot-magnify.png"
+              alt=""
+              width={680}
+              height={904}
               priority
-              sizes="(max-width: 1024px) 240px, 300px"
-              className="h-auto w-[220px] drop-shadow-[0_18px_30px_rgba(0,0,0,0.5)] sm:w-[260px] lg:w-[300px]"
+              sizes="(max-width:1024px) 70vw, 500px"
+              className="h-auto w-[74%] max-w-[500px] opacity-[0.12] drop-shadow-[0_24px_40px_rgba(0,0,0,0.5)] animate-float-slow dark:opacity-[0.2]"
             />
           </div>
           <HeroVisual />

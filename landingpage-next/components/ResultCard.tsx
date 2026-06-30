@@ -5,7 +5,6 @@ import Link from "next/link";
 import { AlertTriangleIcon, ArrowRightIcon, CheckCircle2Icon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { useCheckout } from "@/lib/checkout-context";
 import { cn } from "@/lib/utils";
 
@@ -181,13 +180,14 @@ export function ResultCard({ result }: { result: ScanResult }) {
           >
             Alle Pakete vergleichen
           </Link>
-          <Button
+          <button
+            type="button"
             onClick={() => openCheckout("profi")}
-            className="h-11 gap-1.5 rounded-xl bg-brand-mint text-sm font-semibold text-brand-deep hover:bg-brand-mint/85 focus-visible:ring-brand-deep/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="btn-cta h-11 gap-1.5 rounded-xl text-sm"
           >
             {totalIssues > 0 ? "Vollreport sichern" : "Bestätigung sichern"}
             <ArrowRightIcon className="size-4" />
-          </Button>
+          </button>
         </div>
       </div>
     </motion.div>

@@ -56,20 +56,20 @@ export function CtaSection() {
             className="pointer-events-none absolute inset-0 dot-bg-dark mask-radial"
           />
 
-          <div className="relative text-center lg:text-left">
+          <div className="relative z-10 text-center lg:text-left">
             {/* Orange Mono-Kicker (kein Pill — Design: nackte Marken-Linie). */}
-            <p className="font-mono text-xs tracking-[0.12em] text-brand-orange uppercase">
+            <p className="font-mono text-xs tracking-[0.12em] text-[#ffb07a] uppercase">
               60 Sekunden bis zur ersten Fährte
             </p>
 
             <h2
               id="cta-heading"
-              className="mt-4 max-w-2xl font-display text-3xl font-extrabold tracking-tight text-balance text-foreground sm:text-[2.75rem] sm:leading-[1.05]"
+              className="mt-4 max-w-2xl font-display text-3xl font-extrabold tracking-tight text-balance text-on-deep sm:text-[2.75rem] sm:leading-[1.05]"
             >
               Lassen Sie den Fuchs ran —{" "}
               <span className="italic gradient-text">bevor andere zuschnappen.</span>
             </h2>
-            <p className="mx-auto mt-5 max-w-xl text-base text-muted-foreground text-pretty lg:mx-0 sm:text-lg">
+            <p className="mx-auto mt-5 max-w-xl text-base text-[oklch(0.97_0.004_95)]/72 text-pretty lg:mx-0 sm:text-lg">
               Kostenloser Sofort-Check, Ergebnis in 60 Sekunden. Keine Anmeldung,
               kein generischer Lighthouse-Dump — sondern priorisierte Mängel mit
               Fix.
@@ -78,7 +78,7 @@ export function CtaSection() {
             {/* Amber Urgency-Pill mit verstrichenen Tagen (rose Puls-Punkt). Pill-
                 TEXT light-mode-AA: dunkles Burnt-Amber auf hell, helles Amber im
                 Dark. Punkt/Rahmen bleiben dekorativ (brand-amber/brand-rose). */}
-            <p className="mt-7 inline-flex items-center gap-2.5 rounded-full border border-brand-amber/25 bg-brand-amber/10 px-4 py-1.5 text-[13px] text-[oklch(0.5_0.13_70)] dark:text-brand-amber">
+            <p className="mt-7 inline-flex items-center gap-2.5 rounded-full border border-brand-amber/25 bg-brand-amber/10 px-4 py-1.5 text-[13px] text-[#f5b13d]">
               <span
                 aria-hidden
                 className="inline-flex size-1.5 rounded-full bg-brand-rose shadow-[0_0_8px_var(--brand-rose)] animate-pulse-soft"
@@ -94,46 +94,44 @@ export function CtaSection() {
             </p>
 
             <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
-              {/* Mint Haupt-CTA (Action-Farbe). */}
-              <Button
-                size="lg"
-                className="h-12 gap-1.5 rounded-xl bg-brand-mint px-6 text-base font-semibold text-primary-foreground transition-transform hover:bg-brand-mint/85 hover:scale-[1.02] focus-visible:ring-brand-mint/70 focus-visible:ring-offset-2 focus-visible:ring-offset-brand-deeper"
-                render={<Link href="/#scan" />}
-              >
+              {/* Orange 3D-Haupt-CTA (Fuchsbau-Action-Farbe via .btn-cta). */}
+              <Link href="/#scan" className="btn-cta h-12 px-6 text-base">
                 {HERO.cta}
                 <ArrowRightIcon className="size-4" />
-              </Button>
+              </Link>
               {/* Creme sekundärer CTA. */}
               <Button
                 size="lg"
                 variant="ghost"
-                className="h-12 gap-1.5 rounded-xl border border-border bg-foreground/[0.04] px-5 text-base font-medium text-foreground hover:bg-foreground/10 hover:text-foreground"
+                className="h-12 gap-1.5 rounded-xl border border-[oklch(0.97_0.004_95)]/18 bg-[oklch(0.97_0.004_95)]/[0.06] px-5 text-base font-medium text-on-deep hover:bg-[oklch(0.97_0.004_95)]/12 hover:text-on-deep"
                 render={<Link href="/#pakete" />}
               >
                 {HERO.ctaSecondary}
               </Button>
             </div>
 
-            <p className="mt-6 inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+            <p className="mt-6 inline-flex items-center gap-1.5 text-xs text-[oklch(0.97_0.004_95)]/72">
               <ShieldCheckIcon className="size-3.5 text-brand-mint" />
               Sichere Zahlung über Stripe · Rechnung sofort per E-Mail
             </p>
           </div>
 
-          {/* Maskottchen rechts — schwebt sanft (foxBob via animate-float),
-              unten weich ausgeblendet (mask-fade-b). Dekorativ neben dem CTA. */}
-          <div className="relative hidden items-end justify-center lg:flex">
-            <div className="animate-float">
-              <Image
-                src="/mascot-fox.png"
-                alt="BFSG-Fuchs Maskottchen mit Tablet"
-                width={324}
-                height={435}
-                loading="lazy"
-                sizes="324px"
-                className="h-auto w-[18rem] mask-fade-b drop-shadow-[0_24px_40px_rgba(0,0,0,0.6)] xl:w-[20rem]"
-              />
-            </div>
+          {/* Maskottchen (Daumen hoch) — groß + transparent als Hintergrund-
+              Backdrop, auch mobil dezent sichtbar. Schwebt sanft (animate-float-
+              slow), unten weich ausgeblendet (mask-fade-b). Dekorativ → aria-hidden,
+              pointer-events-none, liegt HINTER dem Text (z-0). */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -right-6 bottom-0 z-0 flex items-end sm:-right-2 lg:right-6"
+          >
+            <Image
+              src="/mascot-thumbsup.png"
+              alt=""
+              width={680}
+              height={1235}
+              loading="lazy"
+              className="h-auto w-40 opacity-[0.10] mask-fade-b animate-float-slow drop-shadow-[0_24px_40px_rgba(0,0,0,0.5)] sm:w-56 lg:w-72 dark:opacity-[0.18]"
+            />
           </div>
         </motion.div>
       </div>

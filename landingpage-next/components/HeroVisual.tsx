@@ -28,7 +28,7 @@ export function HeroVisual() {
           erster Halo kleinerer Blur-Radius, zweiter erst ab md. */}
       <div className="pointer-events-none absolute -inset-8 -z-10">
         <div className="absolute left-1/2 top-1/3 size-[80%] -translate-x-1/2 rounded-full bg-brand-orange/20 blur-[40px] md:blur-[80px]" />
-        <div className="absolute right-0 bottom-0 hidden size-[55%] rounded-full bg-brand-mint/12 blur-[80px] md:block" />
+        <div className="absolute right-0 bottom-0 hidden size-[55%] rounded-full bg-brand-amber/10 blur-[80px] md:block" />
       </div>
 
       {/* Schwebende Akzent-Badges (Layering/Tiefe). Erst ab sm sichtbar: der
@@ -167,7 +167,7 @@ export function HeroVisual() {
 
           {/* Fix-Plan-Teaser — dekorativ (Teil des aria-hidden Visuals). Marken-
               Orange-getönte Kante/Fläche statt mint. */}
-          <p className="pointer-events-none rounded-xl border border-brand-orange/30 bg-gradient-to-r from-brand-orange/10 to-brand-mint/8 px-4 py-3 text-center text-[13px] font-medium text-muted-foreground">
+          <p className="pointer-events-none rounded-xl border border-brand-orange/30 bg-gradient-to-r from-brand-orange/10 to-brand-amber/8 px-4 py-3 text-center text-[13px] font-medium text-muted-foreground">
             + priorisierter Fix-Plan &amp; Entwurf der Barrierefreiheitserklärung
           </p>
         </div>

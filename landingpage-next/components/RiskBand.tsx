@@ -11,7 +11,6 @@ import {
   ScaleIcon,
 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { RISK_BAND } from "@/lib/config";
 
 import { DeadlineCounter } from "./DeadlineCounter";
@@ -56,7 +55,7 @@ export function RiskBand() {
           />
           <h2
             id="risk-heading"
-            className="mt-4 font-display text-3xl font-semibold tracking-tight text-balance sm:text-[2.6rem] sm:leading-[1.05]"
+            className="mt-4 font-display text-3xl font-bold tracking-tight text-balance sm:text-[2.6rem] sm:leading-[1.05]"
           >
             {titlePre}
             <span className="italic gradient-text">{RISK_BAND.titleAccent}</span>
@@ -65,14 +64,13 @@ export function RiskBand() {
           <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground text-pretty">
             {RISK_BAND.desc}
           </p>
-          <Button
-            size="lg"
-            className="mt-6 gap-1.5 rounded-xl bg-brand-mint text-brand-deep shadow-glow-mint transition-transform hover:scale-[1.015] hover:bg-brand-mint/85 focus-visible:ring-brand-deep/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-            render={<Link href="/#scan" />}
+          <Link
+            href="/#scan"
+            className="btn-cta mt-6 h-12 rounded-xl px-6 text-base"
           >
             In 60 Sekunden prüfen
             <ArrowRightIcon className="size-4" />
-          </Button>
+          </Link>
         </motion.div>
 
         <div className="relative grid gap-4">
