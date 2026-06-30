@@ -631,6 +631,71 @@ app.post('/api/newsletter', rateLimit({ windowMs: 60_000, max: 5 }), async (req,
   }
 });
 
+// --- Scan-Lead-Capture via Brevo Double-Opt-in (Value-first-Funnel) ---
+// Wie /api/newsletter, aber mit SCAN-KONTEXT: uebergibt die gescannte URL + Score
+// als Brevo-Kontakt-Attribute (SCAN_URL/SCAN_SCORE/SCAN_ISSUES), damit die
+// Nurture-Sequenz das Ergebnis personalisieren kann ("Ihre Seite: 68/100").
+// Erfolg = Bestaetigungsmail verschickt (DOI), NICHT bereits eingetragen (§7 UWG/DSGVO).
+// Env-gated: aktiv, sobald BREVO_API_KEY + BREVO_LEAD_LIST_ID + (BREVO_LEAD_DOI_TEMPLATE_ID
+// ODER als Fallback BREVO_DOI_TEMPLATE_ID) gesetzt sind UND in Brevo eine Scan-Leads-Liste,
+// ein aktives DOI-Template sowie die 3 Kontakt-Attribute (SCAN_URL/SCAN_SCORE/SCAN_ISSUES)
+// existieren. Fehlen die Attribute, wird der Lead trotzdem ohne Attribute eingetragen.
+app.post('/api/lead', rateLimit({ windowMs: 60_000, max: 5 }), async (req, res) => {
+  const email = String(req.body?.email || '').trim().slice(0, 200);
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    return res.status(400).json({ error: 'Bitte eine gültige E-Mail-Adresse angeben.' });
+
+  const apiKey = process.env.BREVO_API_KEY;
+  const listId = Number(process.env.BREVO_LEAD_LIST_ID);
+  const templateId = Number(process.env.BREVO_LEAD_DOI_TEMPLATE_ID || process.env.BREVO_DOI_TEMPLATE_ID);
+  const redirectionUrl = process.env.BREVO_LEAD_DOI_REDIRECT_URL || `${PUBLIC_URL}/?lead=bestaetigt`;
+  if (!apiKey || !listId || !templateId) {
+    logger.warn('Lead-Anfrage, aber Brevo-DOI nicht konfiguriert (BREVO_API_KEY/_LEAD_LIST_ID/_LEAD_DOI_TEMPLATE_ID).');
+    return res.status(503).json({ error: 'Der Versand per E-Mail ist gerade nicht verfügbar. Bitte später erneut versuchen.' });
+  }
+
+  // Scan-Kontext defensiv aufbereiten (best-effort, niemals harte Pflicht).
+  const rawUrl = String(req.body?.url || '').trim().slice(0, 300);
+  const score = Number(req.body?.score);
+  const issues = Number(req.body?.totalIssues);
+  const attributes = {};
+  if (rawUrl) attributes.SCAN_URL = rawUrl;
+  if (Number.isFinite(score)) attributes.SCAN_SCORE = Math.round(score);
+  if (Number.isFinite(issues)) attributes.SCAN_ISSUES = Math.round(issues);
+  const hasAttrs = Object.keys(attributes).length > 0;
+
+  const doiCall = (withAttrs) =>
+    fetch('https://api.brevo.com/v3/contacts/doubleOptinConfirmation', {
+      method: 'POST',
+      headers: { 'api-key': apiKey, 'content-type': 'application/json', accept: 'application/json' },
+      body: JSON.stringify({
+        email,
+        ...(withAttrs && hasAttrs ? { attributes } : {}),
+        includeListIds: [listId],
+        templateId,
+        redirectionUrl
+      })
+    });
+
+  try {
+    let r = await doiCall(true);
+    // Sind die Attribute im Brevo-Konto (noch) nicht angelegt, lehnt Brevo mit 400 ab.
+    // Dann den Lead trotzdem retten: einmal OHNE Attribute wiederholen.
+    if (r.status === 400 && hasAttrs) {
+      const b = await r.text().catch(() => '');
+      logger.warn({ status: 400, body: b.slice(0, 200) }, 'Lead-DOI mit Attributen abgelehnt — Retry ohne Attribute');
+      r = await doiCall(false);
+    }
+    if (r.status === 201 || r.status === 204) return res.json({ ok: true, status: 'pending' });
+    const body = await r.text().catch(() => '');
+    logger.error({ status: r.status, body: body.slice(0, 300) }, 'Brevo-Lead-DOI fehlgeschlagen');
+    return res.status(502).json({ error: 'Versand derzeit nicht möglich. Bitte später erneut.' });
+  } catch (err) {
+    logger.error({ err: err.message }, 'Lead-Endpoint Fehler');
+    return res.status(502).json({ error: 'Versand derzeit nicht möglich.' });
+  }
+});
+
 app.get('/health', (req, res) => {
   const live = isStripeLive();
   const mailerOk = mailerStatus().startsWith('aktiv');

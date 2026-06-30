@@ -24,6 +24,17 @@ services:
       - REPLY_TO=${REPLY_TO}
       - INVOICE_CONTACT_EMAIL=${INVOICE_CONTACT_EMAIL:-info@bfsg-fix.de}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
+      # --- Brevo REST-API (Newsletter + Scan-Lead-Capture via Double-Opt-in). Ohne
+      #     explizite Auflistung erreichen die .env-Werte den Container NICHT (kein
+      #     env_file → nur gelistete Vars werden durchgereicht). Leer = Endpunkte
+      #     melden ehrlich "gerade nicht verfügbar". ---
+      - BREVO_API_KEY=${BREVO_API_KEY:-}
+      - BREVO_NEWSLETTER_LIST_ID=${BREVO_NEWSLETTER_LIST_ID:-}
+      - BREVO_DOI_TEMPLATE_ID=${BREVO_DOI_TEMPLATE_ID:-}
+      - BREVO_DOI_REDIRECT_URL=${BREVO_DOI_REDIRECT_URL:-}
+      - BREVO_LEAD_LIST_ID=${BREVO_LEAD_LIST_ID:-}
+      - BREVO_LEAD_DOI_TEMPLATE_ID=${BREVO_LEAD_DOI_TEMPLATE_ID:-}
+      - BREVO_LEAD_DOI_REDIRECT_URL=${BREVO_LEAD_DOI_REDIRECT_URL:-}
       - ENABLE_ABO=${ENABLE_ABO:-false}
       - MAX_CONCURRENT_SCANS=${MAX_CONCURRENT_SCANS:-2}
       # Gratis-Teaser-TLS-Toleranz (env-gated, Default aus). Wird in app.js gelesen
