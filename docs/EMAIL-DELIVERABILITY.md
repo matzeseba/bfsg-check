@@ -4,6 +4,31 @@ Pragmatischer Leitfaden, damit Brevo-Mails (Scan-Reports, Stripe-Belege, Onboard
 
 ---
 
+## ⚠️ OFFEN (Stand 30.06.2026): Alle Mails landen aktuell im SPAM — muss überarbeitet werden
+
+**Beobachtung (real getestet, Empfänger outlook.de):** Sowohl die **Double-Opt-in-Bestätigungsmails** (Lead-Capture **und** Newsletter) als auch der **bezahlte Scan-Report** und die Transaktionsmails landen derzeit im **Spam-Ordner**. Absender: `no-reply@bfsg-fuchs.de` über Brevo.
+
+**Was schon stimmt:** `bfsg-fuchs.de` ist bei Brevo als Domain **„Authentifiziert"** (DKIM) markiert und der Sender zeigt **„DMARC ist konfiguriert"**. Auth allein verhindert Spam aber NICHT — der Hauptfaktor ist die Sender-Reputation.
+
+**Wahrscheinlichste Ursache:** **Cold-Start-Reputation der jungen Sende-Domain `bfsg-fuchs.de`.** Die Domain ist nach dem Marken-Cutover (PR #95/#96) neu als Primär-Sender, das Sendevolumen ist sehr niedrig → Provider (Outlook/Microsoft, Gmail) stufen neue Low-Volume-Absender defensiv als Spam ein, bis Reputation aufgebaut ist (typisch 3–6 Wochen Warm-up). Das deckt sich mit [[email-infra-state]] (Cold-Start für bfsg-fix.de) — gilt für die noch jüngere bfsg-fuchs.de verstärkt.
+
+### Rework-To-dos (priorisiert — „falls es geht")
+1. **SPF/DKIM/DMARC für `bfsg-fuchs.de` auf DNS-Ebene verifizieren** (nicht nur Brevo-UI vertrauen):
+   ```bash
+   bash deployment/scripts/check-mail-auth.sh bfsg-fuchs.de
+   ```
+   Erwartung: SPF (`v=spf1 include:spf.brevo.com ~all`), DKIM (Brevo `brevo1/brevo2`-CNAMEs bzw. `mail._domainkey`), DMARC-TXT auf `_dmarc.bfsg-fuchs.de` jeweils `[OK]`. **Zusätzlich** den Header einer wirklich empfangenen Mail prüfen: `Authentication-Results` muss `spf=pass`, `dkim=pass`, `dmarc=pass` zeigen. Fehlt eines → das ist der erste Fix.
+2. **mail-tester.com-Score ziehen** (Section 6): echte `no-reply@bfsg-fuchs.de`-Mail (DOI + Report) an die Test-Adresse senden, Ziel **≥ 9/10**, gemeldete Mängel abarbeiten.
+3. **Warm-up + Reputation:** Owner soll die bereits erhaltenen Mails in Outlook als **„Kein Junk"** markieren und Absender zu Kontakten hinzufügen (wirkt sofort auf die eigene Zustellung). Niedrigvolumig + konsistent weitersenden über 3–6 Wochen.
+4. **Inhalts-/Header-Hygiene:** `text/plain`-Alternative zusätzlich zu HTML liefern, `List-Unsubscribe`-Header (bei Newsletter/Nurture Pflicht — Nurture-Templates haben `{{ unsubscribe }}`, Header in Brevo prüfen), nicht zu bildlastig, keine Spam-Trigger-Wörter.
+5. **Optional/später:** Custom Return-Path (eigene Subdomain bei Brevo), bei höherem Volumen ggf. dedizierte IP. Für jetzt zu früh.
+
+**Realismus:** Auth + mail-tester-Fixes sind „heute machbar"; der Reputations-/Warm-up-Teil braucht Zeit und lässt sich nicht erzwingen. Erwartung: deutlich besser nach 3–6 Wochen konsistentem Versand + sauberer Auth.
+
+> Hinweis: Dieser Leitfaden unten ist teils noch auf `bfsg-fix.de` formuliert (vor dem Marken-Cutover). Für die Praxis gilt jetzt **`bfsg-fuchs.de`** als Primär-Sende-Domain — alle Checks/Records entsprechend auf `bfsg-fuchs.de` anwenden.
+
+---
+
 ## 1. Status-Check (in 10 Sekunden)
 
 ```bash
