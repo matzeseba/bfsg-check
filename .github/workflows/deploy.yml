@@ -28,11 +28,17 @@ jobs:
     steps:
       - name: SSH Deploy
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          # Brevo REST-API-Key kommt aus den GitHub-Repo-Secrets (maskiert), NICHT aus
+          # dem Repo/Chat. Wird unten in die Server-.env upgesertet. Leer = kein Eintrag.
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
         with:
           host: ${{ secrets.HETZNER_HOST }}
           username: root
           key: ${{ secrets.HETZNER_SSH_KEY }}
           port: 22
+          # An den Remote-Skript-Kontext durchreichen (sonst sieht das Skript die Var nicht).
+          envs: BREVO_API_KEY
           script_stop: true
           request_pty: true
           # Hotfix: cloud-init setzt initial chage -d 0 root → bei jedem SSH-Login fragt
@@ -49,6 +55,21 @@ jobs:
             git reset --hard origin/main
 
             cd /opt/bfsg-check/deployment
+
+            # BREVO_API_KEY aus GitHub-Secret in die .env upserten (nur falls Secret gesetzt).
+            # Das Eintragen des Secrets erfolgt hier durch den CI-Runner, nicht im Chat;
+            # GitHub maskiert den Wert in den Actions-Logs. Andere BREVO_*-Vars (Listen-/
+            # Template-IDs) sind nicht geheim und liegen bereits in der Server-.env.
+            if [ -n "${BREVO_API_KEY:-}" ]; then
+              if grep -q '^BREVO_API_KEY=' .env; then
+                sed -i "s|^BREVO_API_KEY=.*|BREVO_API_KEY=${BREVO_API_KEY}|" .env
+              else
+                echo "BREVO_API_KEY=${BREVO_API_KEY}" >> .env
+              fi
+              echo "BREVO_API_KEY aus GitHub-Secret in .env gesetzt (Wert maskiert)."
+            else
+              echo "Kein BREVO_API_KEY-Secret gesetzt — .env unveraendert."
+            fi
 
             # Immer bauen (Docker-Layer-Cache macht unveränderte Images schnell).
             echo "=== docker compose up -d --build ==="
