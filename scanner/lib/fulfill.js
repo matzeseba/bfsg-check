@@ -1,8 +1,8 @@
 // Auftrags-Erfüllung: aus {url, company, email, pkg, prevSnapshot?} wird automatisch
 // der vollständige Report (HTML + PDF) erzeugt. Bei BFSG-Paketen zusätzlich die
 // Barrierefreiheitserklärung; bei Cookie-Paketen kein BFSG-Statement.
-// Multi-Page-Crawl wird per pkg-Konfiguration angesteuert (5 Seiten Basis,
-// 25 Profi, 1 Cookie-Basis, 5 Cookie-Profi).
+// Multi-Page-Crawl wird per pkg-Konfiguration angesteuert (8 Seiten Basis,
+// 40 Profi, 25 Abo, 1 Cookie-Basis, 5 Cookie-Profi; scanSite cappt hart auf 50).
 //
 // Wird nach erfolgreicher Stripe-Zahlung vom Webhook aufgerufen, und ebenso bei
 // jedem invoice.paid (subscription_cycle) des Re-Check-Abos.
@@ -23,13 +23,17 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // Pro Paket: welche Engine, wie viele Seiten, welche Report-Optionen, welches
 // Anschreiben (siehe mailer.js#sendReportFor). Single Source of Truth, damit
 // app.js und subscriptions.js dieselbe Konfiguration nutzen.
+// PR3: tieferer Bezahl-Scan. maxPages hoch (basis 5→8, profi 25→40; scanSite cappt
+// hart auf 50 als Sicherheitsnetz). settleMs/perPageTimeout geben dem bezahlten Pfad
+// mehr Zeit als dem Gratis-Teaser (JS-lastige Seiten). axe-Tags inkl. WCAG 2.2 AA
+// laufen über den scan.js-Default (AXE_TAGS) auf JEDEM Pfad.
 export const PKG_CONFIG = {
-  basis:        { kind: 'bfsg',   maxPages: 5,  withStatement: true,  emailKind: 'bfsg'   },
-  profi:        { kind: 'bfsg',   maxPages: 25, withStatement: true,  emailKind: 'bfsg'   },
+  basis:        { kind: 'bfsg',   maxPages: 8,  withStatement: true,  emailKind: 'bfsg',    settleMs: 12000, perPageTimeout: 45000 },
+  profi:        { kind: 'bfsg',   maxPages: 40, withStatement: true,  emailKind: 'bfsg',    settleMs: 12000, perPageTimeout: 45000 },
   // Abo: withStatement:true → jeder Monats-Re-Check liefert eine FRISCH erzeugte
   // Erklärung zur Barrierefreiheit mit (Owner-Wunsch). Diff zeigt die Änderungen,
-  // die Erklärung spiegelt den aktuellen Stand.
-  abo:          { kind: 'bfsg',   maxPages: 25, withStatement: true,  emailKind: 'recheck'},
+  // die Erklärung spiegelt den aktuellen Stand. Gleiche Scan-Tiefe wie ein Erst-Scan.
+  abo:          { kind: 'bfsg',   maxPages: 25, withStatement: true,  emailKind: 'recheck', settleMs: 12000, perPageTimeout: 45000 },
   'cookie-basis': { kind: 'cookie', maxPages: 1,  withStatement: false, emailKind: 'cookie' },
   'cookie-profi': { kind: 'cookie', maxPages: 5,  withStatement: false, emailKind: 'cookie' }
 };
@@ -68,6 +72,9 @@ export function paidLenientTls(env = process.env) {
 }
 
 async function runScan(url, cfg, { lenientTls = false } = {}) {
+  // PR3: Tiefen-Parameter aus der Paket-Config an die Engine durchreichen
+  // (Default in scan.js greift, falls ein Feld fehlt).
+  const { settleMs, perPageTimeout } = cfg;
   if (cfg.kind === 'cookie') {
     // Cookie-Multi-Page derzeit sequentiell same-origin (Engine erweiterbar);
     // V1: scannt nur Startseite (klares 1-Tier-Signal). 'cookie-profi' bekommt
@@ -76,9 +83,9 @@ async function runScan(url, cfg, { lenientTls = false } = {}) {
     return await scanCookie(url, { timeout: 45000, lenientTls });
   }
   if (cfg.maxPages > 1) {
-    return await scanSite(url, { maxPages: cfg.maxPages, perPageTimeout: 30000, lenientTls });
+    return await scanSite(url, { maxPages: cfg.maxPages, perPageTimeout: perPageTimeout ?? 45000, lenientTls, settleMs });
   }
-  return await scanUrl(url, { timeout: 45000, lenientTls });
+  return await scanUrl(url, { timeout: 60000, lenientTls, settleMs });
 }
 
 export async function fulfillOrder({ url, company = '', email = '', pkg = 'basis', prevSnapshot = null, outDir, lenientTls = paidLenientTls() }) {
