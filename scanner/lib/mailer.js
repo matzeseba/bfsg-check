@@ -30,6 +30,9 @@ const INVOICE_FROM_NAME = process.env.INVOICE_FROM_NAME || FROM_NAME;
 const INVOICE_FROM_ADDRESS = process.env.INVOICE_FROM_ADDRESS || '';
 const PUBLIC_HOST = (process.env.PUBLIC_URL || 'https://bfsg-fix.de')
   .replace(/^https?:\/\//, '').replace(/\/+$/, '');
+// Voll-URL (mit Schema) fuer Links in HTML-Mails; CTA der Value-Mail (PR2).
+const PUBLIC_URL = (process.env.PUBLIC_URL || 'https://bfsg-fix.de').replace(/\/+$/, '');
+const LEAD_TEASER_CTA_URL = process.env.LEAD_TEASER_CTA_URL || `${PUBLIC_URL}/#pakete`;
 
 // Exportiert fuer Unit-Tests (reine Funktion, keine Seiteneffekte).
 export function legalFooter() {
@@ -244,6 +247,169 @@ ${FROM_NAME}`;
   return deliver({ to, subject, text, attachments: [] });
 }
 
+// --- PR2: Value-E-Mail nach dem Gratis-Scan --------------------------------
+// Minimal-HTML-Escape fuer nutzergelieferte Strings (URL/Host/Befund-Titel).
+function escHtml(s = '') {
+  return String(s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+// Note aus Score — identische Schwellen wie scanner/lib/report.js computeScore,
+// damit die Mail-Note nie der Report-Note widerspricht. Fallback, falls der
+// Client keine grade mitschickt.
+function gradeFromScore(score) {
+  if (!Number.isFinite(score)) return '—';
+  if (score >= 90) return 'A';
+  if (score >= 75) return 'B';
+  if (score >= 50) return 'C';
+  return 'D';
+}
+function verdictFromScore(score) {
+  if (!Number.isFinite(score)) return 'Erste automatisierte Einschätzung deiner Seite.';
+  if (score >= 90) return 'Weitgehend konform — nur Feinschliff nötig.';
+  if (score >= 75) return 'Solide Basis, aber relevante Lücken mit Handlungsbedarf.';
+  if (score >= 50) return 'Deutliche Mängel — Handlungsbedarf.';
+  return 'Kritisch — viele Mängel, dringender Handlungsbedarf.';
+}
+// Reine, host-tolerante URL→Host-Extraktion (kein Throw bei krummer Eingabe).
+function hostFromUrl(url = '') {
+  const raw = String(url).trim();
+  if (!raw) return '';
+  try {
+    return new URL(/^https?:\/\//i.test(raw) ? raw : 'https://' + raw).host;
+  } catch {
+    return oneLine(raw).replace(/^https?:\/\//i, '').split('/')[0].slice(0, 80);
+  }
+}
+// Grad → Ampel-Farben (Score-Badge im HTML).
+function toneForGrade(grade) {
+  if (grade === 'A') return { bg: '#ecfdf5', fg: '#047857' };
+  if (grade === 'D') return { bg: '#fef2f2', fg: '#b91c1c' };
+  if (grade === '—') return { bg: '#f3f4f6', fg: '#374151' };
+  return { bg: '#fffbeb', fg: '#b45309' }; // B/C = amber
+}
+
+// Baut Betreff + text/plain + HTML der Value-Mail. PURE Funktion (keine
+// Seiteneffekte) → deterministisch unit-testbar. ZEIGT: Score/Note + Einordnung,
+// ALLE Befund-Kategorien mit Zählern, Top-3-Prioritäten (nur das WAS, keine
+// Selektoren/Fixes). SPERRT (nur Vollreport): exakte Fundstellen, Copy-Paste-Fixes,
+// Umsetzungsplan, Erklärung. Keine verbotenen Claims (UWG §5).
+export function buildLeadTeaser({ url = '', score, grade = '', counts = {}, topIssues = [], totalIssues = 0 } = {}) {
+  const s = Number.isFinite(Number(score)) ? Math.round(Number(score)) : null;
+  const g = grade || gradeFromScore(s);
+  const verdict = verdictFromScore(s);
+  const host = hostFromUrl(url);
+  const c = {
+    critical: Math.max(0, Number(counts?.critical) || 0),
+    serious: Math.max(0, Number(counts?.serious) || 0),
+    moderate: Math.max(0, Number(counts?.moderate) || 0),
+    minor: Math.max(0, Number(counts?.minor) || 0)
+  };
+  const sumCounts = c.critical + c.serious + c.moderate + c.minor;
+  const total = Number.isFinite(Number(totalIssues)) && Number(totalIssues) >= 0
+    ? Math.round(Number(totalIssues)) : sumCounts;
+  const tops = (Array.isArray(topIssues) ? topIssues : [])
+    .filter((x) => typeof x === 'string' && x.trim())
+    .slice(0, 3)
+    .map((x) => oneLine(x));
+  const remaining = Math.max(0, total - tops.length);
+  const cta = LEAD_TEASER_CTA_URL;
+  const subject = `Ihre WCAG-Erstprüfung: Note ${g}${s !== null ? ` (${s}/100)` : ''}${host ? ` für ${host}` : ''}`;
+
+  const topsText = tops.length
+    ? `DEINE TOP-${tops.length}-PRIORITÄTEN (was zuerst anzupacken ist)
+${tops.map((t, i) => `  ${i + 1}. ${t}`).join('\n')}
+
+`
+    : '';
+  const text = `Hallo,
+
+hier ist Filo, der BFSG-Fuchs. Danke, dass du deine Seite${host ? ` (${host})` : ''} durch die
+kostenlose WCAG-2.1-AA-Erstprüfung geschickt hast. Hier ist deine Übersicht:
+
+DEINE NOTE: ${g}${s !== null ? ` — ${s} von 100 Punkten` : ''}
+${verdict}
+
+GEFUNDENE BEFUNDE NACH SCHWERE
+  Kritisch:       ${c.critical}
+  Schwerwiegend:  ${c.serious}
+  Mittel:         ${c.moderate}
+  Gering:         ${c.minor}
+  ------------------------------
+  Gesamt:         ${total}
+
+${topsText}Im Vollreport bekommst du zu jedem Punkt die genaue Fundstelle und den
+fertigen Copy-Paste-Fix${remaining > 0 ? ` sowie ${remaining} weitere Fundstellen` : ''} — plus einen
+priorisierten Umsetzungsplan und einen Entwurf deiner Erklärung zur Barrierefreiheit.
+
+Vollständigen Report holen:
+${cta}
+
+Diese Übersicht ist eine automatisierte technische Erstprüfung nach WCAG 2.1 AA
+und ersetzt keine vollständige manuelle Prüfung und keine Rechtsberatung.
+
+Viele Grüße
+Filo & das Team von ${FROM_NAME}
+
+${legalFooter()}`;
+
+  const tone = toneForGrade(g);
+  const countRow = (label, val, emoji) =>
+    `<tr><td style="padding:7px 0;border-bottom:1px solid #f1f1f1;font-size:14px;">${emoji} ${label}</td>` +
+    `<td align="right" style="padding:7px 0;border-bottom:1px solid #f1f1f1;font-size:14px;font-weight:700;">${val}</td></tr>`;
+  const topsHtml = tops.length
+    ? `<p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;margin:22px 0 8px;">Deine Top-${tops.length}-Prioritäten</p>
+      <ol style="margin:0 0 4px;padding-left:22px;font-size:14px;line-height:1.6;color:#1f2430;">
+        ${tops.map((t) => `<li style="margin-bottom:4px;">${escHtml(t)}</li>`).join('')}
+      </ol>`
+    : '';
+  const html = `<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f5f3ef;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1f2430;">
+  <div style="max-width:560px;margin:0 auto;padding:24px 14px;">
+    <div style="background:#ffffff;border-radius:16px;padding:26px 24px;border:1px solid #ececec;">
+      <p style="font-size:15px;margin:0 0 12px;">Hallo,</p>
+      <p style="font-size:15px;line-height:1.55;margin:0 0 20px;">hier ist <strong>Filo, der BFSG-Fuchs</strong> — danke, dass du ${host ? `<strong>${escHtml(host)}</strong>` : 'deine Seite'} durch die kostenlose WCAG-2.1-AA-Erstprüfung geschickt hast. Hier ist deine Übersicht.</p>
+      <div style="text-align:center;background:${tone.bg};border-radius:14px;padding:20px 16px;margin:0 0 22px;">
+        <div style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:${tone.fg};opacity:.85;">Deine Note</div>
+        <div style="font-size:46px;font-weight:800;color:${tone.fg};line-height:1.05;margin:2px 0;">${escHtml(g)}</div>
+        ${s !== null ? `<div style="font-size:15px;color:${tone.fg};font-weight:600;">${s} / 100 Punkten</div>` : ''}
+        <div style="font-size:13px;color:${tone.fg};opacity:.95;margin-top:6px;line-height:1.4;">${escHtml(verdict)}</div>
+      </div>
+      <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;margin:0 0 6px;">Gefundene Befunde nach Schwere</p>
+      <table role="presentation" width="100%" style="border-collapse:collapse;margin:0;">
+        ${countRow('Kritisch', c.critical, '🔴')}
+        ${countRow('Schwerwiegend', c.serious, '🟠')}
+        ${countRow('Mittel', c.moderate, '🟡')}
+        ${countRow('Gering', c.minor, '⚪')}
+        <tr><td style="padding:9px 0;font-size:14px;font-weight:800;">Gesamt</td><td align="right" style="padding:9px 0;font-size:14px;font-weight:800;">${total}</td></tr>
+      </table>
+      ${topsHtml}
+      <p style="font-size:14px;line-height:1.55;background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:14px 16px;margin:22px 0;">Im <strong>Vollreport</strong> bekommst du zu jedem Punkt die <strong>genaue Fundstelle</strong> und den <strong>fertigen Copy-Paste-Fix</strong>${remaining > 0 ? ` sowie <strong>${remaining} weitere Fundstellen</strong>` : ''} — plus einen priorisierten Umsetzungsplan und einen Entwurf deiner Erklärung zur Barrierefreiheit.</p>
+      <div style="text-align:center;margin:0 0 6px;">
+        <a href="${escHtml(cta)}" style="display:inline-block;background:#ea580c;color:#ffffff;text-decoration:none;font-weight:700;font-size:16px;padding:14px 30px;border-radius:12px;">Vollständigen Report holen →</a>
+      </div>
+      <p style="font-size:12px;line-height:1.5;color:#9ca3af;margin:22px 0 0;">Diese Übersicht ist eine automatisierte technische Erstprüfung nach WCAG 2.1 AA und ersetzt keine vollständige manuelle Prüfung und keine Rechtsberatung.</p>
+      <p style="font-size:14px;margin:16px 0 0;">Viele Grüße<br>Filo &amp; das Team von ${escHtml(FROM_NAME)}</p>
+    </div>
+    <div style="white-space:pre-line;font-size:11px;color:#9ca3af;padding:16px 10px 0;line-height:1.5;">${escHtml(legalFooter())}</div>
+  </div>
+</body></html>`;
+
+  return { subject, text, html };
+}
+
+// Versendet die Value-Mail. Der Lead hat über den Button „Übersicht anfordern"
+// die schriftliche Übersicht AUSDRÜCKLICH angefordert → einmalige, angeforderte
+// Service-Mail (kein § 7 UWG-Problem; der Newsletter-DOI läuft getrennt über
+// Brevo). Ungültige Adresse → Dry-Run-Skip (kein Throw), damit /api/lead robust
+// bleibt. Best-Effort: Aufrufer kapselt den Call in try/catch.
+export async function sendLeadTeaser({ to, url = '', score, grade = '', counts = {}, topIssues = [], totalIssues = 0 }) {
+  if (!isEmail(to)) return { dryRun: true, skipped: 'invalid-recipient' };
+  const { subject, text, html } = buildLeadTeaser({ url, score, grade, counts, topIssues, totalIssues });
+  return deliver({ to, subject, text, html, attachments: [] });
+}
+
 // MF5: Best-Effort-Eingangs-/Verzögerungs-Mail an den ZAHLENDEN Kunden, wenn der
 // automatische Scan/Report fehlschlägt (FAILED). Bewusst KEIN Report-Anhang (es gibt
 // im Fehlerfall kein PDF) und KEINE Termin-/Refund-Zusage — nur „wir haben es bemerkt
@@ -359,7 +525,7 @@ export async function sendWithRetry(send, {
   throw lastErr; // unerreichbar, aber explizit für den Linter.
 }
 
-async function deliver({ to, subject, text, attachments = [] }) {
+async function deliver({ to, subject, text, html = null, attachments = [] }) {
   if (!enabled) {
     console.log(`[mailer DRY-RUN] An ${to} | ${subject} | Anhänge: ${attachments.map((a) => a.filename).join(', ') || '—'}`);
     return { dryRun: true };
@@ -371,6 +537,8 @@ async function deliver({ to, subject, text, attachments = [] }) {
       replyTo: REPLY_TO_ADDR || undefined,
       subject,
       text,
+      // HTML nur setzen, wenn vorhanden — bestehende Text-only-Mails bleiben unveraendert.
+      ...(html ? { html } : {}),
       attachments,
       // Deliverability: One-Click-List-Unsubscribe (RFC 8058). Verbessert die
       // Zustellbarkeit (Gmail/Yahoo-Sender-Anforderungen). Unsubscribe geht an die
