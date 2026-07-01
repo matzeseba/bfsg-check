@@ -20,6 +20,14 @@ Konkret:
 
 ---
 
+## 🧭 Coding-Guidelines (Karpathy-inspiriert — FESTE REGEL)
+
+Die vollständigen Karpathy-Coding-Guidelines (**Think Before Coding · Simplicity First · Surgical Changes · Goal-Driven Execution**) gelten **global** für alle Projekte — Quelle: `~/.claude/rules/karpathy-coding-guidelines.md` (von der Harness bei jedem Session-Start automatisch geladen, hier nicht dupliziert).
+
+> **Verhältnis zum Express-Modus:** Der Express-Modus regelt das **WIE** der Umsetzung (Tempo, selbst erledigen, keine Klick-Tutorials, parallele Tool-Calls). Die Guidelines regeln das **WAS/OB** (vorher denken, minimal + chirurgisch ändern, verifizieren). Bei echter Mehrdeutigkeit oder Nur-vom-User-Entscheidungen gilt Guideline 1 (kurz benennen/fragen) — deckt sich mit der Express-Modus-Ausnahme „außer Entscheidungen sind echt nur vom User zu treffen". Bei trivialen Aufgaben: Urteilsvermögen nutzen, nicht formalisieren.
+
+---
+
 ## 🏗️ Projekt-Kontext
 
 - **Produkt:** BFSG-Check — automatisierter Compliance-Scanner für deutsche Websites (BFSG/WCAG/TDDDG)
