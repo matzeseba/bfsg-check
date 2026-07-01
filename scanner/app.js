@@ -932,7 +932,8 @@ app.post('/api/resend/:sessionId', requireAdminAuth, async (req, res) => {
   const { sessionId } = req.params;
   const { getOrder, markStatus } = await import('./lib/orders.js');
   // order = Snapshot von VOR dem RESENDING-Write (für mailOnly-Entscheidung + SF1-Rollback).
-  const order = await getOrder(sessionId);
+  // let: wird beim Konsum eines offenen Freigabe-Jobs (PR5) auf den READY_NOT_MAILED-Stand neu geladen.
+  let order = await getOrder(sessionId);
   if (!order) return res.status(404).json({ error: 'Session nicht gefunden' });
   if (order.status === 'MAILED' || order.status === 'RESENT') {
     return res.status(409).json({ error: `Order Status ${order.status} — bereits ausgeliefert.` });
@@ -962,14 +963,34 @@ app.post('/api/resend/:sessionId', requireAdminAuth, async (req, res) => {
   // oder ein späterer Owner-Klick den Report ein ZWEITES Mal (Doppelversand/Doppelrechnung,
   // §14/GoBD). Atomar claimen + terminal markieren. Läuft die Auto-Freigabe gerade selbst
   // (RELEASING), lässt sich der Job nicht claimen → Resend mit 409 ablehnen (kurz warten).
-  const queueJob = await reportQueue.getJob(sessionId);
-  if (queueJob && (queueJob.status === 'SCHEDULED' || queueJob.status === 'RELEASING')) {
-    const claimed = reportQueue.claimForRelease(sessionId);
-    if (!claimed) {
-      resendInFlight.delete(sessionId);
-      return res.status(409).json({ error: 'Report wird gerade automatisch freigegeben — bitte in ~1 Minute erneut versuchen.' });
+  // Eigenes try/catch: die Disk-Writes hier liegen VOR dem Haupt-try/finally → Lock würde
+  // bei einem Schreibfehler sonst lecken. Danach den Order-Status mit den Queue-Artefakten
+  // auf READY_NOT_MAILED syncen, damit der Resend den Mail-only-Fastpath nimmt (KEIN
+  // unnötiger Voll-Rescan des bereits fertig gescannten Reports).
+  try {
+    const queueJob = await reportQueue.getJob(sessionId);
+    if (queueJob && (queueJob.status === 'SCHEDULED' || queueJob.status === 'RELEASING')) {
+      const claimed = reportQueue.claimForRelease(sessionId);
+      if (!claimed) {
+        resendInFlight.delete(sessionId);
+        return res.status(409).json({ error: 'Report wird gerade automatisch freigegeben — bitte in ~1 Minute erneut versuchen.' });
+      }
+      await reportQueue.markJobStatus(sessionId, 'RELEASED', { releasedBy: 'resend' });
+      await markStatus(sessionId, 'READY_NOT_MAILED', {
+        pdfPath: queueJob.pdfPath,
+        stmtPath: queueJob.stmtPath || null,
+        emailKind: queueJob.emailKind || 'bfsg',
+        invoiceNumber: queueJob.invoiceNumber || null,
+        invoicePdfPath: queueJob.invoicePdfPath || null,
+        customerType: queueJob.customerType || '',
+        consentTs: queueJob.consentTs || ''
+      });
+      order = await getOrder(sessionId); // frischer READY_NOT_MAILED-Stand für die mailOnly-Prüfung
     }
-    await reportQueue.markJobStatus(sessionId, 'RELEASED', { releasedBy: 'resend' });
+  } catch (err) {
+    resendInFlight.delete(sessionId);
+    logger.error({ sessionId, err: err.message }, 'Queue-Konsum im Resend fehlgeschlagen');
+    return res.status(500).json({ error: 'Resend fehlgeschlagen (Freigabe-Queue).' });
   }
 
   // MF6: optionale, admin-authentifizierte korrigierte Empfängeradresse — liefert eine

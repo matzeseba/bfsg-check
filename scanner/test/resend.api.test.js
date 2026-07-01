@@ -25,6 +25,7 @@ import os from 'node:os';
 const tmp = mkdtempSync(path.join(os.tmpdir(), 'bfsg-resend-api-'));
 process.env.ORDERS_FILE = path.join(tmp, 'orders.jsonl');
 process.env.SUBS_FILE = path.join(tmp, 'subs.jsonl');
+process.env.PENDING_REPORTS_FILE = path.join(tmp, 'pending.jsonl'); // PR5-Release-Queue in tmp
 const TOKEN = '0123456789abcdef0123456789abcdef01'; // >= 32 Zeichen (admin-auth-Pflicht)
 process.env.ADMIN_TOKEN = TOKEN;
 delete process.env.STRIPE_SECRET_KEY; // nicht live → keine Fail-Fast-/Listen-Seiteneffekte beim Import
@@ -53,6 +54,29 @@ beforeEach(() => {
   services.fulfillOrder = async () => { throw new Error('TEST: fulfillOrder nicht gemockt'); };
   services.sendReportFor = async () => { throw new Error('TEST: sendReportFor nicht gemockt'); };
   services.generateInvoicePdf = async () => { throw new Error('TEST: generateInvoicePdf nicht gemockt'); };
+});
+
+// --- PR5: Resend während eines offenen Freigabe-Fensters (RELEASE_SCHEDULED) ---
+// Muss den Queue-Job konsumieren (kein späterer Doppelversand) UND den Mail-only-Fastpath
+// nehmen (kein unnötiger, kostenpflichtiger Voll-Rescan des bereits fertigen Reports).
+test('Resend bei RELEASE_SCHEDULED: konsumiert Queue-Job + Mail-only (kein Rescan)', async () => {
+  const reportQueue = await import('../lib/report-queue.js');
+  const id = sid();
+  await seedOrder({ sessionId: id, status: 'RELEASE_SCHEDULED', extra: { pdfPath: '/tmp/r.pdf', invoiceNumber: 'RE-9' } });
+  await reportQueue.enqueue({
+    sessionId: id, to: 'kunde@example.com', company: '', url: 'https://example.com', pkg: 'basis',
+    emailKind: 'bfsg', pdfPath: '/tmp/r.pdf', stmtPath: null, diffText: '',
+    invoicePdfPath: null, invoiceNumber: 'RE-9', customerType: '', consentTs: '',
+    releaseAt: new Date(Date.now() + 90 * 60_000).toISOString()
+  });
+  let sent = 0;
+  services.sendReportFor = async () => { sent += 1; };
+  services.fulfillOrder = async () => { throw new Error('TEST: darf im Freigabe-Fenster NICHT rescannen'); };
+  const res = await authPost(id);
+  assert.equal(res.status, 200);
+  assert.equal(res.body.mode, 'mail-only');   // kein Voll-Rescan
+  assert.equal(sent, 1);
+  assert.equal((await reportQueue.getJob(id)).status, 'RELEASED'); // Job konsumiert → kein Zweitversand
 });
 
 // --- Vorbedingungen: Auth-Gate (sonst sagen Folgetests nichts aus) ---
