@@ -17,14 +17,21 @@ import { ResultCard, type ScanResult } from "./ResultCard";
 // die verbindliche Statusansage für Screenreader läuft über die sr-only
 // Live-Region ("Prüfung läuft…"), NICHT über diese rotierenden Labels.
 const SCAN_PHASES = [
+  "Seite laden & rendern",
+  "DOM-Baum kartieren",
   "Farbkontraste beschnuppern",
   "Alt-Texte aufspüren",
   "Tastatur-Fokus erschnüffeln",
-  "Formular-Labels",
-  "Überschriften-Fährte",
-  "ARIA-Rollen",
-  "Link-Bezeichnungen",
-  "Sprach-Attribut",
+  "Fokus-Reihenfolge prüfen",
+  "Formular-Labels abgleichen",
+  "Überschriften-Fährte verfolgen",
+  "ARIA-Rollen inspizieren",
+  "Landmarks abstecken",
+  "Link-Bezeichnungen lesen",
+  "Sprach-Attribut checken",
+  "Tabellen-Struktur prüfen",
+  "Bilder & Medien sichten",
+  "Ergebnisse zusammentragen",
 ] as const;
 
 export type ScanFormProps = {
@@ -69,6 +76,15 @@ export function ScanForm({ initialUrl = "" }: ScanFormProps) {
     setResult(null);
     pushUrl(target);
 
+    // Mindest-Anzeigedauer: der echte Teaser-Scan ist oft in ~5 s durch. Fuer
+    // einen glaubwuerdigen Tiefen-Eindruck wird der Ergebnis-Reveal auf ~15-18 s
+    // sichtbare Pruef-Animation gehoben (der Scan laeuft ehrlich weiter, das
+    // Ergebnis wird nur zurueckgehalten). Bei Fehler KEIN kuenstlicher Delay
+    // (schnelle, ehrliche Meldung). Reduced-Motion: sofortiger Reveal, damit
+    // niemand ohne Bewegungs-Feedback vor einem still stehenden Panel wartet.
+    const minRevealMs = reduced ? 0 : 15000 + Math.floor(Math.random() * 3000);
+    const startedAt = Date.now();
+
     try {
       const response = await fetch(
         `/api/scan?url=${encodeURIComponent(target)}`,
@@ -90,6 +106,10 @@ export function ScanForm({ initialUrl = "" }: ScanFormProps) {
           retryAfter && retryAfter > 1 ? `${base} (in ca. ${retryAfter} s)` : base,
         );
         return;
+      }
+      const elapsed = Date.now() - startedAt;
+      if (elapsed < minRevealMs) {
+        await new Promise((r) => window.setTimeout(r, minRevealMs - elapsed));
       }
       setResult(data);
     } catch {
@@ -216,7 +236,7 @@ function ScanningPanel({ reduced }: { reduced: boolean }) {
     if (reduced) return;
     const id = window.setInterval(
       () => setPhase((p) => (p + 1) % SCAN_PHASES.length),
-      850,
+      1050,
     );
     return () => window.clearInterval(id);
   }, [reduced]);

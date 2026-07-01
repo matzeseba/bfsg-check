@@ -1,6 +1,7 @@
 "use client";
 
 import * as motion from "motion/react-client";
+import Image from "next/image";
 import { GaugeIcon, MicroscopeIcon, SparklesIcon, WalletIcon } from "lucide-react";
 
 import { DIFFERENTIATORS } from "@/lib/config";
@@ -67,7 +68,7 @@ export function Testimonials() {
       aria-labelledby="why-heading"
       className="relative overflow-hidden border-y border-border/60 bg-brand-deeper"
     >
-      <div className="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-24">
+      <div className="relative z-10 mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-24">
         <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
           <SectionKicker icon={SparklesIcon} label="Warum der BFSG-Fuchs" />
           <h2
@@ -84,8 +85,30 @@ export function Testimonials() {
           </p>
         </div>
 
-        <ul className="mt-14 grid gap-6 md:grid-cols-3">
-          {DIFFERENTIATORS.map((item, i) => {
+        {/* Grid-Wrapper (relative, an max-w-6xl gebunden): die opaken Fuechse haengen
+            an den GRID-Aussenkanten, damit sie bei JEDER Bildschirmbreite an den
+            Aussenkarten kleben (statt an die Viewport-Raender zu driften). Nur ab lg. */}
+        <div className="relative mt-14">
+          <Image
+            src="/mascot-watch.png"
+            alt=""
+            aria-hidden
+            width={1599}
+            height={2496}
+            loading="lazy"
+            className="pointer-events-none absolute -bottom-1 -left-16 z-20 hidden h-auto drop-shadow-[0_18px_30px_rgba(0,0,0,0.45)] lg:block lg:w-44"
+          />
+          <Image
+            src="/mascot-thumbsup.png"
+            alt=""
+            aria-hidden
+            width={680}
+            height={1235}
+            loading="lazy"
+            className="pointer-events-none absolute -bottom-2 -right-16 z-20 hidden h-auto drop-shadow-[0_18px_30px_rgba(0,0,0,0.45)] lg:block lg:w-44"
+          />
+          <ul className="grid gap-6 md:grid-cols-3">
+            {DIFFERENTIATORS.map((item, i) => {
             const Icon = ICONS[i] ?? GaugeIcon;
             return (
               <motion.li
@@ -94,7 +117,11 @@ export function Testimonials() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.55, delay: i * 0.08, ease: EASE }}
-                className="group/diff card-lift relative flex flex-col items-center overflow-hidden rounded-3xl border border-border/70 bg-card p-7 text-center shadow-card-soft backdrop-blur dark:ring-1 dark:ring-white/5 md:items-start md:text-left"
+                className={
+                  "group/diff card-lift relative flex flex-col items-center overflow-hidden rounded-3xl border border-border/70 bg-card p-7 text-center shadow-card-soft backdrop-blur dark:ring-1 dark:ring-white/5 md:items-start md:text-left " +
+                  // Aussenkarten: Platz fuer die opaken Fuechse links (Uhr) / rechts (Daumen-hoch).
+                  (i === 0 ? "lg:pl-28" : i === 2 ? "lg:pr-28" : "")
+                }
               >
                 {/* Spotlight-Glow beim Hover (Marken-Orange). */}
                 <div
@@ -118,7 +145,8 @@ export function Testimonials() {
               </motion.li>
             );
           })}
-        </ul>
+          </ul>
+        </div>
 
         <p className="mx-auto mt-10 max-w-xl text-center text-xs text-muted-foreground">
           Der Fuchs zeigt lieber prüfbare Fakten als gekaufte Sternebewertungen —

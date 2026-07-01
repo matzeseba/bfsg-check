@@ -167,7 +167,7 @@ export function HeroVisual() {
 
           {/* Fix-Plan-Teaser — dekorativ (Teil des aria-hidden Visuals). Marken-
               Orange-getönte Kante/Fläche statt mint. */}
-          <p className="pointer-events-none rounded-xl border border-brand-orange/30 bg-gradient-to-r from-brand-orange/10 to-brand-amber/8 px-4 py-3 text-center text-[13px] font-medium text-muted-foreground">
+          <p className="pointer-events-none rounded-xl border border-brand-orange/30 bg-gradient-to-r from-brand-orange/10 to-brand-amber/8 py-3 pl-4 pr-14 text-center text-[13px] font-medium text-muted-foreground">
             + priorisierter Fix-Plan &amp; Entwurf der Barrierefreiheitserklärung
           </p>
         </div>

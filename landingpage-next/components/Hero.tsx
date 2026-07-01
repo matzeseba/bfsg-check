@@ -1,7 +1,6 @@
 "use client";
 
 import * as motion from "motion/react-client";
-import Image from "next/image";
 import { ArrowRightIcon, CheckCircle2Icon } from "lucide-react";
 
 import { HERO, HERO_VISUAL } from "@/lib/config";
@@ -227,20 +226,6 @@ export function Hero() {
               Dunkelmodus etwas präsenter). animate-float-slow ist reduced-motion-
               gated. pointer-events-none → kein Klick-Fang. Eltern-Section hat
               overflow-hidden → kein horizontaler Overflow auf Mobile. */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -inset-x-8 -top-4 -bottom-10 -z-10 flex items-end justify-center lg:justify-end"
-          >
-            <Image
-              src="/mascot-magnify.png"
-              alt=""
-              width={680}
-              height={904}
-              priority
-              sizes="(max-width:1024px) 70vw, 500px"
-              className="h-auto w-[74%] max-w-[500px] opacity-[0.12] drop-shadow-[0_24px_40px_rgba(0,0,0,0.5)] animate-float-slow dark:opacity-[0.2]"
-            />
-          </div>
           <HeroVisual />
         </motion.div>
       </div>
