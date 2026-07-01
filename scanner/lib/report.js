@@ -72,20 +72,42 @@ export function renderReport(
     verdictText = null,
     // Zusätzliche technische Hinweise (z. B. fehlerhaftes TLS-Zertifikat), die KEINE
     // WCAG-Verstöße sind — eigener Abschnitt, fließen NICHT in Score/Erklärung ein.
-    notices = []
+    notices = [],
+    // PR4: optionale KI-QA-Overrides { falsePositiveIds[], findingOverrides[{id,why,fix}],
+    // additionalNotices[{title,text,severity}] }. Default null = unverändertes Verhalten.
+    qaOverrides = null
   } = {}
 ) {
-  const { score, grade, verdict: gradeVerdict } = computeScore(scan.violations);
+  // PR4: KI-QA anwenden — False Positives rausfiltern (Score/Counts/Findings
+  // laufen danach über die gefilterte Liste → konsistent zu statement.js),
+  // generische why/fix je Regel-ID überschreiben, Zusatz-Hinweise anhängen.
+  const fpIds = new Set(Array.isArray(qaOverrides?.falsePositiveIds) ? qaOverrides.falsePositiveIds : []);
+  const overrideById = new Map(
+    (Array.isArray(qaOverrides?.findingOverrides) ? qaOverrides.findingOverrides : []).map((o) => [o.id, o])
+  );
+  const effectiveViolations = fpIds.size
+    ? scan.violations.filter((v) => !fpIds.has(v.id))
+    : scan.violations;
+  // ruleInfo() plus optionalem Override je Regel-ID (leere Override-Felder = Basis behalten).
+  const infoFor = (v) => {
+    const base = ruleInfo(v);
+    const ov = overrideById.get(v.id);
+    return ov ? { title: base.title, why: ov.why || base.why, fix: ov.fix || base.fix } : base;
+  };
+  const extraNotices = Array.isArray(qaOverrides?.additionalNotices) ? qaOverrides.additionalNotices : [];
+  const allNotices = extraNotices.length ? [...notices, ...extraNotices] : notices;
+
+  const { score, grade, verdict: gradeVerdict } = computeScore(effectiveViolations);
   const verdict = verdictText != null ? verdictText : gradeVerdict;
-  const counts = countByImpact(scan.violations);
+  const counts = countByImpact(effectiveViolations);
   const order = ['critical', 'serious', 'moderate', 'minor'];
-  const sorted = [...scan.violations].sort(
+  const sorted = [...effectiveViolations].sort(
     (a, b) => order.indexOf(a.impact) - order.indexOf(b.impact)
   );
 
   const findings = sorted
     .map((v, idx) => {
-      const info = ruleInfo(v);
+      const info = infoFor(v);
       const examples = v.nodes
         .slice(0, 3)
         .map((n) => `<code>${esc(n.target.join(' '))}</code>`)
@@ -222,7 +244,7 @@ export function renderReport(
   <h2 class="section">${esc(introTitle)}</h2>
   ${introHtml}
 
-  <h2 class="section">Befunde nach Dringlichkeit (${scan.violations.length})</h2>
+  <h2 class="section">Befunde nach Dringlichkeit (${effectiveViolations.length})</h2>
   ${findings || '<p>Keine automatisiert erkennbaren Verstöße gefunden. Eine manuelle Prüfung wird dennoch empfohlen.</p>'}
 
   <h2 class="section">Umsetzungs-Checkliste (zum Abarbeiten)</h2>
@@ -232,7 +254,7 @@ export function renderReport(
     sorted.length
       ? sorted
           .map((v) => {
-            const info = ruleInfo(v);
+            const info = infoFor(v);
             return `<li><span class="box">&#9744;</span><span><strong>${esc(info.title)}</strong> (${v.nodes.length}&times;, ${IMPACT_DE[v.impact] || v.impact}) &mdash; ${esc(info.fix)}</span></li>`;
           })
           .join('\n')
@@ -240,9 +262,9 @@ export function renderReport(
   }
   </ul>
 
-  ${notices && notices.length ? `
+  ${allNotices && allNotices.length ? `
   <h2 class="section">Weitere technische Hinweise</h2>
-  ${notices.map((n) => `
+  ${allNotices.map((n) => `
       <div class="finding ${n.severity || 'moderate'}">
         <div class="finding-head">
           <span class="badge ${n.severity || 'moderate'}">Hinweis</span>

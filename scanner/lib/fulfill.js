@@ -17,6 +17,7 @@ import { renderReport } from './report.js';
 import { renderStatement } from './statement.js';
 import { diff, snapshot } from './diff.js';
 import { tlsCertNotice } from './tls-check.js';
+import { qaReport } from './report-qa.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -126,13 +127,29 @@ export async function fulfillOrder({ url, company = '', email = '', pkg = 'basis
     : { company, diff: scanDiff, pagesScanned: scan.pagesScanned };
   reportOpts.notices = notices;
 
+  // PR4: KI-Report-QA — prüft/überarbeitet den Report vor Auslieferung. STRIKT
+  // fail-open (null bei deaktiviert/Fehler/Timeout/Refusal → Report unverändert).
+  // Dormant, solange REPORT_QA_ENABLED nicht gesetzt ist. Nur BFSG-Reports (die
+  // WCAG-Rubrik passt nicht auf den TDDDG-Cookie-Report). PR5 verschiebt den Call
+  // ins Delay-Fenster; hier synchron eingehängt + testbar.
+  let qaOverrides = null;
+  if (cfg.kind === 'bfsg') {
+    qaOverrides = await qaReport({ scan, pkg });
+    if (qaOverrides) reportOpts.qaOverrides = qaOverrides;
+  }
+
   const html = renderReport(scan, reportOpts);
   const htmlPath = path.join(outDir, `${slug}-report.html`);
   await writeFile(htmlPath, html);
 
   let stmtPath = null;
   if (cfg.withStatement) {
-    const statement = renderStatement(scan, {
+    // Erklärung auf denselben Stand wie den Report bringen: von der QA als False
+    // Positive markierte Regeln auch hier rausfiltern → Score/Aussage konsistent.
+    const stmtScan = qaOverrides?.falsePositiveIds?.length
+      ? { ...scan, violations: scan.violations.filter((v) => !new Set(qaOverrides.falsePositiveIds).has(v.id)) }
+      : scan;
+    const statement = renderStatement(stmtScan, {
       company: company || '[Unternehmen]',
       email: email || '[E-Mail-Adresse]'
     });
