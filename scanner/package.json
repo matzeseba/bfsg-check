@@ -18,7 +18,7 @@
     "@anthropic-ai/sdk": "^0.109.0",
     "@axe-core/playwright": "4.10.1",
     "express": "4.22.2",
-    "nodemailer": "8.0.11",
+    "nodemailer": "9.0.3",
     "playwright": "1.55.1",
     "stripe": "17.5.0"
   },
