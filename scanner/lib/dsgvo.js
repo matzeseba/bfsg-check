@@ -128,9 +128,18 @@ export async function exportUserData(email) {
 }
 
 export async function deleteUserData(email) {
-  // Tombstone-Append: PII redacted, Record bleibt für GoBD-Aufbewahrung.
-  // Compaction kann das später konsolidieren (siehe lib/compact.js — TODO).
+  // ECHTE Löschung (Art. 17): PII wird in allen historischen Zeilen von orders.jsonl/
+  // subscriptions.jsonl redigiert (Datei-Rewrite + In-Memory-Map — sonst lieferte
+  // /admin/orders die Klartext-PII bis zum Neustart weiter aus). Transaktionsdaten
+  // (Beträge, Rechnungsnummern, Status) + Rechnungs-PDFs bleiben: Aufbewahrungspflicht
+  // §147 AO/GoBD = Ausnahme nach Art. 17 Abs. 3 lit. b DSGVO. Aktive/pausierte Abos
+  // sind vertragsnotwendig ausgenommen (erst kündigen). Tombstone bleibt als Marker
+  // für exportUserData (leeres Ergebnis nach Löschung).
   const hash = hashEmail(email);
+  const { redactOrdersByEmail } = await import('./orders.js');
+  const { redactSubsByEmail } = await import('./subscriptions.js');
+  const ordersRedacted = await redactOrdersByEmail(email, hash);
+  const { redacted: subsRedacted, skippedActive } = await redactSubsByEmail(email, hash);
   const tombstone = {
     type: 'DELETED',
     deletedAt: new Date().toISOString(),
@@ -139,5 +148,14 @@ export async function deleteUserData(email) {
   };
   await appendJsonl(ORDERS_FILE, tombstone);
   await appendJsonl(SUBS_FILE, tombstone);
-  return { deletedAt: tombstone.deletedAt, emailHash: hash, notice: 'Tombstone-Eintrag gesetzt. PII wurde aus aktiven Records redacted (Hash-Replacement). GoBD-Pflicht-Aufbewahrung bleibt davon unberührt.' };
+  return {
+    deletedAt: tombstone.deletedAt,
+    emailHash: hash,
+    ordersRedacted,
+    subsRedacted,
+    skippedActive,
+    notice: 'PII wurde aus allen gespeicherten Bestell-/Abo-Records entfernt (redigiert). ' +
+      'Rechnungsdaten unterliegen der gesetzlichen Aufbewahrungspflicht (§147 AO) und bleiben gespeichert (Art. 17 Abs. 3 lit. b DSGVO).' +
+      (skippedActive ? ' Hinweis: Ein laufendes Abo wurde nicht gelöscht — bitte zuerst kündigen.' : '')
+  };
 }
