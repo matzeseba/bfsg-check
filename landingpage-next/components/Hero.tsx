@@ -1,7 +1,6 @@
 "use client";
 
 import * as motion from "motion/react-client";
-import Image from "next/image";
 import { ArrowRightIcon, CheckCircle2Icon } from "lucide-react";
 
 import { HERO, HERO_VISUAL } from "@/lib/config";
@@ -193,7 +192,7 @@ export function Hero() {
               kippt die Screenreader-Outline (WCAG 1.3.1). Klar kleiner als die H1
               (max ~1.6rem → kein LCP-Kandidat), aber deutlich als Vorschau erkennbar
               (Chip "Vorschau" + "Beispiel"-Kennzeichnung im Report selbst). */}
-          <div className="mb-5 text-center lg:pr-28 lg:text-left">
+          <div className="mb-5 text-center lg:text-left">
             <span
               aria-hidden
               className="inline-flex items-center gap-1.5 rounded-full bg-brand-amber px-2.5 py-1 font-mono text-[10px] font-bold tracking-[0.16em] text-brand-deep uppercase"
@@ -227,20 +226,6 @@ export function Hero() {
               Dunkelmodus etwas präsenter). animate-float-slow ist reduced-motion-
               gated. pointer-events-none → kein Klick-Fang. Eltern-Section hat
               overflow-hidden → kein horizontaler Overflow auf Mobile. */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -top-9 -right-8 z-20 sm:-right-5 lg:-right-7"
-          >
-            <Image
-              src="/mascot-magnify.png"
-              alt=""
-              width={665}
-              height={772}
-              priority
-              sizes="180px"
-              className="h-auto w-[102px] opacity-100 drop-shadow-[0_16px_28px_rgba(0,0,0,0.45)] animate-float-slow sm:w-[140px] lg:w-[170px]"
-            />
-          </div>
           <HeroVisual />
         </motion.div>
       </div>

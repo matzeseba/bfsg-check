@@ -68,28 +68,6 @@ export function Testimonials() {
       aria-labelledby="why-heading"
       className="relative overflow-hidden border-y border-border/60 bg-brand-deeper"
     >
-      {/* Zwei opake Maskottchen (dekorativ, aria-hidden): Uhr-Fuchs = "Schneller"
-          links, Daumen-hoch = "Guenstiger" rechts. Text der Aussenkarten weicht
-          per pl/pr aus (siehe unten). Nur ab md (3-Spalten-Grid); overflow-hidden
-          der Section clippt die Aussenkanten sauber. */}
-      <Image
-        src="/mascot-watch.png"
-        alt=""
-        aria-hidden
-        width={1599}
-        height={2496}
-        loading="lazy"
-        className="pointer-events-none absolute bottom-0 left-0 z-20 hidden h-auto drop-shadow-[0_18px_30px_rgba(0,0,0,0.45)] lg:block lg:w-44"
-      />
-      <Image
-        src="/mascot-thumbsup.png"
-        alt=""
-        aria-hidden
-        width={680}
-        height={1235}
-        loading="lazy"
-        className="pointer-events-none absolute -bottom-1 right-0 z-20 hidden h-auto drop-shadow-[0_18px_30px_rgba(0,0,0,0.45)] lg:block lg:w-44"
-      />
       <div className="relative z-10 mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-24">
         <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
           <SectionKicker icon={SparklesIcon} label="Warum der BFSG-Fuchs" />
@@ -107,8 +85,30 @@ export function Testimonials() {
           </p>
         </div>
 
-        <ul className="mt-14 grid gap-6 md:grid-cols-3">
-          {DIFFERENTIATORS.map((item, i) => {
+        {/* Grid-Wrapper (relative, an max-w-6xl gebunden): die opaken Fuechse haengen
+            an den GRID-Aussenkanten, damit sie bei JEDER Bildschirmbreite an den
+            Aussenkarten kleben (statt an die Viewport-Raender zu driften). Nur ab lg. */}
+        <div className="relative mt-14">
+          <Image
+            src="/mascot-watch.png"
+            alt=""
+            aria-hidden
+            width={1599}
+            height={2496}
+            loading="lazy"
+            className="pointer-events-none absolute -bottom-1 -left-16 z-20 hidden h-auto drop-shadow-[0_18px_30px_rgba(0,0,0,0.45)] lg:block lg:w-44"
+          />
+          <Image
+            src="/mascot-thumbsup.png"
+            alt=""
+            aria-hidden
+            width={680}
+            height={1235}
+            loading="lazy"
+            className="pointer-events-none absolute -bottom-2 -right-16 z-20 hidden h-auto drop-shadow-[0_18px_30px_rgba(0,0,0,0.45)] lg:block lg:w-44"
+          />
+          <ul className="grid gap-6 md:grid-cols-3">
+            {DIFFERENTIATORS.map((item, i) => {
             const Icon = ICONS[i] ?? GaugeIcon;
             return (
               <motion.li
@@ -145,7 +145,8 @@ export function Testimonials() {
               </motion.li>
             );
           })}
-        </ul>
+          </ul>
+        </div>
 
         <p className="mx-auto mt-10 max-w-xl text-center text-xs text-muted-foreground">
           Der Fuchs zeigt lieber prüfbare Fakten als gekaufte Sternebewertungen —

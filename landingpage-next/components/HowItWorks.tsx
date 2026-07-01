@@ -31,18 +31,6 @@ export function HowItWorks() {
         aria-hidden
         className="absolute inset-0 -z-10 hidden dot-bg-dark opacity-50 mask-radial dark:block"
       />
-      {/* Lupen-Fuchs als sichtbarer Guide (dekorativ, aria-hidden). Steht unten
-          rechts neben den drei Schritten; overflow-hidden der Section clippt
-          sauber. Aus dem Footer hierher verschoben. */}
-      <Image
-        src="/mascot-full.png"
-        alt=""
-        aria-hidden
-        width={680}
-        height={1329}
-        loading="lazy"
-        className="pointer-events-none absolute -bottom-2 z-20 hidden h-auto opacity-100 drop-shadow-[0_18px_30px_rgba(0,0,0,0.45)] lg:block lg:-right-2 lg:w-44"
-      />
       <div className="relative z-10 mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-24">
         <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
           <SectionKicker icon={ScanLineIcon} label="Wie es funktioniert" />
@@ -60,6 +48,18 @@ export function HowItWorks() {
         </div>
 
         <div className="relative mt-14">
+          {/* Lupen-Fuchs-Guide: haengt am GRID-Wrapper (max-w-6xl-Bezug), damit er
+              bei JEDER Breite rechts neben Karte 3 bleibt (statt an den Viewport-Rand
+              zu driften). Nur ab lg; Section overflow-hidden clippt sauber. */}
+          <Image
+            src="/mascot-full.png"
+            alt=""
+            aria-hidden
+            width={680}
+            height={1329}
+            loading="lazy"
+            className="pointer-events-none absolute -bottom-2 -right-14 z-20 hidden h-auto opacity-100 drop-shadow-[0_18px_30px_rgba(0,0,0,0.45)] lg:block lg:w-44"
+          />
           {/* Ablauf-Linie (Design-Signatur): warmer Orange-Verlauf mit Lauflicht-
               Punkt, der von links nach rechts wandert (animate-travel-dot, reduced-
               motion-gated). Markiert visuell den Fortschritt URL → Scan → Fix-Plan.
@@ -89,7 +89,7 @@ export function HowItWorks() {
                     "group/step card-lift relative flex flex-col items-center rounded-3xl p-6 text-center backdrop-blur md:items-start md:text-left " +
                     // Karte 3 bekommt rechts Platz fuer den grossen Lupen-Fuchs, der
                     // rechts daneben steht (Text weicht aus, keine Verdeckung).
-                    (i === 2 ? "lg:pr-24 " : "") +
+                    (i === 2 ? "lg:pr-28 " : "") +
                     (featured
                       ? "border-gradient bg-card shadow-card-hover"
                       : "border border-border/70 bg-card/85 shadow-card-soft dark:ring-1 dark:ring-white/5")
