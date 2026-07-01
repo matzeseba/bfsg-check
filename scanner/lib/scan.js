@@ -21,7 +21,13 @@ import { classifyScanError } from './scan-error.js';
 // Settle-Budget: max. 1/3 des Gesamt-Budgets, gedeckelt 6–8 s.
 // Exportiert für den Unit-Test (test/goto-resilient.test.js): ein 4xx/5xx-Status muss
 // werfen (HTTP-Fehlerseite/WAF-Interstitial ist KEIN verwertbarer Scan), 2xx/null nicht.
-export async function gotoResilient(page, safeUrl, addresses, timeout) {
+// PR3: Gemeinsamer axe-Regelsatz für Gratis-Teaser UND bezahlten Scan. Neuzugang
+// gegenüber vorher: 'wcag22aa' (WCAG 2.2 AA) — einziger sinnvoller Zuwachs.
+// 'experimental' bewusst NICHT (zu viel Rauschen/False Positives). Ein einzelner
+// Aufruf kann via axeTags-Option überschreiben; Default = dieser Satz.
+export const AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'];
+
+export async function gotoResilient(page, safeUrl, addresses, timeout, settleMs = 12000) {
   await verifyNoDnsRebinding(safeUrl, addresses);
   // Zuverlässiger Primärladevorgang. Wirft (z.B. TLS/DNS/Connection) wird durch
   // an den Aufrufer durchgereicht — dort greift der Retry / die Klassifizierung.
@@ -35,14 +41,16 @@ export async function gotoResilient(page, safeUrl, addresses, timeout) {
     throw new Error(`http-status-${resp.status()}`);
   }
   // Kurze, gekappte Netzwerk-Ruhe-Phase. Eigenes kleines Budget; ein Timeout hier
-  // ist KEIN Fehler (axe läuft danach trotzdem auf dem geladenen DOM).
-  const settleBudget = Math.max(2000, Math.min(8000, Math.floor(timeout / 3)));
+  // ist KEIN Fehler (axe läuft danach trotzdem auf dem geladenen DOM). Obergrenze
+  // via settleMs (PR3: 12s statt 8s → JS-lastige Seiten werden ruhiger, bevor axe
+  // läuft), immer noch auf 1/3 des Gesamt-Timeouts gedeckelt.
+  const settleBudget = Math.max(2000, Math.min(settleMs, Math.floor(timeout / 3)));
   await page
     .waitForLoadState('networkidle', { timeout: settleBudget })
     .catch(() => { /* Seite wird nie ganz ruhig (Tracking/Polling) — bewusst ignoriert. */ });
 }
 
-export async function scanUrl(url, { timeout = 45000, lenientTls = false } = {}) {
+export async function scanUrl(url, { timeout = 60000, lenientTls = false, settleMs = 12000, axeTags = AXE_TAGS } = {}) {
   // SSRF-Schutz + Rebinding-Pin: erst Adressen auflösen + verifizieren.
   const safe = await assertPublicHttpUrl(/^https?:\/\//i.test(url) ? url : 'https://' + url);
   // IP-Pin: Chromium-Resolver auf die geprüfte öffentliche IP zwingen (SSRF C1).
@@ -79,21 +87,21 @@ export async function scanUrl(url, { timeout = 45000, lenientTls = false } = {})
     // Versuch verdoppelt nur die Wartezeit und riskiert, das HTTP-/Proxy-Budget zu
     // sprengen. classifyScanError ist die einzige Quelle des Timeout-Kriteriums.
     try {
-      await gotoResilient(page, safe.url, safe.addresses, timeout);
+      await gotoResilient(page, safe.url, safe.addresses, timeout, settleMs);
     } catch (firstErr) {
       // KEIN Retry bei Timeout (Seite ist nur langsam) ODER bei deterministischem
       // HTTP-Fehlerstatus (404/403/5xx ändert sich beim Sofort-Retry nicht — ein
       // zweiter Chromium-Lauf wäre reine Zeit-/Budget-Verschwendung).
       const reason = classifyScanError(firstErr?.message).reason;
       if (reason === 'timeout' || /^http-status-/.test(firstErr?.message || '')) throw firstErr;
-      await gotoResilient(page, safe.url, safe.addresses, timeout).catch(() => {
+      await gotoResilient(page, safe.url, safe.addresses, timeout, settleMs).catch(() => {
         throw firstErr; // Originalfehler durchreichen (für die Klassifizierung).
       });
     }
 
-    // axe-core nach WCAG 2.1 A + AA und Best-Practices laufen lassen.
+    // axe-core nach WCAG 2.1/2.2 A + AA und Best-Practices laufen lassen.
     const results = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'best-practice'])
+      .withTags(axeTags)
       .analyze();
 
     // Leichtgewichtige Zusatz-Checks direkt aus dem DOM.
@@ -131,7 +139,7 @@ export async function scanUrl(url, { timeout = 45000, lenientTls = false } = {})
 // werden gemerged (Pro-Seiten-Stellen multiplizieren sich nicht, doppelte Stellen
 // werden deduped). passes ist die Summe der bestandenen Regeln, incomplete dito.
 // Fehler einzelner Seiten brechen den Lauf NICHT ab (resilient).
-export async function scanSite(startUrl, { maxPages = 5, perPageTimeout = 30000, lenientTls = false } = {}) {
+export async function scanSite(startUrl, { maxPages = 5, perPageTimeout = 45000, lenientTls = false, settleMs = 12000, axeTags = AXE_TAGS } = {}) {
   if (!/^https?:\/\//i.test(startUrl)) startUrl = 'https://' + startUrl;
   const origin = new URL(startUrl).origin;
   // Adress-Cache pro Hostname für DNS-Rebinding-Pin im Crawl-Loop (Erstauflösung).
@@ -184,9 +192,9 @@ export async function scanSite(startUrl, { maxPages = 5, perPageTimeout = 30000,
       await installSsrfGuard(page);
       try {
         // Rebinding-Pin + robustes Laden (networkidle → domcontentloaded-Fallback).
-        await gotoResilient(page, safeTarget.url, safeTarget.addresses, perPageTimeout);
+        await gotoResilient(page, safeTarget.url, safeTarget.addresses, perPageTimeout, settleMs);
         const results = await new AxeBuilder({ page })
-          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'best-practice'])
+          .withTags(axeTags)
           .analyze();
         const title = await page.title().catch(() => null);
 
