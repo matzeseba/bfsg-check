@@ -18,6 +18,9 @@ export async function releaseJob(sessionId, deps) {
   const { reportQueue, sendReportFor, markStatus, sendAlert, logger, via = 'auto' } = deps;
   const job = reportQueue.claimForRelease(sessionId); // synchroner atomarer Claim
   if (!job) return { released: false, reason: 'not-claimable' };
+  // Claim durabel machen, BEVOR gemailt wird: ein Crash zwischen Versand und RELEASED-
+  // Write hinterlässt dann RELEASING (in-doubt) statt SCHEDULED → kein Auto-Zweitversand.
+  await reportQueue.persistClaim(sessionId);
 
   try {
     await sendReportFor({
@@ -70,6 +73,27 @@ export async function releaseJob(sessionId, deps) {
     logger?.error?.({ sessionId, attempts, err: err.message }, 'REPORT-FREIGABE ENDGÜLTIG FEHLGESCHLAGEN');
     return { released: false, reason: 'permanent', attempts };
   }
+}
+
+/**
+ * Beim Start Jobs melden, die beim letzten Absturz mitten im Versand standen (RELEASING).
+ * Ob deren Mail rausging, ist ungewiss → Owner-Alarm (kein Auto-Zweitversand). Danach
+ * terminal RELEASE_IN_DOUBT markieren, damit nicht bei jedem Neustart erneut alarmiert wird.
+ */
+export async function recoverInDoubt(deps) {
+  const { reportQueue, sendAlert, logger } = deps;
+  const inDoubt = await reportQueue.listInDoubt();
+  for (const job of inDoubt) {
+    await sendAlert(
+      `Report-Freigabe unklar nach Neustart: ${job.to}`,
+      `Session: ${job.sessionId}\nDer Prozess wurde während des Versands beendet — ob die Mail zugestellt wurde, ist ungewiss.\n` +
+      `Bitte den Posteingang des Kunden prüfen. Falls NICHT angekommen, nur Mail erneut senden (kein Neuscan):\n` +
+      `curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" ${process.env.PUBLIC_URL || ''}/api/resend/${job.sessionId}`
+    );
+    await reportQueue.markJobStatus(job.sessionId, 'RELEASE_IN_DOUBT', {});
+    logger?.warn?.({ sessionId: job.sessionId }, 'Report-Freigabe in-doubt nach Neustart gemeldet');
+  }
+  return inDoubt.length;
 }
 
 /** Alle fälligen Jobs freigeben (ein Tick). */

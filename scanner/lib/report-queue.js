@@ -22,28 +22,32 @@ const FILE = process.env.PENDING_REPORTS_FILE || path.join(__dirname, '..', 'out
 // atomar beansprucht) → RELEASED (versendet, terminal) | RELEASE_FAILED (terminal,
 // nach permanentem Mailfehler; Owner-Alarm + manueller /api/resend).
 const jobs = new Map(); // sessionId -> letzter Job-Record
-let loaded = false;
+let loadPromise = null;
 
-async function ensureLoaded() {
-  if (loaded) return;
-  loaded = true;
-  if (!existsSync(FILE)) return;
-  try {
-    const txt = await readFile(FILE, 'utf8');
-    for (const line of txt.split('\n')) {
-      if (!line.trim()) continue;
-      const rec = JSON.parse(line);
-      if (rec.sessionId) jobs.set(rec.sessionId, rec);
+// Promise-basiert (nicht bool): verhindert die Race, dass zwei parallele Aufrufe
+// (Scheduler-Start-Tick + reconcileOnStartup) beide vor dem readFile durchlaufen und
+// eine leere Job-Map sehen. Alle Aufrufer awaiten dieselbe Ladephase.
+function ensureLoaded() {
+  if (loadPromise) return loadPromise;
+  loadPromise = (async () => {
+    if (!existsSync(FILE)) return;
+    try {
+      const txt = await readFile(FILE, 'utf8');
+      for (const line of txt.split('\n')) {
+        if (!line.trim()) continue;
+        const rec = JSON.parse(line);
+        if (rec.sessionId) jobs.set(rec.sessionId, rec);
+      }
+    } catch {
+      /* defekte Zeilen ignorieren */
     }
-  } catch {
-    /* defekte Zeilen ignorieren */
-  }
-  // Crash-Safety: ein beim Absturz in RELEASING hängengebliebener Job wird beim
-  // Laden auf SCHEDULED zurückgesetzt, damit der Scheduler ihn erneut aufgreift
-  // (die eigentliche Mail-Idempotenz liegt beim Order-Status MAILED/claimForRelease).
-  for (const rec of jobs.values()) {
-    if (rec.status === 'RELEASING') rec.status = 'SCHEDULED';
-  }
+    // RELEASING wird beim Laden BEWUSST NICHT auf SCHEDULED zurückgesetzt: ein solcher
+    // Job war beim Absturz mitten im Versand — ob die Mail rausging, ist ungewiss. Ein
+    // Auto-Reset würde ihn erneut versenden (Doppelversand-Risiko, §14/GoBD). Stattdessen
+    // bleibt er RELEASING (listDue liefert nur SCHEDULED → kein Auto-Retry) und wird beim
+    // Start über listInDoubt dem Owner gemeldet (manueller Resend bei Bedarf).
+  })();
+  return loadPromise;
 }
 
 async function write(rec) {
@@ -99,6 +103,26 @@ export function claimForRelease(sessionId) {
   return rec;
 }
 
+// Persistiert den RELEASING-Claim VOR dem Sendeversuch (Crash-Idempotenz): stürzt der
+// Prozess zwischen erfolgreichem Versand und dem RELEASED-Status-Write ab, steht der Job
+// beim Neustart auf RELEASING (in-doubt) statt SCHEDULED → KEIN automatischer Zweitversand
+// (listDue liefert nur SCHEDULED). Wird stattdessen über listInDoubt gemeldet.
+export async function persistClaim(sessionId) {
+  await ensureLoaded();
+  const rec = jobs.get(sessionId);
+  if (!rec) return null;
+  rec.status = 'RELEASING';
+  await write(rec);
+  return rec;
+}
+
+// Jobs, die beim letzten Absturz mitten im Versand standen (RELEASING) — beim Start
+// dem Owner melden, damit er den Kunden-Posteingang prüft und ggf. manuell nachliefert.
+export async function listInDoubt() {
+  await ensureLoaded();
+  return [...jobs.values()].filter((j) => j.status === 'RELEASING');
+}
+
 /** Einen zuvor beanspruchten Job wieder freigeben (transienter Mailfehler → Retry). */
 export async function requeue(sessionId, { error = '' } = {}) {
   await ensureLoaded();
@@ -124,5 +148,5 @@ export async function markJobStatus(sessionId, status, info = {}) {
 // Test-Hilfe: In-Memory-Zustand zurücksetzen (die Datei bleibt unangetastet).
 export function _resetForTests() {
   jobs.clear();
-  loaded = false;
+  loadPromise = null;
 }

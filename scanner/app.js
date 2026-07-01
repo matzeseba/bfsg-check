@@ -23,7 +23,7 @@ import {
   mailerEnabled, mailerStatus, requireMailerOrExit, isStripeLive, isEmail
 } from './lib/mailer.js';
 import * as reportQueue from './lib/report-queue.js';
-import { startScheduler, releaseJob } from './lib/scheduler.js';
+import { startScheduler, releaseJob, recoverInDoubt } from './lib/scheduler.js';
 import { signRelease, verifyRelease, releaseTokenConfigured } from './lib/release-token.js';
 import { requireAdminAuth } from './lib/admin-auth.js';
 import { exportUserData, deleteUserData, requestDsgvoToken, consumeDsgvoToken } from './lib/dsgvo.js';
@@ -89,27 +89,51 @@ function releaseDeps(via = 'auto') {
 // (handleInvoicePaid). Wirft NIE — der Report ist bereits durabel persistiert.
 async function enqueueForRelease({ sessionId, to, company = '', url = '', pkg = '', order, invoice = null, emailKind, customerType = '', consentTs = '', sendReceipt = false }) {
   const releaseAt = new Date(Date.now() + RELEASE_DELAY_MIN * 60_000).toISOString();
-  await services.reportQueue.enqueue({
-    sessionId,
-    to,
-    company,
-    url,
-    pkg,
-    emailKind,
-    pdfPath: order.pdfPath,
-    stmtPath: order.stmtPath || null,
-    diffText: diffSummaryText(order.diff),
-    invoicePdfPath: invoice?.pdfPath || null,
-    invoiceNumber: invoice?.invoiceNumber || null,
-    customerType,
-    consentTs,
-    releaseAt
-  });
-  await markStatus(sessionId, 'RELEASE_SCHEDULED', {
-    pdfPath: order.pdfPath,
-    invoiceNumber: invoice?.invoiceNumber || null,
-    releaseAt
-  });
+  try {
+    await services.reportQueue.enqueue({
+      sessionId,
+      to,
+      company,
+      url,
+      pkg,
+      emailKind,
+      pdfPath: order.pdfPath,
+      stmtPath: order.stmtPath || null,
+      diffText: diffSummaryText(order.diff),
+      invoicePdfPath: invoice?.pdfPath || null,
+      invoiceNumber: invoice?.invoiceNumber || null,
+      customerType,
+      consentTs,
+      releaseAt
+    });
+    await markStatus(sessionId, 'RELEASE_SCHEDULED', {
+      pdfPath: order.pdfPath,
+      invoiceNumber: invoice?.invoiceNumber || null,
+      releaseAt
+    });
+  } catch (err) {
+    // Enqueue/Persistenz fehlgeschlagen (z. B. Volume voll/EACCES): der Report ist erzeugt,
+    // liegt aber NICHT in der Freigabe-Queue. SOFORT alarmieren (nicht erst beim Neustart)
+    // + READY_NOT_MAILED, damit /api/resend ihn Mail-only nachliefern kann.
+    logger.error({ sessionId, err: err.message }, 'Report-Enqueue fehlgeschlagen');
+    sentry.captureException(err, { stage: 'enqueueForRelease', session_id: sessionId });
+    try {
+      await markStatus(sessionId, 'READY_NOT_MAILED', {
+        error: `enqueue: ${err.message}`,
+        pdfPath: order.pdfPath,
+        stmtPath: order.stmtPath || null,
+        emailKind,
+        invoiceNumber: invoice?.invoiceNumber || null,
+        invoicePdfPath: invoice?.pdfPath || null
+      });
+    } catch { /* Persistenz-Folgefehler nur best-effort */ }
+    await sendAlert(
+      `Report-Enqueue fehlgeschlagen: ${to}`,
+      `Session: ${sessionId}\nFehler: ${err.message}\n\nReport + Rechnung liegen vor. NUR Mail erneut senden (kein Neuscan):\n` +
+      `curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" ${PUBLIC_URL}/api/resend/${sessionId}`
+    );
+    return;
+  }
   // Owner-Freigabe-Mail (best-effort; scheitert sie, greift trotzdem der Auto-Release).
   try {
     const token = signRelease(sessionId);
@@ -933,6 +957,21 @@ app.post('/api/resend/:sessionId', requireAdminAuth, async (req, res) => {
   }
   resendInFlight.add(sessionId);
 
+  // PR5: Existiert für diese Session noch ein offener Freigabe-Job (Report ist im 90-Min-
+  // Fenster eingequeut), muss der Resend ihn KONSUMIEREN — sonst versendet der Scheduler
+  // oder ein späterer Owner-Klick den Report ein ZWEITES Mal (Doppelversand/Doppelrechnung,
+  // §14/GoBD). Atomar claimen + terminal markieren. Läuft die Auto-Freigabe gerade selbst
+  // (RELEASING), lässt sich der Job nicht claimen → Resend mit 409 ablehnen (kurz warten).
+  const queueJob = await reportQueue.getJob(sessionId);
+  if (queueJob && (queueJob.status === 'SCHEDULED' || queueJob.status === 'RELEASING')) {
+    const claimed = reportQueue.claimForRelease(sessionId);
+    if (!claimed) {
+      resendInFlight.delete(sessionId);
+      return res.status(409).json({ error: 'Report wird gerade automatisch freigegeben — bitte in ~1 Minute erneut versuchen.' });
+    }
+    await reportQueue.markJobStatus(sessionId, 'RELEASED', { releasedBy: 'resend' });
+  }
+
   // MF6: optionale, admin-authentifizierte korrigierte Empfängeradresse — liefert eine
   // bezahlte Bestellung trotz im Checkout vertippter/unzustellbarer Adresse aus.
   const overrideEmail = (req.body && isEmail(req.body.email)) ? String(req.body.email).trim() : null;
@@ -1057,7 +1096,38 @@ function releasePage(msg, ok) {
     `<p style="color:#888;font-size:13px">BFSG-Fuchs &middot; Report-Freigabe</p></body>`;
 }
 
+const attrEsc = (s) => String(s).replace(/[<>&"']/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&#39;' }[c]));
+
+// Bestätigungsseite (GET macht KEINE Zustandsänderung): E-Mail-Sicherheitsgateways
+// (z. B. Outlook Safe Links) prefetchen Links per GET/HEAD — dürften sie damit direkt
+// freigeben, würde der „vor Auslieferung gesichtet"-Anspruch unterlaufen. Deshalb gibt
+// erst der bewusste POST (Button-Klick) frei; Scanner posten nicht.
+function confirmPage(sessionId, token, jobInfo = null) {
+  const action = `/api/release/${encodeURIComponent(sessionId)}?token=${encodeURIComponent(token)}`;
+  const meta = jobInfo ? `<p style="color:#555;font-size:14px">Kunde: <strong>${attrEsc(jobInfo.to || '—')}</strong>${jobInfo.url ? ` · ${attrEsc(jobInfo.url)}` : ''}</p>` : '';
+  return `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">` +
+    `<title>Report freigeben</title><body style="font-family:system-ui,Arial,sans-serif;max-width:480px;margin:60px auto;padding:0 20px;text-align:center;color:#1a1a1a">` +
+    `<div style="font-size:44px">&#129418;</div><h2 style="margin:8px 0">Report freigeben?</h2>${meta}` +
+    `<form method="post" action="${action}" style="margin-top:24px">` +
+    `<button type="submit" style="background:#e8590c;color:#fff;border:0;font-weight:600;padding:14px 28px;border-radius:10px;font-size:16px;cursor:pointer">Freigeben &amp; senden &rarr;</button></form>` +
+    `<p style="color:#888;font-size:13px;margin-top:20px">Tust du nichts, wird der Report am Ende des Fensters automatisch versendet.</p>` +
+    `<p style="color:#aaa;font-size:12px">BFSG-Fuchs &middot; Report-Freigabe</p></body>`;
+}
+
 app.get('/api/release/:sessionId', async (req, res) => {
+  const { sessionId } = req.params;
+  const token = req.query.token || '';
+  if (!verifyRelease(sessionId, token)) {
+    return res.status(403).type('html').send(releasePage('Ungültiger Freigabe-Link.', false));
+  }
+  const job = await services.reportQueue.getJob(sessionId);
+  if (job && job.status === 'RELEASED') {
+    return res.type('html').send(releasePage('Dieser Report wurde bereits versendet.', true));
+  }
+  return res.type('html').send(confirmPage(sessionId, token, job));
+});
+
+app.post('/api/release/:sessionId', async (req, res) => {
   const { sessionId } = req.params;
   const token = req.query.token || '';
   if (!verifyRelease(sessionId, token)) {
@@ -1136,6 +1206,9 @@ if (isMain) {
     // PR5: Release-Scheduler starten (sofortiger Tick fängt beim Redeploy überfällige
     // Jobs → crash-safe; danach im Intervall). Nur bei aktivem Gate.
     if (RELEASE_GATE_ENABLED) {
+      // Zuerst beim Absturz mitten im Versand hängengebliebene Jobs melden (in-doubt,
+      // KEIN Auto-Zweitversand), DANN den Scheduler starten (der nur SCHEDULED-Jobs auto-released).
+      recoverInDoubt(releaseDeps('auto'));
       startScheduler(releaseDeps('auto'));
       logger.info({ delayMin: RELEASE_DELAY_MIN, tokenReady: releaseTokenConfigured() }, 'Owner-Release-Gate aktiv');
     }

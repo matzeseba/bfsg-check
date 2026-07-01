@@ -14,7 +14,7 @@ const QUEUE_FILE = path.join(os.tmpdir(), `bfsg-pending-reports-test-${process.p
 process.env.PENDING_REPORTS_FILE = QUEUE_FILE;
 
 const reportQueue = await import('../lib/report-queue.js');
-const { releaseJob, releaseDue } = await import('../lib/scheduler.js');
+const { releaseJob, releaseDue, recoverInDoubt } = await import('../lib/scheduler.js');
 const { signRelease, verifyRelease, releaseTokenConfigured } = await import('../lib/release-token.js');
 
 const past = () => new Date(Date.now() - 60_000).toISOString();
@@ -141,6 +141,38 @@ test('releaseJob: permanenter Fehler → RELEASE_FAILED + READY_NOT_MAILED + Own
   assert.equal(job.status, 'RELEASE_FAILED');
   assert.ok(calls.status.some((s) => s.status === 'READY_NOT_MAILED'));
   assert.equal(calls.alerts.length, 1);
+});
+
+// --- Crash-Idempotenz (CRITICAL-Fix): Claim persistiert, kein Auto-Zweitversand -------
+test('persistClaim: schreibt RELEASING durabel (überlebt Neuladen als in-doubt)', async () => {
+  await reportQueue.enqueue(baseJob('crash_1', past()));
+  reportQueue.claimForRelease('crash_1');            // In-Memory-Claim
+  await reportQueue.persistClaim('crash_1');         // vor dem Send persistieren
+  // „Crash" simulieren: In-Memory-State verwerfen, aus der Datei neu laden.
+  reportQueue._resetForTests();
+  const job = await reportQueue.getJob('crash_1');
+  assert.equal(job.status, 'RELEASING');             // NICHT auf SCHEDULED zurückgesetzt
+  const due = await reportQueue.listDue();
+  assert.equal(due.length, 0);                       // wird NICHT automatisch erneut versendet
+  const inDoubt = await reportQueue.listInDoubt();
+  assert.deepEqual(inDoubt.map((j) => j.sessionId), ['crash_1']);
+});
+
+test('recoverInDoubt: meldet in-doubt-Jobs beim Start + markiert sie terminal', async () => {
+  await reportQueue.enqueue(baseJob('id_1', past()));
+  reportQueue.claimForRelease('id_1');
+  await reportQueue.persistClaim('id_1');
+  reportQueue._resetForTests();
+  const { deps, calls } = makeDeps();
+  const n = await recoverInDoubt(deps);
+  assert.equal(n, 1);
+  assert.equal(calls.alerts.length, 1);              // Owner-Alarm (kein Auto-Zweitversand)
+  assert.equal((await reportQueue.getJob('id_1')).status, 'RELEASE_IN_DOUBT');
+  // Zweiter Start alarmiert nicht erneut (terminal).
+  reportQueue._resetForTests();
+  const { deps: d2, calls: c2 } = makeDeps();
+  await recoverInDoubt(d2);
+  assert.equal(c2.alerts.length, 0);
 });
 
 test('releaseDue: gibt nur fällige Jobs frei', async () => {
