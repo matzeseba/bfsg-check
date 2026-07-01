@@ -2,6 +2,13 @@
 
 ---
 
+## ▶️ NÄCHSTE SESSION STARTET HIER (01.07.2026)
+**PR1 (Frontend-Politur + Maskottchen-Ausbau) ist fertig + auf `main` gemergt (live).** Umgesetzt: Liefer-Claims („innerhalb einer Stunde"), Gratis-Scan-Anzeige 15–18 s, Lighthouse/WAVE rechtssicher gehärtet, alle Maskottchen platziert (inkl. neu generiertem Uhr-Fuchs, an `max-w-6xl`-Grid verankert → kein Drift), Hero-Fuchs entfernt. Unabhängig über 1920/1440/1280/1024 + Mobile abgenommen.
+
+➡️ **Der komplette, dateigenaue Rest-Plan mit Agenten-Orchestrierung pro PR steht in `docs/BLUEPRINT-NEXT-SESSION.md`** — dort **ohne Rückfragen** durchstarten. Reihenfolge strikt: **PR2 (Value-Mail) → PR3 (Tiefen-Scan+TLS) → PR4 (KI-QA-Agent) → PR5 (Release-Queue) → WS7 (Mail-Härtung)**. **Owner-Inputs zuerst abholen:** `ANTHROPIC_API_KEY` (PR4), Sofort-Eingangsmail ja/nein (PR5), Claim-Variante „menschlich geprüft" (PR5, §5-UWG-relevant).
+
+---
+
 ## 🟠 OFFEN (30.06.2026): E-Mails landen im SPAM — überarbeiten
 
 Real getestet (outlook.de): **DOI-Bestätigungsmails (Lead + Newsletter), der bezahlte Report und Transaktionsmails landen aktuell im Spam-Ordner** (Absender `no-reply@bfsg-fuchs.de` via Brevo). Brevo zeigt `bfsg-fuchs.de` als DKIM-authentifiziert + DMARC konfiguriert — Hauptursache ist daher die **Cold-Start-Reputation der jungen Sende-Domain** (Warm-up 3–6 Wochen). **Vollständige Diagnose + priorisierte Rework-To-dos** (DNS-Auth für bfsg-fuchs.de hart verifizieren, mail-tester ≥9/10, Warm-up, „Kein Junk" markieren, text/plain + List-Unsubscribe) stehen in **`docs/EMAIL-DELIVERABILITY.md` → Abschnitt „⚠️ OFFEN (Stand 30.06.2026)"**. *Zwischenzeitlich:* erhaltene Mails in Outlook als „Kein Junk" markieren.
