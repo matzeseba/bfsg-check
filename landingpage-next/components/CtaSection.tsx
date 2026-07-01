@@ -122,7 +122,7 @@ export function CtaSection() {
               pointer-events-none, liegt HINTER dem Text (z-0). */}
           <div
             aria-hidden
-            className="pointer-events-none absolute -right-6 bottom-0 z-0 flex items-end sm:-right-2 lg:right-6"
+            className="pointer-events-none absolute -right-9 bottom-0 z-0 flex items-end sm:-right-2 lg:right-6"
           >
             <Image
               src="/mascot-thumbsup.png"
@@ -130,7 +130,7 @@ export function CtaSection() {
               width={680}
               height={1235}
               loading="lazy"
-              className="h-auto w-40 opacity-90 mask-fade-b animate-float-slow drop-shadow-[0_24px_40px_rgba(0,0,0,0.5)] sm:w-56 lg:w-72"
+              className="h-auto w-28 opacity-90 mask-fade-b animate-float-slow drop-shadow-[0_24px_40px_rgba(0,0,0,0.5)] sm:w-56 lg:w-72"
             />
           </div>
         </motion.div>

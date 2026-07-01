@@ -1,6 +1,7 @@
 "use client";
 
 import * as motion from "motion/react-client";
+import Image from "next/image";
 import { CheckCircle2Icon, GlobeIcon, ScanLineIcon } from "lucide-react";
 
 import { HOW_IT_WORKS } from "@/lib/config";
@@ -30,7 +31,19 @@ export function HowItWorks() {
         aria-hidden
         className="absolute inset-0 -z-10 hidden dot-bg-dark opacity-50 mask-radial dark:block"
       />
-      <div className="mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-24">
+      {/* Lupen-Fuchs als sichtbarer Guide (dekorativ, aria-hidden). Steht unten
+          rechts neben den drei Schritten; overflow-hidden der Section clippt
+          sauber. Aus dem Footer hierher verschoben. */}
+      <Image
+        src="/mascot-full.png"
+        alt=""
+        aria-hidden
+        width={680}
+        height={1329}
+        loading="lazy"
+        className="pointer-events-none absolute -bottom-3 -right-2 z-20 hidden h-auto w-20 opacity-95 drop-shadow-[0_18px_30px_rgba(0,0,0,0.4)] sm:block sm:right-1 lg:w-24"
+      />
+      <div className="relative z-10 mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-24">
         <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
           <SectionKicker icon={ScanLineIcon} label="Wie es funktioniert" />
           <h2

@@ -78,18 +78,8 @@ export function Footer() {
 
   return (
     <footer className="relative overflow-hidden border-t border-border/60 bg-brand-deeper">
-      {/* Riesiges, sehr blasses Hintergrund-Maskottchen (Ganzkörper Lupe) in der
-          unteren Ecke. Dekorativ → aria-hidden, pointer-events-none, liegt HINTER
-          dem Inhalt (z-0). */}
-      <Image
-        src="/mascot-full.png"
-        alt=""
-        aria-hidden
-        width={680}
-        height={1329}
-        loading="lazy"
-        className="pointer-events-none absolute -bottom-6 -left-4 z-0 h-auto w-48 opacity-[0.28] sm:-left-6 sm:w-64 sm:opacity-[0.3] dark:opacity-[0.36]"
-      />
+      {/* Maskottchen wurde aus dem Footer in die "Wie es funktioniert"-Sektion
+          verschoben (dort besser platziert statt am aeussersten Rand verloren). */}
       <div
         aria-hidden
         className="absolute inset-x-0 top-0 -z-10 h-32 bg-gradient-to-b from-brand-orange/5 to-transparent"

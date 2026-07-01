@@ -229,16 +229,16 @@ export function Hero() {
               overflow-hidden → kein horizontaler Overflow auf Mobile. */}
           <div
             aria-hidden
-            className="pointer-events-none absolute -bottom-10 -right-2 -z-10 sm:-right-6 lg:-right-10"
+            className="pointer-events-none absolute -bottom-14 -right-10 z-20 sm:-right-8 lg:-right-14"
           >
             <Image
               src="/mascot-magnify.png"
               alt=""
-              width={680}
-              height={904}
+              width={665}
+              height={772}
               priority
-              sizes="300px"
-              className="h-auto w-[200px] opacity-95 drop-shadow-[0_24px_40px_rgba(0,0,0,0.5)] animate-float-slow sm:w-[250px] lg:w-[290px]"
+              sizes="180px"
+              className="h-auto w-[116px] opacity-100 drop-shadow-[0_16px_28px_rgba(0,0,0,0.45)] animate-float-slow sm:w-[138px] lg:w-[158px]"
             />
           </div>
           <HeroVisual />
