@@ -4,7 +4,7 @@
 // erkannt, und fehlgeschlagene Erfüllungen sind manuell nachlieferbar
 // (POST /api/resend/:sessionId mit Admin-Bearer-Token, siehe app.js).
 
-import { appendFile, mkdir, readFile } from 'node:fs/promises';
+import { appendFile, mkdir, readFile, writeFile, rename } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -95,6 +95,64 @@ export async function markStatus(sessionId, status, info = {}) {
 export async function getOrder(sessionId) {
   await ensureLoaded();
   return orders.get(sessionId) || null;
+}
+
+// --- DSGVO Art. 17: echte PII-Redaction -------------------------------------------
+// Redigiert die PII (E-Mail, URL, Firma, Billing-Anschrift, Stripe-customerId) in
+// ALLEN historischen Zeilen dieser E-Mail — per atomarem Datei-Rewrite (tmp+rename)
+// UND in der In-Memory-Map (sonst lieferte /admin/orders die PII bis zum Neustart
+// weiter aus). Transaktionsdaten (sessionId, eventId, pkg, amount, status,
+// invoiceNumber, ts) bleiben erhalten: Aufbewahrungspflicht §147 AO/GoBD ist eine
+// Ausnahme nach Art. 17 Abs. 3 lit. b DSGVO. Rechnungs-PDFs (invoices/) fallen
+// vollständig unter diese Aufbewahrungspflicht und bleiben unangetastet.
+
+const PII_REDACTED = '[geloescht-dsgvo]';
+
+function redactOrderRec(rec, emailHash) {
+  const email = String(rec.email || '');
+  const out = { ...rec, emailHash, piiRedactedAt: new Date().toISOString() };
+  for (const f of ['email', 'url', 'company', 'customerId', 'resentTo', 'correctedUrl']) {
+    if (out[f]) out[f] = PII_REDACTED;
+  }
+  if (out.billing) out.billing = PII_REDACTED;
+  // Fehlermeldungen können die Adresse zitieren („Empfängeradresse ungültig: x@y").
+  if (email && typeof out.error === 'string' && out.error.includes(email)) {
+    out.error = out.error.split(email).join(PII_REDACTED);
+  }
+  return out;
+}
+
+export async function redactOrdersByEmail(email, emailHash) {
+  await ensureLoaded();
+  const norm = String(email).toLowerCase().trim();
+  const matches = (rec) => String(rec.email || '').toLowerCase().trim() === norm;
+  const redactedSessions = new Set();
+  if (existsSync(FILE)) {
+    const txt = await readFile(FILE, 'utf8');
+    const outLines = [];
+    for (const line of txt.split('\n')) {
+      if (!line.trim()) continue;
+      let rec;
+      try { rec = JSON.parse(line); } catch { outLines.push(line); continue; }
+      if (matches(rec)) {
+        rec = redactOrderRec(rec, emailHash);
+        if (rec.sessionId) redactedSessions.add(rec.sessionId);
+      }
+      outLines.push(JSON.stringify(rec));
+    }
+    const tmp = FILE + '.redact.tmp';
+    await writeFile(tmp, outLines.join('\n') + '\n');
+    await rename(tmp, FILE);
+  }
+  // In-Memory-Map nachziehen (auch Sessions erwischen, deren letzte Zeile schon im
+  // Speicher, aber evtl. nicht in der Datei stand — defensiv über matches()).
+  for (const [sid, rec] of orders) {
+    if (matches(rec)) {
+      orders.set(sid, redactOrderRec(rec, emailHash));
+      redactedSessions.add(sid);
+    }
+  }
+  return redactedSessions.size;
 }
 
 // Liefert alle Orders (letzter Status pro Session) — für Admin-Dashboard.
