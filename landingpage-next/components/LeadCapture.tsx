@@ -6,10 +6,15 @@ import { ArrowRightIcon, MailIcon } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { useCheckout } from "@/lib/checkout-context";
+import type { ScanCounts } from "./ResultCard";
 
 type LeadCaptureProps = {
   score: number;
   totalIssues: number;
+  // Fuer die Value-Mail (PR2): alle Befund-Kategorien + Top-3-Prioritaeten,
+  // damit die E-Mail exakt das im Formular versprochene Paket liefert.
+  counts?: ScanCounts;
+  topIssues?: string[];
 };
 
 // Value-first-Lead-Magnet: NACH dem ungated Score + Top-Befunden, VOR dem Kauf.
@@ -20,7 +25,12 @@ type LeadCaptureProps = {
 // eingetragen. Der gescannte URL + Score gehen als Kontext mit, damit die Nurture
 // das Ergebnis personalisieren kann. Faellt ehrlich auf "gerade nicht verfuegbar"
 // zurueck, solange das Brevo-Setup (Liste/Template) noch nicht steht (503).
-export function LeadCapture({ score, totalIssues }: LeadCaptureProps) {
+export function LeadCapture({
+  score,
+  totalIssues,
+  counts,
+  topIssues,
+}: LeadCaptureProps) {
   const { state } = useCheckout();
   const [email, setEmail] = React.useState("");
   const [status, setStatus] = React.useState<
@@ -37,7 +47,14 @@ export function LeadCapture({ score, totalIssues }: LeadCaptureProps) {
       const res = await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, url: state.url, score, totalIssues }),
+        body: JSON.stringify({
+          email,
+          url: state.url,
+          score,
+          totalIssues,
+          counts,
+          topIssues,
+        }),
       });
       const data = (await res.json().catch(() => ({}))) as {
         ok?: boolean;

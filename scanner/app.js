@@ -19,7 +19,7 @@ import { renderTeaser } from './lib/report.js';
 import { fulfillOrder, PKG_CONFIG } from './lib/fulfill.js';
 import {
   sendReportFor, sendAlert, sendCancellationConfirmation, sendDsgvoToken, sendDelayNotice,
-  mailerStatus, requireMailerOrExit, isStripeLive, isEmail
+  sendLeadTeaser, mailerEnabled, mailerStatus, requireMailerOrExit, isStripeLive, isEmail
 } from './lib/mailer.js';
 import { requireAdminAuth } from './lib/admin-auth.js';
 import { exportUserData, deleteUserData, requestDsgvoToken, consumeDsgvoToken } from './lib/dsgvo.js';
@@ -640,10 +640,44 @@ app.post('/api/newsletter', rateLimit({ windowMs: 60_000, max: 5 }), async (req,
 // ODER als Fallback BREVO_DOI_TEMPLATE_ID) gesetzt sind UND in Brevo eine Scan-Leads-Liste,
 // ein aktives DOI-Template sowie die 3 Kontakt-Attribute (SCAN_URL/SCAN_SCORE/SCAN_ISSUES)
 // existieren. Fehlen die Attribute, wird der Lead trotzdem ohne Attribute eingetragen.
+// Defensives Parsen des client-gelieferten Scan-Kontexts fuer die Value-Mail
+// (PR2). Nie vertrauen: counts → nicht-negative Ganzzahlen; topIssues → max 3
+// bereinigte Strings. Spoofing ist vernachlaessigbar (die Mail geht an die selbst
+// angegebene Adresse), ein Re-Scan waere teuer/unnoetig.
+function parseImpactCounts(raw) {
+  const src = raw && typeof raw === 'object' ? raw : {};
+  const clamp = (v) => { const n = Math.round(Number(v)); return Number.isFinite(n) && n > 0 ? n : 0; };
+  return { critical: clamp(src.critical), serious: clamp(src.serious), moderate: clamp(src.moderate), minor: clamp(src.minor) };
+}
+function parseTopIssues(raw) {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((x) => typeof x === 'string' && x.trim()).slice(0, 3).map((x) => x.trim().slice(0, 160));
+}
+
 app.post('/api/lead', rateLimit({ windowMs: 60_000, max: 5 }), async (req, res) => {
   const email = String(req.body?.email || '').trim().slice(0, 200);
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
     return res.status(400).json({ error: 'Bitte eine gültige E-Mail-Adresse angeben.' });
+
+  // Scan-Kontext defensiv aufbereiten (best-effort, niemals harte Pflicht).
+  const rawUrl = String(req.body?.url || '').trim().slice(0, 300);
+  const score = Number(req.body?.score);
+  const issues = Number(req.body?.totalIssues);
+  const leadCounts = parseImpactCounts(req.body?.counts);
+  const leadTopIssues = parseTopIssues(req.body?.topIssues);
+
+  // PR2: Value-Mail SOFORT + UNABHÄNGIG vom Brevo-DOI senden. Der Nutzer hat die
+  // schriftliche Übersicht über den Button „Übersicht anfordern" ausdrücklich
+  // angefordert → einmalige, angeforderte Service-Mail (kein § 7 UWG-Problem;
+  // der Newsletter-DOI läuft separat). Best-Effort: ein Mailfehler darf weder
+  // den Lead-Flow noch die 200/503-Antwort kippen. Läuft, sobald SMTP aktiv ist.
+  if (mailerEnabled()) {
+    try {
+      await sendLeadTeaser({ to: email, url: rawUrl, score, counts: leadCounts, topIssues: leadTopIssues, totalIssues: issues });
+    } catch (err) {
+      logger.warn({ err: err.message }, 'Lead-Value-Mail (sendLeadTeaser) fehlgeschlagen — best-effort, ignoriert');
+    }
+  }
 
   const apiKey = process.env.BREVO_API_KEY;
   const listId = Number(process.env.BREVO_LEAD_LIST_ID);
@@ -654,10 +688,6 @@ app.post('/api/lead', rateLimit({ windowMs: 60_000, max: 5 }), async (req, res) 
     return res.status(503).json({ error: 'Der Versand per E-Mail ist gerade nicht verfügbar. Bitte später erneut versuchen.' });
   }
 
-  // Scan-Kontext defensiv aufbereiten (best-effort, niemals harte Pflicht).
-  const rawUrl = String(req.body?.url || '').trim().slice(0, 300);
-  const score = Number(req.body?.score);
-  const issues = Number(req.body?.totalIssues);
   const attributes = {};
   if (rawUrl) attributes.SCAN_URL = rawUrl;
   if (Number.isFinite(score)) attributes.SCAN_SCORE = Math.round(score);

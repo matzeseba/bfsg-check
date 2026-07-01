@@ -10,10 +10,22 @@ import { cn } from "@/lib/utils";
 
 import { LeadCapture } from "./LeadCapture";
 
+export type ScanCounts = {
+  critical: number;
+  serious: number;
+  moderate: number;
+  minor: number;
+};
+
 export type ScanResult = {
   score: number;
   totalIssues: number;
   topIssues?: string[];
+  // Vom /api/scan-Teaser (renderTeaser) mitgeliefert; zur Laufzeit bereits
+  // vorhanden (setResult speichert die volle Antwort). Fuer die Value-Mail (PR2)
+  // an LeadCapture durchgereicht.
+  counts?: ScanCounts;
+  grade?: string;
 };
 
 function gradeFor(score: number): {
@@ -156,7 +168,12 @@ export function ResultCard({ result }: { result: ScanResult }) {
       </div>
       {/* Value-first-Lead-Capture: erweiterte Befund-Übersicht gegen E-Mail
           (Double-Opt-in), sitzt zwischen ungated Befunden und Kauf-CTA. */}
-      <LeadCapture score={score} totalIssues={totalIssues} />
+      <LeadCapture
+        score={score}
+        totalIssues={totalIssues}
+        counts={result.counts}
+        topIssues={topIssues}
+      />
       <div className="flex flex-col items-stretch gap-3 border-t border-border/60 bg-muted/40 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
         {/* Personalisiert auf das echte Ergebnis — KEINE erfundenen Zahlen.
             Mit Funden: konkrete Fund-Zahl + Fix-Versprechen. Ohne Funde: das
