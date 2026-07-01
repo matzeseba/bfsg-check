@@ -2,10 +2,25 @@
 
 ---
 
-## ▶️ NÄCHSTE SESSION STARTET HIER (01.07.2026)
-**PR1 (Frontend-Politur + Maskottchen-Ausbau) ist fertig + auf `main` gemergt (live).** Umgesetzt: Liefer-Claims („innerhalb einer Stunde"), Gratis-Scan-Anzeige 15–18 s, Lighthouse/WAVE rechtssicher gehärtet, alle Maskottchen platziert (inkl. neu generiertem Uhr-Fuchs, an `max-w-6xl`-Grid verankert → kein Drift), Hero-Fuchs entfernt. Unabhängig über 1920/1440/1280/1024 + Mobile abgenommen.
+## ▶️ NÄCHSTE SESSION STARTET HIER (01.07.2026, nachmittags) — PR5 + WS7
 
-➡️ **Der komplette, dateigenaue Rest-Plan mit Agenten-Orchestrierung pro PR steht in `docs/BLUEPRINT-NEXT-SESSION.md`** — dort **ohne Rückfragen** durchstarten. Reihenfolge strikt: **PR2 (Value-Mail) → PR3 (Tiefen-Scan+TLS) → PR4 (KI-QA-Agent) → PR5 (Release-Queue) → WS7 (Mail-Härtung)**. **Owner-Inputs zuerst abholen:** `ANTHROPIC_API_KEY` (PR4), Sofort-Eingangsmail ja/nein (PR5), Claim-Variante „menschlich geprüft" (PR5, §5-UWG-relevant).
+**PR2 + PR3 + PR4 sind fertig, gemergt + LIVE** (alle drei Deploys `success`, `/health` = `ok:true, stripe:true, live:true, mailer aktiv, aboEnabled:true`). Jeweils Branch → lokal build+test → Multi-Agent-Review (FREIGABE) → squash-merge → Deploy verifiziert. Details/Memory: [[pr2-pr4-report-glaubwuerdigkeit]].
+
+- **PR2 (#102) — Value-E-Mail nach Gratis-Scan (LIVE):** `sendLeadTeaser`/`buildLeadTeaser` in `mailer.js` (HTML+text über `deliver()`, jetzt mit optionalem `html`; Text-only-Mails byte-identisch), `/api/lead` Split-Flow (Teaser sofort best-effort + unabhängig vom Brevo-DOI), `LeadCapture.tsx`/`ResultCard.tsx` reichen `counts`+`topIssues` durch. Live geprüft: `/api/scan` liefert counts+topIssues. Code-Review = FREIGABE. scanner 148/148.
+- **PR3 (#103) — Tiefen-Scan + TLS (LIVE):** `PKG_CONFIG` maxPages basis 8/profi 40 (+settleMs/perPageTimeout), `scan.js` `AXE_TAGS` inkl. **wcag22aa**, Settle 12s, Timeouts 60/45s. TLS-Fix schon verdrahtet → **Owner muss `SCAN_PAID_LENIENT_TLS=true` im Server-.env setzen** (+ `docker compose up -d --build`). AppSec-Review = FREIGABE (SSRF orthogonal, code-belegt). scanner 151/151. Realer Test: matthias-seba.de Apex = kaputt (404+Cert), www = sauber → Follow-up-Chip Apex→www-Fallback (task_c620509c). Siehe [[paid-scan-strict-tls]].
+- **PR4 (#104) — KI-Report-QA-Agent (LIVE aber DORMANT):** `anthropic-client.js` (lazy `@anthropic-ai/sdk`, strict-tool_use+streaming, fail-open), `report-qa.js` (`qaReport` strikt fail-open + deterministischer §5-`FORBIDDEN_CLAIM`-Backstop), `report.js` `renderReport(qaOverrides)`, in `fulfillOrder` gated eingehängt. **Kill-Switch `REPORT_QA_ENABLED` Default false** → 0 Verhaltensänderung ohne Aktivierung. Code- + Legal/§5-Review = FREIGABE (Legal nach Regex-Härtung). scanner 164/164.
+
+➡️ **Rest-Plan weiterhin in `docs/BLUEPRINT-NEXT-SESSION.md`.** Als Nächstes: **PR5 (verzögerter Release + Persistenz + Scheduler; QA läuft dann im Delay-Fenster) → WS7 (Mail-DNS hart verifizieren)**.
+
+**Owner-Inputs / -Aktionen zuerst abholen:**
+1. **PR4 aktivieren (sonst dormant):** `ANTHROPIC_API_KEY` (eigenes API-Konto console.anthropic.com, **NICHT** Max-Abo) + `REPORT_QA_ENABLED=true` in `/opt/bfsg-check/deployment/.env` **+ als GitHub-Secret**; danach `docker compose up -d --build`. Monatscap in der Console setzen.
+2. **PR3 scharfschalten (optional):** `SCAN_PAID_LENIENT_TLS=true` im Server-.env für SMB-Seiten mit Cert-Eigenheiten.
+3. **PR5-Inputs:** Sofort-Eingangsbestätigungsmail ja/nein + Wortlaut · Claim-Variante „menschlich geprüft" (echtes Owner-Freigabefenster `REQUIRE_OWNER_RELEASE=true` [empfohlen, Claim bleibt wahr] vs. voll-automatisch + Claim-Wortlaut ändern; §5-UWG-relevant).
+
+---
+
+### 0.b) Was PR1 erledigt hat (Historie)
+**PR1 (Frontend-Politur + Maskottchen-Ausbau) ist fertig + auf `main` gemergt (live).** Umgesetzt: Liefer-Claims („innerhalb einer Stunde"), Gratis-Scan-Anzeige 15–18 s, Lighthouse/WAVE rechtssicher gehärtet, alle Maskottchen platziert (inkl. neu generiertem Uhr-Fuchs, an `max-w-6xl`-Grid verankert → kein Drift), Hero-Fuchs entfernt. Unabhängig über 1920/1440/1280/1024 + Mobile abgenommen.
 
 ---
 
