@@ -32,13 +32,16 @@ jobs:
           # Brevo REST-API-Key kommt aus den GitHub-Repo-Secrets (maskiert), NICHT aus
           # dem Repo/Chat. Wird unten in die Server-.env upgesertet. Leer = kein Eintrag.
           BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          # Anthropic-API-Key für den KI-Report-QA-Agenten (PR4). Gleiches Muster wie BREVO:
+          # aus GitHub-Secret (maskiert) in die Server-.env upserten. Leer = kein Eintrag.
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         with:
           host: ${{ secrets.HETZNER_HOST }}
           username: root
           key: ${{ secrets.HETZNER_SSH_KEY }}
           port: 22
           # An den Remote-Skript-Kontext durchreichen (sonst sieht das Skript die Var nicht).
-          envs: BREVO_API_KEY
+          envs: BREVO_API_KEY,ANTHROPIC_API_KEY
           script_stop: true
           request_pty: true
           # Hotfix: cloud-init setzt initial chage -d 0 root → bei jedem SSH-Login fragt
@@ -70,6 +73,17 @@ jobs:
               echo "BREVO_API_KEY in .env gesetzt (Laenge ${#KEY_CLEAN})."
             else
               echo "Kein BREVO_API_KEY-Secret gesetzt — .env unveraendert."
+            fi
+            # ANTHROPIC_API_KEY analog upserten (PR4 KI-Report-QA). REPORT_QA_ENABLED steuert
+            # separat im .env, ob die QA tatsaechlich laeuft (fail-open ohne Key = No-op).
+            if [ -n "${ANTHROPIC_API_KEY:-}" ]; then
+              AKEY_CLEAN=$(printf '%s' "$ANTHROPIC_API_KEY" | tr -d '[:space:]')
+              grep -v '^ANTHROPIC_API_KEY=' .env > .env.anthropic.tmp
+              printf 'ANTHROPIC_API_KEY=%s\n' "$AKEY_CLEAN" >> .env.anthropic.tmp
+              mv .env.anthropic.tmp .env
+              echo "ANTHROPIC_API_KEY in .env gesetzt (Laenge ${#AKEY_CLEAN})."
+            else
+              echo "Kein ANTHROPIC_API_KEY-Secret gesetzt — .env unveraendert."
             fi
             set -e
 
