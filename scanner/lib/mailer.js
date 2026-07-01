@@ -434,6 +434,75 @@ ${legalFooter()}`;
   return deliver({ to, subject, text, attachments: [] });
 }
 
+// Kunden-Eingangsbestätigung direkt nach der Zahlung (PR5 Owner-Release-Gate).
+// Bewusst OHNE Zeit-/„automatisch"-Angabe: der Report wird geprüft und in Kürze
+// zugestellt. Kein Anhang. Best-effort — ein Fehler darf den Webhook nicht kippen.
+export async function sendOrderReceived({ to, company = '' }) {
+  if (!isEmail(to)) return { dryRun: true, skipped: 'invalid-recipient' };
+  const subject = `Zahlung eingegangen — Ihr Report wird geprüft${company ? ' · ' + oneLine(company) : ''}`;
+  const text = `Vielen Dank für Ihre Bestellung — Ihre Zahlung ist bei uns eingegangen.
+
+Ihr Report wird jetzt geprüft und Ihnen anschließend per E-Mail zugestellt.
+Sie müssen nichts weiter tun.
+
+Bei Rückfragen antworten Sie einfach auf diese E-Mail.
+
+Mit freundlichen Grüßen
+${FROM_NAME}
+
+${legalFooter()}`;
+  return deliver({ to, subject, text, attachments: [] });
+}
+
+// Owner-Freigabe-Mail (PR5): geht an den Betreiber (ADMIN_EMAIL), enthält den fertigen
+// Report als Anhang zur Sichtung + einen 1-Klick-„Freigeben & senden"-Button. Tut der
+// Owner nichts, gibt der Scheduler den Report bei `releaseAt` automatisch frei. So bleibt
+// der Claim „jeder Report wird vor Auslieferung gesichtet" wahr, ohne die Auslieferung
+// unbegrenzt zu blockieren.
+export async function sendOwnerReview({ sessionId, to = ADMIN_EMAIL, customerEmail = '', url = '', company = '', pkg = '', summary = '', releaseUrl = '', releaseAt = null, pdfPath = null, stmtPath = null, invoicePdfPath = null }) {
+  const recipient = to || FROM_EMAIL;
+  const when = releaseAt
+    ? new Date(releaseAt).toLocaleString('de-DE', { timeZone: 'Europe/Berlin', hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' }) + ' Uhr'
+    : '90 Minuten';
+  const subject = `Freigabe nötig: Report für ${oneLine(customerEmail || url || sessionId)}`;
+  const lines = [
+    `Ein bezahlter Report ist fertig und wartet auf deine Freigabe.`,
+    ``,
+    `Kunde:  ${customerEmail || '—'}`,
+    `Website: ${url || '—'}`,
+    `Paket:  ${pkg || '—'}`,
+    company ? `Firma:  ${company}` : '',
+    summary ? `\n${summary}` : '',
+    ``,
+    `>> FREIGEBEN & SENDEN:`,
+    releaseUrl || '(Release-Link nicht konfiguriert — bitte ADMIN_TOKEN/RELEASE_TOKEN_SECRET setzen)',
+    ``,
+    `Wenn du nichts tust, wird der Report um ${when} automatisch freigegeben und an den Kunden gesendet.`,
+    `Der Report hängt zur Sichtung an dieser Mail.`
+  ].filter((l) => l !== '');
+  const text = lines.join('\n');
+
+  const html = `<!doctype html><html><body style="font-family:system-ui,Arial,sans-serif;max-width:560px;margin:0 auto;color:#1a1a1a">
+<h2 style="margin:0 0 4px">Report-Freigabe</h2>
+<p style="color:#555;margin:0 0 16px">Ein bezahlter Report ist fertig und wartet auf deine Sichtung.</p>
+<table style="font-size:14px;border-collapse:collapse;margin-bottom:16px">
+<tr><td style="padding:2px 12px 2px 0;color:#777">Kunde</td><td>${escHtml(customerEmail || '—')}</td></tr>
+<tr><td style="padding:2px 12px 2px 0;color:#777">Website</td><td>${escHtml(url || '—')}</td></tr>
+<tr><td style="padding:2px 12px 2px 0;color:#777">Paket</td><td>${escHtml(pkg || '—')}</td></tr>
+${company ? `<tr><td style="padding:2px 12px 2px 0;color:#777">Firma</td><td>${escHtml(company)}</td></tr>` : ''}
+</table>
+${summary ? `<div style="background:#f6f6f6;border-radius:8px;padding:12px 16px;font-size:14px;margin-bottom:16px">${escHtml(summary).replace(/\n/g, '<br>')}</div>` : ''}
+${releaseUrl ? `<p style="margin:0 0 20px"><a href="${escHtml(releaseUrl)}" style="display:inline-block;background:#e8590c;color:#fff;text-decoration:none;font-weight:600;padding:14px 28px;border-radius:10px;font-size:16px">Freigeben &amp; senden &rarr;</a></p>` : `<p style="color:#c00">Release-Link nicht konfiguriert (ADMIN_TOKEN/RELEASE_TOKEN_SECRET fehlt).</p>`}
+<p style="color:#777;font-size:13px;margin:0">Wenn du nichts tust, wird der Report um <strong>${escHtml(when)}</strong> automatisch freigegeben und an den Kunden gesendet. Der Report hängt zur Sichtung an dieser Mail.</p>
+</body></html>`;
+
+  const attachments = [];
+  for (const [p, name] of [[pdfPath, 'report.pdf'], [stmtPath, 'barrierefreiheitserklaerung.md'], [invoicePdfPath, 'rechnung.pdf']]) {
+    if (p) attachments.push({ filename: name, path: p });
+  }
+  return deliver({ to: recipient, subject, text, html, attachments });
+}
+
 // DSGVO-Bestätigungs-Mail an den ANTRAGSTELLER (Code-Review F3).
 // Der Token-Link MUSS an die angefragte Adresse gehen — das ist der Double-Opt-in,
 // der Eigentum der E-Mail nachweist. Vorher ging der Token nur an den Betreiber.

@@ -19,8 +19,12 @@ import { renderTeaser } from './lib/report.js';
 import { fulfillOrder, PKG_CONFIG } from './lib/fulfill.js';
 import {
   sendReportFor, sendAlert, sendCancellationConfirmation, sendDsgvoToken, sendDelayNotice,
-  sendLeadTeaser, mailerEnabled, mailerStatus, requireMailerOrExit, isStripeLive, isEmail
+  sendLeadTeaser, sendOwnerReview, sendOrderReceived, isTransientMailError,
+  mailerEnabled, mailerStatus, requireMailerOrExit, isStripeLive, isEmail
 } from './lib/mailer.js';
+import * as reportQueue from './lib/report-queue.js';
+import { startScheduler, releaseJob } from './lib/scheduler.js';
+import { signRelease, verifyRelease, releaseTokenConfigured } from './lib/release-token.js';
 import { requireAdminAuth } from './lib/admin-auth.js';
 import { exportUserData, deleteUserData, requestDsgvoToken, consumeDsgvoToken } from './lib/dsgvo.js';
 import { diffSummaryText } from './lib/diff.js';
@@ -39,6 +43,14 @@ const PORT = process.env.PORT || 8080;
 const PUBLIC_URL = process.env.PUBLIC_URL || `http://localhost:${PORT}`;
 const ENABLE_ABO = process.env.ENABLE_ABO === 'true'; // Abo standardmäßig AUS, bis Webhook-Endpoint aktiv getestet.
 
+// PR5 Owner-Release-Gate: fertige Reports werden vor Auslieferung dem Owner zur
+// Freigabe gemailt (1-Klick-Link) und bei Ablauf des Fensters automatisch versendet.
+// Default AN (Owner-Wunsch: jeder Report wird gesichtet). Flag=false → sofortiger
+// Auto-Versand wie zuvor (dann müssen die „menschlich geprüft"-Claims wahr formuliert sein).
+const RELEASE_GATE_ENABLED = process.env.REPORT_RELEASE_GATE_ENABLED !== 'false';
+// Auto-Release-Fenster in Minuten (Owner-Vorgabe: 90 Min nach Versand der Freigabe-Mail).
+const RELEASE_DELAY_MIN = Math.max(0, Number(process.env.RELEASE_DELAY_MIN) || 90);
+
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 
 // Wird diese Datei direkt gestartet (`node app.js`, Produktion) oder nur importiert
@@ -54,7 +66,69 @@ const isMain = !!process.argv[1] && import.meta.url === pathToFileURL(process.ar
 // überschreibt einzelne Funktionen, um Webhook-/Resend-Handler ohne echten Browser,
 // SMTP oder PDF gegen die ECHTE Express-App zu testen. Aufrufer lesen services.X zur
 // Laufzeit (kein Capture beim Modul-Laden), daher wirkt eine Test-Überschreibung sofort.
-export const services = { fulfillOrder, sendReportFor, generateInvoicePdf };
+export const services = { fulfillOrder, sendReportFor, generateInvoicePdf, sendOwnerReview, sendOrderReceived, reportQueue };
+
+// Gebündelte Abhängigkeiten für den Release-Scheduler + den /api/release-Endpoint.
+// Beide Wege (Auto-Release bei Ablauf, Owner-Klick) laufen durch dieselbe releaseJob-
+// Logik → atomarer Claim → genau ein Versand. services.X wird zur Laufzeit gelesen
+// (Test-Überschreibung wirkt sofort).
+function releaseDeps(via = 'auto') {
+  return {
+    reportQueue: services.reportQueue,
+    sendReportFor: (args) => services.sendReportFor(args),
+    markStatus,
+    sendAlert,
+    isTransientMailError,
+    logger,
+    via
+  };
+}
+
+// Fertigen Report zur Freigabe einqueuen + Owner-Review-Mail (best-effort) senden.
+// Gemeinsam für den Erstkauf (handleCheckoutCompleted) und den Abo-Re-Check
+// (handleInvoicePaid). Wirft NIE — der Report ist bereits durabel persistiert.
+async function enqueueForRelease({ sessionId, to, company = '', url = '', pkg = '', order, invoice = null, emailKind, customerType = '', consentTs = '', sendReceipt = false }) {
+  const releaseAt = new Date(Date.now() + RELEASE_DELAY_MIN * 60_000).toISOString();
+  await services.reportQueue.enqueue({
+    sessionId,
+    to,
+    company,
+    url,
+    pkg,
+    emailKind,
+    pdfPath: order.pdfPath,
+    stmtPath: order.stmtPath || null,
+    diffText: diffSummaryText(order.diff),
+    invoicePdfPath: invoice?.pdfPath || null,
+    invoiceNumber: invoice?.invoiceNumber || null,
+    customerType,
+    consentTs,
+    releaseAt
+  });
+  await markStatus(sessionId, 'RELEASE_SCHEDULED', {
+    pdfPath: order.pdfPath,
+    invoiceNumber: invoice?.invoiceNumber || null,
+    releaseAt
+  });
+  // Owner-Freigabe-Mail (best-effort; scheitert sie, greift trotzdem der Auto-Release).
+  try {
+    const token = signRelease(sessionId);
+    const releaseUrl = releaseTokenConfigured() ? `${PUBLIC_URL}/api/release/${encodeURIComponent(sessionId)}?token=${token}` : '';
+    await services.sendOwnerReview({
+      sessionId, customerEmail: to, url, company, pkg,
+      summary: order.scan ? `Befunde: ${order.scan.violations?.length ?? '?'} · Seiten: ${order.scan.pagesScanned ?? 1}` : '',
+      releaseUrl, releaseAt,
+      pdfPath: order.pdfPath, stmtPath: order.stmtPath || null, invoicePdfPath: invoice?.pdfPath || null
+    });
+  } catch (err) {
+    logger.warn({ sessionId, err: err.message }, 'Owner-Review-Mail nicht gesendet (Auto-Release bleibt aktiv)');
+  }
+  // Kunden-Eingangsbestätigung (nur Erstkauf; Abo-Re-Checks brauchen keine).
+  if (sendReceipt) {
+    try { await services.sendOrderReceived({ to, company }); }
+    catch (err) { logger.warn({ sessionId, err: err.message }, 'Eingangsbestätigung nicht gesendet'); }
+  }
+}
 
 if (isMain) {
   // Fail-fast: Live-Stripe ohne SMTP würde bezahlte Reports stillschweigend nicht ausliefern.
@@ -256,9 +330,25 @@ async function handleCheckoutCompleted(event) {
     return;
   }
 
-  // Phase 2: Mailversand (sendReportFor → deliver mit 3× Retry/Backoff bei transienten Fehlern).
-  // Subject/Anschreiben passend zum Paket (BFSG / Cookie / Re-Check).
+  // Phase 2: Auslieferung. Subject/Anschreiben passend zum Paket (BFSG / Cookie / Re-Check).
   const emailKind = isSub ? PKG_CONFIG[pkg]?.emailKind || 'bfsg' : order.emailKind;
+
+  // PR5 Owner-Release-Gate: statt sofort zu mailen, den fertigen Report zur Freigabe
+  // einqueuen (Owner-Mail + 90-Min-Auto-Release). So wird jeder Report vor Auslieferung
+  // gesichtet (Claim „menschlich geprüft" bleibt wahr). Idempotenz: der Report ist über
+  // INVOICED durabel; enqueue schreibt den Job, der Scheduler/Owner-Klick versendet.
+  if (RELEASE_GATE_ENABLED) {
+    await enqueueForRelease({
+      sessionId: s.id, to: email, company: meta.company || '', url: meta.url, pkg,
+      order, invoice, emailKind,
+      customerType: meta.customerType || '', consentTs: meta.consentTs || '',
+      sendReceipt: true
+    });
+    logger.info({ sessionId: s.id, pkg, releaseInMin: RELEASE_DELAY_MIN }, 'Report zur Owner-Freigabe eingequeut');
+    return;
+  }
+
+  // Gate aus: sofortiger Mailversand (sendReportFor → deliver mit 3× Retry/Backoff).
   try {
     await services.sendReportFor({
       to: email, company: meta.company || '',
@@ -399,6 +489,22 @@ async function handleInvoicePaid(event) {
     // Monatsrechnung fürs Abo (§ 14 UStG) — Betrag aus der Stripe-Invoice.
     const cycleAmount = inv.amount_paid ?? inv.total ?? 0;
     const invoice = await safeGenerateInvoice({ orderId: inv.id || sub.subscriptionId, email: sub.email, company: sub.company || '', pkg: sub.pkg || 'abo', amount: cycleAmount });
+    // Snapshot SOFORT sichern (unabhängig vom Auslieferungszeitpunkt): er ist die
+    // Diff-Basis für den nächsten Monats-Re-Check und darf nicht am Release-Fenster hängen.
+    await saveSnapshot(sub.subscriptionId, order.snapshot);
+
+    // PR5: Auch der Abo-Re-Check läuft durch das Owner-Release-Gate („jeder Report").
+    // Queue-Key = Invoice-ID (pro Zyklus eindeutig; Abo-Zyklen liegen nicht in orders.js).
+    const cycleKey = inv.id || `${sub.subscriptionId}-${Date.now()}`;
+    if (RELEASE_GATE_ENABLED) {
+      await enqueueForRelease({
+        sessionId: cycleKey, to: sub.email, company: sub.company || '', url: sub.url, pkg: sub.pkg || 'abo',
+        order, invoice, emailKind: 'recheck', sendReceipt: false
+      });
+      logger.info({ subscriptionId: sub.subscriptionId, cycleKey, releaseInMin: RELEASE_DELAY_MIN }, 'Re-Check zur Owner-Freigabe eingequeut');
+      return;
+    }
+
     await services.sendReportFor({
       to: sub.email, company: sub.company || '',
       pdfPath: order.pdfPath,
@@ -410,7 +516,6 @@ async function handleInvoicePaid(event) {
       invoicePdfPath: invoice?.pdfPath || null,
       invoiceNumber: invoice?.invoiceNumber || null
     });
-    await saveSnapshot(sub.subscriptionId, order.snapshot);
     logger.info({ subscriptionId: sub.subscriptionId, invoiceNumber: invoice?.invoiceNumber || null }, 'Re-Check ausgeliefert');
   } catch (err) {
     await sendAlert(
@@ -939,6 +1044,45 @@ process.on('uncaughtException', (e) => {
   sentry.captureException(e instanceof Error ? e : new Error(String(e)), { source: 'uncaughtException' });
 });
 
+// PR5: 1-Klick-Freigabe aus der Owner-Review-Mail. KEIN Admin-Bearer (der Link kommt
+// aus einer Mail), stattdessen HMAC-Token-Verifikation (release-token.js) gegen
+// Enumeration. Owner-Klick und Auto-Release laufen durch dieselbe releaseJob-Logik
+// (atomarer Claim → genau ein Versand). Antwortet mit einer kleinen HTML-Seite.
+function releasePage(msg, ok) {
+  const safe = String(msg).replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
+  return `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">` +
+    `<title>Report-Freigabe</title><body style="font-family:system-ui,Arial,sans-serif;max-width:480px;margin:60px auto;padding:0 20px;text-align:center;color:#1a1a1a">` +
+    `<div style="font-size:44px">${ok ? '&#9989;' : '&#9888;&#65039;'}</div>` +
+    `<p style="font-size:18px">${safe}</p>` +
+    `<p style="color:#888;font-size:13px">BFSG-Fuchs &middot; Report-Freigabe</p></body>`;
+}
+
+app.get('/api/release/:sessionId', async (req, res) => {
+  const { sessionId } = req.params;
+  const token = req.query.token || '';
+  if (!verifyRelease(sessionId, token)) {
+    return res.status(403).type('html').send(releasePage('Ungültiger Freigabe-Link.', false));
+  }
+  try {
+    const result = await releaseJob(sessionId, releaseDeps('owner'));
+    if (result.released) {
+      return res.type('html').send(releasePage('Report freigegeben und an den Kunden gesendet.', true));
+    }
+    if (result.reason === 'not-claimable') {
+      const job = await services.reportQueue.getJob(sessionId);
+      const already = !!job && job.status === 'RELEASED';
+      return res.type('html').send(releasePage(
+        already ? 'Dieser Report wurde bereits versendet.' : 'Freigabe gerade nicht möglich (läuft evtl. schon).',
+        already
+      ));
+    }
+    return res.status(502).type('html').send(releasePage('Versand fehlgeschlagen — bitte später erneut versuchen.', false));
+  } catch (err) {
+    logger.error({ sessionId, err: err.message }, 'Release-Endpoint fehlgeschlagen');
+    return res.status(500).type('html').send(releasePage('Interner Fehler bei der Freigabe.', false));
+  }
+});
+
 // Reconcile-Sweeper: beim Start nicht-terminale Bestellungen aufspüren und den
 // Operator alarmieren. Schließt das Restart-Loch (Webhook quittiert nach durabler
 // Order-Persistenz, arbeitet dann asynchron — ein Crash mitten in der Erfüllung
@@ -953,9 +1097,14 @@ async function reconcileOnStartup() {
   try {
     const { listOrders } = await import('./lib/orders.js');
     const all = await listOrders({ limit: 1000 });
-    const TERMINAL = new Set(['MAILED', 'RESENT', 'CANCELLED', 'FAILED']);
+    const TERMINAL = new Set(['MAILED', 'RESENT', 'CANCELLED', 'FAILED', 'RELEASED']);
+    // PR5: RELEASE_SCHEDULED mit noch offenem Queue-Job ist ERWARTET (Scheduler-Start-Tick
+    // gibt überfällige Jobs sofort frei) → nicht alarmieren. Nur ein RELEASE_SCHEDULED OHNE
+    // Queue-Job wäre ein echtes Loch (Job verloren) und bleibt als „hängend" sichtbar.
+    const pendingIds = new Set((await reportQueue.listPending()).map((j) => j.sessionId));
     const stuck = all
       .filter((o) => o.status && !TERMINAL.has(o.status))
+      .filter((o) => !(o.status === 'RELEASE_SCHEDULED' && pendingIds.has(o.sessionId)))
       .map((o) => `${o.sessionId} — ${o.status} (${o.email || '?'}, ${o.url || '?'})`);
     if (stuck.length) {
       await sendAlert(
@@ -984,6 +1133,12 @@ if (isMain) {
     );
     // Nicht-blockierend: Server ist sofort bereit, Reconcile läuft im Hintergrund.
     reconcileOnStartup();
+    // PR5: Release-Scheduler starten (sofortiger Tick fängt beim Redeploy überfällige
+    // Jobs → crash-safe; danach im Intervall). Nur bei aktivem Gate.
+    if (RELEASE_GATE_ENABLED) {
+      startScheduler(releaseDeps('auto'));
+      logger.info({ delayMin: RELEASE_DELAY_MIN, tokenReady: releaseTokenConfigured() }, 'Owner-Release-Gate aktiv');
+    }
   });
   process.on('SIGTERM', () => server.close(() => process.exit(0)));
 }
