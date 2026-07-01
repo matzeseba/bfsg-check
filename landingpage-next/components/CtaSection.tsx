@@ -71,7 +71,7 @@ export function CtaSection() {
             </h2>
             <p className="mx-auto mt-5 max-w-xl text-base text-[oklch(0.97_0.004_95)]/72 text-pretty lg:mx-0 sm:text-lg">
               Kostenloser Sofort-Check, Ergebnis in 60 Sekunden. Keine Anmeldung,
-              kein generischer Lighthouse-Dump — sondern priorisierte Mängel mit
+              keine generische Tool-Rohliste — sondern priorisierte Mängel mit
               Fix.
             </p>
 
@@ -130,7 +130,7 @@ export function CtaSection() {
               width={680}
               height={1235}
               loading="lazy"
-              className="h-auto w-40 opacity-[0.10] mask-fade-b animate-float-slow drop-shadow-[0_24px_40px_rgba(0,0,0,0.5)] sm:w-56 lg:w-72 dark:opacity-[0.18]"
+              className="h-auto w-40 opacity-90 mask-fade-b animate-float-slow drop-shadow-[0_24px_40px_rgba(0,0,0,0.5)] sm:w-56 lg:w-72"
             />
           </div>
         </motion.div>

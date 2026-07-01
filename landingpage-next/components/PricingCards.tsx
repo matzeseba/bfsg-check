@@ -56,7 +56,7 @@ export function PricingCards({
   packages = PACKAGES,
   title = "Ein Festpreis statt Stundensatz — Mängel finden, bevor es teuer wird.",
   titleAccent = "Festpreis",
-  subtitle = "Pauschalpreis, feste Lieferung binnen weniger Stunden. Einmal prüfen — oder mit dem Re-Check dauerhaft absichern.",
+  subtitle = "Pauschalpreis, Lieferung typischerweise innerhalb einer Stunde. Einmal prüfen — oder mit dem Re-Check dauerhaft absichern.",
   kicker = "Pakete & Preise",
   kickerIcon = TagIcon,
   id = "pakete",

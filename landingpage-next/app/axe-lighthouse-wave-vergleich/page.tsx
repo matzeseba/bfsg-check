@@ -94,7 +94,10 @@ export default function AxeLighthouseWaveVergleichPage() {
             ihre Situation zu wählen — und erklärt, warum kein Tool allein ausreicht.
           </p>
           <p className="mt-2 text-xs text-muted-foreground">
-            Stand: Juni 2026 · Technischer Vergleichsartikel, keine Rechtsberatung
+            Stand: Juni 2026 · Technischer Vergleichsartikel, keine Rechtsberatung ·
+            Unabhängiger Vergleich — Lighthouse ist eine Marke von Google, WAVE von
+            WebAIM, axe von Deque Systems; keine Kooperation mit oder Empfehlung durch
+            diese Anbieter.
           </p>
         </header>
 

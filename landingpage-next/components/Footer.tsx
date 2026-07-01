@@ -88,7 +88,7 @@ export function Footer() {
         width={680}
         height={1329}
         loading="lazy"
-        className="pointer-events-none absolute -bottom-10 -left-10 z-0 h-auto w-72 opacity-[0.05] sm:w-96 dark:opacity-[0.07]"
+        className="pointer-events-none absolute -bottom-6 -left-4 z-0 h-auto w-48 opacity-[0.28] sm:-left-6 sm:w-64 sm:opacity-[0.3] dark:opacity-[0.36]"
       />
       <div
         aria-hidden
