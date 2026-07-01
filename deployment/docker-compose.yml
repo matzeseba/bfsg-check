@@ -45,6 +45,14 @@ services:
       # mit gelockerter Zertifikatsprüfung erzeugt werden (s. scanner/lib/fulfill.js).
       # Nur setzen, wenn der Owner Lenient-TLS im Bezahlpfad bewusst will. SSRF-Schutz unberührt.
       - SCAN_PAID_LENIENT_TLS=${SCAN_PAID_LENIENT_TLS:-}
+      # PR4: KI-Report-QA-Agent. Default AUS (dormant) — ohne REPORT_QA_ENABLED=true
+      # + ANTHROPIC_API_KEY passiert nichts am verkauften Report (strikt fail-open).
+      # Modell konfigurierbar (Default claude-sonnet-4-6; claude-opus-4-8 optional).
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - REPORT_QA_ENABLED=${REPORT_QA_ENABLED:-false}
+      - REPORT_QA_MODEL=${REPORT_QA_MODEL:-claude-sonnet-4-6}
+      - REPORT_QA_TIMEOUT_MS=${REPORT_QA_TIMEOUT_MS:-90000}
+      - REPORT_QA_MAX_TOKENS=${REPORT_QA_MAX_TOKENS:-8000}
       - ADMIN_TOKEN=${ADMIN_TOKEN:-}
       - SENTRY_DSN=${SENTRY_DSN:-}
       - VAT_MODE=${VAT_MODE:-kleinunternehmer}
