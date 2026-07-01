@@ -18,6 +18,7 @@ const COLUMNS = [
       { href: "/#cookie", label: "Cookie-Check" },
       { href: "/#ablauf", label: "Wie es funktioniert" },
       { href: "/#faq", label: "FAQ" },
+      { href: "/partner", label: "Partnerprogramm für Agenturen" },
     ],
   },
   {

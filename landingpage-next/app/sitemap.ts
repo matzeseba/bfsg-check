@@ -54,6 +54,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "yearly",
       priority: 0.2,
     },
+    // Partnerprogramm (Agentur-Inbound)
+    {
+      url: `${siteUrl}/partner`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
     // SEO Pillar Pages
     {
       url: `${siteUrl}/bfsg-checkliste-online-shop`,
