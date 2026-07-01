@@ -318,7 +318,7 @@ export const DIFFERENTIATORS = [
   {
     kicker: "Schneller als die Kanzlei",
     title: "Audit in Stunden, nicht in Wochen",
-    desc: "Während andere noch Termine koordinieren, haben Sie schon den Fix-Plan auf dem Tisch. Stripe-Checkout, sofortiger Scan-Start, Lieferung typischerweise innerhalb einer Stunde.",
+    desc: "Während andere noch Termine koordinieren, haben Sie schon den Fix-Plan auf dem Tisch. Stripe-Checkout, sofortiger Scan-Start, Lieferung in der Regel innerhalb weniger Stunden — jeder Report wird vorher persönlich gesichtet.",
   },
   {
     kicker: "Tiefer als Gratis-Tools",
@@ -365,7 +365,7 @@ export const COMPARISON = {
       sub: "KI-Spürnase + menschliche Sichtung",
       highlight: true,
       attrs: [
-        { label: "Ergebnis", value: "typischerweise in einer Stunde", strong: true },
+        { label: "Ergebnis", value: "in der Regel wenige Stunden", strong: true },
         { label: "Priorisierung", value: "ja — nach Risiko sortiert", strong: true },
         { label: "Menschliche Sichtung", value: "ja, vor Auslieferung", strong: true },
         { label: "Fix-Plan & Erklärung", value: "Copy-Paste-Fix + Entwurf", strong: true },
@@ -422,7 +422,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: "Was passiert nach dem Kauf?",
-    a: "Nach erfolgreicher Zahlung startet der vollständige Scan automatisch. Sie erhalten Report (PDF) und Entwurf der Barrierefreiheitserklärung typischerweise innerhalb einer Stunde per E-Mail.",
+    a: "Nach erfolgreicher Zahlung startet der vollständige Scan automatisch. Sie erhalten Report (PDF) und Entwurf der Barrierefreiheitserklärung in der Regel innerhalb weniger Stunden per E-Mail — jeder Report wird vor dem Versand persönlich gesichtet.",
   },
   {
     q: "Was, wenn der Report keine relevanten Mängel findet?",

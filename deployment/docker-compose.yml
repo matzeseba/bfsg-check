@@ -53,6 +53,14 @@ services:
       - REPORT_QA_MODEL=${REPORT_QA_MODEL:-claude-sonnet-4-6}
       - REPORT_QA_TIMEOUT_MS=${REPORT_QA_TIMEOUT_MS:-90000}
       - REPORT_QA_MAX_TOKENS=${REPORT_QA_MAX_TOKENS:-8000}
+      # PR5: Owner-Release-Gate. Default AN — jeder Report geht vor Auslieferung zur
+      # Freigabe an den Owner (1-Klick-Mail) + Auto-Release nach RELEASE_DELAY_MIN.
+      # RELEASE_TOKEN_SECRET optional (Fallback ADMIN_TOKEN). pending-reports.jsonl liegt
+      # im bfsg_data-Volume (Default-Pfad /app/out) → überlebt Redeploys.
+      - REPORT_RELEASE_GATE_ENABLED=${REPORT_RELEASE_GATE_ENABLED:-true}
+      - RELEASE_DELAY_MIN=${RELEASE_DELAY_MIN:-90}
+      - SCHEDULER_INTERVAL_MS=${SCHEDULER_INTERVAL_MS:-60000}
+      - RELEASE_TOKEN_SECRET=${RELEASE_TOKEN_SECRET:-}
       - ADMIN_TOKEN=${ADMIN_TOKEN:-}
       - SENTRY_DSN=${SENTRY_DSN:-}
       - VAT_MODE=${VAT_MODE:-kleinunternehmer}
