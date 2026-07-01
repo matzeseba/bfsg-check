@@ -41,7 +41,7 @@ export function HowItWorks() {
         width={680}
         height={1329}
         loading="lazy"
-        className="pointer-events-none absolute -bottom-3 -right-2 z-20 hidden h-auto w-20 opacity-95 drop-shadow-[0_18px_30px_rgba(0,0,0,0.4)] sm:block sm:right-1 lg:w-24"
+        className="pointer-events-none absolute -bottom-2 z-20 hidden h-auto opacity-100 drop-shadow-[0_18px_30px_rgba(0,0,0,0.45)] lg:block lg:-right-2 lg:w-44"
       />
       <div className="relative z-10 mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-24">
         <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
@@ -87,6 +87,9 @@ export function HowItWorks() {
                   transition={{ duration: 0.5, delay: i * 0.1, ease: EASE }}
                   className={
                     "group/step card-lift relative flex flex-col items-center rounded-3xl p-6 text-center backdrop-blur md:items-start md:text-left " +
+                    // Karte 3 bekommt rechts Platz fuer den grossen Lupen-Fuchs, der
+                    // rechts daneben steht (Text weicht aus, keine Verdeckung).
+                    (i === 2 ? "lg:pr-24 " : "") +
                     (featured
                       ? "border-gradient bg-card shadow-card-hover"
                       : "border border-border/70 bg-card/85 shadow-card-soft dark:ring-1 dark:ring-white/5")
