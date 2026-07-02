@@ -65,10 +65,21 @@ export function Testimonials() {
   return (
     <section
       aria-labelledby="why-heading"
-      className="relative overflow-hidden border-y border-border/60 bg-brand-deeper"
+      // Scoped Dark: die Sektion ist in BEIDEN Themes fest dunkel (brand-deeper) —
+      // die `dark`-Klasse flippt alle Theme-Tokens der Kinder auf die Dark-Palette,
+      // sonst stehen im Light-Mode dunkle Texte auf near-black (WCAG 1.4.3).
+      // `text-foreground` ist Pflicht: color vererbt sich als BERECHNETER Wert vom
+      // body — ohne eigene Utility wuerde die H2 die Light-Farbe erben.
+      className="dark relative overflow-hidden border-y border-border/60 bg-brand-deeper text-foreground"
     >
       <div className="relative z-10 mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-24">
-        <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.55, ease: EASE }}
+          className="mx-auto flex max-w-2xl flex-col items-center text-center"
+        >
           <SectionKicker icon={SparklesIcon} label="Warum der BFSG-Fuchs" />
           <h2
             id="why-heading"
@@ -82,7 +93,7 @@ export function Testimonials() {
             Drei Gründe, warum mittelständische Website-Betreiber den Fuchs
             losschicken — statt in den Stundensatz-Marathon zu starten.
           </p>
-        </div>
+        </motion.div>
 
         {/* Grid-Wrapper (relative, an max-w-6xl gebunden): die opaken Fuechse haengen
             an den GRID-Aussenkanten, damit sie bei JEDER Bildschirmbreite an den

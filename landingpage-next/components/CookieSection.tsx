@@ -1,6 +1,8 @@
+import * as motion from "motion/react-client";
 import { CookieIcon } from "lucide-react";
 
 import { COOKIE_PACKAGES } from "@/lib/config";
+import { EASE } from "@/lib/motion";
 
 import { PricingCards } from "./PricingCards";
 import { SectionKicker } from "./SectionKicker";
@@ -12,10 +14,19 @@ export function CookieSection() {
       aria-labelledby="cookie-heading"
       // Dunklere Alt-Sektion (Design: Cookie-Block sitzt auf brand-deeper
       // #0b0807 mit warmen creme-Hairlines oben/unten — „Pflicht-Baustelle Nr. 2").
-      className="relative overflow-hidden border-y border-border bg-brand-deeper"
+      // Scoped Dark (`dark` + `text-foreground`): Flaeche ist in beiden Themes
+      // dunkel → Kinder-Tokens (inkl. eingebetteter PricingCards) muessen die
+      // Dark-Palette nutzen, sonst dunkel-auf-dunkel im Light-Mode (WCAG 1.4.3).
+      className="dark relative overflow-hidden border-y border-border bg-brand-deeper text-foreground"
     >
       <div className="mx-auto max-w-6xl px-5 pt-20 sm:px-6 sm:pt-24">
-        <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.55, ease: EASE }}
+          className="mx-auto flex max-w-2xl flex-col items-center text-center"
+        >
           <SectionKicker
             icon={CookieIcon}
             label="Pflicht-Baustelle Nr. 2"
@@ -34,7 +45,7 @@ export function CookieSection() {
             Tracker und Cookies dürfen erst NACH aktiver Einwilligung laden. Wir
             messen technisch, ob Ihre Seite das einhält — statt zu raten.
           </p>
-        </div>
+        </motion.div>
       </div>
       <PricingCards
         id="cookie-pakete"

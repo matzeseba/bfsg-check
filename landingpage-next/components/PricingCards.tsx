@@ -103,7 +103,13 @@ export function PricingCards({
           embedded ? "pt-10 pb-0" : "py-20 sm:py-24",
         )}
       >
-        <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.55, ease: EASE }}
+          className="mx-auto flex max-w-2xl flex-col items-center text-center"
+        >
           {/* Kicker im Marken-Akzent. Orange-Theme: tone="on-light" rendert
               Icon+Text in brand-indigo (auf die Orange-Familie remapped → orange
               in BEIDEN Themes, ohne dark: auf Mint zu kippen). Amber-Theme
@@ -164,7 +170,7 @@ export function PricingCards({
               </button>
             </div>
           )}
-        </div>
+        </motion.div>
 
         {/* „Welches Paket passt?"-Slider (nur Hauptpakete, nicht eingebettet bei
             Cookie). Reine Kaufhilfe — die echte Auswahl/der Kauf laeuft ueber den
@@ -271,7 +277,9 @@ function PlanFinder({ packages }: { packages: PackageConfig[] }) {
           value={pages}
           onChange={(e) => setPages(Number(e.target.value))}
           aria-valuetext={`${pages} ${PLAN_FINDER.unit} — Empfehlung: ${recName}`}
-          className="mt-4 h-1.5 w-full cursor-pointer appearance-none rounded-full bg-muted accent-brand-orange"
+          // Track deutlich sichtbar (bg-muted war im Light-Mode fast unsichtbar,
+          // WCAG 1.4.11-Risiko): foreground-Alpha kontrastiert in beiden Themes.
+          className="mt-4 h-1.5 w-full cursor-pointer appearance-none rounded-full bg-foreground/20 accent-brand-orange"
         />
         <div className="mt-2 flex justify-between font-mono text-[11px] text-muted-foreground">
           <span>1</span>

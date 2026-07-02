@@ -10,7 +10,9 @@ export function RuleTicker() {
   return (
     <div
       aria-hidden
-      className="relative z-[2] flex h-12 items-center overflow-hidden border-y border-border/60 bg-[var(--brand-deepest)]"
+      // Scoped Dark: Band ist immer near-black → Kriterien-Text braucht die
+      // Dark-muted-Farbe (Light-Token waere dunkel-auf-dunkel).
+      className="dark relative z-[2] flex h-12 items-center overflow-hidden border-y border-border/60 bg-[var(--brand-deepest)] text-foreground"
     >
       {/* Kanten-Masken links/rechts (weiches Ein-/Ausblenden, Design: ~130px). */}
       <div className="pointer-events-none absolute inset-y-0 left-0 z-[3] w-32 bg-gradient-to-r from-[var(--brand-deepest)] via-[var(--brand-deepest)]/90 to-transparent" />
