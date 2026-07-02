@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: "BFSG-Software-Anbieter im Vergleich: Preise und Leistungen 2026",
     description:
       "Einmalkauf oder Abo? Scan-Report, Monitoring oder Widget? Fünf BFSG-Tool-Anbieter im sachlichen Vergleich — nur objektiv nachprüfbare Kriterien.",
-    url: "https://bfsg-fix.de/bfsg-software-anbieter-vergleich",
+    url: "https://bfsg-fuchs.de/bfsg-software-anbieter-vergleich",
     type: "article",
   },
 };
@@ -129,8 +129,8 @@ export default function BfsgSoftwareAnbieterVergleichPage() {
     headline: "BFSG-Software-Anbieter im Vergleich: Preise und Leistungen 2026",
     description:
       "Fünf BFSG-Tool-Anbieter im sachlichen Vergleich: Scan-Reports, Monitoring-Abos und Auto-Fix-Widgets mit Preisen und Leistungsumfang.",
-    url: "https://bfsg-fix.de/bfsg-software-anbieter-vergleich",
-    publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fix.de" },
+    url: "https://bfsg-fuchs.de/bfsg-software-anbieter-vergleich",
+    publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fuchs.de" },
     dateModified: "2026-07-03",
   };
 
@@ -285,7 +285,7 @@ export default function BfsgSoftwareAnbieterVergleichPage() {
             Entwickler-Hinweisen, 30 Tage E-Mail-Support), optional ergänzt um ein Re-Check-Abo für
             24,99 €/Monat. Geprüft wird mit axe-core gegen über 80 Regeln nach WCAG 2.1 AA / EN 301 549,
             jeder Report wird vor Auslieferung menschlich gesichtet und enthält einen Entwurf der
-            Barrierefreiheitserklärung gemäß § 15 BFSGV.
+            Barrierefreiheitserklärung gemäß § 14 BFSG (i. V. m. der BFSGV).
           </p>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
             Ein Punkt ist uns als Qualitätsmerkmal wichtig: <strong>Wir versprechen bewusst keine
