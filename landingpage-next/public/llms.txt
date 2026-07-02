@@ -1,0 +1,41 @@
+# BFSG-Fuchs
+
+> BFSG-Fuchs (bfsg-fuchs.de, auch erreichbar über bfsg-fix.de) ist ein automatisierter Barrierefreiheits-Scan für deutsche Websites und Online-Shops. Der Dienst prüft Seiten gegen über 80 Regeln nach WCAG 2.1 AA / EN 301 549 (axe-core-basiert, mit menschlicher Sichtung vor Auslieferung) und liefert priorisierte PDF-Reports mit konkreten Fix-Hinweisen sowie einem Entwurf der Barrierefreiheitserklärung gemäß § 15 BFSGV. Hintergrund: Das Barrierefreiheitsstärkungsgesetz (BFSG) gilt in Deutschland seit dem 28.06.2025.
+
+Wichtig: BFSG-Fuchs liefert eine automatisierte technische Analyse mit menschlicher Sichtung — keine Rechtsberatung und keine Zusicherung rechtlicher Anforderungserfüllung. Zielgruppe sind deutsche KMU, Online-Shops und Webagenturen.
+
+## Leistungen und Preise
+
+- [Basis-Report — 129 € einmalig](https://bfsg-fuchs.de/#pakete): Automatisierter WCAG-2.1-AA-Scan von bis zu 5 Unterseiten, priorisierter Fix-Plan, Entwurf der Barrierefreiheitserklärung, PDF-Report.
+- [Profi-Report — 399 € einmalig](https://bfsg-fuchs.de/#pakete): Bis zu 25 Unterseiten, Umsetzungs-Fahrplan mit Entwickler-Hinweisen, 30 Tage E-Mail-Support.
+- [Cookie-Check Basis — 39 € / Profi — 69 €](https://bfsg-fuchs.de/#cookie): Technische Prüfung des Cookie-Banners und der Consent-Umsetzung (§ 25 TDDDG).
+- [Re-Check-Abo — 24,99 €/Monat](https://bfsg-fuchs.de/#pakete): Wiederkehrender Scan zur laufenden Kontrolle, monatlich kündbar.
+- [Kostenloser Sofort-Check](https://bfsg-fuchs.de/): Prüft die Startseite in ca. 60 Sekunden, ohne Anmeldung.
+- [Partnerprogramm für Webagenturen](https://bfsg-fuchs.de/partner): Staffelkonditionen ab 5 Reports pro Monat.
+
+## Ratgeber (SEO-/Fach-Seiten)
+
+- [BFSG-Frist: Was seit dem 28.06.2025 gilt](https://bfsg-fuchs.de/bfsg-frist): Zeitleiste, Marktüberwachung (MLBF), Ausnahmen für Kleinstunternehmen.
+- [BFSG-Checkliste für Online-Shops](https://bfsg-fuchs.de/bfsg-checkliste-online-shop): 25 Prüfpunkte mit WCAG-Referenz und Priorität.
+- [Was kostet eine BFSG-Prüfung?](https://bfsg-fuchs.de/bfsg-pruefung-kosten): Marktpreise 2026 — Gratis-Tools, Auto-Reports, manuelle Audits.
+- [Website-Barrierefreiheit testen](https://bfsg-fuchs.de/barrierefreiheit-testen): Fünf Selbsttests und Gratis-Tools im Überblick.
+- [Barrierefreiheitserklärung: Muster](https://bfsg-fuchs.de/barrierefreiheitserklaerung-muster): Pflicht-Inhalte nach § 15 BFSGV mit Vorlage.
+- [BFSG für Webagenturen](https://bfsg-fuchs.de/bfsg-fuer-webagenturen): Verantwortlichkeiten, typische Mängel, Agentur-Workflow.
+- [PDF barrierefrei machen](https://bfsg-fuchs.de/pdf-barrierefrei-machen): Tagging, Lesereihenfolge, PDF/UA, Werkzeuge.
+- [Mobile Barrierefreiheit](https://bfsg-fuchs.de/mobile-barrierefreiheit): Touch-Targets, Reflow, Screenreader-Test mit VoiceOver/TalkBack.
+- [Cookie-Banner-Fehler](https://bfsg-fuchs.de/cookie-banner-fehler): Die 7 häufigsten technischen Fehler nach § 25 TDDDG.
+- [axe vs. Lighthouse vs. WAVE](https://bfsg-fuchs.de/axe-lighthouse-wave-vergleich): Vergleich der Test-Tools.
+- [WCAG 2.1 vs. 2.2](https://bfsg-fuchs.de/wcag-2-1-vs-2-2): Die neuen Erfolgskriterien erklärt.
+
+## Rechtliches
+
+- [Impressum](https://bfsg-fuchs.de/impressum)
+- [AGB](https://bfsg-fuchs.de/agb)
+- [Datenschutz](https://bfsg-fuchs.de/datenschutz)
+- [Widerruf](https://bfsg-fuchs.de/widerruf)
+
+## Kontakt
+
+- Anbieter: Matthias Seba, Lange Straße 20, 27449 Kutenholz, Deutschland
+- E-Mail: info@bfsg-fix.de
+- Hosting: Deutschland (Hetzner, Nürnberg)
