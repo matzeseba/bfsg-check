@@ -23,8 +23,10 @@ export const SEVERITY_LABEL: Record<Severity, string> = {
 
 // Solide Füll-Farben — identisch zu SEVERITY_COLOR/SEVERITY_TEXT der Mail.
 // Kontraststark in hellen UND dunklen Umgebungen (keine hellgrau-auf-weiß-
-// Chips, die im Dark-Mode verschwinden). Weiß auf Amber wäre nur ~1,9:1 →
-// dunkler Text auf der hellen MITTEL-Fläche.
+// Chips, die im Dark-Mode verschwinden). WCAG 1.4.3 (AA, Normaltext 4,5:1):
+// Weiß auf Rot/Orange/Amber läge nur bei ~3,3:1 / ~3,1:1 / ~1,9:1 → dunkler
+// Text #2b1206 auf den hellen Flächen (Kritisch 5,36:1, Schwerwiegend 5,63:1,
+// Mittel ~7:1); nur Gering (#6b7280) trägt weißen Text (4,54:1).
 export const SEVERITY_COLOR: Record<Severity, string> = {
   critical: "#F8554B",
   serious: "#ED6A33",
@@ -33,8 +35,8 @@ export const SEVERITY_COLOR: Record<Severity, string> = {
 };
 
 export const SEVERITY_TEXT: Record<Severity, string> = {
-  critical: "#ffffff",
-  serious: "#ffffff",
+  critical: "#2b1206",
+  serious: "#2b1206",
   moderate: "#2b1206",
   minor: "#ffffff",
 };
