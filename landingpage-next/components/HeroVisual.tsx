@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 import { HERO_VISUAL } from "@/lib/config";
+import { EASE } from "@/lib/motion";
 import { usePrefersReducedMotion } from "@/lib/use-reduced-motion";
 
 // Das Hero-Audit-Report-Visual: ein stilisiertes App-Fenster, das ein
@@ -254,7 +255,7 @@ function FloatBadge({
     <motion.div
       initial={reduced ? false : { opacity: 0, y: 12, scale: 0.9 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ delay, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ delay, duration: 0.5, ease: EASE }}
       className={`absolute z-30 ${className ?? ""}`}
     >
       <div

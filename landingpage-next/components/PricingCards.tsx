@@ -22,6 +22,7 @@ import {
   type PackageConfig,
   type PackageId,
 } from "@/lib/config";
+import { EASE } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { useCheckout } from "@/lib/checkout-context";
 
@@ -185,7 +186,7 @@ export function PricingCards({
               initial={{ opacity: 0, y: 22 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.55, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.55, delay: i * 0.08, ease: EASE }}
               className="relative"
             >
               <PricingCard
@@ -461,6 +462,12 @@ function PricingCard({
         {!isSub && (
           <p className="mt-1 text-xs text-muted-foreground">
             einmalig · keine USt (§ 19 UStG)
+          </p>
+        )}
+        {/* Mengen-Anker (z.B. Profi): rahmt den Pauschalpreis als Preis-pro-Seite. */}
+        {pkg.anchorNote && (
+          <p className="mt-1.5 font-mono text-xs tabular-nums text-brand-orange/90">
+            {pkg.anchorNote}
           </p>
         )}
       </div>

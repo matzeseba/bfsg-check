@@ -3,6 +3,8 @@
 import * as motion from "motion/react-client";
 import { CheckIcon, GaugeIcon } from "lucide-react";
 
+import { EASE } from "@/lib/motion";
+
 import { CountUp } from "./CountUp";
 import { SectionKicker } from "./SectionKicker";
 
@@ -26,7 +28,7 @@ export function WowCounter() {
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.6, ease: EASE }}
           className="border-gradient relative overflow-hidden rounded-[2rem] bg-[oklch(0.97_0.004_95)] px-6 py-14 text-center text-brand-deep shadow-elevated sm:px-12 sm:py-20"
         >
           <div

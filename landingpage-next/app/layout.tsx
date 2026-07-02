@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fredoka, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Fraunces, Fredoka, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import { MotionConfig } from "motion/react";
 
 import { AnnouncementBar } from "@/components/AnnouncementBar";
@@ -39,6 +39,19 @@ const jetbrainsMono = JetBrains_Mono({
 const fredokaDisplay = Fredoka({
   variable: "--font-display",
   subsets: ["latin"],
+  display: "swap",
+});
+
+// Editorial-Akzent: echter Fraunces-KURSIV-Display-Schnitt fuer die betonten
+// Italic-Akzentwoerter (~8 Headlines). Fredoka hat keinen echten Kursiv → das
+// bisherige `italic gradient-text` erzwang synthetisches Oblique auf Fredoka
+// (unschoen). Fraunces (variable Serif-Display) liefert einen echten Kursiv-Schnitt.
+// Gebunden in globals.css an `.gradient-text.italic` (die Akzent-Stellen tragen
+// beide Klassen); reine Fredoka-`.gradient-text` (Hero-H1 „BFSG") bleibt unberuehrt.
+const frauncesItalic = Fraunces({
+  variable: "--font-display-italic",
+  subsets: ["latin"],
+  style: ["italic"],
   display: "swap",
 });
 
@@ -120,7 +133,7 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       // next-themes setzt .dark vor Hydration via Inline-Script.
       suppressHydrationWarning
-      className={`${hankenSans.variable} ${jetbrainsMono.variable} ${fredokaDisplay.variable} h-full antialiased`}
+      className={`${hankenSans.variable} ${jetbrainsMono.variable} ${fredokaDisplay.variable} ${frauncesItalic.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
         <ThemeProvider>

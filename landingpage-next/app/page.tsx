@@ -11,23 +11,24 @@ import { RuleTicker } from "@/components/RuleTicker";
 import { StatsBar } from "@/components/StatsBar";
 import { Testimonials } from "@/components/Testimonials";
 
-// Conversion-Dramaturgie (neues Design): Hero → Trust-Strip (StatsBar) →
-// Live-Regel-Ticker → Schmerz/Frist (RiskBand + Countdown) → Mechanismus
-// (HowItWorks) → Warum wir (Testimonials) → sachlicher Direktvergleich
-// (Comparison) → Entscheidung (Pricing + Plan-Finder) → Cross-Sell (Cookie) →
-// Resteinwände (FAQ) → Final-CTA. Alle Funktionen (Scan, Checkout, JsonLd) bleiben
-// 1:1 in den Komponenten.
+// Conversion-Dramaturgie (PAS — Problem, Agitate, Solve): Hero → Schmerz/Frist
+// (RiskBand + Countdown) → Trust-Strip (StatsBar) → Live-Regel-Ticker als schmales
+// Band darunter → Mechanismus (HowItWorks) → sachlicher Direktvergleich
+// (Comparison) → Warum wir (Testimonials) → Entscheidung (Pricing + Plan-Finder) →
+// Cross-Sell (Cookie) → Resteinwände (FAQ) → Final-CTA. Die Frist traegt allein die
+// AnnouncementBar + RiskBand (Hero-Pill = Produktwert). Alle Funktionen (Scan,
+// Checkout, JsonLd) bleiben 1:1 in den Komponenten.
 export default function Home() {
   return (
     <>
       <HomeJsonLd />
       <Hero />
+      <RiskBand />
       <StatsBar />
       <RuleTicker />
-      <RiskBand />
       <HowItWorks />
-      <Testimonials />
       <Comparison />
+      <Testimonials />
       <PricingCards />
       <CookieSection />
       <FAQAccordion />

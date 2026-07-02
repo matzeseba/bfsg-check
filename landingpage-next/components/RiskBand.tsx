@@ -12,11 +12,10 @@ import {
 } from "lucide-react";
 
 import { RISK_BAND } from "@/lib/config";
+import { EASE } from "@/lib/motion";
 
 import { DeadlineCounter } from "./DeadlineCounter";
 import { SectionKicker } from "./SectionKicker";
-
-const EASE = [0.22, 1, 0.36, 1] as const;
 
 // Pro Risk-Point ein passendes Icon (Reihenfolge = RISK_BAND.points):
 // Stichtag · geforderter Standard · Klagebefugnis.

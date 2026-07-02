@@ -5,6 +5,7 @@ import Image from "next/image";
 import { CheckCircle2Icon, GlobeIcon, ScanLineIcon } from "lucide-react";
 
 import { HOW_IT_WORKS } from "@/lib/config";
+import { EASE } from "@/lib/motion";
 
 import { SectionKicker } from "./SectionKicker";
 
@@ -13,8 +14,6 @@ const ICON_BY_KEY = {
   scan: ScanLineIcon,
   check: CheckCircle2Icon,
 } as const;
-
-const EASE = [0.22, 1, 0.36, 1] as const;
 
 export function HowItWorks() {
   return (
