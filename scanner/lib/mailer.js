@@ -594,12 +594,101 @@ export async function sendWithRetry(send, {
   throw lastErr; // unerreichbar, aber explizit für den Linter.
 }
 
+// --- Brevo-Transactional-API-Fallback ---------------------------------------
+// Hintergrund (Prod-Vorfall 07/2026): Scheitert SMTP mit einem PERMANENTEN
+// Auth-Fehler (z. B. „535 Authentication failed", weil der SMTP-Schlüssel im
+// Brevo-Konto gelöscht/abgelaufen ist), wäre JEDE Transaktionsmail verloren,
+// obwohl die Brevo-REST-API mit BREVO_API_KEY weiterhin funktioniert. Darum:
+// EINMALIGER API-Fallback nur für genau diesen Fall. Transiente Fehler laufen
+// weiter über den bestehenden Retry (sendWithRetry) — dort KEIN Fallback.
+
+// Permanenter Auth-Fehler? (SMTP 535 = „Authentication credentials invalid";
+// /auth/i fängt Textvarianten wie „Authentication failed" ab.) Bewusst NUR
+// nicht-transiente Fehler — bei transienten greift der Retry.
+export function isPermanentAuthError(err) {
+  if (!err || isTransientMailError(err)) return false;
+  if (Number(err.responseCode) === 535) return true;
+  return /\b535\b|auth/i.test(err.message || '');
+}
+
+// Kill-Switch: Fallback ist an, sobald BREVO_API_KEY existiert; explizit
+// abschaltbar via MAILER_API_FALLBACK=false. Zur Laufzeit gelesen (testbar,
+// keine neue Pflicht-Env-Variable).
+function apiFallbackEnabled() {
+  return !!process.env.BREVO_API_KEY && process.env.MAILER_API_FALLBACK !== 'false';
+}
+
+// Versand über die Brevo-Transactional-API (POST /v3/smtp/email) — natives
+// fetch, keine neue Dependency. Mapping nodemailer→Brevo: Anhänge mit
+// `content` (Buffer/String) oder `path` (Datei) werden base64-kodiert;
+// `attachment` wird nur gesetzt, wenn Anhänge existieren.
+export async function sendViaBrevoApi({ to, subject, text, html = null, attachments = [], replyTo = REPLY_TO_ADDR, headers = null }) {
+  const apiKey = process.env.BREVO_API_KEY;
+  if (!apiKey) throw new Error('BREVO_API_KEY fehlt — Brevo-API-Versand nicht möglich');
+  const attachment = [];
+  for (const a of attachments || []) {
+    const buf = a.content != null
+      ? (Buffer.isBuffer(a.content) ? a.content : Buffer.from(String(a.content)))
+      : await readFile(a.path);
+    attachment.push({ name: a.filename || 'anhang', content: buf.toString('base64') });
+  }
+  const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: { 'api-key': apiKey, 'content-type': 'application/json', accept: 'application/json' },
+    body: JSON.stringify({
+      sender: { name: FROM_NAME, email: FROM_EMAIL },
+      to: [{ email: to }],
+      subject,
+      textContent: text,
+      ...(html ? { htmlContent: html } : {}),
+      ...(replyTo ? { replyTo: { email: replyTo } } : {}),
+      ...(attachment.length ? { attachment } : {}),
+      ...(headers ? { headers } : {})
+    })
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    throw new Error(`Brevo-API-Versand fehlgeschlagen (HTTP ${res.status}): ${body.slice(0, 200)}`);
+  }
+  const data = await res.json().catch(() => ({}));
+  return { messageId: data.messageId || null };
+}
+
+// Retry-Schleife + einmaliger API-Fallback bei permanentem Auth-Fehler.
+// Erfolg via API → wie Erfolg behandelt (fallback: 'brevo-api'); scheitert
+// auch die API, wird der URSPRÜNGLICHE SMTP-Fehler geworfen (Verhalten für
+// Aufrufer exakt wie bisher). Direkt unit-testbar (gleiche Seam wie
+// sendWithRetry: `send` = ein SMTP-Versandversuch).
+export async function sendWithFallback(send, { to = '', subject = '', text = '', html = null, attachments = [], headers = null, maxAttempts, backoffBaseMs } = {}) {
+  try {
+    return await sendWithRetry(send, { to, maxAttempts, backoffBaseMs });
+  } catch (err) {
+    if (!(isPermanentAuthError(err) && apiFallbackEnabled())) throw err;
+    try {
+      const info = await sendViaBrevoApi({ to, subject, text, html, attachments, headers });
+      console.warn('[mailer] SMTP fehlgeschlagen — über Brevo-API zugestellt (Fallback)');
+      return { info, attempts: 1, fallback: 'brevo-api' };
+    } catch (apiErr) {
+      console.error(`[mailer] Brevo-API-Fallback an ${to} ebenfalls fehlgeschlagen: ${apiErr.message}`);
+      throw err;
+    }
+  }
+}
+
 async function deliver({ to, subject, text, html = null, attachments = [] }) {
   if (!enabled) {
     console.log(`[mailer DRY-RUN] An ${to} | ${subject} | Anhänge: ${attachments.map((a) => a.filename).join(', ') || '—'}`);
     return { dryRun: true };
   }
-  const { info, attempts } = await sendWithRetry(
+  // Deliverability: One-Click-List-Unsubscribe (RFC 8058). Verbessert die
+  // Zustellbarkeit (Gmail/Yahoo-Sender-Anforderungen). Unsubscribe geht an die
+  // Kontaktadresse (nicht no-reply). FROM_EMAIL bleibt die no-reply-Sendeadresse.
+  // Einmal gebaut, damit BEIDE Transportwege (SMTP + Brevo-API-Fallback) sie tragen.
+  const headers = {
+    'List-Unsubscribe': `<mailto:${REPLY_TO_ADDR}?subject=unsubscribe>`,
+    'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+  };
+  const { info, attempts, fallback } = await sendWithFallback(
     () => transporter.sendMail({
       from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
       to,
@@ -609,18 +698,12 @@ async function deliver({ to, subject, text, html = null, attachments = [] }) {
       // HTML nur setzen, wenn vorhanden — bestehende Text-only-Mails bleiben unveraendert.
       ...(html ? { html } : {}),
       attachments,
-      // Deliverability: One-Click-List-Unsubscribe (RFC 8058). Verbessert die
-      // Zustellbarkeit (Gmail/Yahoo-Sender-Anforderungen). Unsubscribe geht an die
-      // Kontaktadresse (nicht no-reply). FROM_EMAIL bleibt die no-reply-Sendeadresse.
-      headers: {
-        'List-Unsubscribe': `<mailto:${REPLY_TO_ADDR}?subject=unsubscribe>`,
-        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
-      }
+      headers
     }),
-    { to }
+    { to, subject, text, html, attachments, headers }
   );
-  console.log(`[mailer] An ${to} versendet (${info.messageId})`);
-  return { dryRun: false, messageId: info.messageId, attempts };
+  console.log(`[mailer] An ${to} versendet (${info.messageId}${fallback ? ' — via Brevo-API-Fallback' : ''})`);
+  return { dryRun: false, messageId: info.messageId, attempts, ...(fallback ? { fallback } : {}) };
 }
 
 // Betreiber-Alarm bei bezahlt-aber-nicht-geliefert (an ADMIN_EMAIL).
