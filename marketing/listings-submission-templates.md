@@ -1,6 +1,17 @@
-# Listings Submission Templates — copy-paste ready
+# Listings — Einreich-Vorlagen (BFSG-Fuchs)
 
-> **Konsistenz wichtig:** Gleicher Tagline, gleiche Description-Variations überall.
+> **Copy-paste-ready.** Je Plattform ein Block. Konsistenz zählt: gleicher Name,
+> gleiche Tagline, gleiche Description-Varianten überall.
+>
+> **Harte Sprachregeln (gelten für JEDE Submission):**
+> - Pflicht-Wording: „automatisierte technische Analyse" / „WCAG-2.1-AA-Audit"
+> - NIEMALS: „BFSG-konform", „rechtssicher", Wortstamm „garant…" (auch nicht auf
+>   Englisch als Konformitätsversprechen) — wir verkaufen einen technischen Befund,
+>   kein Rechtsergebnis
+> - Keine erfundenen Nutzerzahlen, Bewertungen oder Kundenlogos
+> - Founder-Disclosure („I'm the founder") überall dort, wo Community-Regeln es
+>   verlangen (Product Hunt, AlternativeTo, Foren) — im Zweifel immer offenlegen
+> - Vor jedem Einreichen: `node scripts/legal-grep.mjs` muss PASS sein
 
 ---
 
@@ -8,363 +19,438 @@
 
 | Feld | Wert |
 |---|---|
-| Product Name | BFSG-Check |
-| Tagline (50 chars) | Compliance-Scans für deutsche Websites |
-| Website | https://bfsg-fix.de |
-| Pricing-Page | https://bfsg-fix.de/preise |
-| Category | Accessibility Testing, Compliance, Website Audit |
-| Founded | 2026 |
-| Headquarters | Kutenholz, Germany |
-| Founder | Matthias Seba |
-| Contact | info@matthias-seba.de |
-| Logo | (von landingpage-next/public/logo.png) |
-| Cover-Image | bfsg-fix.de/og-image.png |
+| Product Name | BFSG-Fuchs |
+| Tagline DE (≤50 Zeichen) | WCAG-2.1-AA-Audit für deutsche Websites |
+| Tagline EN (≤50 Zeichen) | Automated WCAG 2.1 AA audits for German sites |
+| Website | https://bfsg-fuchs.de |
+| Preise | https://bfsg-fuchs.de/#pakete |
+| Kategorie | Accessibility Testing · Compliance · Website Audit |
+| Gegründet | 2026 |
+| Sitz | Kutenholz, Deutschland |
+| Gründer | Matthias Seba (Solo-Founder) |
+| Kontakt | info@bfsg-fix.de |
+| Logo | landingpage-next/public/ (Fuchs-Maskottchen „Filo") |
+| OG-Image | https://bfsg-fuchs.de/opengraph-image |
 
----
+### Elevator Pitch (DE)
 
-## Short Description (250 Zeichen)
+> BFSG-Fuchs ist ein automatisierter Barrierefreiheits-Scan für deutsche Websites.
+> Die Engine (axe-core via Playwright) prüft gerenderte Seiten gegen WCAG 2.1 AA —
+> den technischen Mindeststandard, auf den das Barrierefreiheitsstärkungsgesetz
+> (BFSG) über die EN 301 549 verweist. Ergebnis: PDF-Report mit priorisierten
+> Befunden plus Entwurf einer Barrierefreiheitserklärung. Jeder Report wird vor
+> Versand vom Gründer gesichtet. Ab 129 € einmalig, Hosting in Deutschland.
+
+### Elevator Pitch (EN)
+
+> BFSG-Fuchs runs automated accessibility audits for German websites. The engine
+> (axe-core via Playwright) tests fully rendered pages against WCAG 2.1 AA — the
+> technical baseline referenced by Germany's Accessibility Strengthening Act
+> (BFSG) via EN 301 549. Deliverables: a prioritized PDF report plus a draft
+> accessibility statement. Every report is reviewed by the founder before
+> delivery. One-time pricing from €129, hosted in Germany.
+
+### USPs (in jeder Description mindestens 2 davon)
+
+1. **Tiefen-Scan statt Overlay** — wir prüfen den gerenderten Quellcode und
+   liefern konkrete Befunde zum Beheben; wir legen kein Widget über die Seite.
+2. **Ehrliches Wording** — automatisierte technische Analyse mit menschlicher
+   Sichtung, klar deklarierte Grenzen, kein Konformitätsversprechen.
+3. **Deutscher Anbieter, deutsches Hosting** — Betrieb bei Hetzner (Nürnberg),
+   Datenverarbeitung DSGVO-konform, Reports auf Deutsch.
+4. **Einmalpreise statt Abo-Zwang** — Reports ab 129 € einmalig; Monitoring als
+   optionales Abo.
+5. **Owner-Review** — jeder bezahlte Report wird vor Versand persönlich geprüft
+   (Solo-Founder, kein anonymer Report-Automat).
+
+### Preise (Stand Juli 2026 — Endpreise, keine USt. gem. § 19 UStG)
+
+| Paket | Preis | Inhalt |
+|---|---|---|
+| Sofort-Check | 0 € | 60-Sekunden-Teaser: Score + Anzahl Befunde |
+| Basis | 129 € einmalig | WCAG-2.1-AA-Audit bis 5 Unterseiten, PDF-Report, Entwurf Barrierefreiheitserklärung |
+| Profi | 399 € einmalig | bis 25 Unterseiten, Umsetzungsplan, 30 Tage E-Mail-Support |
+| Cookie-Check Basis / Profi | 39 € / 69 € | technische Cookie-/Consent-Banner-Prüfung (TDDDG) |
+| Re-Check-Abo | 24,99 €/Monat oder 249 €/Jahr | Monitoring, monatlicher Re-Check, aktualisierte Erklärung |
+
+### Short Description DE (≤250 Zeichen)
 
 ```
-BFSG-Check ist ein automatisierter Compliance-Scanner für deutsche Websites. 
-In 60 Sekunden erhalten Sie einen Score und Vollreport mit konkreten 
-Findings nach WCAG 2.1 AA und BFSG. Vollreport ab 199 €, ohne Abo-Zwang. 
-Hosting in Deutschland, DSGVO-konform.
+BFSG-Fuchs: automatisierter Barrierefreiheits-Scan für deutsche Websites.
+WCAG-2.1-AA-Audit (axe-core), PDF-Report mit priorisierten Befunden + Entwurf
+der Barrierefreiheitserklärung. Ab 129 € einmalig. Hosting in Deutschland.
 ```
 
-## Long Description (1000 Zeichen)
+### Short Description EN (≤250 chars)
 
 ```
-BFSG-Check liefert automatisierte Compliance-Scans für deutsche Online-Shops, 
-Buchungsplattformen und B2C-Websites. Seit dem Barrierefreiheitsstärkungs-
-Gesetz (BFSG) am 28.06.2025 sind alle B2C-Websites mit über 10 Mitarbeitern 
-zur Barrierefreiheit verpflichtet.
+BFSG-Fuchs runs automated WCAG 2.1 AA audits (axe-core) for German websites.
+Prioritized PDF report plus a draft accessibility statement, founder-reviewed
+before delivery. One-time pricing from €129. Hosted in Germany.
+```
 
-Was wir liefern:
-- 60-Sekunden Gratis-Scan: Score (0-100) + Top-Findings
-- Vollreport (Basis 199 €): PDF mit allen Findings nach WCAG 2.1 AA
-- Profi-Paket (499 €): Multi-Page-Crawl + Umsetzungsplan + 30 Tage 
+### Long Description DE (~1.000 Zeichen)
+
+```
+BFSG-Fuchs prüft deutsche Websites automatisiert auf Barrierefreiheit. Seit dem
+28.06.2025 gilt das Barrierefreiheitsstärkungsgesetz (BFSG) — es verweist über
+die EN 301 549 im Kern auf WCAG 2.1 AA als technischen Mindeststandard.
+
+Was Sie bekommen:
+- Kostenloser Sofort-Check: Score + Anzahl der Befunde in rund 60 Sekunden
+- Basis (129 € einmalig): WCAG-2.1-AA-Audit bis 5 Unterseiten, PDF-Report mit
+  priorisierten Befunden, Entwurf einer Barrierefreiheitserklärung
+- Profi (399 € einmalig): bis 25 Unterseiten, Umsetzungsplan, 30 Tage
   E-Mail-Support
-- Cookie-Check (49 € / 79 €): TDDDG-konforme Cookie-Banner-Prüfung
-- Re-Check-Abo (39 €/Monat): monatliche Überprüfung mit Diff-Report
+- Cookie-Check (39 € / 69 €): technische Prüfung des Consent-Banners (TDDDG)
+- Re-Check-Abo (24,99 €/Monat oder 249 €/Jahr): Monitoring mit monatlichem
+  Re-Check und aktualisierter Erklärung
 
-Technisch: axe-core + Pa11y + eigene Regelwerke. Hosting in Deutschland 
-bei Hetzner Nürnberg. DSGVO-konform. Stripe Live-Payments. Sofort-Download 
-PDF nach Kauf.
+Technik: axe-core via Playwright — die Seiten werden im echten Browser
+gerendert und geprüft, kein Overlay-Widget. Jeder bezahlte Report wird vor
+Versand vom Gründer gesichtet. Hosting in Deutschland (Hetzner, Nürnberg),
+Datenverarbeitung DSGVO-konform.
 
-Made in Germany, ohne Abo-Zwang, mit deutscher Sprache und Anwalts-
-freundlichen Reports.
+Hinweis: automatisierte technische Analyse mit menschlicher Sichtung — keine
+Rechtsberatung.
+```
+
+### Long Description EN (~1,000 chars)
+
+```
+BFSG-Fuchs runs automated accessibility audits for German websites. Since
+28 June 2025, Germany's Accessibility Strengthening Act (BFSG) applies; via
+EN 301 549 it points to WCAG 2.1 AA as the technical baseline.
+
+What you get:
+- Free instant check: score + number of findings in about 60 seconds
+- Basis (€129 one-time): WCAG 2.1 AA audit of up to 5 subpages, prioritized
+  PDF report, draft accessibility statement (German)
+- Profi (€399 one-time): up to 25 subpages, remediation plan, 30 days of
+  email support
+- Cookie check (€39 / €69): technical review of the consent banner (TDDDG)
+- Re-check subscription (€24.99/month or €249/year): monitoring, monthly
+  re-audit, updated statement
+
+Tech: axe-core via Playwright — pages are rendered in a real browser and
+audited at source level; no overlay widget is injected. Every paid report is
+reviewed by the founder before delivery. Hosted in Germany (Hetzner,
+Nuremberg), GDPR-aligned data processing.
+
+Note: automated technical analysis with human review — not legal advice.
+```
+
+### Tags / Keywords
+
+```
+accessibility-testing · wcag · wcag-2-1 · bfsg · barrierefreiheit ·
+website-audit · axe-core · en-301-549 · cookie-compliance · tdddg ·
+made-in-germany · saas-germany
 ```
 
 ---
 
-## Tags / Keywords
+## Per-Plattform-Templates
+
+### 1. SaaSHub — PRIO 1 (https://www.saashub.com/services/submit)
+
+**Warum zuerst:** dofollow-Backlink (selten!), schnelle Freischaltung, EN-Plattform.
 
 ```
-accessibility-testing
-wcag
-bfsg
-website-compliance
-barrierefreiheit
-cookie-compliance
-tdddg
-audit-tool
-saas-germany
-made-in-germany
-```
-
----
-
-## Per-Listing-Templates
-
-### 1. SaaSHub (URL: https://www.saashub.com/services/submit)
-
-**Why SaaSHub first:** DR 74, **dofollow Backlink** (selten!), schnelle Approval.
-
-```
-Name: BFSG-Check
-Tagline: Compliance-Scans für deutsche Websites
-URL: https://bfsg-fix.de
+Name: BFSG-Fuchs
+Tagline: Automated WCAG 2.1 AA audits for German websites
+URL: https://bfsg-fuchs.de
 Category: Accessibility Testing → Website Audit Tools
-Pricing: Freemium (Gratis-Scan + Pakete ab 199 €)
+Pricing: Freemium (free instant check; paid reports from €129 one-time;
+  monitoring €24.99/month or €249/year)
 
-Description (paste Long Description above)
+Description: (Long Description EN einfügen)
 
 Features:
-- Automatischer WCAG 2.1 AA Scan
-- BFSG-spezifische Prüfregeln
-- Cookie-Compliance-Check (TDDDG)
-- Multi-Page-Crawl (bis 50 Seiten)
-- Umsetzungsplan als PDF
-- 30 Tage E-Mail-Support
-- Re-Check-Abo verfügbar
-- Deutsche Sprache
-- DSGVO-konform, Hosting Germany
+- Automated WCAG 2.1 AA audit (axe-core via Playwright, real browser rendering)
+- Source-level findings — no overlay widget
+- Prioritized PDF report in German
+- Draft accessibility statement included
+- Cookie/consent banner check (TDDDG)
+- Multi-page audit (up to 25 subpages on Profi)
+- Founder review of every paid report before delivery
+- Monthly re-check subscription available
+- Hosted in Germany (Hetzner)
 
-Alternatives to: Eye-Able, axe DevTools, AccessiBe, UserWay, eRecht24 BFSG-Check
+Alternatives to: Eye-Able, axe DevTools, Siteimprove, WAVE
 ```
+
+**Hinweis:** Eigen-Einreichung ist auf SaaSHub ausdrücklich vorgesehen — kein
+Disclosure-Text nötig, aber Account auf echten Namen (Matthias Seba) anlegen.
 
 ---
 
-### 2. G2 (URL: https://sell.g2.com/create-a-profile)
+### 2. G2 (https://sell.g2.com/create-a-profile)
 
-**Why G2:** B2B-Trust-Signal, Acquired Capterra/GetApp/Software Advice Feb 2026.
+**Warum:** B2B-Trust-Signal; Profil ist Voraussetzung für spätere echte Reviews.
 
 ```
-Product Name: BFSG-Check
+Product Name: BFSG-Fuchs
 Vendor: Matthias Seba
-Vendor Website: https://matthias-seba.de
-Product Category: Web Accessibility Testing
-Sub-Category: Compliance Management
+Vendor Website: https://bfsg-fuchs.de
+Product Category: Digital Accessibility Tools
+Sub-Category: Accessibility Testing / Compliance Management
 
-Description (paste Long Description above)
+Description: (Long Description EN einfügen)
 
-Pricing Model: One-time + Subscription
-Starting Price: $199 (one-time)
-Free Trial: Yes (60-second scan)
-Free Version: Yes (basic scan with Top-3 findings)
+Pricing Model: One-time + optional subscription
+Starting Price: €129 (one-time report) — free instant check available
+Free Trial: Yes (free 60-second instant check)
+Free Version: Yes (score + number of findings)
+Subscription: €24.99/month or €249/year (monitoring + monthly re-audit)
 
-Languages: German
+Languages: German (product + reports)
 Countries: Germany, Austria, Switzerland (DACH)
-Deployment: SaaS (Cloud)
-
-Integrations: Stripe, Brevo (Email), Google Analytics
+Deployment: SaaS (Cloud, hosted in Germany)
 ```
+
+**Wichtig:** Keine Fake-Reviews anstoßen. Reviews nur organisch von echten
+Kunden (z. B. dezenter Hinweis in der Report-Mail).
 
 ---
 
-### 3. Capterra/GetApp/Software Advice (URL: https://www.capterra.com.de/company/vendors)
+### 3. Capterra / GetApp / Software Advice (https://www.capterra.com/vendors)
 
-**Why:** 1 Form = 3 Listings (G2-Acquisition Feb 2026). DACH-Reach groß.
+**Warum:** 1 Formular = 3 Listings (Gartner Digital Markets), große DACH-Reichweite.
 
-Wie G2-Template, plus:
+Wie G2-Template (EN), plus:
+
 ```
 Target Companies: Small Business, Mid-Market
-Industries: E-Commerce, Healthcare, Legal Services, Tourism
+Industries: E-Commerce, Travel, Financial Services, Education, Healthcare
 Pricing Tiers:
-  - Free: 60-Second Scan
-  - Basis: $199 one-time
-  - Profi: $499 one-time  
-  - Re-Check: $39/month
+  - Free: 60-second instant check (score + findings count)
+  - Basis: €129 one-time (up to 5 subpages, PDF report + draft statement)
+  - Profi: €399 one-time (up to 25 subpages, remediation plan, 30 days support)
+  - Cookie check: €39 / €69 one-time
+  - Re-check subscription: €24.99/month or €249/year
+```
+
+**Hinweis:** Preise in EUR angeben, nicht in USD umrechnen — Zielmarkt ist DACH.
+
+---
+
+### 4. OMR Reviews (https://omr.com/de/reviews/list-software-or-agency)
+
+**Warum:** Stärkste DACH-B2B-Review-Plattform. Free-Tier reicht. Deutsch.
+
+```
+Software Name: BFSG-Fuchs
+Anbieter: Matthias Seba
+Webseite: https://bfsg-fuchs.de
+Kategorie: Barrierefreiheit / Digital Accessibility
+
+Beschreibung: (Long Description DE einfügen)
+
+Preismodell: Freemium (Einmalpreise + optionales Abo)
+Preis-Stufen:
+  - Sofort-Check: 0 €
+  - Basis: 129 € (einmalig, bis 5 Unterseiten)
+  - Profi: 399 € (einmalig, bis 25 Unterseiten, Umsetzungsplan, 30 Tage Support)
+  - Cookie-Check: 39 € / 69 €
+  - Re-Check-Abo: 24,99 €/Monat oder 249 €/Jahr
+
+Zielgruppe: Online-Shops, Dienstleister mit Buchungsfunktion, KMU
+Branchen: E-Commerce, Reise, Finanzdienstleistung, Bildung, Gesundheit
+Sprachen: Deutsch
+Hosting: Deutschland (Hetzner, Nürnberg), DSGVO-konforme Datenverarbeitung
 ```
 
 ---
 
-### 4. AlternativeTo (URL: https://alternativeto.net)
+### 5. AlternativeTo (https://alternativeto.net)
 
-**Why:** Long-Tail "Alternative to" SEO, dofollow auf Product-Pages.
+**Warum:** Long-Tail-SEO über „Alternative zu …"-Suchen, dofollow auf Produktseiten.
 
 ```
-Title: BFSG-Check
-URL: https://bfsg-fix.de
-License: Commercial (Freemium)
-Platform: Web/SaaS
+Title: BFSG-Fuchs
+URL: https://bfsg-fuchs.de
+License: Commercial (free instant check available)
+Platform: Web / SaaS
 
-Submit as Alternative To:
-- Eye-Able (top DACH competitor)
-- axe DevTools (US, dev-focused)
-- AccessiBe (overlay, controversial)
-- UserWay (overlay, controversial)
-- eRecht24 BFSG-Check (free, basic)
-- WAVE (free, basic)
+Submit as alternative to:
+- Eye-Able (DACH enterprise accessibility suite)
+- axe DevTools (developer-focused, US)
+- Siteimprove (enterprise, broad digital governance)
+- WAVE (free browser-based checker)
 
-Description (paste Short Description above + "German-specific, made in Germany, no overlay snake-oil")
+Description: (Short Description EN einfügen, plus:)
+"Built for the German market: audits map to WCAG 2.1 AA as referenced by the
+German BFSG via EN 301 549. Source-level audit — no overlay widget. Reports
+in German, hosted in Germany."
 
 Features:
-✓ WCAG 2.1 AA Scan
-✓ BFSG-Specific Rules (German legal context)
-✓ Cookie/TDDDG Check Included
-✓ PDF Reports in German
-✓ Multi-page Crawl
-✓ Implementation Plan
-✓ Made in Germany
-✓ DSGVO Compliant
-✓ No overlay (honest audit)
+- Automated WCAG 2.1 AA audit (axe-core via Playwright)
+- Prioritized PDF report (German)
+- Draft accessibility statement
+- Cookie/consent banner check (TDDDG)
+- Multi-page audit up to 25 subpages
+- Founder-reviewed reports
+- Monthly re-check subscription
 ```
+
+**Founder-Disclosure:** Beim Einreichen als „product owner / I'm the founder"
+markieren — AlternativeTo fragt das im Formular ab; wahrheitsgemäß angeben.
 
 ---
 
-### 5. TrustRadius (URL: https://solutions.trustradius.com/claim-your-profile/)
+### 6. Product Hunt (optional — nur mit vorbereitetem Launch-Tag)
+
+**Warum optional:** EN-/US-lastiges Publikum, DE-Nischenprodukt → Reichweite
+begrenzt. Nutzen: Backlink + Launch-Anlass für Social/PR. Nicht überinvestieren.
 
 ```
-Company: Matthias Seba (BFSG-Check)
-Product: BFSG-Check
-Category: Web Accessibility & Compliance
-URL: https://bfsg-fix.de
-
-Description (paste Long Description)
-
-Pricing:
-- Free Tier: Yes (60-second scan)
-- Starting Price: $199 one-time
-- Subscription: $39/month for Re-Check
-
-Best For: SMB e-commerce, German online shops, compliance-conscious
-Worst For: Enterprise (we don't replace Eye-Able's enterprise features)
-```
-
----
-
-### 6. SaaSworthy (URL: https://www.saasworthy.com)
-
-```
-Product Name: BFSG-Check
-Tagline: Compliance-Scans für deutsche Websites
-URL: https://bfsg-fix.de
-Category: Web Accessibility Testing → Compliance Tools
-
-Pricing: Freemium starting at $199 (one-time Vollreport)
-Free Plan: Yes (60-second basic scan)
-
-Description (paste Long Description)
-```
-
----
-
-### 7. OMR Reviews (URL: https://omr.com/de/reviews/list-software-or-agency)
-
-**Why:** Stärkste DACH-B2B-Review-Brand. Free-Tier reicht.
-
-```
-Software Name: BFSG-Check
-Anbieter: Matthias Seba
-Webseite: https://bfsg-fix.de
-Kategorie: Barrierefreiheit & Compliance Tools
-
-Beschreibung (paste Long Description in German)
-
-Preismodell: Freemium
-Preis-Stufen:
-  - Basis: 199 € (einmalig)
-  - Profi: 499 € (einmalig)
-  - Re-Check: 39 €/Monat
-  - Cookie-Basis: 49 €
-  - Cookie-Profi: 79 €
-
-Zielgruppe: Kleine und mittelständische Unternehmen, Online-Shops
-Branchen: E-Commerce, Reise, Bildung, Gesundheit
-Sprachen: Deutsch
-Hosting: Deutschland (Hetzner Nürnberg)
-DSGVO: Vollständig konform
-```
-
----
-
-### 8. W3C WAI Evaluation Tools List (https://www.w3.org/WAI/ER/tools/)
-
-**Why:** Globale Accessibility-Tools-Liste, höchste Authority.
-
-```
-Tool Name: BFSG-Check
-Vendor: Matthias Seba, Germany
-URL: https://bfsg-fix.de
-License: Commercial (Freemium)
+Name: BFSG-Fuchs
+Tagline (≤60 chars): Automated WCAG 2.1 AA audits for German websites
+URL: https://bfsg-fuchs.de
+Topics: Accessibility, SaaS, Legal Tech, Web Development
 
 Description:
-Automated WCAG 2.1 AA testing tool with German-language reports, 
-designed for BFSG (German Accessibility Strengthening Act) compliance. 
-Includes cookie-compliance check (TDDDG). Free 60-second scan; 
-paid PDF reports from €199.
+Germany's Accessibility Strengthening Act (BFSG) has applied since June 2025.
+BFSG-Fuchs runs automated WCAG 2.1 AA audits (axe-core via Playwright) on
+German websites and delivers a prioritized PDF report plus a draft
+accessibility statement — founder-reviewed before delivery. Free instant
+check; paid reports from €129 one-time; monitoring from €24.99/month.
+No overlay widget — we audit the rendered source so teams can actually fix
+the issues.
 
-Guidelines/Standards: WCAG 2.1 AA, BFSG
-Reports formats: PDF, HTML
-API Available: Planned (Q3 2026)
-Browser Extension: Planned (Q3 2026)
-
-Languages of Tool Interface: German
-Languages of Reports: German
+First (Maker) Comment — Pflicht-Disclosure:
+"Hi, I'm Matthias, the founder — solo project from northern Germany. I built
+BFSG-Fuchs because German SMBs needed a plain-language accessibility audit
+after the BFSG came into force. It's an automated technical analysis with
+human review, not legal advice and not a compliance badge. Happy to answer
+anything about the stack (Playwright + axe-core) or the German legal context."
 ```
 
 ---
 
-### 9. barrierefreie-agenturen.de (Editor-Outreach)
+### 7. TrustRadius (https://solutions.trustradius.com/claim-your-profile/)
 
-**Wo:** Email an Editor von https://barrierefreie-agenturen.de/ratgeber/barrierefreiheit-testen/
-
-**Subject:** Vorschlag: BFSG-Check als deutsches Audit-Tool in Ihrer Liste
-
-**Body:**
 ```
-Sehr geehrtes Team von barrierefreie-agenturen.de,
+Company: Matthias Seba (BFSG-Fuchs)
+Product: BFSG-Fuchs
+Category: Web Accessibility
+URL: https://bfsg-fuchs.de
 
-Ihre Ratgeber-Seite "Barrierefreiheit testen" listet bereits sehr gute 
-internationale Tools (axe DevTools, Eye-Able, BITV-Test). 
+Description: (Long Description EN einfügen)
 
-Ich möchte BFSG-Check (https://bfsg-fix.de) als deutsches, BFSG-
-spezifisches Audit-Tool für Ihre Übersicht vorschlagen:
+Pricing:
+- Free tier: Yes (60-second instant check)
+- Starting price: €129 one-time
+- Subscription: €24.99/month or €249/year (monitoring + monthly re-audit)
 
-- Automatischer WCAG 2.1 AA Scan in 60 Sekunden
-- Deutsche Sprache + BFSG-spezifische Auslegung
-- Vollreport-PDF ab 199 € (kein Abo-Zwang)
-- Cookie-Compliance (TDDDG) inklusive
-- Hosting in Deutschland, DSGVO-konform
+Best for: German SMB e-commerce and service websites in scope of the BFSG
+Not aimed at: Enterprises needing a full digital-governance suite
+```
 
-Falls Sie das Tool aufnehmen möchten: Gratis-Test ohne Anmeldung möglich. 
-Bei Bedarf liefere ich gerne ein Vollreport-Beispiel oder weiteren 
-Hintergrund.
+---
+
+### 8. SaaSworthy (https://www.saasworthy.com)
+
+```
+Product Name: BFSG-Fuchs
+Tagline: Automated WCAG 2.1 AA audits for German websites
+URL: https://bfsg-fuchs.de
+Category: Web Accessibility Testing → Compliance Tools
+
+Pricing: Freemium — free instant check; reports €129 / €399 one-time;
+monitoring €24.99/month or €249/year
+Free Plan: Yes (score + findings count)
+
+Description: (Long Description EN einfügen)
+```
+
+---
+
+### 9. W3C WAI Evaluation Tools List (https://www.w3.org/WAI/test-evaluate/tools/list/)
+
+**Warum:** Höchste Authority im Accessibility-Umfeld. Nüchtern-technisch einreichen.
+
+```
+Tool Name: BFSG-Fuchs
+Vendor: Matthias Seba, Germany
+URL: https://bfsg-fuchs.de
+License: Commercial (free instant check available)
+
+Description:
+Automated WCAG 2.1 AA testing for German-language websites, built around
+axe-core running in Playwright-rendered pages. Produces German PDF reports
+with prioritized findings and a draft accessibility statement, aimed at
+organizations in scope of the German BFSG (which references EN 301 549).
+Includes an optional cookie/consent banner check. Paid reports are reviewed
+by a human before delivery.
+
+Guidelines: WCAG 2.1 (Level AA), EN 301 549
+Type of tool: Online service
+Automated checks: Yes (axe-core)
+Report formats: PDF
+Language of interface/reports: German
+```
+
+---
+
+### 10. Editor-Outreach: Branchen-Verzeichnisse (DE)
+
+**Ziele:** barrierefreie-agenturen.de (Ratgeber „Barrierefreiheit testen"),
+Stiftung barrierefrei kommunizieren (Werkzeug-Datenbank). Beides sind
+öffentlich publizierte Redaktions-Kontakte mit direktem Themenbezug —
+zulässige redaktionelle Anfrage, KEIN Cold-Mail-Verstoß. Trotzdem: einmalig
+anschreiben, kein Follow-up-Spam.
+
+**Subject:** Vorschlag: BFSG-Fuchs als deutsches Audit-Tool für Ihre Übersicht
+
+```
+Sehr geehrtes Redaktionsteam,
+
+Ihre Übersicht zu Barrierefreiheits-Test-Werkzeugen listet bereits etablierte
+Tools. Ich möchte BFSG-Fuchs (https://bfsg-fuchs.de) als deutsches Audit-Tool
+zur Aufnahme vorschlagen:
+
+- Automatisierte technische Analyse nach WCAG 2.1 AA (axe-core via Playwright,
+  Prüfung der im Browser gerenderten Seite)
+- Kein Overlay-Widget — der Report liefert Befunde zum tatsächlichen Beheben
+- PDF-Report auf Deutsch inkl. Entwurf einer Barrierefreiheitserklärung,
+  vor Versand menschlich gesichtet
+- Kostenloser Sofort-Check ohne Anmeldung; Reports ab 129 € einmalig
+- Hosting in Deutschland, DSGVO-konforme Datenverarbeitung
+
+Zur Einordnung: Ich bin der Gründer (Solo-Anbieter aus Kutenholz). Das Tool
+ersetzt keine Rechtsberatung und gibt kein Konformitätsversprechen ab — es
+liefert den technischen Befund. Gern stelle ich einen Beispiel-Report oder
+weitere Details bereit.
 
 Mit freundlichen Grüßen
 Matthias Seba
-info@matthias-seba.de
-BFSG-Check · bfsg-fix.de
+info@bfsg-fix.de · https://bfsg-fuchs.de
 ```
 
-**Wichtig:** Das ist eine Anfrage an einen ÖFFENTLICH-PUBLIZIERTEN Editor mit DIREKTEM Branchen-Bezug → tolerierte presse@-ähnliche Kommunikation. KEIN Cold-Mail-Verstoß.
-
----
-
-### 10. Stiftung barrierefrei kommunizieren (E-Mail)
-
-**Wo:** https://www.barrierefrei-kommunizieren.de/ → Kontakt
-
-**Subject:** Vorschlag: BFSG-Check in Ihrer Werkzeug-Datenbank
-
-```
-Sehr geehrtes Team der Stiftung barrierefrei kommunizieren,
-
-Ihre Datenbank listet 719+ Hilfsmittel rund um Barrierefreiheit. 
-
-Ich möchte BFSG-Check (https://bfsg-fix.de) als deutsches Audit-Tool für 
-Website-Betreiber vorschlagen:
-
-[gleicher Body wie oben, angepasst]
-```
-
----
-
-### 11. DBSV (Anbieterliste Hilfsmittel)
-
-**Wo:** Email an `barrierefreiheit@dbsv.org`
-
-```
-Subject: Vorschlag: BFSG-Check als Audit-Tool für die Anbieterliste
-
-[Body wie oben — WICHTIG: keine Overlay-Sprache, klare Positionierung 
-als Audit/Scanner, NICHT als Overlay-Lösung. DBSV ist explizit Anti-Overlay.]
-```
+**Wichtig bei Anti-Overlay-Redaktionen (z. B. DBSV-Umfeld):** klar als
+Audit/Scanner positionieren, ausdrücklich KEIN Overlay — die Szene ist
+Overlay-kritisch, und genau das ist unser USP Nr. 1.
 
 ---
 
 ## Tracking
 
 Nach jeder Submission:
-- In `marketing/_logs/submissions-YYYY-MM.md` eintragen
-- Datum, Listing-URL, Status (Submitted/Live/Rejected)
-- Nach 7 Tagen: Live-Check, ob Listing online ist
-- Nach 30 Tagen: GA4-Referrer-Check, wie viel Traffic gekommen
+- In `marketing/_logs/submissions-YYYY-MM.md` eintragen: Datum, Plattform,
+  Listing-URL, Status (Submitted / Live / Rejected)
+- Nach 7 Tagen: Live-Check
+- Nach 30 Tagen: Referrer-Check (Analytics), Traffic-Beitrag notieren
 
----
+## Reihenfolge (empfohlen)
 
-## ROI-Erwartung
-
-| Listing | Aufwand | Klicks/Mo (Mo 3) | Sales/Mo |
-|---|---|---|---|
-| SaaSHub (dofollow) | 8 Min | 20-50 | 0-1 |
-| G2 | 8 Min | 30-100 | 0-2 |
-| Capterra-Stack (3 Listings) | 8 Min | 50-150 | 1-3 |
-| AlternativeTo | 5 Min | 10-30 | 0-1 |
-| TrustRadius | 4 Min | 10-30 | 0-1 |
-| SaaSworthy | 3 Min | 5-20 | 0-1 |
-| OMR Reviews | 30 Min | 50-150 | 1-2 |
-| W3C WAI | 15 Min | 5-20 (international) | 0-1 |
-| barrierefreie-agenturen.de | 15 Min | 20-80 (high-intent!) | 1-3 |
-| **TOTAL (alle live nach Mo 3)** | **~2h** | **200-630** | **3-15** |
+1. SaaSHub (dofollow, schnell)
+2. OMR Reviews (DACH-Kernzielgruppe)
+3. AlternativeTo (Long-Tail-SEO)
+4. Capterra-Stack (3 Listings in einem)
+5. G2 (Profil anlegen, Reviews organisch)
+6. W3C WAI Tools List (Authority, langsamer Prozess)
+7. TrustRadius + SaaSworthy (geringer Aufwand, mitnehmen)
+8. Editor-Outreach DE-Verzeichnisse
+9. Product Hunt (nur mit vorbereitetem Launch-Tag)
