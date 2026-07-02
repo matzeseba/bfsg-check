@@ -2,7 +2,35 @@
 
 ---
 
-## ▶️ NÄCHSTE SESSION STARTET HIER (01.07.2026, nachmittags) — PR5 + WS7
+## ▶️ NÄCHSTE SESSION STARTET HIER (02.07.2026, Nacht-Sprint) — Stand nach 5 Merges
+
+**Diese Session (autonomer 4h-Sprint) hat gemergt + live deployt (alle Deploys grün, `/health` ok):**
+- **#111** docs: DNS-Doku korrigiert (Brevo-DKIM = brevo1/brevo2-CNAMEs, bfsg-fuchs-Zone dokumentiert) + Preis-Sync W2 (OFFER.md/pricing-experiments auf 129/399/24,99)
+- **#112** SEO/AEO: **5 neue Pillar-Pages** (`/bfsg-frist`, `/barrierefreiheit-testen`, `/bfsg-fuer-webagenturen`, `/pdf-barrierefrei-machen`, `/mobile-barrierefreiheit`) + **`/llms.txt`** + Sitemap — alle live 200, legal-grep clean
+- **#113** LP-Design-Überarbeitung: PAS-Sektionsreihenfolge (RiskBand direkt nach Hero), Hero-Pill = Produktwert (nicht-klickbar), ResultCard-CTA **„Vollreport sichern — 129 €"** (statt 399-Direktsprung) + Value-Gate-Zeile, Subline gekürzt, Profi-Mengenanker „~16 €/Seite", **echter Fraunces-Italic** (war synthetisches Fredoka-Oblique), `lib/motion.ts` (11 EASE-Duplikate konsolidiert), Ambient-Reduktion. Visuell abgenommen (Prod-Build 1440px).
+- **#114** Backend W3–W6: `/api/resend` **force**-Param (mail-only, GoBD-sicher), **IPv6-SSRF-Härtung** (byte-basiert: fe80::/10 komplett, mapped-hex, 6to4, NAT64 — adversarial Security-Review FREIGABE mit Live-Verifikation), Admin-Rate-Limits, `sentry:`-Feld im /health, **erster echter /webhook-Supertest**. Tests 186/186.
+- **#115** IndexNow-Key + **IndexNow-Ping an Bing abgesetzt (HTTP 202)** für 10 Kern-URLs (Bing-first-GTM).
+
+### 🔴 P0 ENTDECKT — SMTP-VERSAND IST TOT (Owner-Fix ~2 Min!)
+Realer E2E-Test (mail-tester): **Lead-Teaser kam nicht an** → Diagnose via `gh workflow run diagnose.yml`: App-Log `535 Authentication failed`. Ursache in Brevo-UI verifiziert: **Settings → SMTP & API → SMTP-Schlüssel-Tabelle ist LEER** (kein aktiver Key mehr; Login `aedd19001@smtp-brevo.com` ok). **Folge: bezahlte Reports, Rechnungen, Owner-Gate-Mails werden aktuell NICHT zugestellt** (Kunde zahlt → nichts kommt an!). DOI/Nurture (Brevo-API) funktionieren.
+→ **OWNER:** Brevo → SMTP & API → „Neuen SMTP-Schlüssel generieren" → als `SMTP_PASS` in `/opt/bfsg-check/deployment/.env` → `docker compose up -d app`. Verifikation: `POST /api/lead` an mail-tester-Adresse.
+→ **Mitigation LIVE + E2E-BEWIESEN (PR #116):** `deliver()` fällt bei permanentem Auth-Fehler (535) auf die Brevo-Transactional-API zurück (BREVO_API_KEY, inkl. base64-PDF-Anhängen, Kill-Switch `MAILER_API_FALLBACK=false`). Tests 193/193. **Realer E2E-Beweis:** Teaser-Mail kam via Fallback bei mail-tester an — **Score 9,3/10 („Perfekt")**. Kundenzustellung ist also WIEDER GESICHERT; der Owner-SMTP-Key-Fix bleibt trotzdem sinnvoll (SMTP = Primärpfad, API = Netz).
+Details: Memory `smtp-outage-brevo-key`.
+
+### 🟠 Weitere Owner-Punkte (je ~1 Min, aus WS7/mail-tester 6,5/10)
+1. **Brevo-Templates Reply-To:** Templates #1 („DOI Gratis-Scan-Leads") + #7 („DOI Newsletter") → Erweiterte Einstellungen → Antwort-E-Mail-Adresse = `info@bfsg-fix.de` (aktuell `[DEFAULT_REPLY_TO]` = Gmail → **+2,75 Spam-Punkte**, größter Einzelposten). Auto-Mode durfte das nicht selbst ändern.
+2. **INWX bfsg-fix.de:** **2 SPF-Records + 2 DMARC-Records** (RFC-widrig → SPF-PermError). Fix dokumentiert in `deployment/dns-records.md`.
+3. Weiterhin offen: Steuernummer `INVOICE_TAX_NUMBER` im Server-.env · Stripe-Event `customer.subscription.updated` · `SENTRY_DSN` (Health zeigt jetzt ehrlich `sentry:false`).
+
+**WS7-Ergebnis:** SPF/DKIM/DMARC für bfsg-fuchs.de = **alle `pass`** (Authentication-Results live verifiziert). Eigene Transaktionsmail (Teaser via deliver()): **9,3/10 „Perfekt"** ✅. Die Brevo-DOI-Mail liegt bei 6,5/10 — steigt nach dem Reply-To-Owner-Fix (Punkt 1 oben) auf ~9.
+
+**Abschluss-Audit (02.07., 3 unabhängige Agenten):** Code-Review über alle 6 Session-PRs = **0 KRITISCH / 0 WICHTIG** (1 INFO: JSON-LD-Domain-Konvention, vorbestehend). Live-Audit Desktop+Mobile 390px = **PRODUKTIONSREIF** (kein Overflow, 1 H1/Seite, JSON-LD parsebar, Cookie-2-Button ok; 4 P2s dokumentiert: Font-Anzahl 6, brotli fehlt, Cookie-Banner>Sticky-CTA-Priorität ok, JSON-LD-Domain). Security-Review IPv6-SSRF = FREIGABE mit Live-Verifikation aller Bypass-Klassen.
+
+**Marketing-Stand:** SEO-Säule ausgebaut (10 Ratgeber-Seiten live) + AEO (llms.txt) + IndexNow aktiv. **Listings (SaaSHub etc.) NICHT machbar ohne Owner** (Account-Erstellung ist mir untersagt) — Texte liegen fertig in `marketing/listings-submission-templates.md`.
+
+---
+
+## (Historie) Session 01.07. — PR5 + WS7
 
 **PR2 + PR3 + PR4 sind fertig, gemergt + LIVE** (alle drei Deploys `success`, `/health` = `ok:true, stripe:true, live:true, mailer aktiv, aboEnabled:true`). Jeweils Branch → lokal build+test → Multi-Agent-Review (FREIGABE) → squash-merge → Deploy verifiziert. Details/Memory: [[pr2-pr4-report-glaubwuerdigkeit]].
 
