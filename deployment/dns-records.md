@@ -17,13 +17,38 @@
 | AAAA | `www` | `2a01:4f8:1c18:d890::1` | 3600 |
 | TXT | `@` | `v=spf1 include:spf.brevo.com ~all` | 3600 |
 | TXT | `_dmarc` | `v=DMARC1; p=none; rua=mailto:matthiasseba92@gmail.com` | 3600 |
-| TXT | `mail._domainkey` | *(kommt von Brevo nach Domain-Verifizierung)* | 3600 |
+| CNAME | `brevo1._domainkey` | `b1.bfsg-fix-de.dkim.brevo.com` | 3600 |
+| CNAME | `brevo2._domainkey` | `b2.bfsg-fix-de.dkim.brevo.com` | 3600 |
+
+> **Korrektur (02.07.2026):** Brevo nutzt **CNAME-Selektoren `brevo1`/`brevo2`**, NICHT den früher hier dokumentierten TXT auf `mail._domainkey`. Live per DNS verifiziert.
+
+### ⚠️ OFFENE DNS-FEHLER auf `bfsg-fix.de` (Owner-Fix bei INWX, je ~1 Min)
+Live-Abfrage 02.07.2026 zeigt **doppelte Records — beide RFC-widrig:**
+1. **Zwei SPF-TXT-Records** auf `@`: `v=spf1 a mx include:_spf.webspace.bz ~all` (INWX Mail Easy) UND `v=spf1 include:spf.brevo.com ~all`. Mehr als ein `v=spf1`-Record ⇒ **SPF PermError = SPF fail**. Fix: beide löschen, EINEN setzen: `v=spf1 a mx include:_spf.webspace.bz include:spf.brevo.com ~all`
+2. **Zwei DMARC-TXT-Records** auf `_dmarc`: mit und ohne `rua=`. Mehrere DMARC-Records ⇒ Empfänger ignorieren BEIDE. Fix: den ohne `rua=` löschen.
 
 ### Brevo Domain-Verifizierung
 1. https://app.brevo.com → **Senders, Domains & dedicated IPs → Domains → Domain hinzufügen** → `bfsg-fix.de`
 2. Brevo zeigt einen einmaligen Verifizierungs-TXT-Record (z. B. `brevo-code:abc123...`) — als TXT auf `@` setzen.
-3. Brevo zeigt den DKIM-Wert — als TXT auf `mail._domainkey` setzen.
+3. Brevo zeigt zwei **DKIM-CNAMEs** (`brevo1._domainkey` / `brevo2._domainkey`) — als CNAME setzen.
 4. In Brevo „Verifizieren" klicken → grüner Haken nach DNS-Propagation (5 Min – 4 h).
+
+---
+
+## 1b. `bfsg-fuchs.de` (Marken- + Sende-Domain) — Stand: live verifiziert 02.07.2026 ✅
+
+| Typ | Host / Name | Wert | Status |
+|---|---|---|---|
+| A | `@` | `178.105.83.0` | ✅ live |
+| AAAA | `@` | `2a01:4f8:1c18:d890::1` | ✅ live |
+| TXT | `@` | `v=spf1 include:spf.brevo.com ~all` | ✅ live |
+| TXT | `@` | `brevo-code:69af8f0d07a88b8b18828edde557ae23` | ✅ live |
+| CNAME | `brevo1._domainkey` | `b1.bfsg-fuchs-de.dkim.brevo.com` | ✅ live |
+| CNAME | `brevo2._domainkey` | `b2.bfsg-fuchs-de.dkim.brevo.com` | ✅ live |
+| TXT | `_dmarc` | `v=DMARC1; p=none; rua=mailto:rua@dmarc.brevo.com` | ✅ live |
+| MX | — | *(kein MX — Domain empfängt nicht; optional Null-MX `0 .` nach Warm-up)* | — |
+
+Transaktions-Absender ist `no-reply@bfsg-fuchs.de` (Brevo SMTP-Relay). SPF/DKIM/DMARC dieser Zone sind sauber — Restspam = Cold-Start-Reputation (Warm-up).
 
 ---
 
