@@ -606,32 +606,40 @@ export function annualRecheckDue(sub, now = Date.now()) {
   return now - last >= ANNUAL_RECHECK_DUE_MS;
 }
 
-function startAnnualRecheckTicker() {
-  const tick = async () => {
+// Ein Ticker-Durchlauf — exportiert für den Orchestrierungs-Test
+// (test/annual-recheck.test.js). `now` steuert Fälligkeit UND Retry-Bremse
+// konsistent (kein Mix aus Fake- und Echtzeit im Test).
+// WICHTIG: pro Tick wird höchstens EINE fällige Subscription abgearbeitet — der
+// Ticker teilt sich paidScanGate (Default-Concurrency 1) mit zahlenden Erstkäufen;
+// eine Serie gleichzeitig fälliger Jahres-Abos würde den Slot sonst minutenlang am
+// Stück blockieren. Bei 30-Tage-Fälligkeit ist das Warten unkritisch: der Rest wird
+// über die folgenden 6-h-Ticks aufgeholt.
+export async function annualRecheckTick(now = Date.now()) {
+  const active = await listSubscriptions({ status: 'ACTIVE' });
+  for (const sub of active) {
+    if (!annualRecheckDue(sub, now)) continue;
+    const lastTry = annualAttemptAt.get(sub.subscriptionId) || 0;
+    if (now - lastTry < ANNUAL_RECHECK_RETRY_MS) continue;
+    annualAttemptAt.set(sub.subscriptionId, now);
     try {
-      const active = await listSubscriptions({ status: 'ACTIVE' });
-      for (const sub of active) {
-        if (!annualRecheckDue(sub)) continue;
-        const lastTry = annualAttemptAt.get(sub.subscriptionId) || 0;
-        if (Date.now() - lastTry < ANNUAL_RECHECK_RETRY_MS) continue;
-        annualAttemptAt.set(sub.subscriptionId, Date.now());
-        try {
-          // Queue-Key pro Kalendermonat → idempotent gegen Doppel-Ticks nach Neustart.
-          const monthKey = new Date().toISOString().slice(0, 7);
-          await runSubscriptionRecheck(sub, { cycleKey: `${sub.subscriptionId}-m-${monthKey}` });
-        } catch (err) {
-          await sendAlert(
-            `Jahres-Abo-Re-Check fehlgeschlagen: ${sub.email}`,
-            `Subscription: ${sub.subscriptionId}\nURL: ${sub.url}\nFehler: ${err.message}\n\nNächster automatischer Versuch in ~20 h.`
-          );
-          sentry.captureException(err, { stage: 'annualRecheck', subscription_id: sub.subscriptionId });
-          logger.error({ subscriptionId: sub.subscriptionId, err: err.message }, 'JAHRES-ABO-RE-CHECK FEHLGESCHLAGEN');
-        }
-      }
+      // Queue-Key pro Kalendermonat → idempotent gegen Doppel-Ticks nach Neustart.
+      const monthKey = new Date(now).toISOString().slice(0, 7);
+      await runSubscriptionRecheck(sub, { cycleKey: `${sub.subscriptionId}-m-${monthKey}` });
     } catch (err) {
-      logger.error({ err: err.message }, 'Jahres-Abo-Ticker Fehler');
+      await sendAlert(
+        `Jahres-Abo-Re-Check fehlgeschlagen: ${sub.email}`,
+        `Subscription: ${sub.subscriptionId}\nURL: ${sub.url}\nFehler: ${err.message}\n\nNächster automatischer Versuch in ~20 h.`
+      );
+      sentry.captureException(err, { stage: 'annualRecheck', subscription_id: sub.subscriptionId });
+      logger.error({ subscriptionId: sub.subscriptionId, err: err.message }, 'JAHRES-ABO-RE-CHECK FEHLGESCHLAGEN');
     }
-  };
+    return; // max. 1 Sub pro Tick (paidScanGate-Fairness, siehe oben)
+  }
+}
+
+function startAnnualRecheckTicker() {
+  const tick = () =>
+    annualRecheckTick().catch((err) => logger.error({ err: err.message }, 'Jahres-Abo-Ticker Fehler'));
   tick(); // Start-Tick fängt nach Redeploy überfällige Re-Checks sofort
   const handle = setInterval(tick, ANNUAL_RECHECK_TICK_MS);
   handle.unref?.();
