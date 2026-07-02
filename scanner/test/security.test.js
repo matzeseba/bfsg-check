@@ -22,6 +22,17 @@ test('SSRF: rejects localhost, private, link-local, IPv6-ULA', async () => {
   }
 });
 
+test('SSRF: schließt IPv6-Lücken (W5) — fe90/Hex-mapped/6to4/NAT64 → blockiert', async () => {
+  for (const bad of [
+    'http://[fe90::1]/',            // fe80::/10 (String-startsWith('fe80') verfehlte fe90/feb0)
+    'http://[::ffff:7f00:1]/',      // IPv4-mapped in Hex-Form → 127.0.0.1 (Dotted-Regex verfehlte das)
+    'http://[2002:7f00:1::]/',      // 6to4 → eingebettet 127.0.0.1
+    'http://[64:ff9b::7f00:1]/'     // NAT64 → eingebettet 127.0.0.1
+  ]) {
+    await assert.rejects(() => assertPublicHttpUrl(bad), { message: /.+/ }, `Sollte blockieren: ${bad}`);
+  }
+});
+
 test('SSRF: accepts public hostnames, returns addresses', async () => {
   const safe = await assertPublicHttpUrl('https://example.com/');
   assert.equal(typeof safe.url, 'string');

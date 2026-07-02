@@ -858,7 +858,7 @@ app.post('/api/lead', rateLimit({ windowMs: 60_000, max: 5 }), async (req, res) 
 app.get('/health', (req, res) => {
   const live = isStripeLive();
   const mailerOk = mailerStatus().startsWith('aktiv');
-  res.json({ ok: !(live && !mailerOk), stripe: !!stripe, live, mailer: mailerStatus(), aboEnabled: ENABLE_ABO });
+  res.json({ ok: !(live && !mailerOk), stripe: !!stripe, live, mailer: mailerStatus(), aboEnabled: ENABLE_ABO, sentry: sentry.enabled });
 });
 
 // --- DSGVO Art. 15 (Export) / Art. 17 (Löschung) ---
@@ -903,7 +903,7 @@ app.get('/api/dsgvo/confirm', rateLimit({ windowMs: 60_000, max: 5 }), async (re
 });
 
 // --- Admin-Endpoints (Bearer-Token via ADMIN_TOKEN env) ---
-app.get('/admin/orders', requireAdminAuth, async (req, res) => {
+app.get('/admin/orders', rateLimit({ windowMs: 60_000, max: 30 }), requireAdminAuth, async (req, res) => {
   try {
     const { listOrders } = await import('./lib/orders.js');
     const limit = Math.min(Number(req.query.limit) || 100, 1000);
@@ -914,7 +914,7 @@ app.get('/admin/orders', requireAdminAuth, async (req, res) => {
   }
 });
 
-app.get('/admin/subscriptions', requireAdminAuth, async (req, res) => {
+app.get('/admin/subscriptions', rateLimit({ windowMs: 60_000, max: 30 }), requireAdminAuth, async (req, res) => {
   try {
     const { listSubscriptions } = await import('./lib/subscriptions.js');
     const subs = await listSubscriptions();
@@ -928,15 +928,26 @@ app.get('/admin/subscriptions', requireAdminAuth, async (req, res) => {
 // SF2: atomarer In-Memory-Lock gegen parallele Doppel-Auslieferung (zwei Resends
 // würden sonst doppelt mailen + zwei GoBD-Rechnungsnummern ziehen).
 const resendInFlight = new Set();
-app.post('/api/resend/:sessionId', requireAdminAuth, async (req, res) => {
+app.post('/api/resend/:sessionId', rateLimit({ windowMs: 60_000, max: Number(process.env.RESEND_RATE_MAX || 10) }), requireAdminAuth, async (req, res) => {
   const { sessionId } = req.params;
   const { getOrder, markStatus } = await import('./lib/orders.js');
   // order = Snapshot von VOR dem RESENDING-Write (für mailOnly-Entscheidung + SF1-Rollback).
   // let: wird beim Konsum eines offenen Freigabe-Jobs (PR5) auf den READY_NOT_MAILED-Stand neu geladen.
   let order = await getOrder(sessionId);
   if (!order) return res.status(404).json({ error: 'Session nicht gefunden' });
-  if (order.status === 'MAILED' || order.status === 'RESENT') {
+  // W3: force = admin-gewollter Neu-Versand einer bereits ausgelieferten Order. Liefert
+  // NUR den vorhandenen Report + die vorhandene GoBD-Rechnungsnummer erneut (mail-only) —
+  // NIEMALS ein Voll-Rescan (der zöge für einen abgeschlossenen Verkauf eine zweite
+  // Rechnungsnummer, §14 UStG/GoBD). Ohne fertiges Report-PDF gibt es nichts nachzusenden.
+  const force = req.body?.force === true;
+  if ((order.status === 'MAILED' || order.status === 'RESENT') && !force) {
     return res.status(409).json({ error: `Order Status ${order.status} — bereits ausgeliefert.` });
+  }
+  if (force && !order.pdfPath) {
+    return res.status(409).json({ error: 'force nicht möglich: kein fertiger Report (pdfPath) vorhanden — ein Voll-Rescan würde eine neue Rechnungsnummer ziehen.' });
+  }
+  if (force && req.body?.url) {
+    return res.status(400).json({ error: 'force und korrigierte URL schließen sich aus: force liefert den vorhandenen Report neu (kein Rescan).' });
   }
   // Optionale, admin-korrigierte Ziel-URL (analog overrideEmail): liefert eine bezahlte
   // Bestellung aus, deren bestellte URL kaputt ist (z. B. Apex 404/Cert-Fehler, echte
@@ -1008,7 +1019,9 @@ app.post('/api/resend/:sessionId', requireAdminAuth, async (req, res) => {
     // Voll-Resend-Fallback.
     // Bei korrigierter URL den mail-only-Fastpath erzwingen-überspringen: der vorhandene
     // Report gilt für die falsche/kaputte URL → voller Re-Scan gegen die neue URL.
-    const mailOnly = !overrideUrl && order.status === 'READY_NOT_MAILED' && order.pdfPath;
+    // W3: MAILED/RESENT hier zugelassen (force-Pfad oben abgesichert: kein overrideUrl,
+    // pdfPath vorhanden) → force liefert den fertigen Report + vorhandene Nummer mail-only neu.
+    const mailOnly = !overrideUrl && ['READY_NOT_MAILED', 'MAILED', 'RESENT'].includes(order.status) && order.pdfPath;
     if (mailOnly) {
       await services.sendReportFor({
         to: recipient, company: order.company || '',
@@ -1219,7 +1232,7 @@ export { app };
 if (isMain) {
   const server = app.listen(PORT, () => {
     logger.info(
-      { publicUrl: PUBLIC_URL, stripe: !!stripe, abo: ENABLE_ABO, mailer: mailerStatus() },
+      { publicUrl: PUBLIC_URL, stripe: !!stripe, abo: ENABLE_ABO, mailer: mailerStatus(), sentry: sentry.enabled },
       `BFSG-Audit-Server auf ${PUBLIC_URL}`
     );
     // Nicht-blockierend: Server ist sofort bereit, Reconcile läuft im Hintergrund.
