@@ -65,11 +65,11 @@ const FAQ = [
   },
   {
     q: "Hat die Marktüberwachung schon Bußgelder verhängt?",
-    a: "Öffentlich belegte Einzel-Bußgelder der MLBF sind uns zum Stand Juli 2026 nicht bekannt. Der gesetzliche Rahmen existiert aber: § 37 BFSG sieht Bußgelder bis 100.000 € vor (bei minderschweren Verstößen bis 10.000 €). Die MLBF ist mit rund 70 Mitarbeitenden arbeitsfähig und prüft nach eigenen Angaben auch aktiv per Stichproben — nicht nur auf Beschwerden hin.",
+    a: "Öffentlich belegte Einzel-Bußgelder der MLBF sind uns zum Stand Juli 2026 nicht bekannt. Der gesetzliche Rahmen existiert aber: § 37 BFSG sieht für bestimmte Verstöße — unter anderem das Anbieten nicht barrierefreier Dienstleistungen — Bußgelder bis 100.000 € vor; für Verstöße gegen Informations- und Auskunftspflichten bis 10.000 €. Die MLBF ist mit rund 70 Mitarbeitenden arbeitsfähig und prüft nach eigenen Angaben auch aktiv per Stichproben — nicht nur auf Beschwerden hin.",
   },
   {
     q: "Ich habe noch nichts umgesetzt — ist es jetzt zu spät?",
-    a: "Nein, aber Abwarten verschlechtert die Position. Wer nachweisbar prüft, priorisiert behebt und eine Barrierefreiheitserklärung gemäß § 15 BFSGV veröffentlicht, steht gegenüber Marktüberwachung und möglichen Abmahnern deutlich besser da als bei Stillstand. Der erste Schritt ist eine technische Bestandsaufnahme — automatisiert geht das in Minuten.",
+    a: "Nein, aber Abwarten verschlechtert die Position. Wer nachweisbar prüft, priorisiert behebt und eine Barrierefreiheitserklärung gemäß § 14 BFSG (i. V. m. der BFSGV) veröffentlicht, steht gegenüber Marktüberwachung und möglichen Abmahnern deutlich besser da als bei Stillstand. Der erste Schritt ist eine technische Bestandsaufnahme — automatisiert geht das in Minuten.",
   },
   {
     q: "Welche Mängel fallen in der Praxis am häufigsten auf?",
@@ -159,7 +159,7 @@ export default function BfsgEinJahrBilanzPage() {
             Schnitt nur rund 49 % der Barrierefreiheits-Kriterien. Eine benannte Primärstudie mit
             Stichprobengröße liegt der Zahl nicht bei — sie deckt sich aber mit dem Bild, das wir aus
             automatisierten Scans kennen: Die Mehrheit der geprüften Seiten zeigt Findings, und selbst die
-            Barrierefreiheitserklärung gemäß § 15 BFSGV — eine vergleichsweise einfach erfüllbare
+            Barrierefreiheitserklärung gemäß § 14 BFSG — eine vergleichsweise einfach erfüllbare
             Grundpflicht — fehlt vielerorts.
           </p>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
@@ -181,8 +181,9 @@ export default function BfsgEinJahrBilanzPage() {
             Stichproben.
           </p>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            Der gesetzliche Rahmen: § 37 BFSG sieht Bußgelder bis 100.000 € vor, bei minderschweren Verstößen
-            bis 10.000 €. Öffentlich belegte Einzel-Bußgelder sind uns zum Stand Juli 2026 nicht bekannt — wir
+            Der gesetzliche Rahmen: § 37 BFSG sieht für bestimmte Verstöße — unter anderem das Anbieten nicht
+            barrierefreier Dienstleistungen — Bußgelder bis 100.000 € vor; für Verstöße gegen Informations-
+            und Auskunftspflichten bis 10.000 €. Öffentlich belegte Einzel-Bußgelder sind uns zum Stand Juli 2026 nicht bekannt — wir
             verzichten bewusst auf Drohkulissen. Die realistische Einordnung: Die Behörde setzt bisher
             erkennbar auf Prüfung und Nachbesserung, aber der Sanktionsrahmen steht und die Stichproben-Praxis
             läuft.
@@ -231,7 +232,7 @@ export default function BfsgEinJahrBilanzPage() {
               Fix-Plan spart Entwicklerstunden.
             </li>
             <li>
-              <strong>Barrierefreiheitserklärung veröffentlichen:</strong> Die Erklärung gemäß § 15 BFSGV ist
+              <strong>Barrierefreiheitserklärung veröffentlichen:</strong> Die Erklärung gemäß § 14 BFSG ist
               eine Grundpflicht, fehlt aber laut itiko.de (Stand 30.06.2026) vielerorts. Bekannte Mängel
               benennen, Fortschritt dokumentieren — das zeigt Marktüberwachung und möglichen Abmahnern, dass
               das Thema aktiv bearbeitet wird.

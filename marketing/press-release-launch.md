@@ -133,7 +133,9 @@ und Dienstleistungen (MLBF) in Magdeburg ihre Arbeit aufgenommen — die
 gemeinsame Behörde der 16 Bundesländer, ausgestattet mit rund 70 
 Mitarbeitenden (laut itiko.de, Stand 30.06.2026). Sie prüft nach eigenen 
 Angaben reaktiv auf Beschwerden und aktiv per Stichproben. Der gesetzliche 
-Bußgeldrahmen des § 37 BFSG reicht bis 100.000 Euro; öffentlich belegte 
+Bußgeldrahmen des § 37 BFSG reicht je nach Verstoß bis 100.000 Euro (für 
+bestimmte Tatbestände, etwa das Anbieten nicht barrierefreier 
+Dienstleistungen; im Übrigen bis 10.000 Euro); öffentlich belegte 
 Einzel-Bußgelder sind bislang nicht bekannt (Stand Juli 2026).
 
 Parallel ist das private Abmahngeschehen professioneller geworden. Auf die 
