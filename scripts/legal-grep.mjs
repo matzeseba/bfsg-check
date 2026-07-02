@@ -40,35 +40,49 @@ const FORBIDDEN = [
 
 // ---------------------------------------------------------------------------
 // Whitelist: legitime Negationen / Disclaimer / Meta-Diskussion.
-// Geprüft gegen ein Fenster aus Vorzeile + aktueller Zeile, damit umgebrochene
-// Sätze („Keine Garantie für\nVollständigkeit … BFSG-Konformität") erkannt werden.
+// Geprüft gegen einen positionsnahen Kontext-Slice um den jeweiligen Treffer
+// (nicht die ganze Zeile), inkl. Vorzeile für umgebrochene Sätze
+// („Keine Garantie für\nVollständigkeit … BFSG-Konformität").
 // ---------------------------------------------------------------------------
 const WHITELIST = [
-  // „keine Garantie", „keine Konformitätsgarantie", „Keine Empfehlung oder Garantie",
-  // „Keine Konformitäts-, Garantie- oder Siegel-Claims", „keine … garantiert …"
-  /kein(e[nrsm]?|erlei)?\s+(?:\S+\s+){0,4}\S*garant/i,
+  // Echte Negation des Begriffs: „keine Garantie", „keine Konformitätsgarantie",
+  // „Keine Empfehlung oder Garantie". Zwei Schutzmechanismen gegen falsche
+  // Whitelist-Treffer wie „Kein Wunder, wir garantieren …":
+  //  (a) Zwischenwörter dürfen keine Satz-/Klauselzeichen enthalten (,.!?:;),
+  //  (b) das Zielwort muss nominal sein (…garantie/…garantien) — das Verb
+  //      „garantieren" wird nie über diese Regel gewhitelistet.
+  /kein(e[nrsm]?|erlei)?\s+(?:[^\s,.!?:;]+\s+){0,4}\S*garantie[ns]?\b/i,
   // Negation im selben Satz, vor oder nach dem Wortstamm:
   // „nicht garantiert", „Es geht nicht um Garantien", „Garantie wird ausdrücklich nicht …"
   /\bnicht\b[^.!?]{0,40}garant/i,
   /garant[^.!?]{0,40}\bnicht\b/i,
-  /ohne\s+\S*garantie/i,
+  /ohne\s+\S*garantie\b/i,
   // Meta-Kompositum = Diskussion ÜBER Garantie-Sprache, kein Claim:
   // „Garantie-Claims", „Garantie-Eindruck", „Heils-/Garantie-Sprache", „Garantieversprechen"
   /garantie-/i,
   /garantieversprechen/i,
-  // Zeilen, die Formulierungen explizit als irreführend/verboten einordnen
+  // Kontexte, die Formulierungen explizit als irreführend/verboten einordnen
   /irreführ/i,
   /verboten/i,
   // „das kann kein Tool leisten", „das kann niemand"
   /kann\s+(kein|niemand)/i,
-  // Negationen der übrigen Begriffe
+  // Zitierte Verbots-Beispiele in Doku — nur typografische Anführungszeichen
+  // („…", »…«), NICHT gerade Quotes (") — die stehen in TSX um echte Strings.
+  /[„»«]\s?(garantiert\b|BFSG[-\s]?konform|rechtssicher)/i,
+  // Negationen der übrigen Begriffe (gleiche Klausel-Schranke wie oben)
   /nicht\s+BFSG[-\s]?konform/i,
-  /kein(e[nrsm]?)?\s+(?:\S+\s+){0,3}(TÜV|TUEV|DEKRA)/i,
+  /kein(e[nrsm]?)?\s+(?:[^\s,.!?:;]+\s+){0,3}(TÜV|TUEV|DEKRA)/i,
   // Google-/Bing-Ads-Keyword-Listen: Suchanfragen der Nutzer, keine eigenen Claims
   /bfsg\s+konform\s+machen/i,
   /cookie\s+banner\s+rechtssicher\s+2026/i,
   /keywords?\s*:/i,
 ];
+
+// Whitelist-Kontext: so viele Zeichen vor/nach dem Treffer werden geprüft.
+// 120 rückwärts reicht bis in die Vorzeile (Disclaimer-Umbrüche), 60 vorwärts
+// fängt nachgestellte Negationen („… Garantie wird ausdrücklich nicht gewährt").
+const CTX_BEFORE = 120;
+const CTX_AFTER = 60;
 
 // Code-Kommentare in TS/JS-Dateien sind nicht nutzersichtbar → kein Marketing-Claim.
 const CODE_EXTS = new Set([".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"]);
@@ -128,13 +142,21 @@ for (const file of files) {
 
   lines.forEach((line, i) => {
     if (isCode && COMMENT_LINE.test(line)) return;
-    // Fenster für Whitelist-Prüfung: Vorzeile + aktuelle Zeile (Zeilenumbrüche in Sätzen)
-    const window = (i > 0 ? lines[i - 1] + "\n" : "") + line;
+    // Fenster: Vorzeile + aktuelle Zeile (für umgebrochene Sätze). Die Whitelist
+    // wird nur gegen einen Slice um die Treffer-Position geprüft, damit ein
+    // Disclaimer am Zeilenanfang keinen entfernten Claim am Zeilenende deckt.
+    const prefix = i > 0 ? lines[i - 1] + "\n" : "";
+    const windowText = prefix + line;
     for (const rule of FORBIDDEN) {
       rule.re.lastIndex = 0;
       const match = rule.re.exec(line);
       if (!match) continue;
-      if (WHITELIST.some((w) => w.test(window))) continue;
+      const mi = prefix.length + match.index;
+      const ctx = windowText.slice(
+        Math.max(0, mi - CTX_BEFORE),
+        mi + match[0].length + CTX_AFTER
+      );
+      if (WHITELIST.some((w) => w.test(ctx))) continue;
       findings.push({
         loc: `${rel}:${i + 1}`,
         rule: rule.name,
