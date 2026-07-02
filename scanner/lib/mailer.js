@@ -294,9 +294,13 @@ const SEVERITY_ORDER = ['critical', 'serious', 'moderate', 'minor'];
 const SEVERITY_LABEL = { critical: 'KRITISCH', serious: 'SCHWERWIEGEND', moderate: 'MITTEL', minor: 'GERING' };
 // Solide Füll-Farben → in hellen UND dunklen Mail-Clients (Outlook Dark) kontraststark.
 // Keine hellgrau-auf-weiß-Chips, die in Dark-Mode verschwinden. Textfarbe je Fläche:
-// Weiß auf Amber wäre nur ~1,9:1 → dunkler Text auf der hellen MITTEL-Fläche.
+// WCAG 1.4.3 (AA, Normaltext 4,5:1): Weiß auf Rot/Orange/Amber läge nur bei
+// ~3,3:1 / ~3,1:1 / ~1,9:1 → dunkler Text #2b1206 auf den hellen Flächen
+// (KRITISCH 5,36:1, SCHWERWIEGEND 5,63:1, MITTEL ~7:1); nur GERING (#6b7280)
+// trägt weißen Text (4,54:1). GESPIEGELT in landingpage-next/lib/severity.ts —
+// bei Änderungen hier dort nachziehen.
 const SEVERITY_COLOR = { critical: '#F8554B', serious: '#ED6A33', moderate: '#f5b13d', minor: '#6b7280' };
-const SEVERITY_TEXT = { critical: '#ffffff', serious: '#ffffff', moderate: '#2b1206', minor: '#ffffff' };
+const SEVERITY_TEXT = { critical: '#2b1206', serious: '#2b1206', moderate: '#2b1206', minor: '#ffffff' };
 
 // Leitet je Top-Befund den Schweregrad her. renderTeaser (report.js) sortiert die
 // Befunde streng nach IMPACT_WEIGHT absteigend (critical>serious>moderate>minor) und

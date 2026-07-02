@@ -14,7 +14,9 @@ type LeadCaptureProps = {
   // Fuer die Value-Mail (PR2): alle Befund-Kategorien + Top-3-Prioritaeten,
   // damit die E-Mail exakt das im Formular versprochene Paket liefert.
   counts?: ScanCounts;
-  topIssues?: string[];
+  // readonly: ScanResult.topIssues (ResultPanel) ist readonly — akzeptiert
+  // sowohl API-Daten als auch as-const-Beispieldaten.
+  topIssues?: readonly string[];
 };
 
 // Value-first-Lead-Magnet: NACH dem ungated Score + Top-Befunden, VOR dem Kauf.
