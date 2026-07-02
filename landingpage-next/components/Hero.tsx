@@ -211,16 +211,6 @@ export function Hero() {
             </motion.p>
           </div>
 
-          {/* Fox-Maskottchen als großer, transparenter Backdrop HINTER dem
-              Report-Visual (Design-Wunsch: groß + dezent im Hintergrund, NICHT als
-              knallige Vollfarb-Figur im Vordergrund — wirkt professioneller). Rein
-              dekorativ → aria-hidden + leeres alt. next/image mit priority (rechte
-              Hero-Spalte, nahe LCP), feste width/height (Lupen-Pose-Ratio 680×904)
-              → kein CLS. -z-10 hält es hinter der Report-Card; opacity niedrig
-              (Hellmodus dezenter für AA-Lesbarkeit des darüberliegenden Texts,
-              Dunkelmodus etwas präsenter). animate-float-slow ist reduced-motion-
-              gated. pointer-events-none → kein Klick-Fang. Eltern-Section hat
-              overflow-hidden → kein horizontaler Overflow auf Mobile. */}
           <HeroVisual />
         </motion.div>
       </div>

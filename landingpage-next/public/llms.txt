@@ -27,6 +27,7 @@ Wichtig: BFSG-Fuchs liefert eine automatisierte technische Analyse mit menschlic
 - [axe vs. Lighthouse vs. WAVE](https://bfsg-fuchs.de/axe-lighthouse-wave-vergleich): Vergleich der Test-Tools.
 - [BFSG-Software-Anbieter im Vergleich](https://bfsg-fuchs.de/bfsg-software-anbieter-vergleich): 5 Anbieter (Scan-Report, Monitoring, Widget) mit Preisen und Leistungen, objektive Kriterien.
 - [WCAG 2.1 vs. 2.2](https://bfsg-fuchs.de/wcag-2-1-vs-2-2): Die neuen Erfolgskriterien erklärt.
+- [1 Jahr BFSG: Bilanz 2026](https://bfsg-fuchs.de/bfsg-1-jahr-bilanz): Marktstand (~49 % Kriterienerfüllung), MLBF-Marktüberwachung, Abmahnrisiko — mit Quellen.
 
 ## Rechtliches
 

@@ -133,30 +133,38 @@ export const DEADLINE = {
   kicker: "Verstrichen seit dem Stichtag",
 } as const;
 
-// Daten fuer das Hero-Audit-Report-Visual (rein illustrativ, kein echter Scan).
-// Sichtbar als Beispiel/Demo gekennzeichnet: sampleLabel (Chip in der App-Chrome)
-// + previewHeading (Ueberschrift ueber dem Visual) machen die Vorschau-Natur transparent.
+// Daten für die Hero-Vorschau des Sofort-Ergebnisses (rein illustrativ, kein
+// echter Scan). Sichtbar als Beispiel gekennzeichnet: sampleLabel (Chip in der
+// App-Chrome) + previewHeading machen die Vorschau-Natur transparent.
+// HeroVisual rendert damit DIESELBE ResultPanel-Komponente wie das echte
+// Scan-Ergebnis (ResultCard) — Vorschau == Realität per Konstruktion.
 export const HERO_VISUAL = {
   reportPath: "report/4f2a",
   sampleLabel: "Beispiel",
-  // Vorschau-Überschrift über dem Report-Visual. previewAccent = das eine
-  // Fraunces-Italic-Akzentwort (Editorial-Rhythmus); Hero.tsx splittet die
-  // Überschrift an diesem Wort und setzt es kursiv-gradient.
-  previewHeading: "So sieht Ihr Sofort-Ergebnis aus",
+  // Vorschau-Überschrift über dem Visual — ehrlich: exakt dieses Format liefert
+  // der Gratis-Check. previewAccent = das eine Fraunces-Italic-Akzentwort
+  // (Editorial-Rhythmus); Hero.tsx splittet die Überschrift an diesem Wort.
+  previewHeading: "Ihr Sofort-Ergebnis — exakt in diesem Format",
   previewAccent: "Sofort-Ergebnis",
-  score: 62,
-  grade: "C",
-  totalFindings: 17,
-  criticalCount: 4,
-  findings: [
-    { severity: "Kritisch", title: "8 Bilder ohne Alt-Text", tone: "high" },
-    { severity: "Kritisch", title: "Kontrast 1.9:1 auf CTA-Buttons", tone: "high" },
-    { severity: "Mittel", title: "Formularfeld ohne sichtbares Label", tone: "mid" },
-    { severity: "Hinweis", title: "Heading-Hierarchie überspringt H3", tone: "low" },
-  ],
-  contrast: {
-    before: { ratio: "1.9:1", label: "vorher" },
-    after: { ratio: "7.4:1", label: "nachher" },
+  // Wahr: nach dem Gratis-Check gibt es die Übersicht zusätzlich per
+  // Double-Opt-in-Mail (Value-Mail, scanner/lib/mailer.js buildLeadTeaser).
+  footnote:
+    "Diese Übersicht erhalten Sie nach dem Gratis-Check zusätzlich per E-Mail.",
+  // ScanResult-förmige, in sich konsistente Beispieldaten:
+  // counts-Summe 2+5+6+4 = 17 = totalIssues; Score 62 → Note C (gradeFor-Stufen).
+  // Severity der topIssues folgt severitySequence(counts): die ersten beiden
+  // Befunde sind „Kritisch", der dritte „Schwerwiegend" — die Titel passen dazu
+  // (fehlende Alt-Texte/Labels = critical, Farbkontrast = serious, wie axe-core).
+  sample: {
+    score: 62,
+    grade: "C",
+    totalIssues: 17,
+    counts: { critical: 2, serious: 5, moderate: 6, minor: 4 },
+    topIssues: [
+      "Bilder ohne Alternativtext",
+      "Formularfelder ohne Beschriftung",
+      "Zu geringer Farbkontrast bei Text",
+    ],
   },
 } as const;
 

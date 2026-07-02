@@ -294,9 +294,13 @@ const SEVERITY_ORDER = ['critical', 'serious', 'moderate', 'minor'];
 const SEVERITY_LABEL = { critical: 'KRITISCH', serious: 'SCHWERWIEGEND', moderate: 'MITTEL', minor: 'GERING' };
 // Solide Füll-Farben → in hellen UND dunklen Mail-Clients (Outlook Dark) kontraststark.
 // Keine hellgrau-auf-weiß-Chips, die in Dark-Mode verschwinden. Textfarbe je Fläche:
-// Weiß auf Amber wäre nur ~1,9:1 → dunkler Text auf der hellen MITTEL-Fläche.
+// WCAG 1.4.3 (AA, Normaltext 4,5:1): Weiß auf Rot/Orange/Amber läge nur bei
+// ~3,3:1 / ~3,1:1 / ~1,9:1 → dunkler Text #2b1206 auf den hellen Flächen
+// (KRITISCH 5,36:1, SCHWERWIEGEND 5,63:1, MITTEL ~7:1); nur GERING (#6b7280)
+// trägt weißen Text (4,54:1). GESPIEGELT in landingpage-next/lib/severity.ts —
+// bei Änderungen hier dort nachziehen.
 const SEVERITY_COLOR = { critical: '#F8554B', serious: '#ED6A33', moderate: '#f5b13d', minor: '#6b7280' };
-const SEVERITY_TEXT = { critical: '#ffffff', serious: '#ffffff', moderate: '#2b1206', minor: '#ffffff' };
+const SEVERITY_TEXT = { critical: '#2b1206', serious: '#2b1206', moderate: '#2b1206', minor: '#ffffff' };
 
 // Leitet je Top-Befund den Schweregrad her. renderTeaser (report.js) sortiert die
 // Befunde streng nach IMPACT_WEIGHT absteigend (critical>serious>moderate>minor) und
@@ -481,25 +485,68 @@ export async function sendLeadTeaser({ to, url = '', score, grade = '', counts =
 // MF5: Best-Effort-Eingangs-/Verzögerungs-Mail an den ZAHLENDEN Kunden, wenn der
 // automatische Scan/Report fehlschlägt (FAILED). Bewusst KEIN Report-Anhang (es gibt
 // im Fehlerfall kein PDF) und KEINE Termin-/Refund-Zusage — nur „wir haben es bemerkt
-// und kümmern uns". Verhindert, dass ein Kunde nach der Zahlung im Schweigen sitzt
-// (Trust-/Chargeback-Schutz). Ungültige Adresse → Dry-Run-Skip (kein Throw).
-export async function sendDelayNotice({ to, company = '' }) {
-  if (!isEmail(to)) return { dryRun: true, skipped: 'invalid-recipient' };
-  const subject = `Ihre Bestellung ist eingegangen${company ? ' — ' + oneLine(company) : ''}`;
-  const text = `Vielen Dank für Ihre Bestellung — Ihre Zahlung ist bei uns eingegangen.
+// und ein Mensch übernimmt". Verhindert, dass ein Kunde nach der Zahlung im Schweigen
+// sitzt (Trust-/Chargeback-Schutz). Wortlaut vom Owner freigegeben (03.07.2026).
+// PURE Builder (analog buildLeadTeaser) → Betreff/Text/HTML deterministisch testbar.
+// Bewusst OHNE Score-/Befund-Tabelle, Vergleichs-Grid und CTA-Button: diese Mail
+// hat kein Klick-/Verkaufsziel, sie soll ausschließlich beruhigen.
+export function buildDelayNotice({ company = '' } = {}) {
+  const firma = oneLine(company);
+  const anrede = firma ? `Guten Tag ${firma},` : 'Guten Tag,';
+  const subject = 'Ihr Report kommt persönlich von uns — kurze Zwischennachricht';
+  // Preheader (Vorschautext): nimmt die Kernbotschaft vorweg — kein Alarm.
+  const preheader = 'Ihre Zahlung ist eingegangen — ein Mensch aus unserem Team sieht sich Ihre Seite persönlich an.';
+  const text = `${anrede}
 
-Bei der automatischen Erstellung Ihres Reports ist ein technisches Problem
-aufgetreten (Ihre Website ließ sich nicht vollständig automatisiert auswerten).
-Wir haben das bemerkt und kümmern uns persönlich darum — Sie erhalten Ihren
-Report in Kürze per E-Mail. Sie müssen nichts weiter tun.
+vielen Dank für Ihre Bestellung — Ihre Zahlung ist bei uns eingegangen.
 
-Bei Rückfragen antworten Sie einfach auf diese E-Mail.
+Kurz zu Ihrem Report: Unsere automatische Auswertung ist bei Ihrer Website auf
+eine technische Besonderheit gestoßen und konnte nicht vollständig durchlaufen.
+Das kommt vor und ist kein Grund zur Sorge.
+
+Was jetzt passiert: Wir haben das bereits bemerkt. Statt der Automatik sieht
+sich ein Mensch aus unserem Team Ihre Seite persönlich an und meldet sich
+anschließend mit Ihrem Report bei Ihnen. Sie müssen dafür nichts tun.
+
+Wenn Sie Fragen haben oder uns etwas zu Ihrer Website mitteilen möchten,
+erreichen Sie uns direkt unter ${REPLY_TO_ADDR} — oder antworten Sie einfach
+auf diese E-Mail.
+
+Danke für Ihre Geduld.
 
 Mit freundlichen Grüßen
-${FROM_NAME}
+Filo & das Team von ${FROM_NAME}
 
 ${legalFooter()}`;
-  return deliver({ to, subject, text, attachments: [] });
+
+  const html = `<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><meta name="supported-color-schemes" content="light"></head>
+<body style="margin:0;padding:0;background:#f5f3ef;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1f2430;">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#f5f3ef;font-size:1px;line-height:1px;">${escHtml(preheader)}</div>
+  <div style="max-width:560px;margin:0 auto;padding:24px 14px;">
+    <div style="background:#ffffff;border-radius:16px;padding:26px 24px;border:1px solid #ececec;">
+      <p style="font-size:15px;margin:0 0 12px;color:#1f2430;">${escHtml(anrede)}</p>
+      <p style="font-size:15px;line-height:1.55;margin:0 0 20px;color:#1f2430;">vielen Dank für Ihre Bestellung — <strong>Ihre Zahlung ist bei uns eingegangen.</strong></p>
+      <div style="background:#f3f4f6;border-radius:14px;padding:18px 18px;margin:0 0 22px;">
+        <p style="font-size:14px;line-height:1.55;color:#374151;margin:0;">Kurz zu Ihrem Report: Unsere automatische Auswertung ist bei Ihrer Website auf eine technische Besonderheit gestoßen und konnte nicht vollständig durchlaufen. <strong>Das kommt vor und ist kein Grund zur Sorge.</strong></p>
+      </div>
+      <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;margin:0 0 8px;">Was jetzt passiert</p>
+      <p style="font-size:14px;line-height:1.55;color:#1f2430;margin:0 0 20px;">Wir haben das bereits bemerkt. Statt der Automatik sieht sich <strong>ein Mensch aus unserem Team</strong> Ihre Seite persönlich an und meldet sich anschließend mit Ihrem Report bei Ihnen. Sie müssen dafür nichts tun.</p>
+      <p style="font-size:14px;line-height:1.55;color:#1f2430;margin:0 0 20px;">Wenn Sie Fragen haben oder uns etwas zu Ihrer Website mitteilen möchten, erreichen Sie uns direkt unter <a href="mailto:${escHtml(REPLY_TO_ADDR)}" style="color:#c2410c;text-decoration:underline;">${escHtml(REPLY_TO_ADDR)}</a> — oder antworten Sie einfach auf diese E-Mail.</p>
+      <p style="font-size:14px;line-height:1.55;color:#1f2430;margin:0 0 4px;">Danke für Ihre Geduld.</p>
+      <p style="font-size:14px;margin:16px 0 0;color:#1f2430;">Mit freundlichen Grüßen<br>Filo &amp; das Team von ${escHtml(FROM_NAME)}</p>
+    </div>
+    <div style="white-space:pre-line;font-size:11px;color:#9ca3af;padding:16px 10px 0;line-height:1.5;">${escHtml(legalFooter())}</div>
+  </div>
+</body></html>`;
+
+  return { subject, text, html };
+}
+
+export async function sendDelayNotice({ to, company = '' }) {
+  if (!isEmail(to)) return { dryRun: true, skipped: 'invalid-recipient' };
+  const { subject, text, html } = buildDelayNotice({ company });
+  return deliver({ to, subject, text, html, attachments: [] });
 }
 
 // Kunden-Eingangsbestätigung direkt nach der Zahlung (PR5 Owner-Release-Gate).

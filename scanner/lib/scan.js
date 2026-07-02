@@ -9,6 +9,7 @@ import { chromium } from 'playwright';
 import AxeBuilder from '@axe-core/playwright';
 import { assertPublicHttpUrl, verifyNoDnsRebinding, installSsrfGuard, pinnedHostResolverArg } from './url-guard.js';
 import { classifyScanError } from './scan-error.js';
+import { wwwFallbackCandidate } from './www-fallback.js';
 
 // Lädt eine Seite robust + schnell: PRIMÄR domcontentloaded (zuverlässig, auch
 // auf Tracking-/Long-Poll-lastigen Seiten erreichbar), DANN eine KURZE, begrenzte
@@ -50,7 +51,31 @@ export async function gotoResilient(page, safeUrl, addresses, timeout, settleMs 
     .catch(() => { /* Seite wird nie ganz ruhig (Tracking/Polling) — bewusst ignoriert. */ });
 }
 
-export async function scanUrl(url, { timeout = 60000, lenientTls = false, settleMs = 12000, axeTags = AXE_TAGS } = {}) {
+// Apex↔www-Fallback (W1-F): scheitert der Scan mit „nicht erreichbar/404"
+// (Fehlerklasse dns via classifyScanError) und existiert eine www-/Apex-
+// Schwester-URL, folgt GENAU EIN zweiter Versuch damit. Der Options-Guard
+// _noFallback verhindert Ping-Pong (www→apex→www→…).
+// SSRF-KRITISCH: der zweite Versuch läuft komplett durch scanUrlAttempt →
+// assertPublicHttpUrl + FRISCHER IP-Pin (pinnedHostResolverArg) für den NEUEN
+// Host. Gepinnte Adressen des alten Hosts werden nie wiederverwendet.
+// Das Ergebnis trägt die tatsächlich gescannte URL im url-Feld (Report zeigt
+// sonst die tote Adresse). Schlägt auch der Fallback fehl, wird der ORIGINAL-
+// Fehler geworfen — der Kunde hat DIESE URL eingegeben.
+export async function scanUrl(url, opts = {}) {
+  try {
+    return await scanUrlAttempt(url, opts);
+  } catch (err) {
+    const alt = opts._noFallback ? null : wwwFallbackCandidate(url, err?.message);
+    if (!alt) throw err;
+    try {
+      return await scanUrl(alt, { ...opts, _noFallback: true });
+    } catch {
+      throw err; // Originalfehler durchreichen (für Klassifizierung/Logging).
+    }
+  }
+}
+
+async function scanUrlAttempt(url, { timeout = 60000, lenientTls = false, settleMs = 12000, axeTags = AXE_TAGS } = {}) {
   // SSRF-Schutz + Rebinding-Pin: erst Adressen auflösen + verifizieren.
   const safe = await assertPublicHttpUrl(/^https?:\/\//i.test(url) ? url : 'https://' + url);
   // IP-Pin: Chromium-Resolver auf die geprüfte öffentliche IP zwingen (SSRF C1).
@@ -139,7 +164,44 @@ export async function scanUrl(url, { timeout = 60000, lenientTls = false, settle
 // werden gemerged (Pro-Seiten-Stellen multiplizieren sich nicht, doppelte Stellen
 // werden deduped). passes ist die Summe der bestandenen Regeln, incomplete dito.
 // Fehler einzelner Seiten brechen den Lauf NICHT ab (resilient).
-export async function scanSite(startUrl, { maxPages = 5, perPageTimeout = 45000, lenientTls = false, settleMs = 12000, axeTags = AXE_TAGS } = {}) {
+//
+// Apex↔www-Fallback (W1-F), analog zu scanUrl: GENAU EIN zweiter Versuch mit
+// der Schwester-URL, _noFallback verhindert Ping-Pong. Zwei Scheiter-Formen:
+// 1. Throw (z. B. Start-Host nicht auflösbar → assertPublicHttpUrl wirft),
+// 2. KEIN Throw, aber 0 gescannte Seiten (toter Start-URL-Fehler landet nur
+//    in errors[] — z. B. http-status-404 auf der Startseite).
+// SSRF-KRITISCH: der Retry läuft komplett durch scanSiteAttempt → dort werden
+// assertPublicHttpUrl + IP-Pin (pinnedHostResolverArg) FRISCH für den neuen
+// Host berechnet; nichts vom alten Host wird wiederverwendet. Der Retry wird
+// nur übernommen, wenn er tatsächlich Seiten geliefert hat — sonst bleibt
+// Originalfehler bzw. Original-Ergebnis erhalten (kein Verhaltens-Downgrade).
+export async function scanSite(startUrl, opts = {}) {
+  let result;
+  try {
+    result = await scanSiteAttempt(startUrl, opts);
+  } catch (err) {
+    const alt = opts._noFallback ? null : wwwFallbackCandidate(startUrl, err?.message);
+    if (alt) {
+      try {
+        const retry = await scanSite(alt, { ...opts, _noFallback: true });
+        if (retry.pagesScanned > 0) return retry;
+      } catch { /* Originalfehler unten werfen. */ }
+    }
+    throw err;
+  }
+  if (!opts._noFallback && result.pagesScanned === 0 && result.errors.length > 0) {
+    const alt = wwwFallbackCandidate(startUrl, result.errors[0].error);
+    if (alt) {
+      try {
+        const retry = await scanSite(alt, { ...opts, _noFallback: true });
+        if (retry.pagesScanned > 0) return retry;
+      } catch { /* Original-Ergebnis behalten. */ }
+    }
+  }
+  return result;
+}
+
+async function scanSiteAttempt(startUrl, { maxPages = 5, perPageTimeout = 45000, lenientTls = false, settleMs = 12000, axeTags = AXE_TAGS } = {}) {
   if (!/^https?:\/\//i.test(startUrl)) startUrl = 'https://' + startUrl;
   const origin = new URL(startUrl).origin;
   // Adress-Cache pro Hostname für DNS-Rebinding-Pin im Crawl-Loop (Erstauflösung).
