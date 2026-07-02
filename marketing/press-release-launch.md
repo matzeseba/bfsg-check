@@ -1,12 +1,12 @@
 # Pressemitteilung — Launch + 1-Jahr-BFSG Hook
 
 > **2 Versionen:**
-> 1. Launch-PM (jetzt)
-> 2. 1-Jahr-BFSG-PM (zum 28.06.2026 — Power-Moment!)
+> 1. Launch-PM (ARCHIV — alte Marke „BFSG-Check", nicht mehr versenden)
+> 2. 1-Jahr-BFSG-Bilanz-PM (AKTUELL — Marke BFSG-Fuchs, versandfertig, alle Zahlen quellen-belegt)
 
 ---
 
-## VERSION 1: Launch-Pressemitteilung (jetzt)
+## VERSION 1: Launch-Pressemitteilung (ARCHIV — NICHT MEHR VERSENDEN: alte Marke „BFSG-Check" + alte Preise)
 
 > **Verteiler:** openPR (free, 2/Jahr) · inar.de (free) · firmenpresse.de (free) · pr-gateway Jahres-5 (195€ einmalig für 250+ Portale)
 > **Auch direkt einreichbar** (B2B-Presse-Mail, ≠ Cold-Mail): heise@heise.de, redaktion@t3n.de, redaktion@golem.de, redaktion@internet-world.de — DAS sind redaktionelle Postfächer mit tolerierter Anfrage-Kultur.
@@ -83,72 +83,131 @@ E-Mail: info@matthias-seba.de
 
 ---
 
-## VERSION 2: 1-Jahr-BFSG (zum 28.06.2026) — POWER-MOMENT
+## VERSION 2: 1-Jahr-BFSG-Bilanz (versandfertig ab sofort — News-Hook „1 Jahr + 1 Woche")
 
-> **Wann:** Sende am 28.06.2026 06:00 Uhr (für 07:00 Uhr Verteilung)
-> **Warum:** Der echte News-Hook. Jubiläum + Bilanz + Daten = Journalisten lieben das
+> **Wann:** Ab sofort versendbar (06:00 Uhr für 07:00-Uhr-Verteilung). Der 28.06. ist vorbei,
+> der Bilanz-Hook trägt aber den ganzen Juli („ein Jahr nach Geltungsbeginn").
+> **Verteiler:** openPR (free) · inar.de (free) · firmenpresse.de (free)
 >
-> **⚠️ BELEG-PFLICHT:** Diese Version enthält Statistiken, die ERST nach
-> tatsächlichen Scan-Daten aus dem Betrieb eingetragen werden dürfen.
-> ALLE mit [BELEG NÖTIG] markierten Zahlen sind PLATZHALTER — vor Versand
-> durch echte Auswertungen aus dem eigenen Scan-Dataset ersetzen.
-> Eine PM mit erfundenen Statistiken wäre Pressebetrug (§ 263 StGB bei
-> Schaden) und vernichtet die Medien-Reputation dauerhaft.
+> **✅ BELEG-STATUS:** Alle Zahlen in dieser Version stammen aus nachprüfbaren externen
+> Quellen und sind im Text als Sekundärquelle gekennzeichnet („laut <Quelle>, Stand <Datum>").
+> Eigene Scan-Statistiken wurden bewusst GESTRICHEN (kein belastbares Dataset).
+> Quellen: itiko.de-Artikel vom 30.06.2026 (49-%-Markteinschätzung, MLBF-Personal) ·
+> KBM Legal, Beitrag vom 23.02.2026 (Abmahnkosten, K3-Prüfberichte, Rechtslage) ·
+> MLBF/Sozialministerium Sachsen-Anhalt (Errichtung Magdeburg, 26.09.2025) · § 37 BFSG (Bußgeldrahmen).
+> **Sprach-Regel (UWG § 5):** keine Konformitäts-, Sicherheits- oder Garantie-Zusagen —
+> nur „automatisierte technische Analyse" / „WCAG-2.1-AA-Audit" (Verbotsliste: CLAUDE.md).
 
 ---
 
 **Headline:**
 ```
-[BELEG NÖTIG: Zahl und Prozentwert erst eintragen wenn real gemessen]
-Ein Jahr BFSG: X von 10 deutschen Online-Shops zeigen Findings — Bilanz 
-aus [N] automatisierten Scans
+Ein Jahr BFSG: Markt erfüllt laut Branchenbericht erst rund 49 Prozent 
+der Kriterien — Abmahnschreiben werden professioneller
 ```
 
 **Lead:**
 ```
-Genau ein Jahr nach Inkrafttreten des Barrierefreiheitsstärkungsgesetzes 
-(BFSG) am 28. Juni 2025 zieht BFSG-Check (bfsg-fix.de) eine Daten-Bilanz 
-aus [N] durchgeführten automatisierten Scans [BELEG NÖTIG: tatsächliche 
-Scan-Anzahl aus System eintragen] deutscher Online-Shops.
+Ein Jahr nach Geltungsbeginn des Barrierefreiheitsstärkungsgesetzes (BFSG) 
+am 28. Juni 2025 fällt die Bilanz ernüchternd aus: Laut einer Markteinschätzung 
+des IT-Portals itiko.de (Stand 30.06.2026) erfüllen Unternehmen im Schnitt nur 
+rund 49 Prozent der Barrierefreiheits-Kriterien. Der automatisierte 
+Barrierefreiheits-Scan BFSG-Fuchs (bfsg-fuchs.de) ordnet die Entwicklungen 
+des ersten BFSG-Jahres ein — von der neuen Marktüberwachungsstelle bis zur 
+zweiten, professionelleren Abmahnwelle.
 ```
 
 **Body:**
 ```
-Auf Basis von [N] automatisierten Scans [BELEG NÖTIG] deutscher Websites 
-in den letzten 12 Monaten zeigt sich:
+Seit dem 28. Juni 2025 verpflichtet das BFSG Anbieter von Dienstleistungen 
+im elektronischen Geschäftsverkehr — insbesondere Online-Shops — zur 
+Barrierefreiheit nach dem technischen Maßstab der EN 301 549 (im Kern 
+WCAG 2.1 AA). Ein Jahr später zeigt sich ein deutliches Umsetzungsdefizit: 
+Neben der 49-Prozent-Einschätzung von itiko.de fehlt vielerorts selbst die 
+Barrierefreiheitserklärung nach § 15 BFSGV, eine vergleichsweise einfach 
+erfüllbare Grundpflicht.
 
-Die häufigsten Findings [ALLE PROZENTZAHLEN = BELEG NÖTIG — aus echten
-Scan-Daten berechnen, NICHT schätzen]:
-1. Kontrast unter WCAG-Schwelle (4.5:1) → [X]% der untersuchten Sites
-2. Fehlende Alt-Attribute bei Bildern → [X]%
-3. Keine Skip-Links für Tastatur-Nutzer → [X]%
-4. Form-Inputs ohne Labels → [X]%
-5. Cookie-Banner ohne Opt-Out auf erster Ebene → [X]%
+Marktüberwachung ist arbeitsfähig: Am 26. September 2025 hat die 
+Marktüberwachungsstelle der Länder für die Barrierefreiheit von Produkten 
+und Dienstleistungen (MLBF) in Magdeburg ihre Arbeit aufgenommen — die 
+gemeinsame Behörde der 16 Bundesländer, ausgestattet mit rund 70 
+Mitarbeitenden (laut itiko.de, Stand 30.06.2026). Sie prüft nach eigenen 
+Angaben reaktiv auf Beschwerden und aktiv per Stichproben. Der gesetzliche 
+Bußgeldrahmen des § 37 BFSG reicht je nach Verstoß bis 100.000 Euro (für 
+bestimmte Tatbestände, etwa das Anbieten nicht barrierefreier 
+Dienstleistungen; im Übrigen bis 10.000 Euro); öffentlich belegte 
+Einzel-Bußgelder sind bislang nicht bekannt (Stand Juli 2026).
 
-Durchschnittlicher Score: [X]/100. [BELEG NÖTIG — Mittelwert aus Dataset]
+Parallel ist das private Abmahngeschehen professioneller geworden. Auf die 
+erste breite Welle im Sommer 2025 folgten Schreiben, die sich auf formale 
+Barrierefreiheits-Prüfberichte externer Dienstleister stützen. Die Kanzlei 
+KBM Legal dokumentiert Forderungen von 1.784,10 Euro netto vorgerichtlichen 
+Anwaltskosten plus 490 Euro netto für die Webseitenanalyse — rund 2.700 Euro 
+brutto pro Schreiben (Stand 23.02.2026). Wichtig: Ob BFSG-Verstöße über das 
+UWG abmahnfähig sind, ist gerichtlich nicht abschließend geklärt; viele 
+Fachanwälte halten die kursierenden Abmahnungen für angreifbar. Es handelt 
+sich um ein Kostenrisiko mit offener Rechtslage — nicht um eine gesicherte 
+Anspruchsgrundlage.
 
-Zur Abmahn-Welle: Seit August 2025 mahnen Kanzleien wie 
-CLAIM Rechtsanwälte und Kanzlei MK in Welle ab — Forderungen zwischen 
-600 € und 2.700 € pro Verstoß (Quellen: WBS Legal, Heise.de).
-[BELEG NÖTIG: Gesamtzahl 5.000+ Abmahnungen ist eine Schätzung —
-nur verwenden wenn durch Medienberichte belegbar, sonst weglassen.]
+"Das erste BFSG-Jahr zeigt ein Muster: Abgemahnt und beanstandet werden 
+überwiegend maschinell auffindbare Mängel — fehlende Alt-Texte, 
+Kontrastfehler, leere Links", sagt Matthias Seba, Gründer von BFSG-Fuchs. 
+"Genau diese Punkte kann jeder Betreiber in Minuten selbst sichtbar machen. 
+Wer sie behebt und den Fortschritt dokumentiert, nimmt den aktuellen 
+Prüfberichten die Grundlage."
 
-"Die meisten Shop-Betreiber wissen nicht einmal, dass sie betroffen sind", 
-sagt Matthias Seba, Gründer von BFSG-Check. "Der Test-Aufwand wäre 60 
-Sekunden — aber Compliance ist zur Top-Priorität geworden, sobald die 
-erste Abmahnung kommt."
+BFSG-Fuchs bietet dafür eine automatisierte technische Analyse — 
+ausdrücklich keine Rechtsberatung und keine Zusicherung rechtlicher 
+Anforderungserfüllung:
 
-Forecast für Jahr 2 (Juni 2026 – Juni 2027):
-- Erste Abmahn-Urteile von Oberlandesgerichten antizipiert
-- WordPress-Plugin-Markt reagiert mit BFSG-Compliance-Features
-- BFSG-Check launcht im Q3 2026 eine Chrome-Extension und ein WordPress-
-  Plugin zur frühzeitigen Identifikation
+- Kostenloser Sofort-Check: Startseite in ca. 60 Sekunden gegen über 80 
+  WCAG-2.1-AA-Regeln, ohne Anmeldung
+- Basis-Report (129 Euro einmalig): Scan von bis zu 5 Unterseiten, 
+  priorisierter Fix-Plan, Entwurf der Barrierefreiheitserklärung, PDF-Report
+- Profi-Report (399 Euro einmalig): bis zu 25 Unterseiten, 
+  Umsetzungs-Fahrplan mit Entwickler-Hinweisen, 30 Tage E-Mail-Support
+- Re-Check-Abo (24,99 Euro/Monat, monatlich kündbar): wiederkehrender Scan 
+  zur laufenden Kontrolle
 
-[WENN Dataset public:] Anonymisierter Aggregat-Datensatz auf Anfrage 
-verfügbar — Journalisten können ihn unter info@matthias-seba.de anfordern.
+"Es geht nicht um Garantien — die kann kein automatisiertes Tool seriös 
+abgeben", so Seba. "Es geht darum, in fünf Minuten zu wissen, wo man steht, 
+und einen konkreten, priorisierten Fix-Plan zu haben."
+
+Alle Reports werden in deutscher Sprache geliefert, das Hosting erfolgt in 
+Deutschland (Hetzner, Nürnberg). Verfügbarkeit: bfsg-fuchs.de — der 
+Sofort-Check ist ohne Anmeldung nutzbar.
 ```
 
-**Boilerplate + Pressekontakt:** wie Version 1.
+**Boilerplate:**
+```
+Über BFSG-Fuchs
+BFSG-Fuchs (bfsg-fuchs.de) ist ein Service von Matthias Seba, Kutenholz. 
+Der Dienst liefert automatisierte Barrierefreiheits-Scans deutscher Websites 
+und Online-Shops nach WCAG 2.1 AA / EN 301 549 (axe-core-basiert, mit 
+menschlicher Sichtung vor Auslieferung) sowie technische Cookie-Checks 
+(§ 25 TDDDG). BFSG-Fuchs erstellt technische Analysen, keine Rechtsberatung. 
+Made in Germany, Hosting in Nürnberg.
+```
+
+**Pressekontakt:**
+```
+Matthias Seba
+BFSG-Fuchs · bfsg-fuchs.de
+Lange Straße 20, 27449 Kutenholz
+E-Mail: info@bfsg-fix.de
+```
+
+**Quellen-Anhang für Redaktionen (mit in die PM oder als Fußnoten):**
+```
+[1] itiko.de: "1 Jahr Barrierefreiheitsstärkungsgesetz: Die Abmahnwelle wird 
+    professioneller, der Markt steht erst bei 49 %", 30.06.2026 — 
+    https://www.itiko.de/artikel/2259495/
+[2] KBM Legal: "Abmahnwelle wegen BFSG", 23.02.2026 — 
+    https://www.kbm-legal.com/aktuelles/wissenswertes/artikel/abmahnwelle-wegen-bfsg-wie-barrierefreiheit-jetzt-zum-abmahnrisiko-fuer-webseitenbetreiber-wird.html
+[3] Sozialministerium Sachsen-Anhalt / MLBF: Errichtung der 
+    Marktüberwachungsstelle, Magdeburg — https://www.mlbf-barrierefrei.de/
+[4] § 37 BFSG (Bußgeldvorschriften) — https://bfsg-gesetz.de/
+```
 
 ---
 
@@ -156,35 +215,32 @@ verfügbar — Journalisten können ihn unter info@matthias-seba.de anfordern.
 
 **Wer:** Recherchescout, HARO (Featured.com), redaktion@-Adressen mit klarer Branchen-Relevanz
 
-**Wann:** 1 Tag VOR Versand der PM (24h-Embargo)
+**Wann:** zeitgleich mit oder kurz vor PM-Versand (Themenangebot, kein Embargo nötig)
 
 **E-Mail-Vorlage:**
 
 ```
-[ERST VERWENDEN WENN DATASET REAL EXISTIERT — alle Zahlen durch echte
-Scan-Auswertungen ersetzen, sonst Pressebetrug-Risiko]
-
-Subject: Embargo-Vorab: Daten-Bilanz "1 Jahr BFSG" zum 28.06.2026
+Subject: Themenangebot: Bilanz "1 Jahr BFSG" — Marktstand, Abmahnwelle, Marktüberwachung
 
 Sehr geehrte/r [Redaktion + Titel],
 
-Zum 1. Jahrestag des BFSG am 28.06.2026 erscheint unsere Pressemitteilung 
-mit aggregierten Daten aus [N — BELEG NÖTIG] BFSG-Compliance-Scans 
-deutscher Online-Shops. Highlights:
+ein Jahr nach Geltungsbeginn des BFSG (28.06.2025) bieten wir Ihnen eine 
+quellenbasierte Bilanz als Themenvorschlag an. Kernpunkte (alle mit 
+nachprüfbarer Quelle):
 
-- [X]% der untersuchten Sites zeigen Kontrast-Findings [BELEG NÖTIG]
-- Durchschnitts-Score [X]/100 [BELEG NÖTIG — aus echten Daten]
-- Abmahn-Welle läuft seit August 2025 (Quellen: WBS Legal, Heise.de)
+- Markt erfüllt im Schnitt erst rund 49 % der Kriterien 
+  (laut itiko.de, Stand 30.06.2026)
+- Zweite, professionellere Abmahnwelle mit formalen Prüfberichten; 
+  dokumentierte Forderungen ca. 1.784 € netto + 490 € netto Prüfbericht 
+  (laut KBM Legal, Stand 23.02.2026) — UWG-Abmahnfähigkeit gerichtlich offen
+- Marktüberwachungsstelle MLBF (Magdeburg, seit 26.09.2025) prüft reaktiv 
+  und per Stichproben; Bußgeldrahmen § 37 BFSG bis 100.000 €
 
-Ich biete Ihnen den **anonymisierten Aggregat-Datensatz vor Veröffentlichung** 
-und einen **24-Stunden-Embargo** zur Vorbereitung eines Artikels. 
-Bei Interesse melden Sie sich bis 27.06.2026 12:00 Uhr.
-
-PM-Text + Datensatz auf Anfrage.
+PM-Text mit vollständigem Quellen-Anhang sende ich Ihnen gern vorab.
 
 Mit freundlichen Grüßen
 Matthias Seba
-BFSG-Check · bfsg-fix.de
+BFSG-Fuchs · bfsg-fuchs.de
 ```
 
 **Rechtlich:** Das ist eine **redaktionelle Pressearbeit** an publizierte presse@-Adressen, NICHT eine Werbung. Tolerierter Graubereich (siehe `docs/LEGAL-REALITY-CHECK-2026.md` F5). Risiko niedrig wenn:
@@ -200,18 +256,17 @@ BFSG-Check · bfsg-fix.de
 
 | Datum | Aktion |
 |---|---|
-| Heute / Tag 1 | Launch-PM auf openPR + inar + firmenpresse |
+| Tag 1 (ab sofort) | 1-Jahr-BFSG-Bilanz-PM (Version 2) auf openPR + inar + firmenpresse |
+| Tag 1 | Direkt-Pitches an heise/t3n/Golem (Themenangebot, siehe Vorlage) |
 | Tag 3 | (Optional) pr-gateway Jahres-5 abonnieren (195€), 1 PM auf 250 Portale |
-| 25.06.2026 | Direkt-Pitches an heise/t3n/Golem mit Embargo-Angebot |
-| 27.06.2026 | Embargo-Reminder an Interessierte |
-| 28.06.2026 06:00 | 1-Jahr-BFSG-PM auf allen Verteilern + direkt versendet |
+| Tag 7 | Nachfassen nur bei Rückmeldung (kein unaufgefordertes Follow-up) |
 
 ---
 
 ## Tracking
 
 Erfolgs-Metriken:
-- Erwähnungen in Online-Medien (Mention.com Free-Tier oder Google Alerts auf "BFSG-Check")
+- Erwähnungen in Online-Medien (Mention.com Free-Tier oder Google Alerts auf "BFSG-Fuchs")
 - Backlinks (Search Console + Ahrefs Free)
 - Direkter Traffic-Spike um Veröffentlichungs-Datum (GA4)
 - Stripe-Sales mit utm_source=press
