@@ -20,11 +20,14 @@ import { fulfillOrder, PKG_CONFIG } from './lib/fulfill.js';
 import {
   sendReportFor, sendAlert, sendCancellationConfirmation, sendDsgvoToken, sendDelayNotice,
   sendLeadTeaser, sendOwnerReview, sendOrderReceived, isTransientMailError,
-  mailerEnabled, mailerStatus, requireMailerOrExit, isStripeLive, isEmail
+  mailerStatus, requireMailerOrExit, isStripeLive, isEmail
 } from './lib/mailer.js';
 import * as reportQueue from './lib/report-queue.js';
+import * as leadQueue from './lib/lead-queue.js';
 import { startScheduler, releaseJob, recoverInDoubt } from './lib/scheduler.js';
 import { signRelease, verifyRelease, releaseTokenConfigured } from './lib/release-token.js';
+import { signLead, verifyLead, leadTokenConfigured } from './lib/lead-token.js';
+import { randomBytes } from 'node:crypto';
 import { requireAdminAuth } from './lib/admin-auth.js';
 import { exportUserData, deleteUserData, requestDsgvoToken, consumeDsgvoToken } from './lib/dsgvo.js';
 import { diffSummaryText } from './lib/diff.js';
@@ -66,7 +69,7 @@ const isMain = !!process.argv[1] && import.meta.url === pathToFileURL(process.ar
 // überschreibt einzelne Funktionen, um Webhook-/Resend-Handler ohne echten Browser,
 // SMTP oder PDF gegen die ECHTE Express-App zu testen. Aufrufer lesen services.X zur
 // Laufzeit (kein Capture beim Modul-Laden), daher wirkt eine Test-Überschreibung sofort.
-export const services = { fulfillOrder, sendReportFor, generateInvoicePdf, sendOwnerReview, sendOrderReceived, reportQueue };
+export const services = { fulfillOrder, sendReportFor, generateInvoicePdf, sendOwnerReview, sendOrderReceived, sendLeadTeaser, reportQueue };
 
 // Gebündelte Abhängigkeiten für den Release-Scheduler + den /api/release-Endpoint.
 // Beide Wege (Auto-Release bei Ablauf, Owner-Klick) laufen durch dieselbe releaseJob-
@@ -795,23 +798,41 @@ app.post('/api/lead', rateLimit({ windowMs: 60_000, max: 5 }), async (req, res) 
   const leadCounts = parseImpactCounts(req.body?.counts);
   const leadTopIssues = parseTopIssues(req.body?.topIssues);
 
-  // PR2: Value-Mail SOFORT + UNABHÄNGIG vom Brevo-DOI senden. Der Nutzer hat die
-  // schriftliche Übersicht über den Button „Übersicht anfordern" ausdrücklich
-  // angefordert → einmalige, angeforderte Service-Mail (kein § 7 UWG-Problem;
-  // der Newsletter-DOI läuft separat). Best-Effort: ein Mailfehler darf weder
-  // den Lead-Flow noch die 200/503-Antwort kippen. Läuft, sobald SMTP aktiv ist.
-  if (mailerEnabled()) {
+  // DOI-Gate (02.07.): Der Gratis-Report wird NICHT mehr sofort gesendet, sondern
+  // durabel eingequeut und erst nach dem Brevo-Double-Opt-in-Klick ausgeliefert
+  // (GET /api/lead/confirm). Vorteil: die Bestätigung liegt vor der ersten
+  // Inhalts-Mail und niemand kann fremde Postfächer mit Reports zuspammen. Der
+  // Confirm-Link (mit HMAC-Token) wird zur Brevo-redirectionUrl — kein Webhook nötig.
+  // Voraussetzung: ein Token-Secret (LEAD_TOKEN_SECRET/RELEASE_TOKEN_SECRET/ADMIN_TOKEN,
+  // in Prod gesetzt). Fehlt es, greift der alte, ungegatete Redirect als Fallback.
+  let redirectionUrl = `${PUBLIC_URL}/?lead=bestaetigt`;
+  if (leadTokenConfigured()) {
+    const leadId = randomBytes(16).toString('hex');
+    const token = signLead(leadId);
+    const now = Date.now();
     try {
-      await sendLeadTeaser({ to: email, url: rawUrl, score, counts: leadCounts, topIssues: leadTopIssues, totalIssues: issues });
+      await leadQueue.enqueue({
+        id: leadId,
+        to: email,
+        url: rawUrl,
+        score: Number.isFinite(score) ? Math.round(score) : null,
+        counts: leadCounts,
+        topIssues: leadTopIssues,
+        totalIssues: Number.isFinite(issues) ? Math.round(issues) : null,
+        createdAt: new Date(now).toISOString(),
+        expiresAt: new Date(now + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 Tage
+      });
+      redirectionUrl = `${PUBLIC_URL}/api/lead/confirm?id=${leadId}&token=${token}`;
     } catch (err) {
-      logger.warn({ err: err.message }, 'Lead-Value-Mail (sendLeadTeaser) fehlgeschlagen — best-effort, ignoriert');
+      // Enqueue-Fehler (z. B. Volume nicht schreibbar) darf den Lead nicht kippen:
+      // ohne Gate weiter, damit die DOI-Bestätigung trotzdem läuft (Report entfällt).
+      logger.error({ err: err.message }, 'Lead-Queue enqueue fehlgeschlagen — Fallback ohne DOI-Gate');
     }
   }
 
   const apiKey = process.env.BREVO_API_KEY;
   const listId = Number(process.env.BREVO_LEAD_LIST_ID);
   const templateId = Number(process.env.BREVO_LEAD_DOI_TEMPLATE_ID || process.env.BREVO_DOI_TEMPLATE_ID);
-  const redirectionUrl = process.env.BREVO_LEAD_DOI_REDIRECT_URL || `${PUBLIC_URL}/?lead=bestaetigt`;
   if (!apiKey || !listId || !templateId) {
     logger.warn('Lead-Anfrage, aber Brevo-DOI nicht konfiguriert (BREVO_API_KEY/_LEAD_LIST_ID/_LEAD_DOI_TEMPLATE_ID).');
     return res.status(503).json({ error: 'Der Versand per E-Mail ist gerade nicht verfügbar. Bitte später erneut versuchen.' });
@@ -852,6 +873,58 @@ app.post('/api/lead', rateLimit({ windowMs: 60_000, max: 5 }), async (req, res) 
   } catch (err) {
     logger.error({ err: err.message }, 'Lead-Endpoint Fehler');
     return res.status(502).json({ error: 'Versand derzeit nicht möglich.' });
+  }
+});
+
+// --- DOI-Bestätigung des Gratis-Reports (02.07.) ---
+// Ziel der Brevo-Double-Opt-in-redirectionUrl: Der Klick auf den Bestätigungslink
+// löst hier den einmaligen Teaser-Versand aus (Idempotenz über terminalen SENT-Status
+// + atomaren Claim → Doppelklick sendet nur 1×). Kein Webhook nötig. Immer freundlicher
+// 302-Redirect auf die Bestätigungsseite — Fehler werden über den ?status-Parameter
+// signalisiert (abgelaufen = ungültiger/abgelaufener Token, verzoegert = Versand hakt).
+app.get('/api/lead/confirm', rateLimit({ windowMs: 60_000, max: 10 }), async (req, res) => {
+  const base = `${PUBLIC_URL}/anmeldung-bestaetigt`;
+  const id = String(req.query.id || '').trim().slice(0, 120);
+  const token = String(req.query.token || '').trim().slice(0, 200);
+
+  // Ungültiger/fehlender Token → wie abgelaufen behandeln (keine Enumeration).
+  if (!leadTokenConfigured() || !id || !token || !verifyLead(id, token)) {
+    return res.redirect(302, `${base}?status=abgelaufen`);
+  }
+  const lead = await leadQueue.getLead(id);
+  if (!lead || !lead.expiresAt || Date.parse(lead.expiresAt) < Date.now()) {
+    return res.redirect(302, `${base}?status=abgelaufen`);
+  }
+  // Bereits versendet → idempotenter Erfolg (kein Zweitversand).
+  if (lead.status === 'SENT') return res.redirect(302, base);
+
+  // Atomarer Claim: nur der Gewinner sendet. Verlierer eines parallelen Klicks
+  // (oder ein bereits terminaler Record) landet hier mit null.
+  const claimed = leadQueue.claimForSend(id);
+  if (!claimed) {
+    const cur = await leadQueue.getLead(id);
+    return res.redirect(302, cur?.status === 'SENT' ? base : `${base}?status=verzoegert`);
+  }
+
+  try {
+    await services.sendLeadTeaser({
+      to: lead.to, url: lead.url, score: lead.score,
+      counts: lead.counts, topIssues: lead.topIssues, totalIssues: lead.totalIssues
+    });
+    await leadQueue.markSent(id);
+    return res.redirect(302, base);
+  } catch (err) {
+    if (isTransientMailError(err)) {
+      // Transient → PENDING lassen, nächster Klick versucht erneut. Freundliche Seite.
+      await leadQueue.requeue(id, { error: err.message });
+      logger.warn({ err: err.message, id }, 'Lead-Confirm: transienter Mailfehler — requeued');
+      return res.redirect(302, `${base}?status=verzoegert`);
+    }
+    // Permanent → terminal markieren + Owner alarmieren (angeforderter Report ging verloren).
+    await leadQueue.markFailed(id, { error: err.message });
+    logger.error({ err: err.message, id }, 'Lead-Confirm: permanenter Mailfehler');
+    try { await sendAlert('Gratis-Report-Versand fehlgeschlagen', `Lead ${id} (${lead.to}): ${err.message}`); } catch { /* best-effort */ }
+    return res.redirect(302, `${base}?status=verzoegert`);
   }
 });
 

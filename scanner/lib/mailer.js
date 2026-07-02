@@ -289,6 +289,30 @@ function toneForGrade(grade) {
   return { bg: '#fffbeb', fg: '#b45309' }; // B/C = amber
 }
 
+// Schwere-Stufen für die Top-Befunde — identische Stufen/Farben wie die Zähler-Tabelle.
+const SEVERITY_ORDER = ['critical', 'serious', 'moderate', 'minor'];
+const SEVERITY_LABEL = { critical: 'KRITISCH', serious: 'SCHWERWIEGEND', moderate: 'MITTEL', minor: 'GERING' };
+// Solide Füll-Farben → in hellen UND dunklen Mail-Clients (Outlook Dark) kontraststark.
+// Keine hellgrau-auf-weiß-Chips, die in Dark-Mode verschwinden. Textfarbe je Fläche:
+// Weiß auf Amber wäre nur ~1,9:1 → dunkler Text auf der hellen MITTEL-Fläche.
+const SEVERITY_COLOR = { critical: '#F8554B', serious: '#ED6A33', moderate: '#f5b13d', minor: '#6b7280' };
+const SEVERITY_TEXT = { critical: '#ffffff', serious: '#ffffff', moderate: '#2b1206', minor: '#ffffff' };
+
+// Leitet je Top-Befund den Schweregrad her. renderTeaser (report.js) sortiert die
+// Befunde streng nach IMPACT_WEIGHT absteigend (critical>serious>moderate>minor) und
+// schickt die Top-3. Genau diese Reihenfolge entsteht, wenn man die counts in derselben
+// Schwere-Ordnung expandiert — der i-te Top-Befund trägt also die i-te Schwere dieser
+// Sequenz. So zeigt die Mail dieselbe Schwere wie die Website-Übersicht, ohne Re-Scan
+// oder Frontend-Umbau. Ein künftig explizit mitgeschickter severity/impact hat Vorrang.
+function severitySequence(counts) {
+  const seq = [];
+  for (const sev of SEVERITY_ORDER) {
+    const n = Math.max(0, Number(counts?.[sev]) || 0);
+    for (let i = 0; i < n; i++) seq.push(sev);
+  }
+  return seq;
+}
+
 // Baut Betreff + text/plain + HTML der Value-Mail. PURE Funktion (keine
 // Seiteneffekte) → deterministisch unit-testbar. ZEIGT: Score/Note + Einordnung,
 // ALLE Befund-Kategorien mit Zählern, Top-3-Prioritäten (nur das WAS, keine
@@ -308,17 +332,29 @@ export function buildLeadTeaser({ url = '', score, grade = '', counts = {}, topI
   const sumCounts = c.critical + c.serious + c.moderate + c.minor;
   const total = Number.isFinite(Number(totalIssues)) && Number(totalIssues) >= 0
     ? Math.round(Number(totalIssues)) : sumCounts;
+  const sevSeq = severitySequence(c);
   const tops = (Array.isArray(topIssues) ? topIssues : [])
-    .filter((x) => typeof x === 'string' && x.trim())
     .slice(0, 3)
-    .map((x) => oneLine(x));
+    .map((item, i) => {
+      const rawTitle = typeof item === 'string' ? item : (item?.title || item?.label || item?.text || '');
+      const explicit = item && typeof item === 'object' ? (item.severity || item.impact) : null;
+      const sev = SEVERITY_LABEL[explicit] ? explicit : (sevSeq[i] || null);
+      return { title: oneLine(rawTitle), severity: SEVERITY_LABEL[sev] ? sev : null };
+    })
+    .filter((t) => t.title);
   const remaining = Math.max(0, total - tops.length);
   const cta = LEAD_TEASER_CTA_URL;
+  const ctaTarget = host || 'deine Seite';
   const subject = `Ihre WCAG-Erstprüfung: Note ${g}${s !== null ? ` (${s}/100)` : ''}${host ? ` für ${host}` : ''}`;
+  // Preheader (Vorschautext) mit konkretem Befund-Bezug — kein Clickbait.
+  const lead0 = tops[0];
+  const preheader = lead0
+    ? `Note ${g}${s !== null ? ` (${s}/100)` : ''} — ${lead0.severity ? `${SEVERITY_LABEL[lead0.severity]}: ` : ''}${lead0.title}`
+    : `Deine automatisierte WCAG-2.1-AA-Erstprüfung${host ? ` für ${host}` : ''}: Note ${g}`;
 
   const topsText = tops.length
-    ? `DEINE TOP-${tops.length}-PRIORITÄTEN (was zuerst anzupacken ist)
-${tops.map((t, i) => `  ${i + 1}. ${t}`).join('\n')}
+    ? `DEINE TOP-${tops.length}-PRIORITÄTEN (nach Schwere, was zuerst anzupacken ist)
+${tops.map((t, i) => `  ${i + 1}. [${t.severity ? SEVERITY_LABEL[t.severity] : 'BEFUND'}] ${t.title}`).join('\n')}
 
 `
     : '';
@@ -338,11 +374,23 @@ GEFUNDENE BEFUNDE NACH SCHWERE
   ------------------------------
   Gesamt:         ${total}
 
-${topsText}Im Vollreport bekommst du zu jedem Punkt die genaue Fundstelle und den
-fertigen Copy-Paste-Fix${remaining > 0 ? ` sowie ${remaining} weitere Fundstellen` : ''} — plus einen
-priorisierten Umsetzungsplan und einen Entwurf deiner Erklärung zur Barrierefreiheit.
+${topsText}WAS DAS KONKRET BEDEUTET
+Seit dem 28. Juni 2025 gelten die Anforderungen des BFSG für viele Websites und
+Online-Dienste. Nach § 15 BFSG können auch anerkannte Verbände festgestellte
+Verstöße geltend machen. Die oben gefundenen Punkte sind technische Ansatzpunkte,
+an denen eine Prüfung typischerweise zuerst ansetzt.
 
-Vollständigen Report holen:
+GRATIS-CHECK vs. VOLLREPORT
+Gratis-Check (diese Mail):
+  - Note & Score, Befunde nach Schwere, Top-${tops.length || 3}-Prioritäten
+Vollreport:
+  - jede einzelne Fundstelle (genaue Stelle im Code)
+  - fertiger Copy-Paste-Fix je Befund${remaining > 0 ? `\n  - ${remaining} weitere Fundstellen über die Top-${tops.length} hinaus` : ''}
+  - priorisierter Umsetzungsplan
+  - Entwurf deiner Erklärung zur Barrierefreiheit
+  - alles als PDF zum Weitergeben
+
+Vollreport für ${ctaTarget} sichern:
 ${cta}
 
 Diese Übersicht ist eine automatisierte technische Erstprüfung nach WCAG 2.1 AA
@@ -355,26 +403,33 @@ ${legalFooter()}`;
 
   const tone = toneForGrade(g);
   const countRow = (label, val, emoji) =>
-    `<tr><td style="padding:7px 0;border-bottom:1px solid #f1f1f1;font-size:14px;">${emoji} ${label}</td>` +
-    `<td align="right" style="padding:7px 0;border-bottom:1px solid #f1f1f1;font-size:14px;font-weight:700;">${val}</td></tr>`;
+    `<tr><td style="padding:7px 0;border-bottom:1px solid #f1f1f1;font-size:14px;color:#1f2430;">${emoji} ${label}</td>` +
+    `<td align="right" style="padding:7px 0;border-bottom:1px solid #f1f1f1;font-size:14px;font-weight:700;color:#1f2430;">${val}</td></tr>`;
+  const chipHtml = (sev) => sev
+    ? `<span style="display:inline-block;background:${SEVERITY_COLOR[sev]};color:${SEVERITY_TEXT[sev]};font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:6px;">${SEVERITY_LABEL[sev]}</span>`
+    : '';
   const topsHtml = tops.length
-    ? `<p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;margin:22px 0 8px;">Deine Top-${tops.length}-Prioritäten</p>
-      <ol style="margin:0 0 4px;padding-left:22px;font-size:14px;line-height:1.6;color:#1f2430;">
-        ${tops.map((t) => `<li style="margin-bottom:4px;">${escHtml(t)}</li>`).join('')}
-      </ol>`
+    ? `<p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;margin:22px 0 8px;">Deine Top-${tops.length}-Prioritäten (nach Schwere)</p>
+      <table role="presentation" width="100%" style="border-collapse:collapse;margin:0 0 4px;">
+        ${tops.map((t) => `<tr>
+          <td style="padding:6px 10px 6px 0;vertical-align:top;white-space:nowrap;">${chipHtml(t.severity)}</td>
+          <td style="padding:6px 0;font-size:14px;line-height:1.5;color:#1f2430;vertical-align:top;">${escHtml(t.title)}</td>
+        </tr>`).join('')}
+      </table>`
     : '';
   const html = `<!doctype html>
-<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><meta name="supported-color-schemes" content="light"></head>
 <body style="margin:0;padding:0;background:#f5f3ef;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1f2430;">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#f5f3ef;font-size:1px;line-height:1px;">${escHtml(preheader)}</div>
   <div style="max-width:560px;margin:0 auto;padding:24px 14px;">
     <div style="background:#ffffff;border-radius:16px;padding:26px 24px;border:1px solid #ececec;">
-      <p style="font-size:15px;margin:0 0 12px;">Hallo,</p>
-      <p style="font-size:15px;line-height:1.55;margin:0 0 20px;">hier ist <strong>Filo, der BFSG-Fuchs</strong> — danke, dass du ${host ? `<strong>${escHtml(host)}</strong>` : 'deine Seite'} durch die kostenlose WCAG-2.1-AA-Erstprüfung geschickt hast. Hier ist deine Übersicht.</p>
+      <p style="font-size:15px;margin:0 0 12px;color:#1f2430;">Hallo,</p>
+      <p style="font-size:15px;line-height:1.55;margin:0 0 20px;color:#1f2430;">hier ist <strong>Filo, der BFSG-Fuchs</strong> — danke, dass du ${host ? `<strong>${escHtml(host)}</strong>` : 'deine Seite'} durch die kostenlose WCAG-2.1-AA-Erstprüfung geschickt hast. Hier ist deine Übersicht.</p>
       <div style="text-align:center;background:${tone.bg};border-radius:14px;padding:20px 16px;margin:0 0 22px;">
-        <div style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:${tone.fg};opacity:.85;">Deine Note</div>
+        <div style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:${tone.fg};">Deine Note</div>
         <div style="font-size:46px;font-weight:800;color:${tone.fg};line-height:1.05;margin:2px 0;">${escHtml(g)}</div>
         ${s !== null ? `<div style="font-size:15px;color:${tone.fg};font-weight:600;">${s} / 100 Punkten</div>` : ''}
-        <div style="font-size:13px;color:${tone.fg};opacity:.95;margin-top:6px;line-height:1.4;">${escHtml(verdict)}</div>
+        <div style="font-size:13px;color:${tone.fg};margin-top:6px;line-height:1.4;">${escHtml(verdict)}</div>
       </div>
       <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;margin:0 0 6px;">Gefundene Befunde nach Schwere</p>
       <table role="presentation" width="100%" style="border-collapse:collapse;margin:0;">
@@ -382,15 +437,28 @@ ${legalFooter()}`;
         ${countRow('Schwerwiegend', c.serious, '🟠')}
         ${countRow('Mittel', c.moderate, '🟡')}
         ${countRow('Gering', c.minor, '⚪')}
-        <tr><td style="padding:9px 0;font-size:14px;font-weight:800;">Gesamt</td><td align="right" style="padding:9px 0;font-size:14px;font-weight:800;">${total}</td></tr>
+        <tr><td style="padding:9px 0;font-size:14px;font-weight:800;color:#1f2430;">Gesamt</td><td align="right" style="padding:9px 0;font-size:14px;font-weight:800;color:#1f2430;">${total}</td></tr>
       </table>
       ${topsHtml}
-      <p style="font-size:14px;line-height:1.55;background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:14px 16px;margin:22px 0;">Im <strong>Vollreport</strong> bekommst du zu jedem Punkt die <strong>genaue Fundstelle</strong> und den <strong>fertigen Copy-Paste-Fix</strong>${remaining > 0 ? ` sowie <strong>${remaining} weitere Fundstellen</strong>` : ''} — plus einen priorisierten Umsetzungsplan und einen Entwurf deiner Erklärung zur Barrierefreiheit.</p>
+      <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;margin:24px 0 6px;">Was das konkret bedeutet</p>
+      <p style="font-size:13px;line-height:1.55;color:#4b5563;margin:0 0 20px;">Seit dem <strong>28. Juni 2025</strong> gelten die Anforderungen des BFSG für viele Websites und Online-Dienste. Nach <strong>§ 15 BFSG</strong> können auch anerkannte Verbände festgestellte Verstöße geltend machen. Die gefundenen Punkte sind technische Ansatzpunkte, an denen eine Prüfung typischerweise zuerst ansetzt.</p>
+      <table role="presentation" width="100%" style="border-collapse:separate;border-spacing:0;margin:0 0 20px;">
+        <tr>
+          <td width="50%" style="background:#f3f4f6;border-radius:12px 0 0 12px;padding:14px 14px;vertical-align:top;">
+            <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;margin:0 0 6px;">Gratis-Check</div>
+            <div style="font-size:12px;line-height:1.55;color:#4b5563;">Note &amp; Score · Befunde nach Schwere · Top-${tops.length || 3}-Prioritäten</div>
+          </td>
+          <td width="50%" style="background:#fff7ed;border:1px solid #fed7aa;border-radius:0 12px 12px 0;padding:14px 14px;vertical-align:top;">
+            <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#c2410c;margin:0 0 6px;">Vollreport</div>
+            <div style="font-size:12px;line-height:1.55;color:#7c2d12;">Jede genaue Fundstelle · Copy-Paste-Fix je Befund${remaining > 0 ? ` · ${remaining} weitere Fundstellen` : ''} · Umsetzungsplan · Entwurf der Erklärung zur Barrierefreiheit · PDF</div>
+          </td>
+        </tr>
+      </table>
       <div style="text-align:center;margin:0 0 6px;">
-        <a href="${escHtml(cta)}" style="display:inline-block;background:#ea580c;color:#ffffff;text-decoration:none;font-weight:700;font-size:16px;padding:14px 30px;border-radius:12px;">Vollständigen Report holen →</a>
+        <a href="${escHtml(cta)}" style="display:inline-block;background:#ea580c;color:#ffffff;text-decoration:none;font-weight:700;font-size:16px;padding:14px 30px;border-radius:12px;">Vollreport für ${escHtml(ctaTarget)} sichern →</a>
       </div>
       <p style="font-size:12px;line-height:1.5;color:#9ca3af;margin:22px 0 0;">Diese Übersicht ist eine automatisierte technische Erstprüfung nach WCAG 2.1 AA und ersetzt keine vollständige manuelle Prüfung und keine Rechtsberatung.</p>
-      <p style="font-size:14px;margin:16px 0 0;">Viele Grüße<br>Filo &amp; das Team von ${escHtml(FROM_NAME)}</p>
+      <p style="font-size:14px;margin:16px 0 0;color:#1f2430;">Viele Grüße<br>Filo &amp; das Team von ${escHtml(FROM_NAME)}</p>
     </div>
     <div style="white-space:pre-line;font-size:11px;color:#9ca3af;padding:16px 10px 0;line-height:1.5;">${escHtml(legalFooter())}</div>
   </div>

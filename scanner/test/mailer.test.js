@@ -184,6 +184,30 @@ test('buildLeadTeaser: leakt KEINE gesperrten Inhalte + KEINE verbotenen Claims'
   }
 });
 
+test('buildLeadTeaser: Top-Befunde tragen Schweregrad-Chips (aus counts + Rang abgeleitet)', () => {
+  const { text, html } = buildLeadTeaser({
+    url: 'https://x.de', score: 55,
+    counts: { critical: 1, serious: 1, moderate: 1, minor: 0 },
+    topIssues: ['A-Fehler', 'B-Fehler', 'C-Fehler'], totalIssues: 3
+  });
+  // Rang folgt IMPACT_WEIGHT absteigend → 1. kritisch, 2. schwerwiegend, 3. mittel.
+  assert.match(text, /\[KRITISCH\] A-Fehler/);
+  assert.match(text, /\[SCHWERWIEGEND\] B-Fehler/);
+  assert.match(text, /\[MITTEL\] C-Fehler/);
+  for (const chip of [/KRITISCH/, /SCHWERWIEGEND/, /MITTEL/]) assert.match(html, chip);
+  // Sachlicher Risiko-Bezug ohne verbotene Claims.
+  assert.match(html, /28\.\s*Juni\s*2025/);
+  assert.match(html, /§\s*15\s*BFSG/);
+});
+
+test('buildLeadTeaser: expliziter severity im topIssue-Objekt hat Vorrang', () => {
+  const { text } = buildLeadTeaser({
+    score: 80, counts: { critical: 5, serious: 0, moderate: 0, minor: 0 },
+    topIssues: [{ title: 'Nur gering', severity: 'minor' }], totalIssues: 5
+  });
+  assert.match(text, /\[GERING\] Nur gering/);
+});
+
 test('buildLeadTeaser: Note-Fallback aus Score, wenn keine grade uebergeben', () => {
   assert.match(buildLeadTeaser({ score: 95 }).subject, /Note A/);
   assert.match(buildLeadTeaser({ score: 80 }).subject, /Note B/);

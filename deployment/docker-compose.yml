@@ -61,6 +61,9 @@ services:
       - RELEASE_DELAY_MIN=${RELEASE_DELAY_MIN:-90}
       - SCHEDULER_INTERVAL_MS=${SCHEDULER_INTERVAL_MS:-60000}
       - RELEASE_TOKEN_SECRET=${RELEASE_TOKEN_SECRET:-}
+      # DOI-Gate Gratis-Report: optionales eigenes Secret (Fallback RELEASE_TOKEN_SECRET/ADMIN_TOKEN);
+      # pending-leads.jsonl liegt im bfsg_data-Volume (Default /app/out).
+      - LEAD_TOKEN_SECRET=${LEAD_TOKEN_SECRET:-}
       - ADMIN_TOKEN=${ADMIN_TOKEN:-}
       - SENTRY_DSN=${SENTRY_DSN:-}
       - VAT_MODE=${VAT_MODE:-kleinunternehmer}
