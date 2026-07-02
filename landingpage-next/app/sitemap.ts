@@ -129,6 +129,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${siteUrl}/bfsg-software-anbieter-vergleich`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: `${siteUrl}/bfsg-1-jahr-bilanz`,
       lastModified,
       changeFrequency: "monthly",
