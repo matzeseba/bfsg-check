@@ -94,7 +94,7 @@ export function Footer() {
           <div className="flex flex-col items-center lg:items-start">
             <Link
               href="/"
-              className="inline-flex min-h-11 items-center gap-2.5 py-2 font-display text-lg font-bold tracking-tight"
+              className="inline-flex min-h-11 items-center gap-2.5 py-2 font-brand text-lg font-bold tracking-tight"
               aria-label={`${SITE.name} Startseite`}
             >
               {/* Fuchs-Wappen-Logo (dekorativ → leeres alt, Wortmarke traegt den
@@ -158,7 +158,7 @@ export function Footer() {
               className="mt-2 text-xs text-muted-foreground"
             >
               {status === "pending" ? (
-                <span className="text-brand-indigo dark:text-brand-mint">
+                <span className="text-brand-orange dark:text-brand-mint">
                   Fast geschafft — bitte bestätige den Link in der E-Mail, die wir
                   dir gerade geschickt haben.
                 </span>

@@ -56,14 +56,14 @@ export function Comparison() {
               className={cn(
                 "relative flex flex-col rounded-3xl p-7 backdrop-blur",
                 col.highlight
-                  ? // Highlight-Spalte: border-gradient bleibt + orange-getoenter
-                    // Hintergrund + Elevation (Design: hervorgehobene Fuchs-Spalte, orange).
-                    "border-gradient bg-brand-orange/[0.05] shadow-elevated"
+                  ? // Highlight-Spalte: orange Hairline + orange-getoenter
+                    // Hintergrund + der tiefere der beiden Tinten-Schatten.
+                    "border border-brand-orange/40 bg-brand-orange/[0.05] shadow-card-hover"
                   : "border border-border/70 bg-card/80 shadow-card-soft dark:ring-1 dark:ring-white/5",
               )}
             >
               {col.highlight && (
-                <span className="absolute -top-3 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full bg-brand-amber px-3 py-1 font-mono text-[10px] font-bold tracking-wide text-brand-deep uppercase shadow-glow-orange">
+                <span className="absolute -top-3 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full bg-brand-amber px-3 py-1 font-mono text-[10px] font-bold tracking-wide text-brand-deep uppercase shadow-card-soft">
                   <span aria-hidden>★</span>
                   Unser Ansatz
                 </span>

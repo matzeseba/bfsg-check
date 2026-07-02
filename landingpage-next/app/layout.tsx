@@ -33,25 +33,24 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-// Display/Headlines: Fredoka — die runde, kräftige Headline-Schrift aus dem
-// gelieferten Design "BFSG-Fuchs.dc.html". Variable Font (Achse wght 300–700);
-// ohne weight-Liste wird die volle variable Achse geladen (wir nutzen 600/700).
-const fredokaDisplay = Fredoka({
+// Display/Headlines H1–H3: Fraunces (Upright + Italic) — Serifen-Display der
+// „Gutachten"-Design-Sprache (warm-editorial, Prüfbericht-Typo). EIN variabler
+// Font mit beiden Stilen: die Italic-Akzentwoerter (`italic gradient-text`)
+// loesen ueber font-style automatisch in den echten Kursiv-Schnitt auf —
+// keine separate --font-display-italic-Variable mehr noetig. Nur wght-Achse
+// (Default) → schlanker Payload, display:swap gegen FOIT.
+const frauncesDisplay = Fraunces({
   variable: "--font-display",
   subsets: ["latin"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
-// Editorial-Akzent: echter Fraunces-KURSIV-Display-Schnitt fuer die betonten
-// Italic-Akzentwoerter (~8 Headlines). Fredoka hat keinen echten Kursiv → das
-// bisherige `italic gradient-text` erzwang synthetisches Oblique auf Fredoka
-// (unschoen). Fraunces (variable Serif-Display) liefert einen echten Kursiv-Schnitt.
-// Gebunden in globals.css an `.gradient-text.italic` (die Akzent-Stellen tragen
-// beide Klassen); reine Fredoka-`.gradient-text` (Hero-H1 „BFSG") bleibt unberuehrt.
-const frauncesItalic = Fraunces({
-  variable: "--font-display-italic",
+// Marken-Schrift: Fredoka — NUR noch fuer Marken-/Filo-Momente (Logo-Wortmarke,
+// .btn-cta). Die Headline-Rolle hat Fraunces uebernommen.
+const fredokaBrand = Fredoka({
+  variable: "--font-brand",
   subsets: ["latin"],
-  style: ["italic"],
   display: "swap",
 });
 
@@ -111,13 +110,13 @@ export const metadata: Metadata = {
 };
 
 // Next 16: themeColor/colorScheme gehoeren in den viewport-Export.
-// Dark ist der erzwungene Standard (siehe ThemeProvider) → colorScheme "dark"
-// zuerst und eine dunkle Browser-UI-Farbe als Default. next-themes setzt
-// color-scheme auf <html> beim Theme-Wechsel zusaetzlich dynamisch.
+// Light (Papier-Creme) ist der Standard (siehe ThemeProvider) → colorScheme
+// "light" zuerst und die warme Papier-Farbe als Browser-UI-Default. next-themes
+// setzt color-scheme auf <html> beim Theme-Wechsel zusaetzlich dynamisch.
 export const viewport: Viewport = {
-  colorScheme: "dark light",
-  // BFSG-Fuchs Dark-Default: warmes Braun-Schwarz der Marken-Palette.
-  themeColor: "#0f0b09",
+  colorScheme: "light dark",
+  // „Das Gutachten" Light-Default: Papier-Creme ≈ oklch(0.975 0.008 85).
+  themeColor: "#faf6ed",
 };
 
 export default function RootLayout({
@@ -133,7 +132,7 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       // next-themes setzt .dark vor Hydration via Inline-Script.
       suppressHydrationWarning
-      className={`${hankenSans.variable} ${jetbrainsMono.variable} ${fredokaDisplay.variable} ${frauncesItalic.variable} h-full antialiased`}
+      className={`${hankenSans.variable} ${jetbrainsMono.variable} ${frauncesDisplay.variable} ${fredokaBrand.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
         <ThemeProvider>

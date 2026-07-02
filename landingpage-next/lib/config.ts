@@ -78,12 +78,11 @@ export const HERO = {
   // "menschlich geprüft" ist durch das Owner-Release-Gate wahr. Wird in Hero.tsx
   // als nicht-klickbares <span>-Badge gerendert (kein Link, kein Hover-Pfeil).
   pill: "KI-Spürnase + menschlich geprüft · 80+ WCAG-Kriterien",
-  // Fox-Headline (Design "BFSG-Fuchs"): "Schlau wie ein Fuchs — bereit fürs BFSG?"
-  // Nur das Akzentwort "BFSG" leuchtet im Orange-Verlauf (headlineEmph); der Rest
-  // bleibt creme (headlineLead). "bereit fürs BFSG?" ist eine Bereitschafts-FRAGE,
-  // KEINE verbotene Konformitäts-/Garantie-Aussage ("BFSG-konform", UWG §5).
-  // Das "?" wird in Hero.tsx an das Akzentwort gehängt; Clip-Schutz sitzt in
-  // .gradient-text (padding-/margin-right) → kein Glyph-Clipping, kein CLS.
+  // Fox-Headline: "Schlau wie ein Fuchs — bereit fürs BFSG?"
+  // Nur das Akzentwort "BFSG" steht in Marker-Orange (headlineEmph, .gradient-text
+  // = solide Tinte); der Rest bleibt im Tinten-Ton (headlineLead). "bereit fürs
+  // BFSG?" ist eine Bereitschafts-FRAGE, KEINE verbotene Konformitäts-/Garantie-
+  // Aussage ("BFSG-konform", UWG §5). Das "?" wird in Hero.tsx angehängt.
   headlineLead: "Schlau wie ein Fuchs — bereit fürs",
   headlineEmph: "BFSG",
   // Tail leer: die Pointe "bevor es eine Kanzlei tut" steht in der Subline.

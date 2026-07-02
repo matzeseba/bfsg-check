@@ -70,7 +70,7 @@ export function Header() {
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-6 px-5 sm:px-6">
         <Link
           href="/"
-          className="group/logo -my-2 flex min-h-11 items-center gap-2.5 py-2 font-display text-xl font-bold tracking-tight"
+          className="group/logo -my-2 flex min-h-11 items-center gap-2.5 py-2 font-brand text-xl font-bold tracking-tight"
           aria-label={`${SITE.name} Startseite`}
         >
           {/* Fuchs-Wappen-Logo (Design-Signatur), dekorativ → leeres alt, da die

@@ -89,7 +89,7 @@ export default async function AnmeldungBestaetigtPage({
 
   return (
     <section className="mx-auto w-full max-w-3xl px-6 py-16 sm:py-20">
-      <div className="animate-fade-up">
+      <div>
         <SectionKicker
           icon={content.icon}
           label={content.kicker}
@@ -138,7 +138,7 @@ export default async function AnmeldungBestaetigtPage({
         )}
       </div>
 
-      <div className="mt-14 animate-fade-up sm:mt-16">
+      <div className="mt-14 sm:mt-16">
         <h2 className="font-display text-2xl font-semibold tracking-tight">
           Vom Gratis-Report zum vollständigen Audit
         </h2>

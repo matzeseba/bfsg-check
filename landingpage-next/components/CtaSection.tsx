@@ -45,18 +45,13 @@ export function CtaSection() {
           // Warmes Orange-Gradient-Panel (Design: #2a1408 → #16110e). Token-
           // getrieben via color-mix aus brand-orange über brand-deeper (kein
           // roher Hex), feine Orange-Kante.
-          className="relative grid items-center gap-8 overflow-hidden rounded-[1.5rem] border border-brand-orange/25 bg-[linear-gradient(135deg,color-mix(in_oklab,var(--brand-orange)_18%,var(--brand-deeper)),var(--brand-deeper)_70%)] px-6 py-14 shadow-elevated sm:px-12 sm:py-20 lg:grid-cols-[1.45fr_0.8fr]"
+          className="relative grid items-center gap-8 overflow-hidden rounded-[1.5rem] border border-brand-orange/25 bg-[linear-gradient(135deg,color-mix(in_oklab,var(--brand-orange)_18%,var(--brand-deeper)),var(--brand-deeper)_70%)] px-6 py-14 shadow-card-hover sm:px-12 sm:py-20 lg:grid-cols-[1.45fr_0.8fr]"
         >
-          {/* Orange-Glow oben + Dot-Grid mit radialer Maske (Design). Ambient-
-              Reduktion: statisch (kein animate-float) und kleiner — das war das
-              teuerste Ambient-Element (34rem @ 60px-Blur, dauerhaft animiert). */}
+          {/* Statischer Orange-Glow oben (das Dot-Grid ist mit der Gutachten-
+              Design-Sprache entfallen). */}
           <div
             aria-hidden
             className="pointer-events-none absolute -top-24 left-[30%] size-[24rem] -translate-x-1/2 rounded-full bg-brand-orange/20 blur-[60px]"
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 dot-bg-dark mask-radial"
           />
 
           <div className="relative z-10 text-center lg:text-left">
@@ -120,8 +115,8 @@ export function CtaSection() {
           </div>
 
           {/* Maskottchen (Daumen hoch) — groß + transparent als Hintergrund-
-              Backdrop, auch mobil dezent sichtbar. Schwebt sanft (animate-float-
-              slow), unten weich ausgeblendet (mask-fade-b). Dekorativ → aria-hidden,
+              Backdrop, auch mobil dezent sichtbar. Statisch (kein Schwebe-Loop
+              mehr), unten weich ausgeblendet (mask-fade-b). Dekorativ → aria-hidden,
               pointer-events-none, liegt HINTER dem Text (z-0). */}
           <div
             aria-hidden
@@ -133,7 +128,7 @@ export function CtaSection() {
               width={680}
               height={1235}
               loading="lazy"
-              className="h-auto w-28 opacity-90 mask-fade-b animate-float-slow drop-shadow-[0_24px_40px_rgba(0,0,0,0.5)] sm:w-56 lg:w-72"
+              className="h-auto w-28 opacity-90 mask-fade-b drop-shadow-[0_24px_40px_rgba(0,0,0,0.5)] sm:w-56 lg:w-72"
             />
           </div>
         </motion.div>

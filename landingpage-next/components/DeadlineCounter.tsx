@@ -46,11 +46,11 @@ export function DeadlineCounter() {
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-brand-amber/25 bg-card/80 p-5 shadow-card-soft backdrop-blur dark:ring-1 dark:ring-white/5">
-      {/* Amber-Shimmer-Linie am oberen Rand (Design-Signatur): wandernder Verlauf,
-          reduced-motion-gated (.animate-shimmer steht in der globalen Regel). */}
+      {/* Statische Amber-Linie am oberen Rand (der Shimmer-Loop ist mit der
+          Gutachten-Design-Sprache entfallen). */}
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-[linear-gradient(90deg,transparent,var(--brand-amber),transparent)] bg-[length:200%_100%] animate-shimmer"
+        className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-[linear-gradient(90deg,transparent,var(--brand-amber),transparent)]"
       />
       {/* Kicker-TEXT light-mode-AA: dunkles Burnt-Amber auf hell, helles Amber im
           Dark (analog CtaSection-Urgency-Pill). Puls-Punkt bleibt dekorativ. */}

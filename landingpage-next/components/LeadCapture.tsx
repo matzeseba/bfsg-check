@@ -88,7 +88,7 @@ export function LeadCapture({
           : "";
 
   return (
-    <div className="mx-5 mb-4 rounded-xl border border-brand-indigo/25 bg-brand-indigo/5 px-4 py-4">
+    <div className="mx-5 mb-4 rounded-xl border border-brand-orange/25 bg-brand-orange/5 px-4 py-4">
       <p className="font-display text-sm font-semibold tracking-tight">
         {totalIssues > 0
           ? "Den vollständigen Befund-Überblick per E-Mail"
@@ -149,7 +149,7 @@ export function LeadCapture({
         className="mt-2 min-h-4 text-xs text-muted-foreground"
       >
         {status === "pending" ? (
-          <span className="text-brand-indigo dark:text-brand-mint">
+          <span className="text-brand-orange dark:text-brand-mint">
             {statusText}
           </span>
         ) : (

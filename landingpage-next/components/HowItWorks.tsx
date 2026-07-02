@@ -22,14 +22,6 @@ export function HowItWorks() {
       aria-labelledby="how-heading"
       className="relative isolate overflow-hidden bg-muted/40"
     >
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 dot-bg opacity-50 mask-radial dark:hidden"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 hidden dot-bg-dark opacity-50 mask-radial dark:block"
-      />
       <div className="relative z-10 mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-24">
         <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
           <SectionKicker icon={ScanLineIcon} label="Wie es funktioniert" />
@@ -59,19 +51,14 @@ export function HowItWorks() {
             loading="lazy"
             className="pointer-events-none absolute -bottom-2 -right-14 z-20 hidden h-auto opacity-100 drop-shadow-[0_18px_30px_rgba(0,0,0,0.45)] lg:block lg:w-44"
           />
-          {/* Ablauf-Linie (Design-Signatur): warmer Orange-Verlauf mit Lauflicht-
-              Punkt, der von links nach rechts wandert (animate-travel-dot, reduced-
-              motion-gated). Markiert visuell den Fortschritt URL → Scan → Fix-Plan.
+          {/* Ablauf-Linie: statischer warmer Orange-Verlauf, markiert visuell den
+              Fortschritt URL → Scan → Fix-Plan. Das frühere Lauflicht (Dauer-Loop)
+              ist mit der Gutachten-Design-Sprache entfallen.
               Nur Desktop (md+); aria-hidden, rein dekorativ. */}
           <div
             aria-hidden
-            className="absolute top-14 right-[12%] left-[12%] hidden h-0.5 overflow-visible rounded-full bg-gradient-to-r from-brand-orange/10 via-brand-orange/40 to-brand-orange/10 md:block"
-          >
-            <span
-              aria-hidden
-              className="absolute top-1/2 size-2.5 -translate-y-1/2 rounded-full bg-brand-orange shadow-[0_0_16px_2px_var(--brand-orange)] animate-travel-dot"
-            />
-          </div>
+            className="absolute top-14 right-[12%] left-[12%] hidden h-0.5 rounded-full bg-gradient-to-r from-brand-orange/10 via-brand-orange/40 to-brand-orange/10 md:block"
+          />
 
           <ol className="relative grid gap-6 md:grid-cols-3">
             {HOW_IT_WORKS.map((step, i) => {
@@ -90,7 +77,7 @@ export function HowItWorks() {
                     // rechts daneben steht (Text weicht aus, keine Verdeckung).
                     (i === 2 ? "lg:pr-28 " : "") +
                     (featured
-                      ? "border-gradient bg-card shadow-card-hover"
+                      ? "border border-brand-orange/40 bg-card shadow-card-hover"
                       : "border border-border/70 bg-card/85 shadow-card-soft dark:ring-1 dark:ring-white/5")
                   }
                 >
@@ -109,7 +96,7 @@ export function HowItWorks() {
                   {/* Step-Badge (Design): Kreis mit warmem Orange-Glow + Orange-
                       Rahmen, Icon im Marken-Orange. Mint bleibt Action/Erfolg → die
                       Schritt-Marker tragen den dekorativen Marken-Akzent (Orange). */}
-                  <div className="relative mt-5 flex size-12 items-center justify-center rounded-2xl border border-brand-orange/45 bg-gradient-to-br from-brand-orange/15 to-brand-deep text-brand-orange shadow-glow-orange transition-transform duration-300 group-hover/step:scale-110">
+                  <div className="relative mt-5 flex size-12 items-center justify-center rounded-2xl border border-brand-orange/45 bg-gradient-to-br from-brand-orange/15 to-brand-deep text-brand-orange shadow-card-soft transition-transform duration-300 group-hover/step:scale-110">
                     {/* Dezent pulsierender Ring → "live"-Anmutung, gestaffelt. */}
                     <span
                       aria-hidden

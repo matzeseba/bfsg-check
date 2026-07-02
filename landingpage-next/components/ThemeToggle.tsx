@@ -27,7 +27,7 @@ export function ThemeToggle({ className }: { className?: string }) {
           : "Design umschalten"
       }
       className={cn(
-        "relative inline-flex size-11 items-center justify-center rounded-xl border border-border/70 bg-card/60 text-foreground/70 backdrop-blur transition-all hover:border-brand-mint/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 focus-visible:ring-offset-background dark:focus-visible:ring-brand-mint",
+        "relative inline-flex size-11 items-center justify-center rounded-xl border border-border/70 bg-card/60 text-foreground/70 backdrop-blur transition-all hover:border-brand-mint/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 focus-visible:ring-offset-background dark:focus-visible:ring-brand-mint",
         className,
       )}
     >

@@ -4,7 +4,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Vordergrund für IMMER dunkle Marken-Flächen (brand-deep/brand-indigo sind in
+/* Vordergrund für IMMER dunkle Marken-Flächen (brand-deep/brand-deeper sind in
    beiden Themes dunkel). primary-foreground kippt im Dark-Mode auf dunkel und
    wäre dort unlesbar — diese Utility bleibt konstant hell. */
 @utility text-on-deep {
@@ -16,6 +16,9 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-display: var(--font-display);
+  /* Marken-Schrift (Fredoka): NUR Logo-Wortmarke + .btn-cta + Filo-Momente.
+     Display (Fraunces) trägt die Gutachten-Typo H1–H3. */
+  --font-brand: var(--font-brand);
   --font-mono: var(--font-mono);
   --font-heading: var(--font-display);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -49,15 +52,12 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
 
-  /* Brand-Token-Familie fuer Kompositionen (BFSG-Fuchs-Palette: warmes
-     Braun-Schwarz, Orange = Markenakzent, Mint = Action/CTA). */
+  /* Brand-Token-Familie „Das Gutachten": warmes Papier + Tinte, Orange = Marker/
+     Siegel (sparsam), Mint = NUR Erfolg. Die früheren brand-indigo/violet-Remaps
+     sind entfernt — alle Verwendungen sprechen jetzt direkt brand-orange(-soft). */
   --color-brand-deepest: var(--brand-deepest);
   --color-brand-deep: var(--brand-deep);
   --color-brand-deeper: var(--brand-deeper);
-  /* brand-indigo/violet sind auf die Fox-Orange-Familie remapped (Alt-Namen
-     bleiben fuer Bestands-Komposition/Glows erhalten → kein Massen-Rename). */
-  --color-brand-indigo: var(--brand-indigo);
-  --color-brand-violet: var(--brand-violet);
   --color-brand-orange: var(--brand-orange);
   --color-brand-orange-soft: var(--brand-orange-soft);
   /* Dunkle Unterkante des 3D-CTA-Buttons (Design: box-shadow 0 5px 0 #b8430e). */
@@ -75,97 +75,75 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  /* Brand-Shadow-Tokens: indigo-tinted statt neutral-schwarz */
-  --shadow-glow-mint: 0 0 0 1px color-mix(in oklch, var(--brand-mint), transparent 70%),
-    0 8px 30px -8px color-mix(in oklch, var(--brand-mint), transparent 55%);
-  /* Orange-Glow fuer Marken-Akzent-Flaechen (Hero-Report-Card, Risk-Band, Step-
-     Badges) — Pendant zum Mint-Glow, in der Fox-Markenfarbe. */
-  --shadow-glow-orange: 0 0 0 1px color-mix(in oklch, var(--brand-orange), transparent 68%),
-    0 10px 34px -10px color-mix(in oklch, var(--brand-orange), transparent 50%);
+  /* Genau ZWEI flache, tinten-getönte Schatten (Prüfbericht-Ästhetik: Papier
+     liegt auf dem Tisch, es schwebt nicht). Glow-/Elevated-Schatten entfallen. */
   --shadow-card-soft: 0 1px 2px color-mix(in oklch, var(--brand-deep), transparent 92%),
-    0 8px 24px -10px color-mix(in oklch, var(--brand-deep), transparent 80%);
-  --shadow-card-hover: 0 2px 4px color-mix(in oklch, var(--brand-deep), transparent 88%),
-    0 24px 50px -12px color-mix(in oklch, var(--brand-deep), transparent 72%);
-  /* Hero-Visual: tiefe, mint-getoente Erhebung */
-  --shadow-elevated: 0 2px 6px color-mix(in oklch, var(--brand-deep), transparent 85%),
-    0 18px 40px -16px color-mix(in oklch, var(--brand-deep), transparent 60%),
-    0 40px 80px -24px color-mix(in oklch, var(--brand-indigo), transparent 60%);
+    0 6px 18px -10px color-mix(in oklch, var(--brand-deep), transparent 82%);
+  --shadow-card-hover: 0 2px 4px color-mix(in oklch, var(--brand-deep), transparent 90%),
+    0 16px 36px -14px color-mix(in oklch, var(--brand-deep), transparent 74%);
 
-  --animate-aurora: aurora 18s ease infinite;
+  /* Überlebende Loop-Animationen: NUR pulse-soft (Status-Punkte) + marquee
+     (RuleTicker). Alle dekorativen Dauer-Loops (aurora/float/shimmer/…) sind
+     entfernt — Motion = einmalige Zustands-Animationen (FE-PR 4). */
   --animate-pulse-soft: pulse-soft 2.4s ease-in-out infinite;
-  --animate-shimmer: shimmer 2.2s linear infinite;
   --animate-marquee: marquee 32s linear infinite;
-  --animate-fade-up: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
-  --animate-scan-beam: scan-beam 4.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-  --animate-float: float 7s ease-in-out infinite;
-  --animate-float-slow: float 11s ease-in-out infinite;
-  /* Neue Design-Animationen (Ticker, CTA-Glow, Scan-Equalizer, Ablauf-Lauflicht,
-     Empfehlungs-Puls). Alle dekorativ → via reduced-motion stillgestellt. */
   --animate-ticker: marquee 42s linear infinite;
-  --animate-glow-pulse: glow-pulse 3s ease-in-out infinite;
-  --animate-bar-eq: bar-eq 1s ease-in-out infinite;
-  --animate-travel-dot: travel-dot 4.5s ease-in-out infinite;
-  --animate-warn-pulse: warn-pulse 2.4s ease-in-out infinite;
 }
 
 :root {
-  /* Light (BFSG-Fuchs): warmes Creme-Off-White, Mint-Action-Primary, Orange-Akzent.
-     Das Maskottchen/Logo ist FINAL und wird nicht umgefaerbt — die SEITE folgt der
-     Fox-Palette (Navy/Braun-Schwarz + Orange + Mint). Dark ist der erzwungene
-     Standard; dieser Light-Mode ist die kontrastsichere Tag-Variante derselben Marke. */
-  --background: oklch(0.985 0.006 75);
-  --foreground: oklch(0.21 0.025 55);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.21 0.025 55);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.21 0.025 55);
-  /* Primary = Fox-ORANGE (Action/CTA) in beiden Themes — Buttons sind jetzt orange
-     (Design "BFSG-Fuchs.dc.html": #f4641e mit dunkelbraunem Text). Mint bleibt als
-     Erfolgs-/Success-Akzent (Haken, "konform", "nachher ✓") über --brand-mint erhalten,
-     ist aber NICHT mehr die Button-Farbe. #2b1206 auf #f4641e ≈ 4.9:1 (AA) in beiden
-     Themes. */
+  /* LIGHT = DEFAULT („Das Gutachten"): warmes Papier-Creme, Tinten-Typo,
+     weiß-warme Dokument-Karten. Orange nur als Marker/Siegel — für Text auf
+     Creme die AA-abgedunkelte Burnt-Variante (≥4,5:1), die helle #ED6A33-
+     Familie gehört dem Dark-Theme. CTA-Orange #f4641e + dunkler Text #2b1206
+     bleiben unverändert (konvertierender Bestand, ≈4,9:1 AA). */
+  --background: oklch(0.975 0.008 85);
+  --foreground: oklch(0.22 0.02 50);
+  --card: oklch(0.99 0.005 90);
+  --card-foreground: oklch(0.22 0.02 50);
+  --popover: oklch(0.99 0.005 90);
+  --popover-foreground: oklch(0.22 0.02 50);
   --primary: #f4641e;
   --primary-foreground: #2b1206;
-  --secondary: oklch(0.96 0.012 70);
-  --secondary-foreground: oklch(0.27 0.06 50);
-  --muted: oklch(0.965 0.01 75);
-  /* Warmgrauer Sekundaertext, AA-sicher (>=4.5:1) auf Creme/Weiss. */
-  --muted-foreground: oklch(0.46 0.022 55);
+  --secondary: oklch(0.955 0.012 80);
+  --secondary-foreground: oklch(0.3 0.03 50);
+  --muted: oklch(0.955 0.01 80);
+  /* Warmgrauer Sekundärtext, AA-sicher (≥4,5:1) auf Creme/Weiß-warm. */
+  --muted-foreground: oklch(0.45 0.022 55);
   --accent: #f4641e;
   --accent-foreground: #2b1206;
   --destructive: oklch(0.55 0.2 28);
-  --border: oklch(0.88 0.014 70);
+  /* Hairline-Borders: hell genug für Papier-Zartheit, dunkel genug als Linie. */
+  --border: oklch(0.87 0.015 75);
   --border-card: var(--border);
-  /* Input-Rahmen dunkel genug fuer sichtbare Feldgrenze als EINZIGE Abgrenzung
-     (WCAG 1.4.11, >=3:1 gegen Weiss/Creme — verifiziert: L~0.27 → ~3.3:1). */
+  /* Input-Rahmen dunkel genug für sichtbare Feldgrenze als EINZIGE Abgrenzung
+     (WCAG 1.4.11, ≥3:1 gegen Weiß/Creme — verifiziert: L~0.27 → ~3.3:1). */
   --input: oklch(0.58 0.03 60);
-  /* Fokus-Ring im Light-Mode = dunkles Burnt-Orange (Orange #ED6A33 auf Weiss waere
-     ~3.4:1; diese dunklere Variante ist hochkontrast fuer Tastatur-Fokus). Im Dark
-     ist der Ring Mint (dort hochkontrast). WCAG 2.4.7/1.4.11. */
+  /* Fokus-Ring im Light-Mode = dunkles Burnt-Orange (helles Orange auf Creme
+     wäre ~3.4:1; diese dunklere Variante ist hochkontrast für Tastatur-Fokus).
+     Im Dark ist der Ring Mint (dort hochkontrast). WCAG 2.4.7/1.4.11. */
   --ring: oklch(0.52 0.17 42);
   --chart-1: oklch(0.72 0.18 158);
   --chart-2: oklch(0.62 0.19 42);
   --chart-3: oklch(0.74 0.15 70);
   --chart-4: oklch(0.6 0.2 28);
   --chart-5: oklch(0.5 0.12 50);
-  --radius: 0.8rem;
-  --sidebar: oklch(0.985 0.006 75);
-  --sidebar-foreground: oklch(0.21 0.025 55);
+  /* Gutachten-Form: ruhige 0.5rem-Basis statt der runden 0.8rem-Spielzeug-Radien. */
+  --radius: 0.5rem;
+  --sidebar: oklch(0.975 0.008 85);
+  --sidebar-foreground: oklch(0.22 0.02 50);
   --sidebar-primary: oklch(0.72 0.18 158);
   --sidebar-primary-foreground: oklch(0.24 0.06 162);
-  --sidebar-accent: oklch(0.96 0.012 70);
-  --sidebar-accent-foreground: oklch(0.27 0.06 50);
-  --sidebar-border: oklch(0.88 0.014 70);
+  --sidebar-accent: oklch(0.955 0.012 80);
+  --sidebar-accent-foreground: oklch(0.3 0.03 50);
+  --sidebar-border: oklch(0.87 0.015 75);
   --sidebar-ring: oklch(0.52 0.17 42);
 
-  /* "deep"-Surfaces bleiben in BEIDEN Themes dunkel (Fox-Braun-Schwarz) —
-     z. B. invertierte Bloecke, Skip-Link, Schatten-Toenung. */
+  /* „deep"-Surfaces bleiben in BEIDEN Themes dunkel (warmes Braun-Schwarz) —
+     Scoped-Dark-Inseln (StatsBar/CtaSection), Skip-Link, Schatten-Tönung. */
   --brand-deepest: #0a0705;
   --brand-deeper: #0b0807;
   --brand-deep: #0f0b09;
-  /* indigo/violet remapped auf Orange-Familie (kontrastsicher auf Weiss = dunkler). */
-  --brand-indigo: oklch(0.55 0.18 42);
-  --brand-violet: oklch(0.62 0.17 35);
+  /* Marker-Orange für Text auf Papier: AA-abgedunkelte Burnt-Variante. */
   --brand-orange: oklch(0.55 0.18 42);
   --brand-orange-soft: oklch(0.64 0.17 38);
   --brand-orange-press: #b8430e;
@@ -174,50 +152,38 @@
   --brand-amber: oklch(0.66 0.15 70);
   --brand-rose: oklch(0.55 0.2 28);
 
-  /* Light: Akzentwort in dunklem Burnt-Orange (auf Weiss kontrastsicher >=4.5:1).
-     Dark ueberschreibt das mit hellem Orange (siehe .dark). */
-  --gradient-from: oklch(0.55 0.18 42);
-  --gradient-to: oklch(0.62 0.17 35);
-
   color-scheme: light;
 }
 
 .dark {
-  /* BFSG-Fuchs Dark-Palette (gelieferter Design-Stand "BFSG-Fuchs Landingpage.dc.html"):
-     warmes Braun-Schwarz #0f0b09, Orange #ED6A33 = Markenakzent, Mint #34d99a =
-     Action/CTA, Amber #f5b13d, Rot #F8554B. Werte bewusst als Hex/rgba, um exakt das
-     gelieferte Design zu treffen; token-basiert, damit der Light-Toggle erhalten bleibt.
-     Kontraste gegen #0f0b09 / #171009 per A11y-Audit verifiziert (Eigen-Dogfood). */
+  /* Dark bleibt vollwertig: warmes Braun-Schwarz #0f0b09 + Creme-Text, Orange
+     #ED6A33 = Marker/Siegel, Mint #34d99a = NUR Erfolg. Kontraste gegen
+     #0f0b09 / #171009 per A11y-Audit verifiziert (Eigen-Dogfood). */
   --background: #0f0b09;
   --foreground: #f7f1ea;
   --card: #171009;
   --card-foreground: #f7f1ea;
   --popover: #16110e;
   --popover-foreground: #f7f1ea;
-  /* Primary = Fox-ORANGE (CTA/Action) — Buttons sind orange (Design #f4641e mit
-     dunkelbraunem Text #2b1206). Mint bleibt Erfolgs-Akzent über --brand-mint. */
+  /* Primary = CTA-Orange (unverändert: #f4641e mit dunkelbraunem Text #2b1206). */
   --primary: #f4641e;
   --primary-foreground: #2b1206;
   --secondary: #1d1611;
   --secondary-foreground: #f7f1ea;
   --muted: #120d0a;
-  /* #b6a89d: warmgrauer Sekundaertext, ~8.5:1 auf #0f0b09 / ~7.5:1 auf #171009
-     (AA-sicher). Dimmere Toene (#a99f93/#9a8d80) nur fuer Tertiaer-Labels mit
-     ausreichendem Kontrast einsetzen. */
+  /* #b6a89d: warmgrauer Sekundärtext, ~8.5:1 auf #0f0b09 / ~7.5:1 auf #171009
+     (AA-sicher). */
   --muted-foreground: #b6a89d;
   --accent: #f4641e;
   --accent-foreground: #2b1206;
   --destructive: #F8554B;
-  /* Warme creme-getoente Hairlines (Design: rgba(255,228,205,X)). border/border-card
-     sind dekorative Karten-Hairlines (Begrenzung wird zusaetzlich durch Flaechen-
-     kontrast getragen). --input ist die EINZIGE Abgrenzung eigenstaendiger Felder
-     (CheckoutModal/Footer/FAQ) → solider warmer Ton mit >=3:1 gegen #0f0b09/#171009
-     (WCAG 1.4.11; #7a6a59: L~0.15 → ~3.5:1) statt der zu schwachen Creme-16%-Hairline. */
+  /* Warme creme-getönte Hairlines (dekorative Karten-Kanten). --input ist die
+     EINZIGE Abgrenzung eigenständiger Felder → ≥3:1 gegen #0f0b09/#171009
+     (WCAG 1.4.11; #7a6a59: ~3.5:1). */
   --border: rgba(255, 228, 205, 0.09);
   --border-card: rgba(255, 228, 205, 0.12);
   --input: #7a6a59;
-  /* Fokus-Ring = Mint (auf #0f0b09 ~9:1, hochkontrast). Mint-Buttons setzen lokal
-     einen dunklen Ring + Offset (kein Mint-auf-Mint). */
+  /* Fokus-Ring = Mint (auf #0f0b09 ~9:1, hochkontrast). */
   --ring: #34d99a;
   --chart-1: #34d99a;
   --chart-2: #ED6A33;
@@ -236,10 +202,8 @@
   --brand-deepest: #0a0705;
   --brand-deeper: #0b0807;
   --brand-deep: #0f0b09;
-  /* indigo/violet remapped auf die Orange-Familie → Bestands-Glows/Border-Gradient
-     werden ohne Massen-Rename orange (Design-Signatur). */
-  --brand-indigo: #ED6A33;
-  --brand-violet: #FF8149;
+  /* Marker-Orange im Dark: die leuchtende Marken-Familie (auf #0f0b09 ≥AA für
+     große Akzentwörter, ~6:1). */
   --brand-orange: #ED6A33;
   --brand-orange-soft: #FFB07A;
   --brand-orange-press: #b8430e;
@@ -247,11 +211,6 @@
   --brand-mint-soft: #7fe8bd;
   --brand-amber: #f5b13d;
   --brand-rose: #F8554B;
-
-  /* Headline-Akzent: im Dark leuchtendes Orange (Fox-Signatur, Hero-Wort "BFSG"),
-     im Light dunkles Burnt-Orange (siehe :root) — kontrastsicher in BEIDEN Themes. */
-  --gradient-from: var(--brand-orange);
-  --gradient-to: var(--brand-orange-soft);
 
   color-scheme: dark;
 }
@@ -263,49 +222,21 @@
   html {
     @apply font-sans antialiased;
     scroll-behavior: smooth;
-    /* Schibsted/Hanken/JetBrains: Standard-Kerning + Ligaturen fuer scharfe Typo. */
+    /* Fraunces/Hanken/JetBrains: Standard-Kerning + Ligaturen für scharfe Typo. */
     font-feature-settings: "kern", "liga";
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
   body {
+    /* Ruhiges Papier: EINE Fläche, kein Deko-Wash, kein Noise-Overlay mehr.
+       Die Wärme kommt aus dem Creme-Ton selbst (Prüfbericht, kein Dashboard). */
     @apply bg-background text-foreground;
-    /* Warmer Fox-Wash: Orange + Amber (KEIN Grün/Mint mehr im Hintergrund —
-       Design-Vorgabe: grünen Hintergrund vollständig entfernen). */
-    background-image:
-      radial-gradient(at 12% 0%, color-mix(in oklch, var(--brand-orange), transparent 88%) 0px, transparent 50%),
-      radial-gradient(at 92% 6%, color-mix(in oklch, var(--brand-amber), transparent 92%) 0px, transparent 55%);
-    /* Kein background-attachment: fixed — erzwingt auf Mobile Full-Viewport-Repaint
-       pro Scroll-Frame (INP-/Jank-Killer auf paid-Ads-Traffic). Der Wash sitzt oben
-       im Hero, wo er sichtbar ist; mitscrollen ist optisch unkritisch. */
-    position: relative;
   }
-  /* Grain/Noise-Overlay: nimmt den flachen Digital-Look, gibt Papier-Haptik.
-     Reines inline-SVG (feTurbulence), kein Asset. Nur ab md+ — die fixierte,
-     soft-light-geblendete Full-Viewport-Ebene ist auf Mobile zu teuer (Composite
-     + Repaint je Scroll-Frame) und auf kleinen Screens kaum wahrnehmbar. */
-  @media (min-width: 768px) {
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: 1;
-      pointer-events: none;
-      opacity: 0.035;
-      mix-blend-mode: soft-light;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    }
-    .dark body::before {
-      opacity: 0.06;
-      mix-blend-mode: overlay;
-    }
-  }
-  /* Sichtbarer Fokus-Indikator fuer ROHE interaktive Elemente (shadcn-Buttons/
+  /* Sichtbarer Fokus-Indikator für ROHE interaktive Elemente (shadcn-Buttons/
      -Inputs haben eigene focus-visible-Ringe via Utilities, die diese @layer-base-
-     Regel ueberschreiben → kein Doppel-Ring). WCAG 2.4.7/2.4.11 — deckt jetzt auch
+     Regel überschreiben → kein Doppel-Ring). WCAG 2.4.7/2.4.11 — deckt auch
      rohe <button>, [role=button] (Disclosure/FAQ), den Pricing-Range-Slider und
-     beliebige [tabindex]-Elemente ab, die im neuen Design sonst auf den teils
-     unsichtbaren UA-Default fielen. Mint-Ring (var(--ring)) ist auf #0f0b09 ~11:1. */
+     beliebige [tabindex]-Elemente ab. */
   a:focus-visible,
   button:focus-visible,
   [role="button"]:focus-visible,
@@ -324,12 +255,18 @@
     background-color: var(--brand-orange);
     color: #1c0d04;
   }
-  /* Fredoka ist die Headline-Schrift (Design "BFSG-Fuchs"): rund, kräftig, 700er
-     Gewicht als Standard-Dicke. Komponenten dürfen lokal feiner/fetter setzen. */
-  h1, h2, h3, h4 {
+  /* Gutachten-Typo: Fraunces (Upright) trägt H1–H3 — Serifen-Display wie in
+     einem hochwertigen Prüfgutachten. H4 bleibt in der Sans (Zwischenebene).
+     Komponenten dürfen lokal Gewicht/Größe setzen. */
+  h1, h2, h3 {
     @apply font-display;
-    font-weight: 700;
-    letter-spacing: -0.015em;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  h4 {
+    @apply font-sans;
+    font-weight: 600;
+    letter-spacing: -0.01em;
   }
   .tabular-nums {
     font-variant-numeric: tabular-nums;
@@ -346,101 +283,12 @@
   .text-pretty {
     text-wrap: pretty;
   }
-  /* Akzent-Verlauf fuer betonte Headline-Woerter (Design-Signatur: leuchtendes
-     Mint auf dem Hero-Wort „BFSG").
-     THEME-SICHER: Die Stops kommen aus --gradient-from/--gradient-to. Dark = Mint→
-     Mint-soft (bright, hochkontrast auf #0f0b09). Light = Indigo→Violet (dunkel,
-     kontrastsicher auf Weiss). So ist das Akzentwort in BEIDEN Themes AA-konform —
-     der fruehere „Violet faellt auf near-black unter AA"-Vorbehalt entfaellt.
-     background-size:200% ermoeglicht den Shimmer (siehe .gradient-text-shimmer).
-     CLIP-BOX-SCHUTZ: background-clip:text beschneidet sonst Unterlaengen (g/j/ß/q,
-     padding-bottom) + den rechtsseitigen Glyph-Ueberhang (z.B. „?" in „BFSG?",
-     padding-right). Negative Margins neutralisieren die Box → kein Shift, kein CLS. */
+  /* Akzentwort-Mechanik (Hero „BFSG", SectionKicker-Headlines): früher ein
+     Orange-Verlauf mit background-clip, jetzt dezente Marker-Tinte — solide
+     Orange-Familie, theme-sicher (Light = AA-Burnt-Orange auf Papier, Dark =
+     leuchtendes #ED6A33). Klassenname bleibt für die ~12 Bestands-Stellen. */
   .gradient-text {
-    background-image: linear-gradient(
-      135deg,
-      var(--gradient-from) 0%,
-      var(--gradient-to) 50%,
-      var(--gradient-from) 100%
-    );
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    padding-bottom: 0.1em;
-    margin-bottom: -0.1em;
-    padding-right: 0.09em;
-    margin-right: -0.09em;
-  }
-  /* Editorial-Italic-Akzentwoerter: echter Fraunces-Kursiv-Display-Schnitt statt
-     synthetischem Oblique auf Fredoka. Greift NUR, wenn ein Element BEIDE Klassen
-     traegt (`italic` + `gradient-text`) — genau die ~8 betonten Akzentwoerter.
-     Reine Fredoka-`.gradient-text` (Hero-H1 „BFSG", upright) bleibt unberuehrt.
-     Font-Variable kommt aus next/font (--font-display-italic, s. layout.tsx). */
-  .gradient-text.italic {
-    font-family: var(--font-display-italic), Georgia, serif;
-  }
-  /* Shimmer-Sweep fuer das Hero-Akzentwort (bewegt die background-position).
-     Wird via @media (prefers-reduced-motion) stillgestellt. */
-  .gradient-text-shimmer {
-    animation: shimmer-text 5s linear infinite;
-  }
-  .gradient-text-soft {
-    background-image: linear-gradient(
-      135deg,
-      var(--foreground) 0%,
-      color-mix(in oklch, var(--foreground), var(--brand-indigo) 38%) 100%
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    padding-bottom: 0.1em;
-  }
-  .glass {
-    background-color: color-mix(in oklch, var(--card), transparent 28%);
-    backdrop-filter: blur(18px) saturate(160%);
-    -webkit-backdrop-filter: blur(18px) saturate(160%);
-    border: 1px solid color-mix(in oklch, var(--foreground), transparent 88%);
-  }
-  .glass-dark {
-    background-color: color-mix(in oklch, var(--brand-deep), transparent 35%);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid color-mix(in oklch, #ffffff, transparent 88%);
-  }
-  /* Blueprint-Grid: feines, technisches Liniengitter. */
-  .grid-bg {
-    background-image:
-      linear-gradient(to right, color-mix(in oklch, var(--foreground), transparent 94%) 1px, transparent 1px),
-      linear-gradient(to bottom, color-mix(in oklch, var(--foreground), transparent 94%) 1px, transparent 1px);
-    background-size: 56px 56px;
-  }
-  .grid-bg-fine {
-    background-image:
-      linear-gradient(to right, color-mix(in oklch, var(--foreground), transparent 95%) 1px, transparent 1px),
-      linear-gradient(to bottom, color-mix(in oklch, var(--foreground), transparent 95%) 1px, transparent 1px);
-    background-size: 28px 28px;
-  }
-  .grid-bg-dark {
-    background-image:
-      linear-gradient(to right, color-mix(in oklch, #ffffff, transparent 92%) 1px, transparent 1px),
-      linear-gradient(to bottom, color-mix(in oklch, #ffffff, transparent 92%) 1px, transparent 1px);
-    background-size: 56px 56px;
-  }
-  /* Punkt-Raster als Alternative zum Linien-Grid. */
-  .dot-bg {
-    background-image: radial-gradient(
-      color-mix(in oklch, var(--foreground), transparent 88%) 1px,
-      transparent 1px
-    );
-    background-size: 22px 22px;
-  }
-  .dot-bg-dark {
-    background-image: radial-gradient(
-      color-mix(in oklch, #ffffff, transparent 86%) 1px,
-      transparent 1px
-    );
-    background-size: 22px 22px;
+    color: var(--brand-orange);
   }
   .mask-fade-y {
     mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
@@ -460,18 +308,8 @@
   .shadow-card-hover {
     box-shadow: var(--shadow-card-hover);
   }
-  .shadow-glow-mint {
-    box-shadow: var(--shadow-glow-mint);
-  }
-  .shadow-glow-orange {
-    box-shadow: var(--shadow-glow-orange);
-  }
-  .shadow-elevated {
-    box-shadow: var(--shadow-elevated);
-  }
-  /* Einheitlicher, ruhiger Karten-Hover (statt pro Sektion eigene -translate-y-*-
-     Kombinationen). -0.25rem wirkt teurer/ruhiger als -1.5. Respektiert reduced-
-     motion via der globalen @media-Regel (transition-duration→0). */
+  /* Einheitlicher, ruhiger Karten-Hover. Respektiert reduced-motion via der
+     globalen @media-Regel (transition-duration→0). */
   .card-lift {
     transition:
       transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
@@ -481,61 +319,72 @@
   .card-lift:hover {
     transform: translateY(-0.25rem);
     box-shadow: var(--shadow-card-hover);
-    /* Hover-Rahmen in Marken-Orange (Design: Karten heben mit orange-getoenter
-       Kante an). */
     border-color: color-mix(in oklch, var(--brand-orange), transparent 60%);
   }
-  /* Border-Gradient via mask-composite: echter Verlaufs-Rahmen statt 1px-Flaeche. */
-  .border-gradient {
-    position: relative;
-  }
-  .border-gradient::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(
-      135deg,
-      color-mix(in oklch, var(--brand-mint), transparent 35%),
-      color-mix(in oklch, var(--brand-violet), transparent 55%) 45%,
-      transparent 75%
+  /* Textmarker-Effekt: oranger Marker-Strich hinter der unteren Textkante
+     (wie mit dem Leuchtstift durchs Gutachten). Statisch — die optionale
+     einmalige drawIn-Animation kommt mit FE-PR 4 (Motion-Polish). */
+  .marker-underline {
+    background-image: linear-gradient(
+      color-mix(in oklch, var(--brand-orange), transparent 65%),
+      color-mix(in oklch, var(--brand-orange), transparent 65%)
     );
-    -webkit-mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    mask-composite: exclude;
-    pointer-events: none;
-  }
-  /* Scanline-Overlay fuer das Hero-Visual (statisches feines Linienmuster). */
-  .scanlines {
-    background-image: repeating-linear-gradient(
-      to bottom,
-      color-mix(in oklch, var(--brand-mint), transparent 96%) 0px,
-      color-mix(in oklch, var(--brand-mint), transparent 96%) 1px,
-      transparent 1px,
-      transparent 4px
-    );
+    background-repeat: no-repeat;
+    background-position: left bottom 0.08em;
+    background-size: 100% 0.32em;
   }
 }
 
-/* Orange 3D-CTA-Button (Design-Signatur "BFSG-Fuchs.dc.html"): voll-oranger
-   Knopf mit solider dunkler Unterkante (haptisch/drückbar) + Fredoka-Beschriftung.
-   Ersetzt die bisherigen Mint-CTAs. Caller setzt Größe (h-*, px-*, text-*) und ggf.
-   rounded-* (Utility gewinnt über die Component-Layer-Radius). KEINE bg-/shadow-
-   Utilities daneben setzen. Fokus-Ring kommt aus der globalen @layer-base-Regel
-   (a/button:focus-visible → 2px var(--ring) Offset 2px) = AA in beiden Themes. */
+/* Signatur-Bausteine der Gutachten-Sprache. Component-Layer, damit Utilities
+   (rounded-*, p-*, shadow-*) im Einzelfall gewinnen. */
 @layer components {
+  /* Dokument-Karte: weiß-warmes Papier, Hairline, flacher Tinten-Schatten. */
+  .paper-card {
+    background-color: var(--card);
+    border: 1px solid var(--border-card);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-card-soft);
+  }
+  /* Siegel/Stempel (z. B. „Beispiel" auf dem Muster-Report): Mono-Uppercase im
+     Rahmen aus currentColor, leicht verkantet wie ein echter Stempelabdruck. */
+  .stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.2em 0.6em;
+    border: 2px solid currentColor;
+    border-radius: var(--radius-sm);
+    color: var(--brand-orange);
+    font-family: var(--font-mono);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    transform: rotate(-2deg);
+  }
+  /* Hairline-Tabellenzeile (Befund-Listen, Leistungs-Übersichten). */
+  .rule-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 0.625rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .rule-row:last-child {
+    border-bottom: none;
+  }
+
+  /* Orange 3D-CTA-Button (konvertierender Bestand — Signatur UNVERÄNDERT):
+     voll-oranger Knopf mit solider dunkler Unterkante + Fredoka-Beschriftung
+     (Marken-Schrift, bewusst NICHT Fraunces). Caller setzt Größe (h-*, px-*,
+     text-*) und ggf. rounded-*. KEINE bg-/shadow-Utilities daneben setzen.
+     Fokus-Ring kommt aus der globalen @layer-base-Regel. */
   .btn-cta {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    font-family: var(--font-display);
+    font-family: var(--font-brand);
     font-weight: 600;
     line-height: 1;
     white-space: nowrap;
@@ -573,72 +422,16 @@
   }
 }
 
-@keyframes aurora {
-  0%, 100% {
-    transform: translate3d(0, 0, 0) scale(1);
-    opacity: 0.7;
-  }
-  50% {
-    transform: translate3d(0, 30px, 0) scale(1.08);
-    opacity: 0.9;
-  }
-}
 @keyframes pulse-soft {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.55; }
-}
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
 }
 @keyframes marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
-@keyframes fade-up {
-  from { opacity: 0; transform: translateY(14px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-/* Signatur-Geste: Scan-Beam sweept vertikal ueber das Hero-Visual. */
-@keyframes scan-beam {
-  0% { transform: translateY(-110%); opacity: 0; }
-  8% { opacity: 1; }
-  45% { opacity: 1; }
-  60% { transform: translateY(420%); opacity: 0; }
-  100% { transform: translateY(420%); opacity: 0; }
-}
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-/* Shimmer-Sweep ueber das Hero-Akzentwort (background-position). */
-@keyframes shimmer-text {
-  to { background-position: 200% center; }
-}
-/* Sanfter Mint-Ring-Puls am Haupt-CTA. */
-@keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--brand-mint), transparent 100%); }
-  50% { box-shadow: 0 0 0 5px color-mix(in oklch, var(--brand-mint), transparent 88%); }
-}
-/* Equalizer-Balken im Live-Scan-Fortschritt. */
-@keyframes bar-eq {
-  0%, 100% { transform: scaleY(0.3); }
-  50% { transform: scaleY(1); }
-}
-/* Lauflicht auf der Ablauf-Fortschrittslinie. */
-@keyframes travel-dot {
-  0% { left: 0; opacity: 0; }
-  8% { opacity: 1; }
-  92% { opacity: 1; }
-  100% { left: 100%; opacity: 0; }
-}
-/* Dezenter Puls am Empfehlungs-Rahmen der Pricing-Karte. */
-@keyframes warn-pulse {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
-}
 
-/* prefers-reduced-motion: alle dekorativen Endlos-Animationen ruhigstellen. */
+/* prefers-reduced-motion: alle dekorativen Animationen ruhigstellen. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -648,19 +441,9 @@
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
-  .animate-aurora,
-  .animate-scan-beam,
-  .animate-float,
-  .animate-float-slow,
   .animate-pulse-soft,
-  .animate-shimmer,
   .animate-marquee,
-  .animate-ticker,
-  .animate-glow-pulse,
-  .animate-bar-eq,
-  .animate-travel-dot,
-  .animate-warn-pulse,
-  .gradient-text-shimmer {
+  .animate-ticker {
     animation: none !important;
   }
 }

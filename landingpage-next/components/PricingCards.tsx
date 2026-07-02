@@ -131,9 +131,8 @@ export function PricingCards({
           className="mx-auto flex max-w-2xl flex-col items-center text-center"
         >
           {/* Kicker im Marken-Akzent. Orange-Theme: tone="on-light" rendert
-              Icon+Text in brand-indigo (auf die Orange-Familie remapped → orange
-              in BEIDEN Themes, ohne dark: auf Mint zu kippen). Amber-Theme
-              (Cookie): tone="warn" = Amber-Akzent. */}
+              Icon+Text in brand-orange (orange in BEIDEN Themes, ohne dark: auf
+              Mint zu kippen). Amber-Theme (Cookie): tone="warn" = Amber-Akzent. */}
           <SectionKicker
             icon={kickerIcon}
             label={kicker}
@@ -403,10 +402,10 @@ function PricingCard({
     // Warn-Puls-Ring oben/aussen ueberstehen duerfen. Die Card selbst clippt
     // (overflow-hidden) nur ihre dekorativen Inneren (Glow + Verlaufskante).
     <div className="relative h-full">
-      {/* Schwebendes Fuchs-Wappen oben rechts (dekorativ). Ragt leicht über die
+      {/* Fuchs-Wappen oben rechts (dekorativ, statisch — der Schwebe-Loop ist
+          mit der Gutachten-Design-Sprache entfallen). Ragt leicht über die
           Kartenkante, sitzt rechts → überlappt NICHT die zentrale „Empfohlen"-
-          Badge. Featured-Karte etwas größer. animate-float-slow ist
-          reduced-motion-gated. */}
+          Badge. Featured-Karte etwas größer. */}
       <Image
         src="/logo-fox.png"
         alt=""
@@ -415,17 +414,16 @@ function PricingCard({
         height={144}
         loading="lazy"
         className={cn(
-          "pointer-events-none absolute -top-5 right-4 z-20 h-auto animate-float-slow drop-shadow-[0_8px_14px_rgba(0,0,0,0.5)]",
+          "pointer-events-none absolute -top-5 right-4 z-20 h-auto drop-shadow-[0_8px_14px_rgba(0,0,0,0.5)]",
           pkg.featured ? "w-16 sm:w-20" : "w-14 sm:w-16",
         )}
       />
-      {/* Warn-Puls-Ring um die Featured-Karte (Design-Signatur, dekorativ →
-          reduced-motion stellt animate-warn-pulse still). */}
+      {/* Statischer Akzent-Ring um die Featured-Karte (dekorativ). */}
       {pkg.featured && (
         <div
           aria-hidden
           className={cn(
-            "pointer-events-none absolute inset-[-2px] z-10 rounded-[calc(var(--radius-3xl)+2px)] border-2 opacity-70 animate-warn-pulse",
+            "pointer-events-none absolute inset-[-2px] z-10 rounded-[calc(var(--radius-3xl)+2px)] border-2 opacity-70",
             A.ring,
           )}
         />
@@ -446,7 +444,7 @@ function PricingCard({
         className={cn(
           "group/card relative flex h-full flex-col overflow-hidden rounded-3xl p-7 backdrop-blur transition-all duration-300 hover:-translate-y-1.5",
           pkg.featured
-            ? cn(A.border, A.gradient, "shadow-elevated hover:shadow-elevated")
+            ? cn(A.border, A.gradient, "shadow-card-hover")
             : "border border-border/70 bg-card/85 shadow-card-soft hover:shadow-card-hover",
         )}
       >

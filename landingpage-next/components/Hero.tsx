@@ -11,7 +11,7 @@ import { ScanForm } from "./ScanForm";
 
 export function Hero() {
   // Vorschau-Überschrift am Akzentwort splitten → genau EIN Fraunces-Italic-Wort
-  // (echter Fraunces-Kursiv-Schnitt via --font-display-italic, s. layout.tsx).
+  // (echter Kursiv-Schnitt: Fraunces ist mit style normal+italic geladen).
   // indexOf-Guard: fehlt das Akzentwort mal (künftige Config-Edits), wird die
   // Überschrift ungesplittet ohne Italic gerendert statt das Wort doppelt zu zeigen.
   const pvIdx = HERO_VISUAL.previewHeading.indexOf(HERO_VISUAL.previewAccent);
@@ -30,28 +30,12 @@ export function Hero() {
       id="scan"
       className="relative isolate overflow-hidden border-b border-border/60"
     >
-      {/* Hintergrund: weicher Wash + Spotlight oben + Blueprint-Grid mit Maske. */}
+      {/* Hintergrund: ruhiges Papier mit dezentem Verlauf zur naechsten Sektion.
+          Grid-/Aurora-Deko ist mit der Gutachten-Design-Sprache entfallen. */}
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-gradient-to-b from-background via-background to-muted/30"
       />
-      <div
-        aria-hidden
-        className="absolute inset-x-0 top-0 -z-10 h-[120%] grid-bg-fine opacity-[0.4] mask-fade-y dark:hidden"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-x-0 top-0 -z-10 hidden h-[120%] grid-bg-dark opacity-[0.5] mask-fade-y dark:block"
-      />
-      {/* Aurora-Spots mit langsamer Drift (Design-Signatur; animate-aurora/float
-          sind reduced-motion-gated). */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-[-30%] -z-10 size-[80vw] max-w-5xl -translate-x-1/2 rounded-full bg-brand-orange/10 blur-[70px] animate-aurora"
-      />
-      {/* Ambient-Reduktion: der zweite (Violett-)Blob entfaellt — der primaere
-          Orange-Aurora reicht als Marken-Wash und spart einen teuren GPU-Blur-Pass
-          hinter dem LCP-Element (v.a. Mobile). */}
 
       <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-5 pt-14 pb-20 sm:px-6 sm:pt-20 sm:pb-28 lg:grid-cols-2 lg:gap-12">
         {/* Linke Spalte: Text + Scan-Form. Mobile zentriert (eigenstaendige Saeule),
@@ -82,24 +66,18 @@ export function Hero() {
             </span>
           </motion.div>
 
-          {/* Editorial-Headline: Fredoka-Display; das Akzentwort „BFSG" leuchtet
-              upright im Orange-Verlauf (gradient-text, kein Italic hier).
+          {/* Editorial-Headline: Fraunces-Display; das Akzentwort „BFSG" steht in
+              Marker-Orange (gradient-text = solide Tinte, kein Verlauf mehr).
               Bewusst OHNE Entrance-Animation: die H1 ist das LCP-Element — ein
               opacity:0-Start würde den Largest Contentful Paint künstlich um die
               Animationsdauer verzögern (relevant für paid-Ads-Quality-Score). */}
           {/* EIN fließender Textfluss (kein erzwungener block-Umbruch): der Browser
               bricht via text-balance natürlich um, sodass „bereit fürs BFSG?"
-              zusammenbleibt (Design: „Schlau wie ein Fuchs — bereit fürs BFSG?").
-              Lead inline in gradient-text-soft, gefolgt von Space + Akzent-Span.
-              Design-Signatur: das Akzentwort „BFSG" leuchtet im Orange-Verlauf und
-              shimmert sanft (gradient-text-shimmer). Unterlängen-/Glyph-Überhang-
-              Schutz (g/j/ß, „?") sitzt in .gradient-text → kein Clipping, kein CLS.
-              Shimmer wird bei prefers-reduced-motion stillgestellt. */}
+              zusammenbleibt. Lead im normalen Tinten-Ton, gefolgt von Space +
+              Akzent-Span in Marker-Orange. */}
           <h1 className="mt-6 font-display text-[clamp(2.05rem,6.7vw,4.6rem)] leading-[1.05] font-bold tracking-[-0.025em] text-balance">
-            <span className="gradient-text-soft">{HERO.headlineLead}</span>{" "}
-            <span className="gradient-text gradient-text-shimmer">
-              {HERO.headlineEmph}?
-            </span>
+            {HERO.headlineLead}{" "}
+            <span className="gradient-text">{HERO.headlineEmph}?</span>
             {/* Tail-Guard: nur rendern, wenn nicht leer — sonst kein leeres
                 Block-Element mit Margin. */}
             {HERO.headlineTail && (

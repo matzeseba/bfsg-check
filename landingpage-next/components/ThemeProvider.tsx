@@ -3,12 +3,12 @@
 import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
-// Dark-Mode-Provider. attribute="class" → Tailwind v4 .dark-Variante.
-// defaultTheme="dark" + enableSystem={false}: der Dark-Look ist die GARANTIERTE
-// Standard-Optik beim Seitenaufruf (Owner-Wunsch) — unabhaengig von der OS-
-// Praeferenz. Der ThemeToggle bleibt voll funktional und persistiert die Wahl
-// in localStorage; ein Nutzer, der bewusst auf Hell schaltet, behaelt das.
-// disableTransitionOnChange verhindert ein Aufblitzen beim Umschalten.
+// Theme-Provider. attribute="class" → Tailwind v4 .dark-Variante.
+// defaultTheme="light" + enableSystem={false}: das helle Papier-Creme-Design
+// („Das Gutachten") ist die GARANTIERTE Standard-Optik beim Seitenaufruf —
+// unabhaengig von der OS-Praeferenz. Der ThemeToggle bleibt voll funktional und
+// persistiert die Wahl in localStorage; ein Nutzer, der bewusst auf Dunkel
+// schaltet, behaelt das. disableTransitionOnChange verhindert ein Aufblitzen.
 export function ThemeProvider({
   children,
   ...props
@@ -16,7 +16,7 @@ export function ThemeProvider({
   return (
     <NextThemesProvider
       attribute="class"
-      defaultTheme="dark"
+      defaultTheme="light"
       enableSystem={false}
       disableTransitionOnChange
       {...props}

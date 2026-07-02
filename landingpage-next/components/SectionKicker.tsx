@@ -7,14 +7,12 @@ import { cn } from "@/lib/utils";
 // Kicker-Varianten (nackter Mono-Text vs. Pill mit/ohne Icon).
 //
 // tone:
-//  - default : neutrale Karten-Pill, Akzent = ORANGE (Marken-Akzent) in BEIDEN
-//              Themes. brand-indigo ist in globals.css auf die Orange-Familie
-//              remapped → der Default-Kicker leuchtet im Fox-Orange (#ED6A33 Dark,
-//              dunkles Burnt-Orange Light), wie im "BFSG-Fuchs"-Design. Orange ist
+//  - default : neutrale Karten-Pill, Akzent = ORANGE (Marker-Akzent) in BEIDEN
+//              Themes (#ED6A33 Dark, dunkles Burnt-Orange Light). Orange ist
 //              der dekorative Akzent; Mint bleibt Action/Erfolg (Buttons/Haken).
 //  - warn    : Frist-/Pflicht-Kontext, Amber-Akzent
 //  - on-deep : auf near-black Panels (StatsBar/CtaSection) — Mint auf Dunkel
-//  - on-light: auf hellen Invers-Blöcken (WowCounter) — Indigo/Orange OHNE
+//  - on-light: auf hellen Invers-Blöcken (WowCounter) — Orange OHNE
 //              dark:-Varianten, da der Block auch im Dark-Theme hell bleibt
 //              (sonst heller Akzent auf Creme = FAIL)
 export function SectionKicker({
@@ -37,7 +35,7 @@ export function SectionKicker({
           : tone === "on-deep"
             ? "border-[oklch(0.97_0.004_95)]/20 bg-[oklch(0.97_0.004_95)]/8 text-brand-mint"
             : tone === "on-light"
-              ? "border-brand-indigo/25 bg-brand-indigo/8 text-brand-indigo"
+              ? "border-brand-orange/25 bg-brand-orange/8 text-brand-orange"
               : "border-brand-orange/25 bg-brand-orange/8 text-brand-orange",
         className,
       )}
@@ -49,9 +47,7 @@ export function SectionKicker({
             ? "text-brand-amber"
             : tone === "on-deep"
               ? "text-brand-mint"
-              : tone === "on-light"
-                ? "text-brand-indigo"
-                : "text-brand-orange",
+              : "text-brand-orange",
         )}
         aria-hidden
       />

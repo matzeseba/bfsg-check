@@ -149,7 +149,7 @@ export function ScanForm({ initialUrl = "" }: ScanFormProps) {
       </p>
       <form
         onSubmit={onSubmit}
-        className="group/scan relative rounded-2xl border border-border/70 bg-card/85 p-1.5 shadow-card-soft backdrop-blur transition-all focus-within:border-brand-orange/60 focus-within:shadow-glow-orange"
+        className="group/scan relative rounded-2xl border border-border/70 bg-card/85 p-1.5 shadow-card-soft backdrop-blur transition-all focus-within:border-brand-orange/60 focus-within:shadow-card-hover"
         noValidate
       >
         <div className={inputWrapper}>
@@ -269,20 +269,21 @@ function ScanningPanel({ reduced }: { reduced: boolean }) {
       <div className="relative mt-4 h-2 overflow-hidden rounded-full bg-brand-orange/12">
         <div
           className={
-            "h-full w-2/3 rounded-full bg-gradient-to-r from-brand-orange to-brand-orange-soft shadow-glow-orange " +
+            "h-full w-2/3 rounded-full bg-gradient-to-r from-brand-orange to-brand-orange-soft " +
             (reduced ? "" : "animate-pulse-soft")
           }
         />
       </div>
 
-      {/* bar-eq-Equalizer (7 Balken, gestaffelte Verzögerung). */}
+      {/* Balken-Reihe (7 Balken, gestaffelt sanft pulsierend — pulse-soft ist
+          die einzige verbliebene Loop-Animation neben marquee). */}
       <div className="mt-4 flex h-7 items-end gap-1">
         {[0, 0.15, 0.3, 0.45, 0.6, 0.75, 0.9].map((delay, i) => (
           <span
             key={i}
             className={
               "flex-1 origin-bottom rounded-sm bg-brand-orange/40 " +
-              (reduced ? "h-1/2" : "h-full animate-bar-eq")
+              (reduced ? "h-1/2" : "h-full animate-pulse-soft")
             }
             style={reduced ? undefined : { animationDelay: `${delay}s` }}
           />

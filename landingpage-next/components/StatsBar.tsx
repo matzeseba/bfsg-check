@@ -33,10 +33,6 @@ export function StatsBar() {
       // AA — `dark` erzwingt die hellen Dark-Werte in beiden Themes.
       className="dark relative isolate overflow-hidden bg-brand-deeper text-[oklch(0.97_0.004_95)]"
     >
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 grid-bg-dark opacity-30 mask-radial"
-      />
       {/* Ein dezenter Orange-Glow (kein zweiter Blob → schmales Band, Mobile-leicht). */}
       <div
         aria-hidden

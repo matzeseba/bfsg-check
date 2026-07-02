@@ -29,11 +29,11 @@ export function WowCounter() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.6, ease: EASE }}
-          className="border-gradient relative overflow-hidden rounded-[2rem] bg-[oklch(0.97_0.004_95)] px-6 py-14 text-center text-brand-deep shadow-elevated sm:px-12 sm:py-20"
+          className="relative overflow-hidden rounded-[2rem] border border-brand-deep/10 bg-[oklch(0.97_0.004_95)] px-6 py-14 text-center text-brand-deep shadow-card-hover sm:px-12 sm:py-20"
         >
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-indigo/70 to-transparent"
+            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-orange/70 to-transparent"
           />
           <SectionKicker
             icon={GaugeIcon}
@@ -48,15 +48,15 @@ export function WowCounter() {
           </h2>
 
           <div className="mt-8 flex flex-col items-center">
-            {/* Die Leitzahl "80+" leuchtet im Marken-Orange (brand-indigo ist auf
-                die Orange-Familie remapped, hier dunkles Burnt-Orange → AA-sicher
-                auf Creme). Konsistent mit der Trust-Strip-Leitkennzahl. */}
-            <p className="font-display text-[clamp(3.5rem,12vw,8rem)] leading-none font-bold tracking-tight tabular-nums text-brand-indigo">
+            {/* Die Leitzahl "80+" steht im Marker-Orange (Light: dunkles
+                Burnt-Orange → AA-sicher auf Creme; im Dark löst brand-orange
+                hell auf — Großtext, 3:1-Large-Text-AA reicht hier). */}
+            <p className="font-display text-[clamp(3.5rem,12vw,8rem)] leading-none font-bold tracking-tight tabular-nums text-brand-orange">
               <CountUp value={80} suffix="+" />
             </p>
             <span
               aria-hidden
-              className="mt-4 block h-1 w-16 rounded-full bg-brand-indigo"
+              className="mt-4 block h-1 w-16 rounded-full bg-brand-orange"
             />
             {/* /85 statt /75: im erzwungenen Dark-Theme lösen die Tokens zu ihren
                 Dark-Werten auf — brand-deep/75 auf Creme wäre nur 3,42:1 (sub-AA
@@ -75,7 +75,7 @@ export function WowCounter() {
                 className="inline-flex items-center gap-1.5 rounded-full border border-brand-deep/15 bg-brand-deep/[0.04] px-3 py-1 text-xs font-medium text-brand-deep"
               >
                 <CheckIcon
-                  className="size-3.5 text-brand-indigo"
+                  className="size-3.5 text-brand-orange"
                   strokeWidth={3}
                   aria-hidden
                 />
