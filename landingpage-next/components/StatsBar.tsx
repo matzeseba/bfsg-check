@@ -28,7 +28,10 @@ export function StatsBar() {
   return (
     <section
       aria-label="Prüfgrundlage in Zahlen"
-      className="relative isolate overflow-hidden bg-brand-deeper text-[oklch(0.97_0.004_95)]"
+      // Scoped Dark: Akzentfarben (mint/amber/orange) der Kennzahlen sind im
+      // Light-Theme dunkler abgestimmt und fallen auf dem always-dark Band unter
+      // AA — `dark` erzwingt die hellen Dark-Werte in beiden Themes.
+      className="dark relative isolate overflow-hidden bg-brand-deeper text-[oklch(0.97_0.004_95)]"
     >
       <div
         aria-hidden
@@ -59,7 +62,7 @@ export function StatsBar() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-40px" }}
                 transition={{ duration: 0.5, delay: i * 0.07 }}
-                className="rounded-2xl border border-border-card bg-brand-deeper/60 p-5 text-center sm:p-6 md:text-left"
+                className="card-lift rounded-2xl border border-border-card bg-brand-deeper/60 p-5 text-center sm:p-6 md:text-left"
               >
                 <dt
                   className={

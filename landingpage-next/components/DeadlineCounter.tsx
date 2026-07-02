@@ -71,8 +71,10 @@ export function DeadlineCounter() {
           return (
             <div
               key={c.key}
+              // Scoped Dark: Zellen sind in beiden Themes near-black — Ziffern/
+              // Labels muessen die Dark-Tokens nutzen (Light-Mode war unlesbar).
               className={
-                "rounded-xl border bg-[var(--brand-deeper)] px-1 py-3 text-center " +
+                "dark rounded-xl border bg-[var(--brand-deeper)] px-1 py-3 text-center " +
                 (accent ? "border-brand-amber/30" : "border-border/60")
               }
             >

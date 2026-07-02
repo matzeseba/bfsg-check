@@ -78,7 +78,9 @@ export function Footer() {
   }
 
   return (
-    <footer className="relative overflow-hidden border-t border-border/60 bg-brand-deeper">
+    // Scoped Dark: Footer-Flaeche ist in beiden Themes fest dunkel → `dark` flippt
+    // Spalten-Titel/Links/Input auf die Dark-Tokens (Light-Mode war 1.4.3-FAIL).
+    <footer className="dark relative overflow-hidden border-t border-border/60 bg-brand-deeper text-foreground">
       {/* Maskottchen wurde aus dem Footer in die "Wie es funktioniert"-Sektion
           verschoben (dort besser platziert statt am aeussersten Rand verloren). */}
       <div
