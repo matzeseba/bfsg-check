@@ -28,6 +28,7 @@ process.env.SUBS_FILE = path.join(tmp, 'subs.jsonl');
 process.env.PENDING_REPORTS_FILE = path.join(tmp, 'pending.jsonl'); // PR5-Release-Queue in tmp
 const TOKEN = '0123456789abcdef0123456789abcdef01'; // >= 32 Zeichen (admin-auth-Pflicht)
 process.env.ADMIN_TOKEN = TOKEN;
+process.env.RESEND_RATE_MAX = '1000'; // Rate-Limit für die Test-Salve (viele Resends/IP) hochsetzen
 delete process.env.STRIPE_SECRET_KEY; // nicht live → keine Fail-Fast-/Listen-Seiteneffekte beim Import
 
 const request = (await import('supertest')).default;

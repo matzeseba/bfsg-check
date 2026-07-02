@@ -24,14 +24,77 @@ function ipv4IsPrivate(ip) {
   return false;
 }
 
+// Normalisiert eine IPv6-Adresse auf die volle 16-Byte-Form (Array aus 16 Zahlen).
+// Behandelt Zero-Compression (::), eingebettetes IPv4 in der letzten Gruppe und
+// eine optionale Zone-ID (fe80::1%eth0). Gibt null zurück, wenn nicht parsebar —
+// der Aufrufer blockt dann defensiv. Byte-Form erlaubt exakte Präfix-Prüfungen,
+// statt fehleranfälliger String-startsWith-Heuristiken (fe90/feb0 rutschten durch).
+function ipv6ToBytes(ip) {
+  let s = ip.toLowerCase();
+  const pct = s.indexOf('%');
+  if (pct !== -1) s = s.slice(0, pct); // Zone-ID abschneiden
+  if (!s.includes(':')) return null;
+
+  const halves = s.split('::');
+  if (halves.length > 2) return null; // '::' darf höchstens einmal vorkommen
+
+  const parseGroups = (part) => {
+    if (part === '') return [];
+    const groups = part.split(':');
+    const bytes = [];
+    for (let i = 0; i < groups.length; i++) {
+      const g = groups[i];
+      if (g.includes('.')) {
+        // Eingebettetes IPv4 (nur als letzte Gruppe zulässig) → 4 Bytes.
+        if (i !== groups.length - 1) return null;
+        const v4 = g.split('.').map(Number);
+        if (v4.length !== 4 || v4.some((n) => Number.isNaN(n) || n < 0 || n > 255)) return null;
+        bytes.push(v4[0], v4[1], v4[2], v4[3]);
+      } else {
+        if (!/^[0-9a-f]{1,4}$/.test(g)) return null;
+        const val = parseInt(g, 16);
+        bytes.push((val >> 8) & 0xff, val & 0xff);
+      }
+    }
+    return bytes;
+  };
+
+  const head = parseGroups(halves[0]);
+  if (head === null) return null;
+  let bytes;
+  if (halves.length === 2) {
+    const tail = parseGroups(halves[1]);
+    if (tail === null) return null;
+    const missing = 16 - head.length - tail.length;
+    if (missing < 0) return null;
+    bytes = [...head, ...new Array(missing).fill(0), ...tail];
+  } else {
+    bytes = head;
+  }
+  if (bytes.length !== 16) return null;
+  return bytes;
+}
+
 function ipv6IsPrivate(ip) {
-  const x = ip.toLowerCase();
-  if (x === '::1' || x === '::') return true;       // loopback/unspecified
-  if (x.startsWith('fe80')) return true;            // link-local
-  if (x.startsWith('fc') || x.startsWith('fd')) return true; // unique local fc00::/7
-  // IPv4-mapped (::ffff:a.b.c.d) auf IPv4-Regeln zurückführen
-  const m = x.match(/::ffff:(\d+\.\d+\.\d+\.\d+)$/);
-  if (m) return ipv4IsPrivate(m[1]);
+  const b = ipv6ToBytes(ip);
+  if (!b) return true; // nicht parsebar → blockieren (sichere Default-Annahme)
+
+  if (b.every((x) => x === 0)) return true;                       // :: (unspecified)
+  if (b.slice(0, 15).every((x) => x === 0) && b[15] === 1) return true; // ::1 loopback
+  if (b[0] === 0xfe && (b[1] & 0xc0) === 0x80) return true;       // fe80::/10 link-local (fe80–febf)
+  if ((b[0] & 0xfe) === 0xfc) return true;                        // fc00::/7 unique local (fc/fd)
+  if (b[0] === 0x01 && b.slice(1, 8).every((x) => x === 0)) return true; // 100::/64 discard (RFC 6666)
+
+  const embeds = (start) => ipv4IsPrivate(`${b[start]}.${b[start + 1]}.${b[start + 2]}.${b[start + 3]}`);
+  // IPv4-mapped ::ffff:0:0/96 (auch Hex-Form ::ffff:7f00:1) → letzte 32 Bit als IPv4 prüfen.
+  if (b.slice(0, 10).every((x) => x === 0) && b[10] === 0xff && b[11] === 0xff) return embeds(12);
+  // IPv4-translated ::ffff:0:0:0/96 (Bytes 8–9 = ff:ff, Rest davor 0) → letzte 32 Bit als IPv4.
+  if (b.slice(0, 8).every((x) => x === 0) && b[8] === 0xff && b[9] === 0xff && b[10] === 0 && b[11] === 0) return embeds(12);
+  // 6to4 2002::/16 → eingebettete IPv4 aus Byte 2–5 prüfen.
+  if (b[0] === 0x20 && b[1] === 0x02) return embeds(2);
+  // NAT64 64:ff9b::/96 → letzte 32 Bit als IPv4 prüfen.
+  if (b[0] === 0x00 && b[1] === 0x64 && b[2] === 0xff && b[3] === 0x9b && b.slice(4, 12).every((x) => x === 0)) return embeds(12);
+
   return false;
 }
 
