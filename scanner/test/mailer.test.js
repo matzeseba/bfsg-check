@@ -15,7 +15,7 @@ delete process.env.SMTP_HOST;
 delete process.env.SMTP_USER;
 delete process.env.SMTP_PASS;
 
-const { sendReportFor, sendReport, sendCookieReport, sendRecheckReport, sendDelayNotice, sendLeadTeaser, buildLeadTeaser, isEmail, legalFooter, widerrufHinweis } = await import('../lib/mailer.js');
+const { sendReportFor, sendReport, sendCookieReport, sendRecheckReport, sendDelayNotice, buildDelayNotice, sendLeadTeaser, buildLeadTeaser, isEmail, legalFooter, widerrufHinweis } = await import('../lib/mailer.js');
 
 const tmp = mkdtempSync(path.join(os.tmpdir(), 'bfsg-mailer-'));
 const reportPdf = path.join(tmp, 'report.pdf');
@@ -84,6 +84,54 @@ test('sendDelayNotice (MF5): Verzoegerungs-Notiz laeuft im Dry-Run durch, unguel
   const bad = await sendDelayNotice({ to: 'keine-email', company: 'ACME' });
   assert.equal(bad.dryRun, true);
   assert.equal(bad.skipped, 'invalid-recipient');
+});
+
+test('buildDelayNotice: Owner-freigegebener Betreff + Kernaussagen im Text', () => {
+  const { subject, text } = buildDelayNotice({});
+  assert.equal(subject, 'Ihr Report kommt persönlich von uns — kurze Zwischennachricht');
+  // Kernaussagen des freigegebenen Wortlauts.
+  assert.match(text, /Ihre Zahlung ist bei uns eingegangen/);
+  assert.match(text, /technische Besonderheit/);
+  assert.match(text, /kein Grund zur Sorge/);
+  assert.match(text, /ein Mensch aus unserem Team/);
+  assert.match(text, /Sie müssen dafür nichts tun/);
+  assert.match(text, /info@bfsg-fix\.de/);
+  assert.match(text, /Danke für Ihre Geduld/);
+  assert.match(text, /Filo & das Team von/);
+  // Pflicht-Footer (Anbieterkennzeichnung + Disclaimer) hängt wie bei allen Mails an.
+  assert.match(text, /Keine Rechtsberatung/);
+});
+
+test('buildDelayNotice: Anrede personalisiert mit Firma, neutral ohne', () => {
+  assert.match(buildDelayNotice({ company: 'ACME GmbH' }).text, /^Guten Tag ACME GmbH,/);
+  assert.match(buildDelayNotice({ company: 'ACME GmbH' }).html, /Guten Tag ACME GmbH,/);
+  assert.match(buildDelayNotice({}).text, /^Guten Tag,/);
+});
+
+test('buildDelayNotice: HTML-Variante vorhanden — Ruhe-Box + mailto, aber KEIN Score/CTA', () => {
+  const { html } = buildDelayNotice({ company: 'ACME GmbH' });
+  assert.ok(html && html.includes('<!doctype html>'));
+  // Kontakt als klickbarer mailto-Link.
+  assert.match(html, /href="mailto:info@bfsg-fix\.de"/);
+  // Was-jetzt-passiert-Block + Footer.
+  assert.match(html, /Was jetzt passiert/);
+  assert.match(html, /Keine Rechtsberatung/);
+  // Bewusst OHNE Score-Box, Vergleichs-Grid und CTA-Button (kein Klick-/Verkaufsziel).
+  assert.doesNotMatch(html, /Deine Note|\/ 100 Punkten/);
+  assert.doesNotMatch(html, /#pakete|Vollreport/);
+});
+
+test('buildDelayNotice: keine verbotenen Claims, keine Frist-/Refund-Zusagen', () => {
+  const { subject, text, html } = buildDelayNotice({ company: 'ACME GmbH' });
+  for (const body of [subject, text, html]) {
+    // Verbotene Marketing-Claims (UWG §5 / CLAUDE.md).
+    assert.doesNotMatch(body, /BFSG-konform/i);
+    assert.doesNotMatch(body, /rechtssicher/i);
+    assert.doesNotMatch(body, /\bgarantiert\b/i);
+    // Keine Termin-/Frist-Zusagen und keine Refund-Versprechen.
+    assert.doesNotMatch(body, /innerhalb von|binnen|Werktag|Stunden\b|in Kürze/i);
+    assert.doesNotMatch(body, /Erstattung|Rückerstattung|Refund|Geld zurück/i);
+  }
 });
 
 test('isEmail: Basis-Validierung', () => {
