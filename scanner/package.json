@@ -10,7 +10,7 @@
   "scripts": {
     "start": "node app.js",
     "audit": "node audit.js",
-    "test": "node --test ./test/diff.test.js ./test/security.test.js ./test/dsgvo.test.js ./test/webhook.e2e.test.js ./test/webhook.api.test.js ./test/invoice.test.js ./test/mailer.test.js ./test/mail-retry.test.js ./test/report.test.js ./test/scan-error.test.js ./test/ssrf-redirect.test.js ./test/scan-cookie-pin.test.js ./test/invoice-resend.test.js ./test/limits.test.js ./test/config.test.js ./test/resend.api.test.js ./test/resolve-subscription-id.test.js ./test/goto-resilient.test.js ./test/tls-check.test.js ./test/report-qa.test.js ./test/release-gate.test.js",
+    "test": "node --test ./test/diff.test.js ./test/security.test.js ./test/dsgvo.test.js ./test/webhook.e2e.test.js ./test/webhook.api.test.js ./test/invoice.test.js ./test/mailer.test.js ./test/mail-retry.test.js ./test/report.test.js ./test/scan-error.test.js ./test/ssrf-redirect.test.js ./test/scan-cookie-pin.test.js ./test/invoice-resend.test.js ./test/limits.test.js ./test/config.test.js ./test/resend.api.test.js ./test/resend-force.api.test.js ./test/resolve-subscription-id.test.js ./test/goto-resilient.test.js ./test/tls-check.test.js ./test/report-qa.test.js ./test/release-gate.test.js",
     "test:audit": "npm audit --omit=dev",
     "postinstall": "playwright install chromium"
   },

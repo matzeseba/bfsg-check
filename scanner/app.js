@@ -928,7 +928,10 @@ app.get('/admin/subscriptions', rateLimit({ windowMs: 60_000, max: 30 }), requir
 // SF2: atomarer In-Memory-Lock gegen parallele Doppel-Auslieferung (zwei Resends
 // würden sonst doppelt mailen + zwei GoBD-Rechnungsnummern ziehen).
 const resendInFlight = new Set();
-app.post('/api/resend/:sessionId', rateLimit({ windowMs: 60_000, max: Number(process.env.RESEND_RATE_MAX || 10) }), requireAdminAuth, async (req, res) => {
+// RESEND_RATE_MAX defensiv parsen: ein Tippfehler-Wert ergäbe NaN, und `count > NaN`
+// ist immer false → der Limiter wäre still deaktiviert. Ungültig ⇒ Default 10.
+const RESEND_RATE_MAX = (() => { const n = Number(process.env.RESEND_RATE_MAX); return Number.isFinite(n) && n > 0 ? n : 10; })();
+app.post('/api/resend/:sessionId', rateLimit({ windowMs: 60_000, max: RESEND_RATE_MAX }), requireAdminAuth, async (req, res) => {
   const { sessionId } = req.params;
   const { getOrder, markStatus } = await import('./lib/orders.js');
   // order = Snapshot von VOR dem RESENDING-Write (für mailOnly-Entscheidung + SF1-Rollback).
