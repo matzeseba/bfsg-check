@@ -1,0 +1,70 @@
+name: PR-CI
+
+# PR-Gate vor Merge auf main (Merge = Live-Deploy!):
+# 3 parallele Jobs — Scanner-Tests, Landingpage-Lint+Build, Legal-Grep.
+# Bewusst OHNE Secrets: läuft auch für Fork-PRs sicher.
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: pr-ci-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  scanner-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          # scanner/ hat kein package-lock.json (per scanner/.gitignore
+          # ausgeschlossen) → package.json als Cache-Key.
+          cache-dependency-path: scanner/package.json
+      - name: Dependencies installieren (ohne Chromium-Download)
+        # npm install statt npm ci, weil kein Lockfile versioniert ist.
+        # --ignore-scripts überspringt den postinstall-Chromium-Download —
+        # die Tests (node --test) starten keinen Browser.
+        run: npm install --ignore-scripts
+        working-directory: scanner
+      - name: Tests ausführen
+        run: npm test
+        working-directory: scanner
+
+  landingpage-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: landingpage-next/package-lock.json
+      - name: Dependencies installieren
+        run: npm ci
+        working-directory: landingpage-next
+      - name: Lint
+        run: npm run lint
+        working-directory: landingpage-next
+      - name: Build
+        run: npm run build
+        working-directory: landingpage-next
+
+  legal-grep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verbotene Marketing-Claims prüfen
+        run: node scripts/legal-grep.mjs
