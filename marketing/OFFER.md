@@ -20,7 +20,7 @@
 ## Conversion-Mechanik
 
 ```
-Ad / SEO / Listing  ─►  Gratis-Check (Stufe 0)  ─►  Report 199/499 € (Stufe 1/2)
+Ad / SEO / Listing  ─►  Gratis-Check (Stufe 0)  ─►  Report 129/399 € (Stufe 1/2)
                                                               │
                                                         Upsell ins Abo (Stufe 3)
 ```

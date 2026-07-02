@@ -1,12 +1,14 @@
 # Pricing-Experimente — 5 A/B-Tests (Q3/Q4 2026)
 
+> ⚠️ **Preis-Sync 02.07.2026:** Die Live-Preise sind seit 27.06.2026 **Basis 129 € · Profi 399 € · Cookie 39/69 € · Abo 24,99 €/Mo** (marktbasierte Senkung). Die Experiment-Baselines unten wurden entsprechend aktualisiert — Kontrolle = jeweils aktueller Live-Preis.
+>
 > **Ziel:** Preis-Elastizität, Bundle-Wirkung und Payment-Mix mit echten Kunden empirisch klären, nicht nur raten.
 >
 > **Test-Priorisierung (nach Wettbewerbsanalyse, siehe `docs/PRICING-STRATEGY.md` §6):**
-> 1. **Exp. 4 — Abo 49 € vs. 39 €** (größter strategischer Hebel: Abo ist gegen BFSGuard 19,99 €/Mo am schwächsten; Variante B angepasst → Jahresoption statt Setup-Fee)
-> 2. **Exp. 3 — Bundle BFSG+Cookie 229 €** (umsetzungsreifer AOV-Hebel, niedriges Risiko)
-> 3. **Exp. 1 — Basis 199 € vs. 249 €** (Margen-Hebel auf Volumen-Produkt)
-> 4. **Exp. 2 — Profi 499 € vs. 599 €** (niedriges Volumen → später)
+> 1. **Exp. 4 — Abo-Jahresoption** (größter strategischer Hebel: Monats-Abo 24,99 € vs. Jahresplan ~249 €/Jahr)
+> 2. **Exp. 3 — Bundle BFSG+Cookie** (umsetzungsreifer AOV-Hebel, niedriges Risiko)
+> 3. **Exp. 1 — Basis 129 € vs. 169 €** (Margen-Hebel auf Volumen-Produkt)
+> 4. **Exp. 2 — Profi 399 € vs. 499 €** (niedriges Volumen → später)
 > 5. **Exp. 5 — Payment-Mix** (preisunabhängig, jederzeit parallel)
 > Plus neu: **Exp. 6 (Anchoring-Tier)** und **Exp. 7 (Jahresrabatt-Frame)** — siehe unten.
 >
@@ -19,11 +21,11 @@
 
 ---
 
-## Experiment 1 — Basis-Report: 199 € vs. 249 €
+## Experiment 1 — Basis-Report: 129 € vs. 169 €
 
-- **Hypothese:** „Eine Erhöhung auf 249 € reduziert die Conversion um maximal 15 %, erhöht aber den Net-Revenue pro Besucher (RPV) um mindestens 10 %."
-- **Variante A (Kontrolle):** 199 €
-- **Variante B (Test):** 249 €
+- **Hypothese:** „Eine Erhöhung auf 169 € reduziert die Conversion um maximal 15 %, erhöht aber den Net-Revenue pro Besucher (RPV) um mindestens 10 %."
+- **Variante A (Kontrolle):** 129 € (Live-Preis)
+- **Variante B (Test):** 169 €
 - **Erfolgs-Kriterium:**
   - Primär: Net-Revenue-per-Visitor (Variante B) > 1,10 × Variante A bei 95 % Konfidenz.
   - Sekundär: Conversion-Drop < 15 %.
@@ -41,28 +43,28 @@
 
 ---
 
-## Experiment 2 — Profi-Report: 499 € vs. 599 €
+## Experiment 2 — Profi-Report: 399 € vs. 499 €
 
-- **Hypothese:** „Premium-Käufer reagieren weniger preissensitiv. 599 € verliert maximal 10 % der Conversion, erhöht aber den AOV um 20 %."
-- **Variante A:** 499 €
-- **Variante B:** 599 €
+- **Hypothese:** „Premium-Käufer reagieren weniger preissensitiv. 499 € verliert maximal 10 % der Conversion, erhöht aber den AOV um 20 %."
+- **Variante A:** 399 € (Live-Preis)
+- **Variante B:** 499 €
 - **Erfolgs-Kriterium:**
   - Net-Revenue-per-Visitor (B) > 1,15 × A bei 95 % Konfidenz.
   - Refund-Rate < 5 % in beiden Varianten (sonst preis-induzierte Enttäuschung).
 - **Tooling:**
   - Gleiche Posthog/Stripe-Architektur wie Exp. 1, Flag `pricing.profi`.
-  - Eigener Stripe-Price-ID-Set für 499 / 599.
+  - Eigener Stripe-Price-ID-Set für 399 / 499.
 - **Tracking-Setup:** identisch zu Exp. 1, zusätzlich Event `refund_requested` mit `variant`.
 - **Laufzeit:** 6 Wochen (Profi hat weniger Volumen → längere Sample-Aufbauzeit).
 - **Roll-back-Plan:** Refund-Rate > 8 % bei B → Sofort-Stop; AOV-Wirkung dann nicht real.
 
 ---
 
-## Experiment 3 — Bundle „BFSG + Cookie" 229 € vs. Einzel 248 €
+## Experiment 3 — Bundle „BFSG + Cookie" 149 € vs. Einzel 168 €
 
-- **Hypothese:** „Ein Bundle-Preis 229 € (statt 199 € + 49 € = 248 € einzeln) erhöht Cross-Sell-Take-Rate von < 5 % auf > 25 %, sodass der absolute Umsatz pro Bundle-Käufer steigt."
-- **Variante A (Kontrolle):** Basis 199 € + separate Cookie-Buchung 49 € (Cross-Sell-Banner im Checkout).
-- **Variante B (Test):** Bundle „BFSG + Cookie" 229 € als zusätzliche Option im Checkout-Step 1.
+- **Hypothese:** „Ein Bundle-Preis 149 € (statt 129 € + 39 € = 168 € einzeln) erhöht Cross-Sell-Take-Rate von < 5 % auf > 25 %, sodass der absolute Umsatz pro Bundle-Käufer steigt."
+- **Variante A (Kontrolle):** Basis 129 € + separate Cookie-Buchung 39 € (Cross-Sell-Banner im Checkout).
+- **Variante B (Test):** Bundle „BFSG + Cookie" 149 € als zusätzliche Option im Checkout-Step 1.
 - **Erfolgs-Kriterium:**
   - Bundle-Take-Rate ≥ 25 % aller Basis-Käufer.
   - Net-Revenue pro Besucher (B) > 1,08 × A bei 95 % Konfidenz.
@@ -76,20 +78,20 @@
 
 ---
 
-## Experiment 4 — Abo: 49 €/Mo vs. 39 €/Mo (+ Jahresoption 390 €/Jahr) ⭐ PRIO 1
+## Experiment 4 — Abo: 24,99 €/Mo vs. 24,99 €/Mo + Jahresoption 249 €/Jahr ⭐ PRIO 1
 
-> **Angepasst (06/2026, `docs/PRICING-STRATEGY.md` §3.3):** Setup-Fee verworfen (erhöht Reibung). Stattdessen Preis-Senkung + Jahres-Lock-in. Begründung: Abo ist im Wettbewerb (BFSGuard Starter 19,99 €/Mo für 3 Sites, inkl. Auto-Fix + Monitoring) am schwächsten positioniert; das Abo ist zugleich der MRR-Motor.
+> **Angepasst (07/2026):** Live-Monatspreis ist bereits 24,99 € (Senkung 27.06.). Der Hebel ist jetzt nicht mehr die Monatspreis-Senkung, sondern die **Jahresoption** (Cashflow + LTV-Lock-in, „Audit + 12 Monate Überwachung"-Framing aus dem 02.07.-Audit).
 
-- **Hypothese:** „Der niedrigere Monatspreis (39 €) senkt die psychologische Eintrittsschwelle und erhöht die Report→Abo-Überführungsrate um > 30 %, ohne dass der 6-Monats-LTV sinkt. Die Jahresoption sichert Cashflow + LTV."
-- **Variante A (Kontrolle):** 49 €/Mo, keine Jahresoption.
-- **Variante B (Test):** 39 €/Mo **+ Jahresoption 390 €/Jahr** („2 Monate gratis").
+- **Hypothese:** „Eine Jahresoption 249 €/Jahr (≈ 2 Monate gratis) erhöht Cashflow + LTV, erreicht ≥ 20 % Jahresplan-Anteil und senkt die Report→Abo-Überführungsrate nicht."
+- **Variante A (Kontrolle):** 24,99 €/Mo, keine Jahresoption.
+- **Variante B (Test):** 24,99 €/Mo **+ Jahresoption 249 €/Jahr** („2 Monate gratis").
 - **Erfolgs-Kriterium:**
   - Sign-up-/Überführungs-Rate (B) > 1,3 × A bei 95 % Konfidenz.
   - 6-Monats-LTV (B) ≥ 0,95 × A (max. 5 % LTV-Reduktion; Jahresabschlüsse zählen anteilig).
   - Sekundär: Jahresplan-Anteil ≥ 20 % der B-Abschlüsse (Cashflow-Effekt).
 - **Tooling:**
   - Posthog Flag `abo.pricing = 'A'|'B'`.
-  - Stripe Subscription: Plan 4900/Mo (A) bzw. 3900/Mo + 39000/Jahr (B).
+  - Stripe Subscription: Plan 2499/Mo (A) bzw. 2499/Mo + 24900/Jahr (B).
   - LTV-Modell: Stripe-Revenue/Kunde über 6 Mo, gewichtet nach Cohort, Jahresumsatz auf 12 Mo verteilt.
 - **Tracking-Setup:** Events `abo_view`, `abo_signed` (mit `plan: monthly|yearly`), monatliches Snapshot der Cohort-Retention.
 - **Laufzeit:** 12 Wochen (Subscription braucht Zeit für LTV-Aussage).
