@@ -103,6 +103,30 @@ const products: ProductInput[] = [
     sku: "recheck-abo",
     offerUrl: `${siteUrl}/#pakete`,
   },
+  {
+    // Jahres-Variante (Backend-Paket 'abo-jahr'): gleiche Leistung (monatlicher
+    // Re-Check), jährliche Abrechnung zu 249 €. unitCode ANN = Jahr (UN/CEFACT).
+    name: "Fuchs Re-Check Abo (jährlich)",
+    description:
+      "Monatliches Re-Audit Ihrer Website mit Veränderungs-Report bei jährlicher Abrechnung. Erstlaufzeit 12 Monate, danach monatlich kündbar.",
+    price: "249.00",
+    priceSpecification: {
+      "@type": "UnitPriceSpecification",
+      price: "249.00",
+      priceCurrency: "EUR",
+      billingDuration: 1,
+      billingIncrement: 1,
+      unitCode: "ANN",
+      referenceQuantity: {
+        "@type": "QuantitativeValue",
+        value: 1,
+        unitCode: "ANN",
+      },
+    },
+    category: "Monitoring-Abo",
+    sku: "recheck-abo-jahr",
+    offerUrl: `${siteUrl}/#pakete`,
+  },
 ];
 
 const productSchemas: JsonLdSchema[] = products.map((product) => {

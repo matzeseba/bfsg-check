@@ -59,8 +59,13 @@ export default function AgbPage() {
 
       <h2 className="mt-8 text-xl font-semibold">§ 5 Abo-Laufzeit & Kündigung</h2>
       <p className="mt-2 text-muted-foreground">
-        Das Re-Check-Abo läuft monatlich und ist jederzeit zum Ende der
-        laufenden Abrechnungsperiode kündbar — Formular unter{" "}
+        Das Re-Check-Abo mit monatlicher Zahlung läuft monatlich und ist
+        jederzeit zum Ende der laufenden Abrechnungsperiode kündbar. Das
+        Re-Check-Abo mit jährlicher Zahlung hat eine Erstlaufzeit von zwölf
+        Monaten; es verlängert sich danach auf unbestimmte Zeit und kann nach
+        Ablauf der Erstlaufzeit jederzeit mit einer Frist von einem Monat
+        gekündigt werden (§ 309 Nr. 9 BGB). Kündigung jeweils formlos per
+        E-Mail oder über das Formular unter{" "}
         <a href="/kuendigen" className="underline">/kündigen</a>.
       </p>
 

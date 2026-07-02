@@ -17,8 +17,10 @@ export default function KuendigenPage() {
         Abo kündigen
       </h1>
       <p className="mt-4 text-muted-foreground text-pretty">
-        Ihr Re-Check-Abo ist jederzeit zum Ende der laufenden Abrechnungsperiode
-        kündbar — auf Wunsch auch sofort. Eine formlose E-Mail an{" "}
+        Ihr Monats-Abo ist jederzeit zum Ende der laufenden Abrechnungsperiode
+        kündbar — auf Wunsch auch sofort. Das Jahres-Abo ist zum Ende der
+        Erstlaufzeit von 12 Monaten und danach jederzeit mit einer Frist von
+        einem Monat kündbar. Eine formlose E-Mail an{" "}
         <a href="mailto:kuendigen@bfsg-fix.de" className="underline">
           kuendigen@bfsg-fix.de
         </a>{" "}

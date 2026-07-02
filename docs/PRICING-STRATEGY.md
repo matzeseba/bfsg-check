@@ -105,6 +105,8 @@ PREIS-LANDKARTE (Einmal-Deliverable, DACH, logarithmisch)
 
 ### 3.3 Re-Check-Abo: 49 €/Mo → **39 €/Mo + Jahresoption 390 €/Jahr** ⚠️ HANDLUNGSBEDARF
 
+> **UMGESETZT (Stand 07/2026, W1-G):** Der Live-Monatspreis ist inzwischen **24,99 €/Mo** (Senkung 27.06.), die Jahresoption ist per Owner-Entscheidung mit **249 €/Jahr** live (Backend-Paket `'abo-jahr'`, Ersparnis 50,88 € ggü. 12 × 24,99 € = 299,88 €). Die 39-€-/390-€-Zahlen unten sind der historische Analysestand und NICHT mehr die gültigen Preise.
+
 - **Verdikt:** **Hier liegt das größte Pricing-Problem.** 49 €/Mo ist im direkten Vergleich zu **BFSGuard Starter (19,99 €/Mo für 3 Sites, inkl. Auto-Fix + Monitoring)** schwer zu verteidigen, wenn der Kunde nur „Überwachung" wahrnimmt. 49 € entspricht fast dem BFSGuard-**Business**-Tier (69 €/Mo, 10 Sites, tägliches Monitoring).
 - **Problem:** Ein reines „Re-Check"-Abo ist eine schwache Wertstory gegen automatisierte Dauer-Monitoring-Tools, die dasselbe billiger und häufiger (täglich vs. monatlich) tun.
 - **Zwei Optionen:**
@@ -222,13 +224,12 @@ PREIS-LANDKARTE (Einmal-Deliverable, DACH, logarithmisch)
 - `landingpage-next/lib/config.ts` Z. 152–153: `price: "49 €"` → `"39 €"`; Z. 156: `amountCents: 4900` → `3900`
 - Stripe: neue Subscription-Price `price_abo_3900_monthly` anlegen.
 
-**A2 — Abo-Jahresoption 390 €/Jahr (NEU):**
-- `scanner/app.js` `PACKAGES`: neuen Key ergänzen, z. B.
-  `'abo-jahr': { name: 'BFSG Re-Check Abo (Jahr)', amount: 39000, mode: 'subscription', interval: 'year' }`
-  (analog zum bestehenden `abo`-Eintrag, hinter `ENABLE_ABO`).
-- `landingpage-next/lib/config.ts` `PACKAGES`: neues Objekt `id: "abo-jahr"`, `price: "390 €"`, `priceSuffix: "/Jahr"`, `mode: "subscription"`, `amountCents: 39000`, Feature-Hinweis „2 Monate gratis ggü. monatlich".
-- Stripe: Subscription-Price `interval: year`, 39000 Cent.
-- `PackageId`-Type (Z. 4–9 in config.ts) um `"abo-jahr"` erweitern.
+**A2 — Abo-Jahresoption (UMGESETZT 07/2026 mit 249 €/Jahr statt der hier alten 390 €):**
+- ✅ `scanner/app.js` `PACKAGES`: `'abo-jahr': { name: 'BFSG Re-Check Abo (jährlich)', amount: 24900, mode: 'subscription', interval: 'year' }` (hinter `ENABLE_ABO`).
+- ✅ `scanner/lib/fulfill.js` `PKG_CONFIG['abo-jahr']` identisch zu `abo` (25 Seiten, Statement, emailKind `recheck`) — ohne den Eintrag griffe der basis-Fallback.
+- ✅ `landingpage-next/lib/config.ts`: `PackageId` um `"abo-jahr"` erweitert; Abo-Eintrag trägt `annualId`/`annualAmountCents: 24900`/`annualPrice: "249 €"`; `ABO_ANNUAL`-Paket fürs CheckoutModal; Jahres-Toggle in `PricingCards.tsx` aktiv.
+- ✅ Kein Stripe-Dashboard-Schritt nötig: Checkout nutzt inline `price_data` (kein persistenter Price).
+- ✅ Monats-Re-Check-Takt fürs Jahres-Abo: `startAnnualRecheckTicker` in `scanner/app.js` (invoice.paid feuert bei `interval:'year'` nur jährlich).
 
 **A3 — Bundle „BFSG + Cookie" 229 € (NEU):**
 - `scanner/app.js` `PACKAGES`: neuer Key

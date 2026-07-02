@@ -28,6 +28,16 @@ import { useCheckout } from "@/lib/checkout-context";
 
 import { SectionKicker } from "./SectionKicker";
 
+// Cent-Betrag → deutsches Preisformat ("50,88 €"). Nur für ABGELEITETE Angaben
+// (Ersparnis aus zwei festen Config-Preisen) — Paketpreise selbst kommen IMMER
+// als fertige Strings aus lib/config.ts.
+function formatEur(cents: number): string {
+  return `${(cents / 100).toLocaleString("de-DE", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })} €`;
+}
+
 // Marken-Akzent der Featured-Karte/Highlights (rein optisch):
 //  - "orange" = Haupt-Pricing (Profi) — Marken-Akzentfarbe.
 //  - "amber"  = Cookie-Sektion (Cookie-Profi) — Pflicht-Baustelle-Nr.-2-Signatur.
@@ -61,11 +71,12 @@ export function PricingCards({
   kicker = "Pakete & Preise",
   kickerIcon = TagIcon,
   id = "pakete",
-  // Standardmäßig AUS: Das Backend bietet nur monatliche Abrechnung (interval:'month');
-  // der Jahres-Toggle wäre rein kosmetisch und würde einen nie abgerechneten
-  // Jahrespreis/Rabatt vorgaukeln (Dark-Pattern). Erst auf true setzen, wenn es ein
-  // echtes Jahres-Abo im Stripe-Checkout gibt.
-  showAnnualToggle = false,
+  // AN seit W1-G: Das Backend rechnet die Jahresoption echt ab (scanner/app.js
+  // 'abo-jahr', interval:'year', 249 €/Jahr) — der Toggle zeigt also einen real
+  // buchbaren Preis. Historie: war aus, solange nur interval:'month' existierte
+  // (ein rein kosmetischer Toggle hätte einen nie abgerechneten Rabatt vorgegaukelt).
+  // Alle Anzeige-Preise kommen aus lib/config.ts (annualPrice) — NIE berechnen.
+  showAnnualToggle = true,
   embedded = false,
   accent = "orange",
 }: PricingCardsProps) {
@@ -78,15 +89,24 @@ export function PricingCards({
   const titlePost =
     accentIdx >= 0 ? title.slice(accentIdx + titleAccent.length) : "";
 
-  // Der Monatlich/Jaehrlich-Toggle ergibt nur Sinn, wenn ein KAUFBARES Abo
-  // angezeigt wird. Bei reinen Einmal-Paketen (Basis/Profi/Cookie) tut er nichts
-  // und wirkt mit "-2 Monate" sogar irrefuehrend. Solange das Abo deaktiviert ist
-  // (available:false), blenden wir ihn aus — und zeigen ihn automatisch wieder,
-  // sobald ein Abo kaufbar wird.
-  const hasEnabledSub = packages.some(
-    (p) => p.mode === "subscription" && p.available !== false,
+  // Der Monatlich/Jaehrlich-Toggle ergibt nur Sinn, wenn ein KAUFBARES Abo MIT
+  // Jahresoption angezeigt wird. Bei reinen Einmal-Paketen (Basis/Profi/Cookie)
+  // tut er nichts und wirkt mit einem Rabatt-Badge sogar irrefuehrend. Ist das
+  // Abo deaktiviert (available:false) oder ohne annual*-Config, bleibt er aus.
+  const subWithAnnual = packages.find(
+    (p) =>
+      p.mode === "subscription" &&
+      p.available !== false &&
+      p.annualId != null &&
+      p.annualAmountCents != null &&
+      p.annualPrice != null,
   );
-  const showToggle = showAnnualToggle && hasEnabledSub;
+  const showToggle = showAnnualToggle && !!subWithAnnual;
+  // Ersparnis = Differenz der beiden FESTEN Config-Preise (12 Monatsbeiträge vs.
+  // Jahrespreis), de-DE-formatiert — kein frei erfundener Rabatt (UWG/PAngV).
+  const annualSavings = subWithAnnual?.annualAmountCents
+    ? formatEur(subWithAnnual.amountCents * 12 - subWithAnnual.annualAmountCents)
+    : null;
 
   return (
     <section
@@ -164,9 +184,11 @@ export function PricingCards({
                 )}
               >
                 Jährlich
-                <span className="rounded-full bg-brand-mint px-1.5 py-0.5 text-[10px] font-semibold text-brand-deep">
-                  −2 Monate
-                </span>
+                {annualSavings && (
+                  <span className="rounded-full bg-brand-mint px-1.5 py-0.5 text-[10px] font-semibold text-brand-deep">
+                    spart {annualSavings}
+                  </span>
+                )}
               </button>
             </div>
           )}
@@ -199,7 +221,11 @@ export function PricingCards({
                 pkg={pkg}
                 annual={annual}
                 accent={accent}
-                onSelect={() => openCheckout(pkg.id)}
+                // Jahres-Toggle aktiv + Paket hat eine Jahres-Variante → das
+                // Backend-Paket 'abo-jahr' in den Checkout geben, sonst wie gehabt.
+                onSelect={() =>
+                  openCheckout(annual && pkg.annualId ? pkg.annualId : pkg.id)
+                }
               />
             </motion.div>
           ))}
@@ -320,18 +346,28 @@ function PricingCard({
   accent: AccentTone;
   onSelect: () => void;
 }) {
-  // Annual-Toggle ist nur fuer Subscriptions relevant — kosmetischer Rabatt.
+  // Annual-Toggle ist nur fuer Subscriptions MIT konfigurierter Jahres-Variante
+  // relevant. Der Jahrespreis kommt als FESTER String aus der Config (annualPrice,
+  // z.B. "249 €") — frueher stand hier Math.round(monthly*10), was 250 € angezeigt
+  // haette: Anzeige-Preise werden NIE berechnet (Quelle: scanner/app.js 'abo-jahr').
   const isSub = pkg.mode === "subscription";
   // available === false → beworben, aber noch nicht kaufbar (z.B. Abo-Gate Backend).
   const comingSoon = pkg.available === false;
-  const monthly = pkg.amountCents / 100;
-  const yearly = Math.round(monthly * 10);
-  const displayedPrice = isSub && annual ? `${yearly} €` : pkg.price;
+  const hasAnnual =
+    isSub && pkg.annualPrice != null && pkg.annualAmountCents != null;
+  const showAnnual = hasAnnual && annual;
+  const displayedPrice = showAnnual ? pkg.annualPrice : pkg.price;
   const displayedSuffix = isSub
-    ? annual
+    ? showAnnual
       ? "/Jahr"
       : (pkg.priceSuffix ?? "/Monat")
     : pkg.priceSuffix;
+  // Ersparnis ggü. 12 Monatsbeiträgen — abgeleitet aus den beiden festen
+  // Config-Preisen, de-DE-formatiert (kein roher Float wie "50.88000000000001").
+  const annualSavings =
+    showAnnual && pkg.annualAmountCents != null
+      ? formatEur(pkg.amountCents * 12 - pkg.annualAmountCents)
+      : null;
 
   // Marken-Akzent-Klassen pro Tone (rein optisch). Orange = Haupt-Pricing,
   // Amber = Cookie. Die Featured-Action-CTA ist jetzt der orange 3D-.btn-cta
@@ -462,9 +498,9 @@ function PricingCard({
             </span>
           )}
         </div>
-        {isSub && annual && (
+        {annualSavings && (
           <p className="mt-1 text-xs font-medium text-brand-orange">
-            Spart {monthly * 12 - yearly} € im Vergleich zur Monatszahlung
+            Sie sparen {annualSavings} im Vergleich zur Monatszahlung
           </p>
         )}
         {!isSub && (
@@ -481,7 +517,10 @@ function PricingCard({
       </div>
 
       <ul className="relative mt-8 grid flex-1 gap-3 text-sm">
-        {pkg.features.map((feature) => (
+        {(showAnnual && pkg.annualFeatures
+          ? pkg.annualFeatures
+          : pkg.features
+        ).map((feature) => (
           <li key={feature} className="flex items-start gap-2.5">
             <span
               aria-hidden
@@ -535,7 +574,9 @@ function PricingCard({
         {pkg.moneyBack && (
           <p className="inline-flex items-center gap-1.5 rounded-lg bg-brand-mint/8 px-2.5 py-1.5 text-xs text-muted-foreground">
             <ShieldCheckIcon className="size-3.5 shrink-0 text-brand-mint" />
-            {pkg.moneyBack}
+            {/* Jahres-Ansicht: Kündigungs-Konditionen des Jahres-Abos (§ 309 Nr. 9
+                BGB), nicht die "zum Monatsende"-Zusage des Monats-Abos. */}
+            {showAnnual ? (pkg.annualMoneyBack ?? pkg.moneyBack) : pkg.moneyBack}
           </p>
         )}
         </div>

@@ -2,7 +2,8 @@
 // der vollständige Report (HTML + PDF) erzeugt. Bei BFSG-Paketen zusätzlich die
 // Barrierefreiheitserklärung; bei Cookie-Paketen kein BFSG-Statement.
 // Multi-Page-Crawl wird per pkg-Konfiguration angesteuert (8 Seiten Basis,
-// 40 Profi, 25 Abo, 1 Cookie-Basis, 5 Cookie-Profi; scanSite cappt hart auf 50).
+// 40 Profi, 25 Abo (monatlich wie jährlich), 1 Cookie-Basis, 5 Cookie-Profi;
+// scanSite cappt hart auf 50).
 //
 // Wird nach erfolgreicher Stripe-Zahlung vom Webhook aufgerufen, und ebenso bei
 // jedem invoice.paid (subscription_cycle) des Re-Check-Abos.
@@ -35,6 +36,10 @@ export const PKG_CONFIG = {
   // Erklärung zur Barrierefreiheit mit (Owner-Wunsch). Diff zeigt die Änderungen,
   // die Erklärung spiegelt den aktuellen Stand. Gleiche Scan-Tiefe wie ein Erst-Scan.
   abo:          { kind: 'bfsg',   maxPages: 25, withStatement: true,  emailKind: 'recheck', settleMs: 12000, perPageTimeout: 45000 },
+  // Jahres-Abo: EXAKT dieselbe Leistung wie 'abo' (nur jährliche Abrechnung). Ohne diesen
+  // Eintrag griffe der basis-Fallback (5 Seiten, emailKind 'bfsg') — Abo-Kunden bekämen
+  // den falschen Report.
+  'abo-jahr':   { kind: 'bfsg',   maxPages: 25, withStatement: true,  emailKind: 'recheck', settleMs: 12000, perPageTimeout: 45000 },
   'cookie-basis': { kind: 'cookie', maxPages: 1,  withStatement: false, emailKind: 'cookie' },
   'cookie-profi': { kind: 'cookie', maxPages: 5,  withStatement: false, emailKind: 'cookie' }
 };
