@@ -372,6 +372,14 @@
     padding-right: 0.09em;
     margin-right: -0.09em;
   }
+  /* Editorial-Italic-Akzentwoerter: echter Fraunces-Kursiv-Display-Schnitt statt
+     synthetischem Oblique auf Fredoka. Greift NUR, wenn ein Element BEIDE Klassen
+     traegt (`italic` + `gradient-text`) — genau die ~8 betonten Akzentwoerter.
+     Reine Fredoka-`.gradient-text` (Hero-H1 „BFSG", upright) bleibt unberuehrt.
+     Font-Variable kommt aus next/font (--font-display-italic, s. layout.tsx). */
+  .gradient-text.italic {
+    font-family: var(--font-display-italic), Georgia, serif;
+  }
   /* Shimmer-Sweep fuer das Hero-Akzentwort (bewegt die background-position).
      Wird via @media (prefers-reduced-motion) stillgestellt. */
   .gradient-text-shimmer {

@@ -4,11 +4,10 @@ import * as motion from "motion/react-client";
 import { CheckIcon, GitCompareArrowsIcon } from "lucide-react";
 
 import { COMPARISON } from "@/lib/config";
+import { EASE } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 import { SectionKicker } from "./SectionKicker";
-
-const EASE = [0.22, 1, 0.36, 1] as const;
 
 // Direktvergleich — UWG-§5/§6-sauber: qualitativer, sachlicher Vergleich
 // OHNE erfundene Score-Zahlen/Balken, OHNE "Bester"-Superlativ, OHNE

@@ -2,10 +2,11 @@
 
 import * as motion from "motion/react-client";
 import Link from "next/link";
-import { AlertTriangleIcon, ArrowRightIcon, CheckCircle2Icon } from "lucide-react";
+import { AlertTriangleIcon, ArrowRightIcon, CheckCircle2Icon, LockIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { useCheckout } from "@/lib/checkout-context";
+import { EASE } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 import { LeadCapture } from "./LeadCapture";
@@ -79,7 +80,7 @@ export function ResultCard({ result }: { result: ScanResult }) {
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.55, ease: EASE }}
       role="region"
       aria-live="polite"
       className="overflow-hidden rounded-2xl border border-border/70 bg-card/90 shadow-card-soft backdrop-blur"
@@ -128,19 +129,40 @@ export function ResultCard({ result }: { result: ScanResult }) {
               Top-Befunde aus der Sofort-Prüfung
             </p>
             {topIssues && topIssues.length > 0 ? (
-              <ul className="grid gap-2 text-sm text-muted-foreground">
-                {topIssues.slice(0, 3).map((issue) => (
-                  <li key={issue} className="flex items-start gap-2">
-                    {/* WCAG 1.4.1: Bedeutung nicht allein über Farbe — Icon je Befund,
-                        Farbe bleibt zusätzlich (rot = Mangel). */}
-                    <AlertTriangleIcon
+              <>
+                <ul className="grid gap-2 text-sm text-muted-foreground">
+                  {topIssues.slice(0, 3).map((issue) => (
+                    <li key={issue} className="flex items-start gap-2">
+                      {/* WCAG 1.4.1: Bedeutung nicht allein über Farbe — Icon je Befund,
+                          Farbe bleibt zusätzlich (rot = Mangel). */}
+                      <AlertTriangleIcon
+                        aria-hidden
+                        className="mt-0.5 size-4 shrink-0 text-brand-rose"
+                      />
+                      <span>{issue}</span>
+                    </li>
+                  ))}
+                </ul>
+                {/* Value-Gate: die weiteren Funde bleiben dem Vollreport vorbehalten
+                    (shown = angezeigte Top-Befunde). Ehrlich formuliert, keine
+                    erfundenen Zahlen — totalIssues kommt aus dem echten Teaser. */}
+                {totalIssues > Math.min(topIssues.length, 3) && (
+                  <p className="flex items-start gap-2 rounded-lg border border-border/60 bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
+                    <LockIcon
                       aria-hidden
-                      className="mt-0.5 size-4 shrink-0 text-brand-rose"
+                      className="mt-0.5 size-3.5 shrink-0 text-brand-amber"
                     />
-                    <span>{issue}</span>
-                  </li>
-                ))}
-              </ul>
+                    <span>
+                      +{" "}
+                      <span className="font-semibold text-foreground tabular-nums">
+                        {totalIssues - Math.min(topIssues.length, 3)}
+                      </span>{" "}
+                      weitere Stellen erst im Vollreport aufgeschlüsselt — je mit
+                      Copy-Paste-Fix.
+                    </span>
+                  </p>
+                )}
+              </>
             ) : (
               // Befunde vorhanden, aber keine Titel im Teaser — KEINE erfundenen
               // Beispiele, sondern eine ehrliche Zusammenfassung.
@@ -202,12 +224,16 @@ export function ResultCard({ result }: { result: ScanResult }) {
           >
             Alle Pakete vergleichen
           </Link>
+          {/* Einstiegs-Anker: kostenloser Scan → Basis-Report (129 €), nicht direkt
+              Profi (399 €). Preis am Button sichtbar (Reibung senken). */}
           <button
             type="button"
-            onClick={() => openCheckout("profi")}
+            onClick={() => openCheckout("basis")}
             className="btn-cta h-11 gap-1.5 rounded-xl text-sm"
           >
-            {totalIssues > 0 ? "Vollreport sichern" : "Bestätigung sichern"}
+            {totalIssues > 0
+              ? "Vollreport sichern — 129 €"
+              : "Bestätigung sichern — 129 €"}
             <ArrowRightIcon className="size-4" />
           </button>
         </div>

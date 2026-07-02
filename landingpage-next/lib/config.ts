@@ -23,6 +23,9 @@ export type PackageConfig = {
   // false = Paket beworben, aber noch nicht kaufbar (Backend-Gate, z.B. ENABLE_ABO=false).
   // CTA zeigt dann "Bald verfügbar" statt einen 400-Checkout auszulösen.
   available?: boolean;
+  // Optionaler Mengen-Anker unter dem Preis (z.B. "25 Unterseiten — rund 16 €/Seite").
+  // Rahmt den Pauschalpreis als Preis-pro-Einheit. Rein optisch, keine Kauf-Logik.
+  anchorNote?: string;
 };
 
 // HINWEIS Domain/Rebrand (Cutover 29.06.2026): Marke + Primär-Domain = "bfsg-fuchs.de".
@@ -60,7 +63,10 @@ export const NAV_LINKS = [
 
 export const HERO = {
   pillFlag: "DE",
-  pill: "BFSG seit 28.06.2025 in Kraft · Erste Abmahnungen rollen an",
+  // Produktwert-Badge (NICHT die Frist — die traegt allein die AnnouncementBar).
+  // "menschlich geprüft" ist durch das Owner-Release-Gate wahr. Wird in Hero.tsx
+  // als nicht-klickbares <span>-Badge gerendert (kein Link, kein Hover-Pfeil).
+  pill: "KI-Spürnase + menschlich geprüft · 80+ WCAG-Kriterien",
   // Fox-Headline (Design "BFSG-Fuchs"): "Schlau wie ein Fuchs — bereit fürs BFSG?"
   // Nur das Akzentwort "BFSG" leuchtet im Orange-Verlauf (headlineEmph); der Rest
   // bleibt creme (headlineLead). "bereit fürs BFSG?" ist eine Bereitschafts-FRAGE,
@@ -73,7 +79,7 @@ export const HERO = {
   // Hero.tsx rendert das Tail-Span nur, wenn der String nicht leer ist.
   headlineTail: "",
   subline:
-    "Der BFSG-Fuchs schnüffelt in 60 Sekunden über 80 WCAG-2.1-AA-Regeln durch und legt jeden Mangel priorisiert offen — mit Copy-Paste-Fix und menschlicher Sichtung. Premium-Audit ohne Kanzlei-Honorar.",
+    "In 60 Sekunden zeigt der BFSG-Fuchs, wo Ihre Website die WCAG 2.1 AA verfehlt — jeder Mangel priorisiert, mit Copy-Paste-Fix. Premium-Audit ohne Kanzlei-Honorar.",
   cta: "Kostenlos prüfen",
   // Aktionsspezifisches Label am Scan-Feld (Design: "Gratis-Check starten") —
   // verb-getrieben auf die Mikro-Conversion gemünzt; cta bleibt für Header/Final-CTA.
@@ -136,7 +142,7 @@ export const HERO_VISUAL = {
   // Vorschau-Überschrift über dem Report-Visual. previewAccent = das eine
   // Fraunces-Italic-Akzentwort (Editorial-Rhythmus); Hero.tsx splittet die
   // Überschrift an diesem Wort und setzt es kursiv-gradient.
-  previewHeading: "So sieht Ihr kostenloses Sofort-Ergebnis aus",
+  previewHeading: "So sieht Ihr Sofort-Ergebnis aus",
   previewAccent: "Sofort-Ergebnis",
   score: 62,
   grade: "C",
@@ -253,6 +259,8 @@ export const PACKAGES: PackageConfig[] = [
     amountCents: 39900,
     featured: true,
     moneyBack: "Sichere Zahlung über Stripe · Rechnung sofort per E-Mail",
+    // 399 € / 25 Unterseiten = 15,96 € → gerundet ~16 €/Seite (Mengen-Anker).
+    anchorNote: "25 Unterseiten — rund 16 €/Seite",
     features: [
       "Alles aus dem Basis-Report",
       "Bis zu 25 Unterseiten statt 5 (5× Abdeckung)",

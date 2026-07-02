@@ -4,14 +4,14 @@ import * as motion from "motion/react-client";
 import { ArrowRightIcon, CheckCircle2Icon } from "lucide-react";
 
 import { HERO, HERO_VISUAL } from "@/lib/config";
+import { EASE } from "@/lib/motion";
 
 import { HeroVisual } from "./HeroVisual";
 import { ScanForm } from "./ScanForm";
 
-const EASE = [0.22, 1, 0.36, 1] as const;
-
 export function Hero() {
-  // Vorschau-Überschrift am Akzentwort splitten → genau EIN Fraunces-Italic-Wort.
+  // Vorschau-Überschrift am Akzentwort splitten → genau EIN Fraunces-Italic-Wort
+  // (echter Fraunces-Kursiv-Schnitt via --font-display-italic, s. layout.tsx).
   // indexOf-Guard: fehlt das Akzentwort mal (künftige Config-Edits), wird die
   // Überschrift ungesplittet ohne Italic gerendert statt das Wort doppelt zu zeigen.
   const pvIdx = HERO_VISUAL.previewHeading.indexOf(HERO_VISUAL.previewAccent);
@@ -49,12 +49,9 @@ export function Hero() {
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-[-30%] -z-10 size-[80vw] max-w-5xl -translate-x-1/2 rounded-full bg-brand-orange/10 blur-[70px] animate-aurora"
       />
-      {/* Zweiter Glow nur ab md+: zwei gestapelte Großradius-Blur-Layer hinter
-          dem LCP-Element sind auf Mobile ein teurer GPU-Blur-Pass. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute right-[-10%] top-[-10%] -z-10 hidden size-[45vw] rounded-full bg-brand-violet/15 blur-[70px] animate-float-slow md:block"
-      />
+      {/* Ambient-Reduktion: der zweite (Violett-)Blob entfaellt — der primaere
+          Orange-Aurora reicht als Marken-Wash und spart einen teuren GPU-Blur-Pass
+          hinter dem LCP-Element (v.a. Mobile). */}
 
       <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-5 pt-14 pb-20 sm:px-6 sm:pt-20 sm:pb-28 lg:grid-cols-2 lg:gap-12">
         {/* Linke Spalte: Text + Scan-Form. Mobile zentriert (eigenstaendige Saeule),
@@ -69,13 +66,11 @@ export function Hero() {
             transition={{ duration: 0.5, ease: EASE }}
             className="inline-flex"
           >
-            {/* Fox-Design: Pill ist die Marken-Akzent-Fläche (orange). Dot +
-                Flag-Wort in brand-orange, Hover-Kante orange. Mint bleibt der
-                Action-/CTA-Farbe vorbehalten. */}
-            <a
-              href="#risiko"
-              className="group/pill inline-flex items-center gap-2 rounded-full border border-brand-orange/26 bg-brand-orange/[0.09] px-3 py-1.5 font-mono text-xs font-medium tracking-[0.01em] text-foreground/80 shadow-card-soft backdrop-blur transition-all hover:border-brand-orange/55 hover:text-foreground"
-            >
+            {/* Fox-Design: Pill ist die Marken-Akzent-Fläche (orange). Produktwert-
+                Badge, NICHT die Frist — daher bewusst nicht-klickbar (<span>, kein
+                href, kein Hover-Pfeil), damit es nicht als Link/CTA missverstanden
+                wird. Dot + Flag-Wort in brand-orange. Mint bleibt Action/CTA. */}
+            <span className="inline-flex items-center gap-2 rounded-full border border-brand-orange/26 bg-brand-orange/[0.09] px-3 py-1.5 font-mono text-xs font-medium tracking-[0.01em] text-foreground/80 shadow-card-soft backdrop-blur">
               <span
                 aria-hidden
                 className="inline-flex size-1.5 rounded-full bg-brand-orange animate-pulse-soft"
@@ -84,11 +79,11 @@ export function Hero() {
                 {HERO.pillFlag}
               </span>
               <span>{HERO.pill}</span>
-              <ArrowRightIcon className="size-3 -translate-x-0.5 opacity-0 transition-all group-hover/pill:translate-x-0 group-hover/pill:opacity-100" />
-            </a>
+            </span>
           </motion.div>
 
-          {/* Editorial-Headline: Fraunces-Serif, betontes Wort als Serif-Italic.
+          {/* Editorial-Headline: Fredoka-Display; das Akzentwort „BFSG" leuchtet
+              upright im Orange-Verlauf (gradient-text, kein Italic hier).
               Bewusst OHNE Entrance-Animation: die H1 ist das LCP-Element — ein
               opacity:0-Start würde den Largest Contentful Paint künstlich um die
               Animationsdauer verzögern (relevant für paid-Ads-Quality-Score). */}

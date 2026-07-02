@@ -8,6 +8,7 @@ import { ArrowRightIcon, ShieldCheckIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { DEADLINE, HERO } from "@/lib/config";
+import { EASE } from "@/lib/motion";
 
 // Verstrichene Tage seit dem BFSG-Stichtag (faktische Angabe, keine Drohung).
 // Hydration-sicher: Start ohne Wert, Berechnung erst clientseitig (gleiche Logik
@@ -40,16 +41,18 @@ export function CtaSection() {
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.6, ease: EASE }}
           // Warmes Orange-Gradient-Panel (Design: #2a1408 → #16110e). Token-
           // getrieben via color-mix aus brand-orange über brand-deeper (kein
           // roher Hex), feine Orange-Kante.
           className="relative grid items-center gap-8 overflow-hidden rounded-[1.5rem] border border-brand-orange/25 bg-[linear-gradient(135deg,color-mix(in_oklab,var(--brand-orange)_18%,var(--brand-deeper)),var(--brand-deeper)_70%)] px-6 py-14 shadow-elevated sm:px-12 sm:py-20 lg:grid-cols-[1.45fr_0.8fr]"
         >
-          {/* Orange-Glow oben + Dot-Grid mit radialer Maske (Design). */}
+          {/* Orange-Glow oben + Dot-Grid mit radialer Maske (Design). Ambient-
+              Reduktion: statisch (kein animate-float) und kleiner — das war das
+              teuerste Ambient-Element (34rem @ 60px-Blur, dauerhaft animiert). */}
           <div
             aria-hidden
-            className="pointer-events-none absolute -top-24 left-[30%] size-[34rem] -translate-x-1/2 rounded-full bg-brand-orange/20 blur-[60px] animate-float"
+            className="pointer-events-none absolute -top-24 left-[30%] size-[24rem] -translate-x-1/2 rounded-full bg-brand-orange/20 blur-[60px]"
           />
           <div
             aria-hidden
@@ -58,7 +61,7 @@ export function CtaSection() {
 
           <div className="relative z-10 text-center lg:text-left">
             {/* Orange Mono-Kicker (kein Pill — Design: nackte Marken-Linie). */}
-            <p className="font-mono text-xs tracking-[0.12em] text-[#ffb07a] uppercase">
+            <p className="font-mono text-xs tracking-[0.12em] text-brand-orange-soft uppercase">
               60 Sekunden bis zur ersten Fährte
             </p>
 
@@ -78,7 +81,7 @@ export function CtaSection() {
             {/* Amber Urgency-Pill mit verstrichenen Tagen (rose Puls-Punkt). Pill-
                 TEXT light-mode-AA: dunkles Burnt-Amber auf hell, helles Amber im
                 Dark. Punkt/Rahmen bleiben dekorativ (brand-amber/brand-rose). */}
-            <p className="mt-7 inline-flex items-center gap-2.5 rounded-full border border-brand-amber/25 bg-brand-amber/10 px-4 py-1.5 text-[13px] text-[#f5b13d]">
+            <p className="mt-7 inline-flex items-center gap-2.5 rounded-full border border-brand-amber/25 bg-brand-amber/10 px-4 py-1.5 text-[13px] text-brand-amber">
               <span
                 aria-hidden
                 className="inline-flex size-1.5 rounded-full bg-brand-rose shadow-[0_0_8px_var(--brand-rose)] animate-pulse-soft"

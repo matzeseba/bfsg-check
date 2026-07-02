@@ -5,10 +5,9 @@ import Image from "next/image";
 import { GaugeIcon, MicroscopeIcon, SparklesIcon, WalletIcon } from "lucide-react";
 
 import { DIFFERENTIATORS } from "@/lib/config";
+import { EASE } from "@/lib/motion";
 
 import { SectionKicker } from "./SectionKicker";
-
-const EASE = [0.22, 1, 0.36, 1] as const;
 
 // Pro Differentiator ein Icon (schneller/tiefer/guenstiger).
 const ICONS = [GaugeIcon, MicroscopeIcon, WalletIcon] as const;

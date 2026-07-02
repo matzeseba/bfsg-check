@@ -3,10 +3,9 @@
 import * as motion from "motion/react-client";
 
 import { STATS } from "@/lib/config";
+import { EASE } from "@/lib/motion";
 
 import { CountUp } from "./CountUp";
-
-const EASE = [0.22, 1, 0.36, 1] as const;
 
 // Pro Box eine eigene Akzentfarbe (Design Z.210/215/220/225): die Leitkennzahl
 // orange, "DSGVO" mint (Erfolgs-Grün BLEIBT), "DE" amber, "60 Sek." creme.
