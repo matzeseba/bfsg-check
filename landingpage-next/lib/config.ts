@@ -6,7 +6,8 @@ export type PackageId =
   | "profi"
   | "cookie-basis"
   | "cookie-profi"
-  | "abo";
+  | "abo"
+  | "abo-jahr";
 
 export type PackageConfig = {
   id: PackageId;
@@ -26,6 +27,16 @@ export type PackageConfig = {
   // Optionaler Mengen-Anker unter dem Preis (z.B. "25 Unterseiten — rund 16 €/Seite").
   // Rahmt den Pauschalpreis als Preis-pro-Einheit. Rein optisch, keine Kauf-Logik.
   anchorNote?: string;
+  // Jahresoption (nur Abo): FESTE Config-Werte — Anzeige-Preise werden NIE aus dem
+  // Monatspreis berechnet (Quelle der Wahrheit: scanner/app.js 'abo-jahr').
+  // annualId = Backend-Paket-Id, die der Checkout bei Jahres-Auswahl sendet.
+  annualId?: PackageId;
+  annualAmountCents?: number;
+  annualPrice?: string;
+  annualMoneyBack?: string;
+  // Feature-Liste der Jahres-Ansicht (ersetzt z.B. "Jederzeit kündbar", das beim
+  // Jahres-Abo mit 12 Monaten Erstlaufzeit irreführend wäre).
+  annualFeatures?: string[];
 };
 
 // HINWEIS Domain/Rebrand (Cutover 29.06.2026): Marke + Primär-Domain = "bfsg-fuchs.de".
@@ -278,6 +289,19 @@ export const PACKAGES: PackageConfig[] = [
     amountCents: 2499,
     available: true, // Abo live (Server ENABLE_ABO=true). Bei Backend-Deaktivierung wieder false setzen.
     moneyBack: "Jederzeit zum Monatsende kündbar",
+    // Jahresoption 249 €/Jahr (Backend-Paket 'abo-jahr', Exp. 4): gleiche Leistung,
+    // jährliche Zahlung. 12 × 24,99 € = 299,88 € → Ersparnis 50,88 € (Anzeige wird in
+    // PricingCards aus den beiden Cent-Werten de-DE-formatiert, nie frei erfunden).
+    annualId: "abo-jahr",
+    annualAmountCents: 24900,
+    annualPrice: "249 €",
+    annualMoneyBack: "Erstlaufzeit 12 Monate, danach mit Frist von 1 Monat kündbar",
+    annualFeatures: [
+      "Monatlicher Re-Check",
+      "Alarm bei neuen Mängeln",
+      "Aktualisierte Erklärung",
+      "Nach 12 Monaten Erstlaufzeit monatlich kündbar",
+    ],
     features: [
       "Monatlicher Re-Check",
       "Alarm bei neuen Mängeln",
@@ -286,6 +310,28 @@ export const PACKAGES: PackageConfig[] = [
     ],
   },
 ];
+
+// Jahres-Abo als eigenständig auflösbares Checkout-Paket (pkg='abo-jahr' im Backend).
+// Bewusst NICHT in PACKAGES (die Pricing-Karte zeigt es über den Jahres-Toggle),
+// aber im CheckoutModal wählbar/auflösbar. Preisfelder = annual*-Werte des Abo-Eintrags.
+export const ABO_ANNUAL: PackageConfig = {
+  id: "abo-jahr",
+  name: "Fuchs Re-Check Abo (jährlich)",
+  tag: "Abo · Jahr",
+  price: "249 €",
+  priceSuffix: "/Jahr",
+  description: "Dauerhafte Überwachung — jährliche Zahlung",
+  mode: "subscription",
+  amountCents: 24900,
+  available: true, // wie 'abo' ans Server-Flag ENABLE_ABO gekoppelt
+  moneyBack: "Erstlaufzeit 12 Monate, danach mit Frist von 1 Monat kündbar",
+  features: [
+    "Monatlicher Re-Check",
+    "Alarm bei neuen Mängeln",
+    "Aktualisierte Erklärung",
+    "Nach 12 Monaten Erstlaufzeit monatlich kündbar",
+  ],
+};
 
 export const COOKIE_PACKAGES: PackageConfig[] = [
   {
@@ -462,7 +508,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: "Wie kündige ich das Re-Check-Abo?",
-    a: "Das Abo ist jederzeit zum Monatsende ohne Angabe von Gründen kündbar. Eine formlose E-Mail oder das Formular auf der Seite /kündigen genügt. Die Kündigung bestätigen wir per E-Mail.",
+    a: "Das Monats-Abo ist jederzeit zum Monatsende ohne Angabe von Gründen kündbar. Das Jahres-Abo (249 €/Jahr) hat eine Erstlaufzeit von 12 Monaten und ist danach jederzeit mit einer Frist von einem Monat kündbar. Eine formlose E-Mail oder das Formular auf der Seite /kündigen genügt. Die Kündigung bestätigen wir per E-Mail.",
   },
   {
     q: "Was passiert mit meinen Daten?",

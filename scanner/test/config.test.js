@@ -68,9 +68,21 @@ test('PKG_CONFIG (PR3): tiefere maxPages, hart auf ≤ 50 gedeckelt', () => {
 });
 
 test('PKG_CONFIG (PR3): bezahlte BFSG-Pakete tragen Tiefen-Parameter', () => {
-  for (const name of ['basis', 'profi', 'abo']) {
+  for (const name of ['basis', 'profi', 'abo', 'abo-jahr']) {
     const cfg = PKG_CONFIG[name];
     assert.equal(cfg.settleMs, 12000, `${name}: settleMs`);
     assert.equal(cfg.perPageTimeout, 45000, `${name}: perPageTimeout`);
   }
+});
+
+// --- W1-G: Abo-Jahresoption ---------------------------------------------------
+test("PKG_CONFIG 'abo-jahr': exakt dieselbe Leistung wie 'abo' (kein basis-Fallback)", () => {
+  const y = PKG_CONFIG['abo-jahr'];
+  assert.ok(y, "'abo-jahr' fehlt in PKG_CONFIG — Jahres-Abo-Kunden bekämen den basis-Report");
+  // Kritische Einzel-Asserts (sprechende Fehlermeldung bei Drift)…
+  assert.equal(y.emailKind, 'recheck', 'abo-jahr: emailKind muss recheck sein');
+  assert.equal(y.maxPages, 25, 'abo-jahr: maxPages muss 25 sein');
+  assert.equal(y.withStatement, true, 'abo-jahr: withStatement muss true sein');
+  // …plus Voll-Vergleich: Jahres-Abo darf sich in KEINEM Feld vom Monats-Abo unterscheiden.
+  assert.deepEqual(y, PKG_CONFIG.abo, "'abo-jahr' muss identisch zu 'abo' konfiguriert sein");
 });

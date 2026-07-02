@@ -53,7 +53,7 @@ scripts/          PDF-Generator + Helper-Scripts
 - **Basis** 129 € (einmalig, Auto-Scan + PDF-Report)
 - **Profi** 399 € (einmalig, Multi-Page + Umsetzungsplan + 30 Tage Support)
 - **Cookie-Basis** 39 € · **Cookie-Profi** 69 €
-- **Re-Check-Abo** 24,99 €/Monat (`ENABLE_ABO=true`, Re-Check-Abo live)
+- **Re-Check-Abo** 24,99 €/Monat oder 249 €/Jahr (`ENABLE_ABO=true`; Jahresoption = Backend-Paket `abo-jahr`)
 
 ---
 

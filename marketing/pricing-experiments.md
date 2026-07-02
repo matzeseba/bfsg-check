@@ -78,9 +78,11 @@
 
 ---
 
-## Experiment 4 — Abo: 24,99 €/Mo vs. 24,99 €/Mo + Jahresoption 249 €/Jahr ⭐ PRIO 1
+## Experiment 4 — Abo: 24,99 €/Mo vs. 24,99 €/Mo + Jahresoption 249 €/Jahr ⭐ PRIO 1 · **IN UMSETZUNG**
 
 > **Angepasst (07/2026):** Live-Monatspreis ist bereits 24,99 € (Senkung 27.06.). Der Hebel ist jetzt nicht mehr die Monatspreis-Senkung, sondern die **Jahresoption** (Cashflow + LTV-Lock-in, „Audit + 12 Monate Überwachung"-Framing aus dem 02.07.-Audit).
+>
+> **Status IN UMSETZUNG (03.07.2026, W1-G):** Variante B ist technisch gebaut — Backend-Paket `'abo-jahr'` (249 €/Jahr, inline `price_data`, `interval:'year'`), Jahres-Toggle in `PricingCards.tsx`, AGB § 5 (Erstlaufzeit 12 Monate, § 309 Nr. 9 BGB), monatlicher Re-Check-Ticker fürs Jahres-Abo. Ersparnis-Auslobung „spart 50,88 €" (aus den festen Preisen abgeleitet, PAngV-transparent). Posthog-Flag/A-B-Split noch NICHT verdrahtet — aktuell sehen alle Besucher die Jahresoption (de facto Variante B für 100 %).
 
 - **Hypothese:** „Eine Jahresoption 249 €/Jahr (≈ 2 Monate gratis) erhöht Cashflow + LTV, erreicht ≥ 20 % Jahresplan-Anteil und senkt die Report→Abo-Überführungsrate nicht."
 - **Variante A (Kontrolle):** 24,99 €/Mo, keine Jahresoption.

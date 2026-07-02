@@ -272,7 +272,8 @@ function pkgDescription(pkg) {
     profi: 'BFSG-Report Profi — Multi-Page-Crawl + Umsetzungsplan + 30 Tage Rückfrage-Support',
     'cookie-basis': 'Cookie-Check Basis — Tracker-Audit gemäß § 25 TDDDG',
     'cookie-profi': 'Cookie-Check Profi — Tracker-Audit + manuelle CMP-Sichtung',
-    abo: 'BFSG Re-Check Abo — monatliche Überprüfung mit Diff-Report'
+    abo: 'BFSG Re-Check Abo — monatliche Überprüfung mit Diff-Report',
+    'abo-jahr': 'BFSG Re-Check Abo (jährlich) — monatliche Überprüfung mit Diff-Report, jährliche Abrechnung'
   };
   return map[pkg] || `BFSG-Check Leistung (${pkg})`;
 }

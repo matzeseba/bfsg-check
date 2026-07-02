@@ -36,7 +36,8 @@ import { assertPublicHttpUrl } from './lib/url-guard.js';
 import { rateLimit, concurrencyGate } from './lib/limits.js';
 import { claimEvent, releaseEvent, recordPaid, markStatus } from './lib/orders.js';
 import {
-  recordSubscription, saveSnapshot, getSubscription, markCancelled, markSubscriptionStatus
+  recordSubscription, saveSnapshot, getSubscription, markCancelled, markSubscriptionStatus,
+  listSubscriptions
 } from './lib/subscriptions.js';
 import logger, { httpLog } from './lib/logger.js';
 import sentry from './lib/sentry.js';
@@ -69,7 +70,13 @@ const isMain = !!process.argv[1] && import.meta.url === pathToFileURL(process.ar
 // überschreibt einzelne Funktionen, um Webhook-/Resend-Handler ohne echten Browser,
 // SMTP oder PDF gegen die ECHTE Express-App zu testen. Aufrufer lesen services.X zur
 // Laufzeit (kein Capture beim Modul-Laden), daher wirkt eine Test-Überschreibung sofort.
-export const services = { fulfillOrder, sendReportFor, generateInvoicePdf, sendOwnerReview, sendOrderReceived, sendLeadTeaser, reportQueue };
+// createCheckoutSession gehört mit in die Naht: so testet test/checkout.api.test.js die
+// echte /api/checkout-Route (Paket-/Consent-Validierung, price_data, interval) ohne
+// Netz-Call zu Stripe.
+export const services = {
+  fulfillOrder, sendReportFor, generateInvoicePdf, sendOwnerReview, sendOrderReceived, sendLeadTeaser, reportQueue,
+  createCheckoutSession: (params) => stripe.checkout.sessions.create(params)
+};
 
 // Gebündelte Abhängigkeiten für den Release-Scheduler + den /api/release-Endpoint.
 // Beide Wege (Auto-Release bei Ablauf, Owner-Klick) laufen durch dieselbe releaseJob-
@@ -183,7 +190,12 @@ const PACKAGES = {
   'cookie-basis': { name: 'Cookie-Check (§25 TDDDG)',  amount:  3900, mode: 'payment' },
   'cookie-profi': { name: 'Cookie-Check Profi',        amount:  6900, mode: 'payment' },
   ...(ENABLE_ABO
-    ? { abo: { name: 'BFSG Re-Check Abo', amount: 2499, mode: 'subscription', interval: 'month' } }
+    ? {
+        abo: { name: 'BFSG Re-Check Abo', amount: 2499, mode: 'subscription', interval: 'month' },
+        // Jahresoption (Owner-Entscheidung 249 €/Jahr, Exp. 4): gleiche Leistung wie 'abo',
+        // nur jährliche Abrechnung. inline price_data → keine Stripe-Dashboard-Aktion nötig.
+        'abo-jahr': { name: 'BFSG Re-Check Abo (jährlich)', amount: 24900, mode: 'subscription', interval: 'year' }
+      }
     : {})
 };
 
@@ -505,45 +517,16 @@ async function handleInvoicePaid(event) {
   }
 
   try {
-    await assertPublicHttpUrl(sub.url);
-    const order = await paidScanGate(() =>
-      services.fulfillOrder({
-        url: sub.url, company: sub.company || '', email: sub.email,
-        pkg: sub.pkg || 'abo',
-        prevSnapshot: sub.lastSnapshot || null
+    await runSubscriptionRecheck(sub, {
+      // Queue-Key = Invoice-ID (pro Zyklus eindeutig; Abo-Zyklen liegen nicht in orders.js).
+      cycleKey: inv.id || `${sub.subscriptionId}-${Date.now()}`,
+      // Zyklus-Rechnung fürs Abo (§ 14 UStG) — Betrag aus der Stripe-Invoice. Läuft NACH
+      // erfolgreichem Scan (wie zuvor: kein Rechnungs-/Nummernverbrauch bei Scan-Fehler).
+      makeInvoice: () => safeGenerateInvoice({
+        orderId: inv.id || sub.subscriptionId, email: sub.email, company: sub.company || '',
+        pkg: sub.pkg || 'abo', amount: inv.amount_paid ?? inv.total ?? 0
       })
-    );
-    // Monatsrechnung fürs Abo (§ 14 UStG) — Betrag aus der Stripe-Invoice.
-    const cycleAmount = inv.amount_paid ?? inv.total ?? 0;
-    const invoice = await safeGenerateInvoice({ orderId: inv.id || sub.subscriptionId, email: sub.email, company: sub.company || '', pkg: sub.pkg || 'abo', amount: cycleAmount });
-    // Snapshot SOFORT sichern (unabhängig vom Auslieferungszeitpunkt): er ist die
-    // Diff-Basis für den nächsten Monats-Re-Check und darf nicht am Release-Fenster hängen.
-    await saveSnapshot(sub.subscriptionId, order.snapshot);
-
-    // PR5: Auch der Abo-Re-Check läuft durch das Owner-Release-Gate („jeder Report").
-    // Queue-Key = Invoice-ID (pro Zyklus eindeutig; Abo-Zyklen liegen nicht in orders.js).
-    const cycleKey = inv.id || `${sub.subscriptionId}-${Date.now()}`;
-    if (RELEASE_GATE_ENABLED) {
-      await enqueueForRelease({
-        sessionId: cycleKey, to: sub.email, company: sub.company || '', url: sub.url, pkg: sub.pkg || 'abo',
-        order, invoice, emailKind: 'recheck', sendReceipt: false
-      });
-      logger.info({ subscriptionId: sub.subscriptionId, cycleKey, releaseInMin: RELEASE_DELAY_MIN }, 'Re-Check zur Owner-Freigabe eingequeut');
-      return;
-    }
-
-    await services.sendReportFor({
-      to: sub.email, company: sub.company || '',
-      pdfPath: order.pdfPath,
-      // Aktualisierte Erklärung zur Barrierefreiheit pro Monats-Re-Check mitsenden
-      // (Owner-Anforderung; abo.withStatement ist jetzt true → order.stmtPath gesetzt).
-      stmtPath: order.stmtPath,
-      emailKind: 'recheck',
-      diffText: diffSummaryText(order.diff),
-      invoicePdfPath: invoice?.pdfPath || null,
-      invoiceNumber: invoice?.invoiceNumber || null
     });
-    logger.info({ subscriptionId: sub.subscriptionId, invoiceNumber: invoice?.invoiceNumber || null }, 'Re-Check ausgeliefert');
   } catch (err) {
     await sendAlert(
       `Re-Check fehlgeschlagen: ${sub.email}`,
@@ -558,6 +541,101 @@ async function handleInvoicePaid(event) {
     sentry.captureException(err, { webhook_event: 'invoice.paid', subscription_id: sub.subscriptionId });
     logger.error({ subscriptionId: sub.subscriptionId, err: err.message }, 'RE-CHECK FEHLGESCHLAGEN');
   }
+}
+
+// Gemeinsamer Re-Check-Kern für BEIDE Auslöser: invoice.paid (Monats-Abo: monatlich;
+// Jahres-Abo: die eine Jahresrechnung) und den Jahres-Abo-Ticker (siehe unten).
+// makeInvoice ist optional — der Ticker erzeugt KEINE Rechnung (es gibt keine Zahlung
+// im Zwischenmonat; die Jahresrechnung entsteht beim invoice.paid der Jahreszahlung).
+async function runSubscriptionRecheck(sub, { cycleKey, makeInvoice = null }) {
+  await assertPublicHttpUrl(sub.url);
+  const order = await paidScanGate(() =>
+    services.fulfillOrder({
+      url: sub.url, company: sub.company || '', email: sub.email,
+      pkg: sub.pkg || 'abo',
+      prevSnapshot: sub.lastSnapshot || null
+    })
+  );
+  const invoice = makeInvoice ? await makeInvoice() : null;
+  // Snapshot SOFORT sichern (unabhängig vom Auslieferungszeitpunkt): er ist die
+  // Diff-Basis für den nächsten Monats-Re-Check und darf nicht am Release-Fenster hängen.
+  await saveSnapshot(sub.subscriptionId, order.snapshot);
+
+  // PR5: Auch der Abo-Re-Check läuft durch das Owner-Release-Gate („jeder Report").
+  if (RELEASE_GATE_ENABLED) {
+    await enqueueForRelease({
+      sessionId: cycleKey, to: sub.email, company: sub.company || '', url: sub.url, pkg: sub.pkg || 'abo',
+      order, invoice, emailKind: 'recheck', sendReceipt: false
+    });
+    logger.info({ subscriptionId: sub.subscriptionId, cycleKey, releaseInMin: RELEASE_DELAY_MIN }, 'Re-Check zur Owner-Freigabe eingequeut');
+    return;
+  }
+
+  await services.sendReportFor({
+    to: sub.email, company: sub.company || '',
+    pdfPath: order.pdfPath,
+    // Aktualisierte Erklärung zur Barrierefreiheit pro Monats-Re-Check mitsenden
+    // (Owner-Anforderung; abo.withStatement ist jetzt true → order.stmtPath gesetzt).
+    stmtPath: order.stmtPath,
+    emailKind: 'recheck',
+    diffText: diffSummaryText(order.diff),
+    invoicePdfPath: invoice?.pdfPath || null,
+    invoiceNumber: invoice?.invoiceNumber || null
+  });
+  logger.info({ subscriptionId: sub.subscriptionId, invoiceNumber: invoice?.invoiceNumber || null }, 'Re-Check ausgeliefert');
+}
+
+// --- Jahres-Abo-Ticker ('abo-jahr') ------------------------------------------------
+// Stripe stellt bei interval:'year' nur EINE Rechnung pro Jahr → invoice.paid
+// (subscription_cycle) feuert jährlich. Verkaufter Leistungsinhalt ist aber der
+// MONATLICHE Re-Check (identisch zum Monats-Abo). Diesen Takt liefert der Ticker:
+// er stößt für aktive Jahres-Abos denselben Re-Check-Kern an, sobald der letzte
+// Scan ≥ 30 Tage zurückliegt. Der bezahlte invoice.paid-Scan aktualisiert lastScanAt
+// mit — im Verlängerungsmonat gibt es dadurch keinen Doppel-Scan.
+const ANNUAL_RECHECK_DUE_MS = 30 * 24 * 3600_000;
+const ANNUAL_RECHECK_TICK_MS = Math.max(60_000, Number(process.env.ANNUAL_RECHECK_TICK_MS) || 6 * 3600_000);
+// Fehlversuche frühestens nach 20 h wiederholen (sonst alarmiert jeder 6-h-Tick erneut).
+const ANNUAL_RECHECK_RETRY_MS = 20 * 3600_000;
+const annualAttemptAt = new Map(); // subscriptionId -> letzter Versuch (in-flight-Guard + Retry-Bremse)
+
+// Pure Fälligkeits-Logik, exportiert für den Unit-Test (test/config.test.js).
+export function annualRecheckDue(sub, now = Date.now()) {
+  if (!sub || sub.status !== 'ACTIVE' || sub.pkg !== 'abo-jahr') return false;
+  const last = Date.parse(sub.lastScanAt || sub.createdAt || '');
+  if (Number.isNaN(last)) return true; // kein Zeitstempel → lieber prüfen als still auslassen
+  return now - last >= ANNUAL_RECHECK_DUE_MS;
+}
+
+function startAnnualRecheckTicker() {
+  const tick = async () => {
+    try {
+      const active = await listSubscriptions({ status: 'ACTIVE' });
+      for (const sub of active) {
+        if (!annualRecheckDue(sub)) continue;
+        const lastTry = annualAttemptAt.get(sub.subscriptionId) || 0;
+        if (Date.now() - lastTry < ANNUAL_RECHECK_RETRY_MS) continue;
+        annualAttemptAt.set(sub.subscriptionId, Date.now());
+        try {
+          // Queue-Key pro Kalendermonat → idempotent gegen Doppel-Ticks nach Neustart.
+          const monthKey = new Date().toISOString().slice(0, 7);
+          await runSubscriptionRecheck(sub, { cycleKey: `${sub.subscriptionId}-m-${monthKey}` });
+        } catch (err) {
+          await sendAlert(
+            `Jahres-Abo-Re-Check fehlgeschlagen: ${sub.email}`,
+            `Subscription: ${sub.subscriptionId}\nURL: ${sub.url}\nFehler: ${err.message}\n\nNächster automatischer Versuch in ~20 h.`
+          );
+          sentry.captureException(err, { stage: 'annualRecheck', subscription_id: sub.subscriptionId });
+          logger.error({ subscriptionId: sub.subscriptionId, err: err.message }, 'JAHRES-ABO-RE-CHECK FEHLGESCHLAGEN');
+        }
+      }
+    } catch (err) {
+      logger.error({ err: err.message }, 'Jahres-Abo-Ticker Fehler');
+    }
+  };
+  tick(); // Start-Tick fängt nach Redeploy überfällige Re-Checks sofort
+  const handle = setInterval(tick, ANNUAL_RECHECK_TICK_MS);
+  handle.unref?.();
+  return handle;
 }
 
 // Zahlungsausfall-Resilienz: Stripe meldet Status-Wechsel (active -> past_due ->
@@ -706,7 +784,7 @@ app.post('/api/checkout', rateLimit({ windowMs: 60_000, max: 10 }), async (req, 
     const subscription_data = p.mode === 'subscription'
       ? { metadata: { url: safe.url, pkg, company: baseMeta.company, email: cleanEmail || '' } }
       : undefined;
-    const session = await stripe.checkout.sessions.create({
+    const session = await services.createCheckoutSession({
       mode: p.mode,
       line_items: [
         { price_data: { currency: 'eur', product_data: { name: p.name }, unit_amount: p.amount, ...recurring }, quantity: 1 }
@@ -1321,6 +1399,12 @@ if (isMain) {
       recoverInDoubt(releaseDeps('auto'));
       startScheduler(releaseDeps('auto'));
       logger.info({ delayMin: RELEASE_DELAY_MIN, tokenReady: releaseTokenConfigured() }, 'Owner-Release-Gate aktiv');
+    }
+    // Jahres-Abo ('abo-jahr'): monatlicher Re-Check unabhängig vom jährlichen
+    // Stripe-Billing-Zyklus (siehe startAnnualRecheckTicker).
+    if (ENABLE_ABO) {
+      startAnnualRecheckTicker();
+      logger.info({ tickMs: ANNUAL_RECHECK_TICK_MS }, 'Jahres-Abo-Re-Check-Ticker aktiv');
     }
   });
   process.on('SIGTERM', () => server.close(() => process.exit(0)));

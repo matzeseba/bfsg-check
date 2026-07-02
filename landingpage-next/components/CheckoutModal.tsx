@@ -16,15 +16,21 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { PACKAGES, COOKIE_PACKAGES, type PackageId } from "@/lib/config";
+import {
+  PACKAGES,
+  COOKIE_PACKAGES,
+  ABO_ANNUAL,
+  type PackageId,
+} from "@/lib/config";
 import { useCheckout } from "@/lib/checkout-context";
 import { cn } from "@/lib/utils";
 
 type CustomerType = "consumer" | "business";
 
-// Reihenfolge im Selector: Hauptangebot zuerst, dann Cookie, dann Abo.
-// Abo zeigt "Bald verfuegbar" + ist disabled (Backend ENABLE_ABO=false).
-const ALL_PACKAGES = [...PACKAGES, ...COOKIE_PACKAGES];
+// Reihenfolge im Selector: Hauptangebot zuerst, dann Abo (Monat + Jahr), dann Cookie.
+// ABO_ANNUAL macht 'abo-jahr' hier auflösbar (packageFor) UND direkt im Modal wählbar
+// — z.B. wenn der Jahres-Toggle der Pricing-Karten den Checkout mit 'abo-jahr' öffnet.
+const ALL_PACKAGES = [...PACKAGES, ABO_ANNUAL, ...COOKIE_PACKAGES];
 
 function packageFor(id: PackageId | null) {
   return ALL_PACKAGES.find((p) => p.id === id) ?? null;
