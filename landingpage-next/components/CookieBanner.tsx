@@ -160,22 +160,22 @@ export function CookieBanner() {
       // "dialog", das Screenreadern eine Fokusführung verspricht, die es nicht gibt).
       role="region"
       aria-labelledby="cookie-banner-title"
-      // Fox-Theme: warme Card-Fläche, creme Hairline-Border, weicher Card-Schatten
-      // + dezenter Amber-Akzent oben (greift die Cookie-/Consent-Sektion auf, ohne
-      // eine der beiden Aktionen optisch zu bevorzugen). Tokens statt Hex.
-      className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-3xl overflow-hidden rounded-2xl border border-border-card bg-card/95 p-5 shadow-card-hover ring-1 ring-brand-amber/15 backdrop-blur-md before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-brand-amber/50 before:to-transparent"
+      // Dark-Glow: dunkles Glas-Panel mit Orange-Verlaufs-Rahmen (.glow-border,
+      // globals.css) — Optik-Akzent liegt am PANEL, nicht an einem der Buttons
+      // (§ 25 TDDDG: keine Aktion wird optisch bevorzugt). Tokens statt Hex.
+      className="glow-border fixed inset-x-4 bottom-4 z-50 mx-auto max-w-3xl rounded-2xl bg-card/95 p-5 shadow-card-hover backdrop-blur-md"
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-1 items-start gap-3.5">
-          {/* Marken-Fuchs-Wappen (rein dekorativ → alt="" + aria-hidden, der Titel
+          {/* Glow-Fuchskopf (rein dekorativ → alt="" + aria-hidden, der Titel
               trägt die Bedeutung). Kein Layout-Shift dank fixer width/height. */}
           <Image
-            src="/logo-fox.png"
+            src="/logo-fox-glow.png"
             alt=""
             aria-hidden="true"
-            width={24}
-            height={36}
-            className="mt-0.5 hidden h-9 w-auto shrink-0 select-none sm:block"
+            width={418}
+            height={512}
+            className="mt-0.5 hidden h-9 w-auto shrink-0 rounded-md select-none sm:block"
           />
           <div>
             <h2

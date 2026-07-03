@@ -10,6 +10,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
+import { Reveal } from "@/components/fx/Reveal";
 import { FAQ_ITEMS, SITE } from "@/lib/config";
 
 export function FAQAccordion() {
@@ -31,11 +32,12 @@ export function FAQAccordion() {
       className="relative overflow-hidden bg-background"
     >
       <div className="mx-auto max-w-2xl px-5 py-20 sm:px-6 sm:py-24">
-        <div className="flex flex-col items-center text-center">
-          {/* Grosse Fuchs-FAQ-Wortmarke (Design: 60px Schibsted-Display). */}
+        <Reveal className="flex flex-col items-center text-center">
+          {/* Grosse Fuchs-FAQ-Wortmarke (Design: 60px Schibsted-Display) mit
+              dezentem Orange-Text-Glow (Dark-Glow-Signatur, nur Akzent-Wortmarke). */}
           <h2
             id="faq-heading"
-            className="font-display text-5xl font-extrabold tracking-tight text-foreground sm:text-6xl"
+            className="font-display text-5xl font-extrabold tracking-tight text-foreground text-glow sm:text-6xl"
           >
             FAQ
           </h2>
@@ -52,9 +54,9 @@ export function FAQAccordion() {
               {SITE.email}
             </a>
           </p>
-        </div>
+        </Reveal>
 
-        <div className="mt-10 mb-3">
+        <Reveal index={1} className="mt-10 mb-3">
           <div className="relative">
             <SearchIcon
               aria-hidden
@@ -84,24 +86,22 @@ export function FAQAccordion() {
               {filtered.length} von {FAQ_ITEMS.length} Treffern
             </p>
           )}
-        </div>
+        </Reveal>
 
         {filtered.length === 0 ? (
           <p className="rounded-2xl border border-dashed border-border bg-card/40 px-6 py-12 text-center text-sm text-muted-foreground">
             Keine Treffer — schreiben Sie uns Ihre Frage einfach per E-Mail.
           </p>
         ) : (
-          // Fuchs-Design: einzelne abgesetzte Karten (kein durchgehender Block),
-          // ruhiger Abstand statt Divider.
+          // Dark-Glow: einzelne dunkle Karten (kein durchgehender Block); Hover
+          // und offener Zustand bekommen die Orange-Kante, offen zusaetzlich ein
+          // weiches Orange-Glimmen. base-ui setzt data-open am Item-Element.
           <Accordion className="grid gap-2.5">
             {filtered.map((item, idx) => (
               <AccordionItem
                 key={item.q}
                 value={`faq-${idx}`}
-                // Karte #171009 (bg-card); offener Item bekommt orange Rahmen
-                // (Design: q.borderColor → rgba(237,106,51,.3)). Geschlossen warme
-                // Creme-Kante. base-ui setzt data-open am Item-Element.
-                className="rounded-xl border border-border bg-card px-5 transition-colors duration-200 data-open:border-brand-orange/40 sm:px-6"
+                className="rounded-xl border border-border bg-card px-5 transition-[border-color,box-shadow] duration-200 hover:border-brand-orange/25 data-open:border-brand-orange/40 data-open:shadow-[0_14px_44px_-20px_color-mix(in_oklch,var(--brand-orange),transparent_35%)] sm:px-6"
               >
                 {/* Built-in Chevron der Trigger-Primitive ausblenden — wir nutzen
                     stattdessen das Design-"+"-Icon (rotiert zu ×). */}

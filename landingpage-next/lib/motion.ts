@@ -22,3 +22,19 @@ export const staggerItem = {
   hidden: { opacity: 0, y: 8 },
   show: { opacity: 1, y: 0 },
 } as const;
+
+// Dark-Glow-Redesign (04.07.2026): zwei zusaetzliche Reveal-Varianten fuer die
+// kinetische Sektions-Sprache. Gleiche EASE-Kurve, once:true — kein Re-Trigger.
+export const revealScale = (index = 0, duration = 0.55) => ({
+  initial: { opacity: 0, scale: 0.94 },
+  whileInView: { opacity: 1, scale: 1 },
+  viewport: { once: true, margin: "-60px" },
+  transition: { duration, delay: index * 0.08, ease: EASE },
+});
+
+export const revealSide = (from: "left" | "right", index = 0, duration = 0.55) => ({
+  initial: { opacity: 0, x: from === "left" ? -28 : 28 },
+  whileInView: { opacity: 1, x: 0 },
+  viewport: { once: true, margin: "-60px" },
+  transition: { duration, delay: index * 0.08, ease: EASE },
+});

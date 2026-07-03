@@ -15,6 +15,7 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { MagneticButton } from "@/components/fx/MagneticButton";
 import {
   PACKAGES,
   PLAN_FINDER,
@@ -130,14 +131,12 @@ export function PricingCards({
           transition={{ duration: 0.55, ease: EASE }}
           className="mx-auto flex max-w-2xl flex-col items-center text-center"
         >
-          {/* Kicker im Marken-Akzent. Orange-Theme: tone="on-light" rendert
-              Icon+Text in brand-indigo (auf die Orange-Familie remapped → orange
-              in BEIDEN Themes, ohne dark: auf Mint zu kippen). Amber-Theme
-              (Cookie): tone="warn" = Amber-Akzent. */}
+          {/* Kicker im Marken-Akzent: Standard-Glow-Pill (tone=default), im
+              Amber-Kontext (Cookie-Pflicht) die Warn-Variante. */}
           <SectionKicker
             icon={kickerIcon}
             label={kicker}
-            tone={accent === "amber" ? "warn" : "on-light"}
+            tone={accent === "amber" ? "warn" : "default"}
           />
           <h2
             id={`${id}-heading`}
@@ -165,8 +164,10 @@ export function PricingCards({
                 aria-pressed={!annual}
                 className={cn(
                   "inline-flex min-h-11 items-center rounded-full px-5 text-xs font-medium transition-colors",
+                  // Aktiver Zustand im Orange-Selected-State (Dark-Glow-Vorlagen);
+                  // #2b1206 auf #f4641e ist AA (~4.9:1).
                   !annual
-                    ? "bg-brand-deep text-on-deep"
+                    ? "bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:text-foreground",
                 )}
               >
@@ -179,7 +180,7 @@ export function PricingCards({
                 className={cn(
                   "inline-flex min-h-11 items-center gap-1.5 rounded-full px-5 text-xs font-medium transition-colors",
                   annual
-                    ? "bg-brand-deep text-on-deep"
+                    ? "bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:text-foreground",
                 )}
               >
@@ -278,9 +279,9 @@ function PlanFinder({ packages }: { packages: PackageConfig[] }) {
       : "Profi (25 Seiten) + Re-Check fürs laufende Monitoring";
 
   return (
-    // Plan-Finder-Panel im Marken-Orange (Design: orange-getoenter Verlauf +
-    // orange Hairline). bg via brand-orange/[0.06] auf der Card-Flaeche.
-    <div className="mx-auto mt-10 grid max-w-3xl gap-6 rounded-3xl border border-brand-orange/20 bg-gradient-to-br from-brand-orange/[0.08] to-card/70 p-6 shadow-card-soft backdrop-blur sm:grid-cols-[1.5fr_1fr] sm:items-center sm:gap-8 dark:ring-1 dark:ring-brand-orange/10">
+    // Plan-Finder-Panel als Glas-Card mit Orange-Glow-Rahmen (.glow-card =
+    // Standard-Kartensprache des Dark-Glow-Redesigns). Logik unveraendert.
+    <div className="glow-card mx-auto mt-10 grid max-w-3xl gap-6 rounded-3xl p-6 sm:grid-cols-[1.5fr_1fr] sm:items-center sm:gap-8">
       <div>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <label
@@ -322,14 +323,16 @@ function PlanFinder({ packages }: { packages: PackageConfig[] }) {
           {recName}
         </p>
         <p className="mt-0.5 text-xs text-muted-foreground">{recSub}</p>
-        <button
-          type="button"
-          onClick={() => openCheckout(recId)}
-          className="btn-cta mt-3 h-10 w-full text-sm"
-        >
-          {recName} wählen
-          <ArrowRightIcon className="size-4" />
-        </button>
+        <MagneticButton className="mt-3 w-full">
+          <button
+            type="button"
+            onClick={() => openCheckout(recId)}
+            className="btn-cta min-h-11 w-full text-sm"
+          >
+            {recName} wählen
+            <ArrowRightIcon className="size-4" />
+          </button>
+        </MagneticButton>
       </div>
     </div>
   );
@@ -370,39 +373,43 @@ function PricingCard({
       : null;
 
   // Marken-Akzent-Klassen pro Tone (rein optisch). Orange = Haupt-Pricing,
-  // Amber = Cookie. Die Featured-Action-CTA ist jetzt der orange 3D-.btn-cta
-  // (in BEIDEN Tones) — daher kein eigener cta-Eintrag mehr im A-Objekt.
+  // Amber = Cookie. Die Kartenflaeche ist jetzt einheitlich die .glow-card
+  // (Glas + Verlaufs-Rahmen) — der Tone steuert nur noch --glow-color, Tag-/
+  // Preis-Farbe, Puls-Ring und Badge. Haken sind IMMER Mint (Erfolgsfarbe).
   const isAmber = accent === "amber";
   const A = isAmber
     ? {
         tag: "text-brand-amber",
         price: "text-brand-amber",
-        border: "border-[1.5px] border-brand-amber/40",
-        gradient: "bg-gradient-to-b from-brand-amber/[0.08] to-card",
-        glow: "bg-brand-amber/20",
         ring: "border-brand-amber",
         pill: "bg-brand-amber text-brand-deep",
-        check: "bg-brand-amber/15 text-brand-amber",
+        glowColor: "var(--brand-amber)",
       }
     : {
         tag: "text-brand-orange",
         price: "text-brand-orange",
-        border: "border-[1.5px] border-brand-orange/40",
-        gradient: "bg-gradient-to-b from-brand-orange/10 to-card",
-        glow: "bg-brand-orange/20",
         ring: "border-brand-orange",
         // Empfohlen-Badge = Amber (Design Z.459: #ffb454) — dunkler Text darauf ist
-        // in BEIDEN Themes AA (orange-Fläche wäre im Light-Mode nur 3.7:1).
+        // AA-sicher (orange-Fläche wäre zu kontrastarm).
         pill: "bg-brand-amber text-brand-deep",
-        // Haken bleiben Mint (Erfolgsfarbe) auch in der Featured-Karte.
-        check: "bg-brand-mint/20 text-brand-mint",
+        glowColor: "var(--brand-orange)",
       };
 
   return (
     // Aeusserer Wrapper OHNE overflow-hidden, damit die "Empfohlen"-Pill + der
     // Warn-Puls-Ring oben/aussen ueberstehen duerfen. Die Card selbst clippt
     // (overflow-hidden) nur ihre dekorativen Inneren (Glow + Verlaufskante).
-    <div className="relative h-full">
+    // Featured-Karte steht leicht groesser/hoeher im Raster (Premium-Pricing-
+    // Geste der Vorlagen) — transform-only, kein Layout-Shift.
+    <div
+      className={cn(
+        "relative h-full",
+        // .glow-ring liegt auf dem Wrapper (nicht der Card), damit der
+        // card-lift-Hover-Schatten den Orange-Aussenschein nicht ueberschreibt.
+        pkg.featured &&
+          "glow-ring rounded-3xl md:-translate-y-1 md:scale-[1.03]",
+      )}
+    >
       {/* Schwebendes Fuchs-Wappen oben rechts (dekorativ). Ragt leicht über die
           Kartenkante, sitzt rechts → überlappt NICHT die zentrale „Empfohlen"-
           Badge. Featured-Karte etwas größer. animate-float-slow ist
@@ -442,31 +449,20 @@ function PricingCard({
           Empfohlen
         </Badge>
       )}
+      {/* Kartenflaeche = .glow-card (Glas + Orange-/Amber-Verlaufs-Rahmen),
+          Hover via .card-lift; Featured zusaetzlich mit .glow-ring-Aussenschein. */}
       <div
-        className={cn(
-          "group/card relative flex h-full flex-col overflow-hidden rounded-3xl p-7 backdrop-blur transition-all duration-300 hover:-translate-y-1.5",
-          pkg.featured
-            ? cn(A.border, A.gradient, "shadow-elevated hover:shadow-elevated")
-            : "border border-border/70 bg-card/85 shadow-card-soft hover:shadow-card-hover",
-        )}
+        style={{ "--glow-color": A.glowColor } as React.CSSProperties}
+        className="glow-card card-lift group/card relative flex h-full flex-col overflow-hidden rounded-3xl p-7"
       >
         {pkg.featured && (
-          <>
-            <div
-              aria-hidden
-              className={cn(
-                "pointer-events-none absolute -top-24 -right-24 size-64 rounded-full blur-[70px]",
-                A.glow,
-              )}
-            />
-            <div
-              aria-hidden
-              className={cn(
-                "pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent",
-                isAmber ? "via-brand-amber/60" : "via-brand-orange/60",
-              )}
-            />
-          </>
+          <div
+            aria-hidden
+            className={cn(
+              "pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent",
+              isAmber ? "via-brand-amber/60" : "via-brand-orange/60",
+            )}
+          />
         )}
 
         <div className="relative">
@@ -484,10 +480,12 @@ function PricingCard({
         <p className="mt-1 text-sm text-muted-foreground">{pkg.description}</p>
 
         <div className="mt-6 flex items-baseline gap-1">
+          {/* Preis in Mono gross (Vorlagen-Typo); Featured-Preis leuchtet
+              zusaetzlich per .text-glow (Akzentzahl, kein Fliesstext). */}
           <span
             className={cn(
-              "font-display text-5xl font-bold tracking-tight tabular-nums",
-              pkg.featured ? A.price : "text-foreground",
+              "font-mono text-5xl font-bold tracking-tight tabular-nums",
+              pkg.featured ? cn(A.price, "text-glow") : "text-foreground",
             )}
           >
             {displayedPrice}
@@ -522,14 +520,11 @@ function PricingCard({
           : pkg.features
         ).map((feature) => (
           <li key={feature} className="flex items-start gap-2.5">
+            {/* Feature-Haken einheitlich in Mint (Erfolgsfarbe) — auch in der
+                Featured- und Amber-Karte. */}
             <span
               aria-hidden
-              className={cn(
-                "mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full",
-                pkg.featured
-                  ? A.check
-                  : "bg-brand-mint/15 text-brand-mint",
-              )}
+              className="mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-brand-mint/15 text-brand-mint"
             >
               <CheckIcon className="size-3" strokeWidth={3} />
             </span>
@@ -550,22 +545,24 @@ function PricingCard({
             Bald verfügbar
           </Button>
         ) : pkg.featured ? (
-          // Featured-Karte: orange 3D-Haupt-CTA (.btn-cta).
-          <button
-            type="button"
-            onClick={onSelect}
-            className="btn-cta h-11 w-full text-sm"
-          >
-            {isSub ? "Abo starten" : "Paket kaufen"}
-            <ArrowRightIcon className="size-4" />
-          </button>
+          // Featured-Karte: orange 3D-Haupt-CTA (.btn-cta), magnetisch.
+          <MagneticButton className="w-full">
+            <button
+              type="button"
+              onClick={onSelect}
+              className="btn-cta h-11 w-full text-sm"
+            >
+              {isSub ? "Abo starten" : "Paket kaufen"}
+              <ArrowRightIcon className="size-4" />
+            </button>
+          </MagneticButton>
         ) : (
           // Nicht-Featured: creme-getoenter Outline-Button (Design: dezente
           // Sekundaer-Aktion, kein Mint-/Orange-Vollton).
           <Button
             onClick={onSelect}
             size="lg"
-            className="h-11 w-full gap-1.5 rounded-xl border border-[oklch(0.97_0.004_95)]/12 bg-[oklch(0.97_0.004_95)]/[0.06] text-sm font-semibold text-foreground transition-transform hover:scale-[1.015] hover:bg-[oklch(0.97_0.004_95)]/10 focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+            className="h-11 w-full gap-1.5 rounded-xl border border-foreground/15 bg-foreground/[0.06] text-sm font-semibold text-foreground transition-transform hover:scale-[1.015] hover:bg-foreground/10 focus-visible:ring-offset-2 focus-visible:ring-offset-card"
           >
             {isSub ? "Abo starten" : "Paket kaufen"}
             <ArrowRightIcon className="size-4" />

@@ -78,14 +78,19 @@ export function Footer() {
   }
 
   return (
-    // Scoped Dark: Footer-Flaeche ist in beiden Themes fest dunkel → `dark` flippt
-    // Spalten-Titel/Links/Input auf die Dark-Tokens (Light-Mode war 1.4.3-FAIL).
-    <footer className="dark relative overflow-hidden border-t border-border/60 bg-brand-deeper text-foreground">
-      {/* Maskottchen wurde aus dem Footer in die "Wie es funktioniert"-Sektion
-          verschoben (dort besser platziert statt am aeussersten Rand verloren). */}
+    // Scoped Dark: Footer-Flaeche ist fest dunkel (tiefstes Schwarz des
+    // Dark-Glow-Redesigns) → `dark` haelt Spalten-Titel/Links/Input auf den
+    // Dark-Tokens, auch falls je wieder ein Light-Kontext existiert.
+    <footer className="dark relative overflow-hidden bg-brand-deepest text-foreground">
+      {/* Feine Glow-Oberkante (Vorlagen-Signatur): Orange-Hairline + warmes
+          Glimmen, das nach unten ins tiefste Schwarz auslaeuft. Dekorativ. */}
       <div
         aria-hidden
-        className="absolute inset-x-0 top-0 -z-10 h-32 bg-gradient-to-b from-brand-orange/5 to-transparent"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-px bg-gradient-to-r from-transparent via-brand-orange/50 to-transparent"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-32 bg-gradient-to-b from-brand-orange/[0.06] to-transparent"
       />
 
       <div className="relative z-10 mx-auto max-w-6xl px-5 py-14 sm:px-6">
@@ -97,15 +102,15 @@ export function Footer() {
               className="inline-flex min-h-11 items-center gap-2.5 py-2 font-display text-lg font-bold tracking-tight"
               aria-label={`${SITE.name} Startseite`}
             >
-              {/* Fuchs-Wappen-Logo (dekorativ → leeres alt, Wortmarke traegt den
-                  Namen). */}
+              {/* Glow-Fuchskopf-Logo (dekorativ → leeres alt, Wortmarke traegt
+                  den Namen). */}
               <Image
-                src="/logo-fox.png"
+                src="/logo-fox-glow.png"
                 alt=""
-                width={27}
-                height={40}
+                width={418}
+                height={512}
                 loading="lazy"
-                className="h-10 w-auto shrink-0"
+                className="h-10 w-auto shrink-0 rounded-md [filter:drop-shadow(0_2px_10px_color-mix(in_oklch,var(--brand-orange),transparent_55%))]"
               />
               <span className="flex items-baseline gap-0.5">
                 <span>BFSG</span>
@@ -134,7 +139,7 @@ export function Footer() {
                   type="email"
                   required
                   placeholder="ihre@firma.de"
-                  className="h-11 rounded-xl bg-card pl-9 text-sm"
+                  className="h-11 rounded-xl bg-card/80 pl-9 text-sm backdrop-blur"
                   aria-label="E-Mail-Adresse"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -158,7 +163,7 @@ export function Footer() {
               className="mt-2 text-xs text-muted-foreground"
             >
               {status === "pending" ? (
-                <span className="text-brand-indigo dark:text-brand-mint">
+                <span className="text-brand-mint">
                   Fast geschafft — bitte bestätige den Link in der E-Mail, die wir
                   dir gerade geschickt haben.
                 </span>
@@ -197,7 +202,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col gap-4 border-t border-border/60 pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-12 flex flex-col gap-4 border-t border-brand-orange/10 pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {new Date().getFullYear()} {SITE.name} ·{" "}
             {SITE.url.replace("https://", "")} · Made in Germany 🇩🇪
@@ -213,7 +218,9 @@ export function Footer() {
           </div>
         </div>
 
-        <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground">
+        {/* Disclaimer bewusst gut lesbar: text-xs statt 11px, muted-foreground
+            (#b3a99f) ist AA-sicher auf dem tiefschwarzen Grund. */}
+        <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
           {LEGAL_NOTE}
         </p>
       </div>

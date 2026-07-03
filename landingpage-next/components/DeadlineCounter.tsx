@@ -31,6 +31,8 @@ function compute(): Elapsed {
 // keine Drohung). Start mit Placeholder (kein Hydration-Mismatch), dann sekuendlich.
 // Das Ticken ist NUR visuell → Zellen aria-hidden; die Kernaussage steht einmalig
 // als sr-only-Text fuer Screenreader (sonst Dauer-Geplapper, WCAG 4.1.3).
+// Dark-Glow-Optik: Ziffern in font-mono mit .text-glow, Amber-Akzent auf der
+// Sekunden-Zelle (Frist-Kontext), Shimmer-Hairline oben.
 export function DeadlineCounter() {
   const [el, setEl] = React.useState<Elapsed>(PLACEHOLDER);
 
@@ -45,16 +47,15 @@ export function DeadlineCounter() {
   }, []);
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-brand-amber/25 bg-card/80 p-5 shadow-card-soft backdrop-blur dark:ring-1 dark:ring-white/5">
+    <div className="relative overflow-hidden rounded-2xl border border-brand-amber/25 bg-card/80 p-5 backdrop-blur">
       {/* Amber-Shimmer-Linie am oberen Rand (Design-Signatur): wandernder Verlauf,
           reduced-motion-gated (.animate-shimmer steht in der globalen Regel). */}
       <span
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-[linear-gradient(90deg,transparent,var(--brand-amber),transparent)] bg-[length:200%_100%] animate-shimmer"
       />
-      {/* Kicker-TEXT light-mode-AA: dunkles Burnt-Amber auf hell, helles Amber im
-          Dark (analog CtaSection-Urgency-Pill). Puls-Punkt bleibt dekorativ. */}
-      <div className="mb-4 flex items-center gap-2 font-mono text-[11px] tracking-[0.12em] text-[oklch(0.5_0.13_70)] dark:text-brand-amber uppercase">
+      {/* Amber-Kicker (Dark-only, ~7:1 auf near-black). Puls-Punkt dekorativ. */}
+      <div className="mb-4 flex items-center gap-2 font-mono text-[11px] tracking-[0.12em] text-brand-amber uppercase">
         <span
           aria-hidden
           className="inline-flex size-1.5 rounded-full bg-brand-rose shadow-[0_0_8px_var(--brand-rose)] animate-pulse-soft"
@@ -71,16 +72,14 @@ export function DeadlineCounter() {
           return (
             <div
               key={c.key}
-              // Scoped Dark: Zellen sind in beiden Themes near-black — Ziffern/
-              // Labels muessen die Dark-Tokens nutzen (Light-Mode war unlesbar).
               className={
-                "dark rounded-xl border bg-[var(--brand-deeper)] px-1 py-3 text-center " +
+                "rounded-xl border bg-[var(--brand-deeper)] px-1 py-3 text-center " +
                 (accent ? "border-brand-amber/30" : "border-border/60")
               }
             >
               <div
                 className={
-                  "font-display text-2xl leading-none font-bold tabular-nums " +
+                  "font-mono text-2xl leading-none font-bold tabular-nums text-glow " +
                   (accent ? "text-brand-amber" : "text-foreground")
                 }
               >

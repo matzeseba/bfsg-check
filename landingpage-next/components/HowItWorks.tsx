@@ -1,12 +1,13 @@
 "use client";
 
-import * as motion from "motion/react-client";
 import Image from "next/image";
 import { CheckCircle2Icon, GlobeIcon, ScanLineIcon } from "lucide-react";
 
 import { HOW_IT_WORKS } from "@/lib/config";
-import { EASE } from "@/lib/motion";
 
+import { AmbientGlow } from "./fx/AmbientGlow";
+import { GlowCard } from "./fx/GlowCard";
+import { Reveal } from "./fx/Reveal";
 import { SectionKicker } from "./SectionKicker";
 
 const ICON_BY_KEY = {
@@ -15,24 +16,31 @@ const ICON_BY_KEY = {
   check: CheckCircle2Icon,
 } as const;
 
+// Prozess-Sektion im Dark-Glow-Stil (Vorlage "Dein Weg zur digitalen
+// Barrierefreiheit"): drei Glas-Karten mit großer Orange-Schrittnummer,
+// verbunden durch eine Fortschrittslinie mit Lauflicht. Texte unverändert
+// aus lib/config.ts (HOW_IT_WORKS, UWG-geprüft).
 export function HowItWorks() {
   return (
     <section
       id="ablauf"
       aria-labelledby="how-heading"
-      className="relative isolate overflow-hidden bg-muted/40"
+      className="relative isolate overflow-hidden bg-background"
     >
+      {/* Ambiente: warmer Orange-Radial oben + Punktraster (einziger Blur-Layer
+          der Sektion). Rein dekorativ. */}
+      <AmbientGlow className="-z-10" />
       <div
         aria-hidden
-        className="absolute inset-0 -z-10 dot-bg opacity-50 mask-radial dark:hidden"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 hidden dot-bg-dark opacity-50 mask-radial dark:block"
+        className="absolute inset-0 -z-10 dot-bg-dark opacity-40 mask-radial"
       />
       <div className="relative z-10 mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-24">
         <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
-          <SectionKicker icon={ScanLineIcon} label="Wie es funktioniert" />
+          <SectionKicker
+            icon={ScanLineIcon}
+            label="Wie es funktioniert"
+            tone="on-deep"
+          />
           <h2
             id="how-heading"
             className="mt-4 font-display text-3xl font-bold tracking-tight text-balance sm:text-[2.75rem] sm:leading-[1.05]"
@@ -47,25 +55,25 @@ export function HowItWorks() {
         </div>
 
         <div className="relative mt-14">
-          {/* Lupen-Fuchs-Guide: haengt am GRID-Wrapper (max-w-6xl-Bezug), damit er
-              bei JEDER Breite rechts neben Karte 3 bleibt (statt an den Viewport-Rand
-              zu driften). Nur ab lg; Section overflow-hidden clippt sauber. */}
+          {/* Filo-Begleiter (zeigt nach oben Richtung Schritte). Schwarzer
+              PNG-Grund verschwimmt per Radial-Maske in den Seitengrund.
+              Nur ab lg; Section overflow-hidden clippt sauber. */}
           <Image
-            src="/mascot-full.png"
+            src="/filo-pointing.png"
             alt=""
             aria-hidden
-            width={680}
-            height={1329}
+            width={821}
+            height={1100}
             loading="lazy"
-            className="pointer-events-none absolute -bottom-2 -right-14 z-20 hidden h-auto opacity-100 drop-shadow-[0_18px_30px_rgba(0,0,0,0.45)] lg:block lg:w-44"
+            className="pointer-events-none absolute -right-12 -bottom-6 z-20 hidden h-auto lg:block lg:w-44 [mask-image:radial-gradient(ellipse_72%_72%_at_50%_45%,black_52%,transparent_76%)]"
           />
-          {/* Ablauf-Linie (Design-Signatur): warmer Orange-Verlauf mit Lauflicht-
-              Punkt, der von links nach rechts wandert (animate-travel-dot, reduced-
-              motion-gated). Markiert visuell den Fortschritt URL → Scan → Fix-Plan.
-              Nur Desktop (md+); aria-hidden, rein dekorativ. */}
+          {/* Fortschrittslinie (Design-Signatur): Orange-Verlauf mit Lauflicht-
+              Punkt, der von links nach rechts wandert (animate-travel-dot,
+              reduced-motion-gated). Verbindet 01 → 02 → 03. Nur Desktop (md+),
+              aria-hidden, rein dekorativ. */}
           <div
             aria-hidden
-            className="absolute top-14 right-[12%] left-[12%] hidden h-0.5 overflow-visible rounded-full bg-gradient-to-r from-brand-orange/10 via-brand-orange/40 to-brand-orange/10 md:block"
+            className="absolute top-16 right-[12%] left-[12%] hidden h-px overflow-visible rounded-full bg-gradient-to-r from-brand-orange/10 via-brand-orange/45 to-brand-orange/10 md:block"
           >
             <span
               aria-hidden
@@ -76,55 +84,46 @@ export function HowItWorks() {
           <ol className="relative grid gap-6 md:grid-cols-3">
             {HOW_IT_WORKS.map((step, i) => {
               const Icon = ICON_BY_KEY[step.icon as keyof typeof ICON_BY_KEY];
-              const featured = i === 1;
               return (
-                <motion.li
-                  key={step.step}
-                  initial={{ opacity: 0, y: 18 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-60px" }}
-                  transition={{ duration: 0.5, delay: i * 0.1, ease: EASE }}
-                  className={
-                    "group/step card-lift relative flex flex-col items-center rounded-3xl p-6 text-center backdrop-blur md:items-start md:text-left " +
-                    // Karte 3 bekommt rechts Platz fuer den grossen Lupen-Fuchs, der
-                    // rechts daneben steht (Text weicht aus, keine Verdeckung).
-                    (i === 2 ? "lg:pr-28 " : "") +
-                    (featured
-                      ? "border-gradient bg-card shadow-card-hover"
-                      : "border border-border/70 bg-card/85 shadow-card-soft dark:ring-1 dark:ring-white/5")
-                  }
-                >
-                  <div className="flex w-full items-center justify-center md:justify-between">
-                    <span
-                      aria-hidden
-                      className="font-mono text-xs font-bold tracking-[0.2em] text-brand-orange"
+                <li key={step.step} className="flex">
+                  <Reveal index={i} className="flex w-full">
+                    <GlowCard
+                      className={
+                        "group/step card-lift relative flex w-full flex-col p-7 " +
+                        // Karte 3 laesst rechts Platz fuer den Filo-Begleiter,
+                        // der daneben steht (Text weicht aus, keine Verdeckung).
+                        (i === 2 ? "lg:pr-24" : "")
+                      }
                     >
-                      {step.step}
-                    </span>
-                    <span
-                      aria-hidden
-                      className="hidden h-px flex-1 mx-3 bg-gradient-to-r from-brand-orange/40 to-transparent md:block"
-                    />
-                  </div>
-                  {/* Step-Badge (Design): Kreis mit warmem Orange-Glow + Orange-
-                      Rahmen, Icon im Marken-Orange. Mint bleibt Action/Erfolg → die
-                      Schritt-Marker tragen den dekorativen Marken-Akzent (Orange). */}
-                  <div className="relative mt-5 flex size-12 items-center justify-center rounded-2xl border border-brand-orange/45 bg-gradient-to-br from-brand-orange/15 to-brand-deep text-brand-orange shadow-glow-orange transition-transform duration-300 group-hover/step:scale-110">
-                    {/* Dezent pulsierender Ring → "live"-Anmutung, gestaffelt. */}
-                    <span
-                      aria-hidden
-                      className="absolute inset-0 rounded-2xl ring-1 ring-brand-orange/40 animate-pulse-soft"
-                      style={{ animationDelay: `${i * 0.4}s` }}
-                    />
-                    {Icon ? <Icon className="relative size-5" /> : null}
-                  </div>
-                  <h3 className="mt-5 font-display text-xl font-semibold tracking-tight">
-                    {step.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                    {step.desc}
-                  </p>
-                </motion.li>
+                      <div className="flex w-full items-start justify-between gap-4">
+                        {/* Grosse Schrittnummer (Vorlagen-Signatur 01/02/03) —
+                            dekorativ, Reihenfolge traegt die <ol>. */}
+                        <span
+                          aria-hidden
+                          className="font-mono text-4xl font-bold tracking-tight text-brand-orange text-glow"
+                        >
+                          {step.step}
+                        </span>
+                        {/* Icon im kleinen Glow-Ring. */}
+                        <span className="glow-ring flex size-11 shrink-0 items-center justify-center rounded-2xl border border-brand-orange/40 bg-brand-orange/10 text-brand-orange transition-transform duration-300 group-hover/step:scale-110">
+                          {Icon ? (
+                            <Icon aria-hidden className="size-5" />
+                          ) : null}
+                        </span>
+                      </div>
+                      <span
+                        aria-hidden
+                        className="mt-4 h-px w-full bg-gradient-to-r from-brand-orange/40 to-transparent"
+                      />
+                      <h3 className="mt-5 font-display text-xl font-semibold tracking-tight">
+                        {step.title}
+                      </h3>
+                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                        {step.desc}
+                      </p>
+                    </GlowCard>
+                  </Reveal>
+                </li>
               );
             })}
           </ol>

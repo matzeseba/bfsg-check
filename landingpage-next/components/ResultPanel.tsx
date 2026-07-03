@@ -1,5 +1,6 @@
 import { CheckCircle2Icon, LockIcon } from "lucide-react";
 
+import { ScoreDonut } from "@/components/fx/ScoreDonut";
 import { Badge } from "@/components/ui/badge";
 import {
   SEVERITY_COLOR,
@@ -127,22 +128,15 @@ export function ResultPanel({
               : "bg-brand-rose/8",
         )}
       >
-        {/* Noten-Kachel im Fox-Report-Stil: großer Buchstabe, getönt nach
-            Tonalität (mint/amber/rose). Dekorativ → aria-hidden, die Note
-            steht zusätzlich als Text rechts. */}
-        <span
-          aria-hidden
-          className={cn(
-            "grid size-11 shrink-0 place-items-center rounded-xl border font-display text-xl font-extrabold",
-            tone === "good"
-              ? "border-brand-mint/30 bg-brand-mint/15 text-brand-mint"
-              : tone === "warn"
-                ? "border-brand-amber/30 bg-brand-amber/15 text-brand-amber"
-                : "border-brand-rose/30 bg-brand-rose/15 text-brand-rose",
-          )}
-        >
-          {grade}
-        </span>
+        {/* Score-Donut (Dark-Glow-Signatur): animierter Orange-Glow-Ring, der
+            beim Reveal auf den Score aufzieht und hochzählt. Dekorativ →
+            aria-hidden-Wrapper, denn Score + Note stehen zusätzlich als Text
+            rechts (die einzige Screenreader-Wahrheit — keine Doppel-Ansage
+            durch die Count-up-Zahl). Gleiche Komponente in Hero-Vorschau und
+            echtem Ergebnis, da ResultPanel geteilt bleibt. */}
+        <div aria-hidden className="shrink-0">
+          <ScoreDonut score={score} size={104} label="/ 100" />
+        </div>
         <div className="min-w-0 flex-1">
           <p className="font-display text-lg font-semibold tracking-tight">
             <span className="font-mono tabular-nums">{score}/100</span> · Note{" "}

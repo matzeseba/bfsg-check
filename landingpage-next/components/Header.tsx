@@ -9,8 +9,6 @@ import { Button } from "@/components/ui/button";
 import { NAV_LINKS, SITE } from "@/lib/config";
 import { cn } from "@/lib/utils";
 
-import { ThemeToggle } from "./ThemeToggle";
-
 // Section-IDs fuer den Scroll-Spy (aus NAV_LINKS /#id abgeleitet).
 const SPY_IDS = NAV_LINKS.map((l) => l.href.replace("/#", ""));
 
@@ -61,28 +59,37 @@ export function Header() {
       className={cn(
         // Dauerhaft leichter Blur + saturate (kein Live-Toggle des Blur-Filters
         // beim Scroll → vermeidet INP/Jank-Spike). Nur bg-/border-Opacity wechseln.
+        // Dark-Glow: near-black Glas-Leiste, gescrollt mit feiner Orange-Unterkante.
         "sticky top-0 z-40 w-full backdrop-blur-sm backdrop-saturate-150 transition-colors duration-300 md:backdrop-blur-md",
         scrolled
-          ? "border-b border-border/70 bg-background/75 supports-[backdrop-filter]:bg-background/65"
-          : "border-b border-transparent bg-transparent",
+          ? "bg-background/80 supports-[backdrop-filter]:bg-background/70"
+          : "bg-transparent",
       )}
     >
+      {/* Feine Glow-Unterkante (Vorlagen-Signatur): Orange-Hairline, die beim
+          Scrollen einblendet. Rein dekorativ. */}
+      <span
+        aria-hidden
+        className={cn(
+          "pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-brand-orange/45 to-transparent transition-opacity duration-300",
+          scrolled ? "opacity-100" : "opacity-0",
+        )}
+      />
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-6 px-5 sm:px-6">
         <Link
           href="/"
           className="group/logo -my-2 flex min-h-11 items-center gap-2.5 py-2 font-display text-xl font-bold tracking-tight"
           aria-label={`${SITE.name} Startseite`}
         >
-          {/* Fuchs-Wappen-Logo (Design-Signatur), dekorativ → leeres alt, da die
-              nebenstehende Wortmarke den Namen traegt. Gut sichtbar wie in der
-              Vorlage, mit orangem Drop-Shadow. */}
+          {/* Eckiges Glow-Fuchskopf-Logo (Dark-Glow-Redesign), dekorativ → leeres
+              alt, da die nebenstehende Wortmarke den Namen traegt. Klein (~36px),
+              mit orangem Drop-Shadow. */}
           <Image
-            src="/logo-fox.png"
+            src="/logo-fox-glow.png"
             alt=""
-            width={56}
-            height={84}
-            priority
-            className="h-12 w-auto shrink-0 lg:h-14 [filter:drop-shadow(0_4px_12px_color-mix(in_oklch,var(--brand-orange),transparent_60%))]"
+            width={418}
+            height={512}
+            className="h-9 w-auto shrink-0 rounded-md [filter:drop-shadow(0_2px_10px_color-mix(in_oklch,var(--brand-orange),transparent_55%))]"
           />
           <span className="flex items-baseline gap-0.5">
             <span>BFSG</span>
@@ -107,18 +114,22 @@ export function Header() {
                 href={link.href}
                 aria-current={isActive ? "true" : undefined}
                 className={cn(
-                  "relative rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+                  "group/nav relative rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
                   isActive
                     ? "text-foreground"
                     : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 {link.label}
+                {/* Animierter Orange-Underline: waechst bei Hover UND im
+                    aktiven Zustand von links ein (Vorlagen-Nav-Signatur). */}
                 <span
                   aria-hidden
                   className={cn(
-                    "absolute inset-x-3 -bottom-px h-px origin-left bg-brand-orange transition-transform duration-300",
-                    isActive ? "scale-x-100" : "scale-x-0",
+                    "absolute inset-x-3 -bottom-px h-px origin-left bg-gradient-to-r from-brand-orange to-brand-orange-soft shadow-[0_0_8px_var(--brand-orange)] transition-transform duration-300",
+                    isActive
+                      ? "scale-x-100"
+                      : "scale-x-0 group-hover/nav:scale-x-100",
                   )}
                 />
               </Link>
@@ -127,7 +138,6 @@ export function Header() {
         </nav>
 
         <div className="ml-auto hidden items-center gap-2 md:flex">
-          <ThemeToggle />
           <Button variant="ghost" size="lg" render={<a href="/kuendigen" />}>
             Konto verwalten
           </Button>
@@ -138,13 +148,12 @@ export function Header() {
         </div>
 
         <div className="ml-auto flex items-center gap-2 md:hidden">
-          <ThemeToggle />
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
             aria-label={open ? "Menü schließen" : "Menü öffnen"}
             aria-expanded={open}
-            className="inline-flex size-11 items-center justify-center rounded-lg border border-border/60 bg-background/60 text-foreground backdrop-blur"
+            className="inline-flex size-11 items-center justify-center rounded-lg border border-brand-orange/20 bg-card/60 text-foreground backdrop-blur"
           >
             {open ? <XIcon className="size-5" /> : <MenuIcon className="size-5" />}
           </button>
@@ -152,7 +161,7 @@ export function Header() {
       </div>
 
       {open && (
-        <div className="border-t border-border/60 bg-background/90 backdrop-blur-xl md:hidden">
+        <div className="border-t border-brand-orange/15 bg-background/95 backdrop-blur-xl md:hidden">
           <nav
             aria-label="Mobile Navigation"
             className="mx-auto flex max-w-6xl flex-col gap-1 px-5 py-4"

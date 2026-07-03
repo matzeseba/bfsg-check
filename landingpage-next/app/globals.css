@@ -183,65 +183,64 @@
 }
 
 .dark {
-  /* BFSG-Fuchs Dark-Palette (gelieferter Design-Stand "BFSG-Fuchs Landingpage.dc.html"):
-     warmes Braun-Schwarz #0f0b09, Orange #ED6A33 = Markenakzent, Mint #34d99a =
-     Action/CTA, Amber #f5b13d, Rot #F8554B. Werte bewusst als Hex/rgba, um exakt das
-     gelieferte Design zu treffen; token-basiert, damit der Light-Toggle erhalten bleibt.
-     Kontraste gegen #0f0b09 / #171009 per A11y-Audit verifiziert (Eigen-Dogfood). */
-  --background: #0f0b09;
-  --foreground: #f7f1ea;
-  --card: #171009;
-  --card-foreground: #f7f1ea;
-  --popover: #16110e;
-  --popover-foreground: #f7f1ea;
+  /* Dark-Glow-Palette (Owner-Vorlagen `design-inputs-landingpage/`, 03.07.2026):
+     tiefes Near-Black #050506, leuchtendes Orange #ff7a1a = Marken-Glow, Mint #34d99a =
+     Erfolgs-Akzent, Amber #f5b13d, Rot #F8554B. Dark ist der EINZIGE Modus
+     (html.dark erzwungen, Light-Toggle entfernt — Owner-Entscheid 04.07.).
+     Kontraste gegen #050506 / #0e0d10 verifiziert (Eigen-Dogfood). */
+  --background: #050506;
+  --foreground: #f5f2ee;
+  --card: #0e0d10;
+  --card-foreground: #f5f2ee;
+  --popover: #0d0c0f;
+  --popover-foreground: #f5f2ee;
   /* Primary = Fox-ORANGE (CTA/Action) — Buttons sind orange (Design #f4641e mit
      dunkelbraunem Text #2b1206). Mint bleibt Erfolgs-Akzent über --brand-mint. */
   --primary: #f4641e;
   --primary-foreground: #2b1206;
-  --secondary: #1d1611;
-  --secondary-foreground: #f7f1ea;
-  --muted: #120d0a;
-  /* #b6a89d: warmgrauer Sekundaertext, ~8.5:1 auf #0f0b09 / ~7.5:1 auf #171009
-     (AA-sicher). Dimmere Toene (#a99f93/#9a8d80) nur fuer Tertiaer-Labels mit
-     ausreichendem Kontrast einsetzen. */
-  --muted-foreground: #b6a89d;
+  --secondary: #15131a;
+  --secondary-foreground: #f5f2ee;
+  --muted: #0b0a0d;
+  /* #b3a99f: warmgrauer Sekundaertext, ~8.9:1 auf #050506 / ~8:1 auf #0e0d10
+     (AA-sicher). Dimmere Toene nur fuer Tertiaer-Labels mit geprüftem Kontrast. */
+  --muted-foreground: #b3a99f;
   --accent: #f4641e;
   --accent-foreground: #2b1206;
   --destructive: #F8554B;
-  /* Warme creme-getoente Hairlines (Design: rgba(255,228,205,X)). border/border-card
+  /* Orange-getoente Hairlines (Vorlagen: Karten glimmen am Rand). border/border-card
      sind dekorative Karten-Hairlines (Begrenzung wird zusaetzlich durch Flaechen-
-     kontrast getragen). --input ist die EINZIGE Abgrenzung eigenstaendiger Felder
-     (CheckoutModal/Footer/FAQ) → solider warmer Ton mit >=3:1 gegen #0f0b09/#171009
-     (WCAG 1.4.11; #7a6a59: L~0.15 → ~3.5:1) statt der zu schwachen Creme-16%-Hairline. */
-  --border: rgba(255, 228, 205, 0.09);
-  --border-card: rgba(255, 228, 205, 0.12);
+     kontrast + .glow-border getragen). --input ist die EINZIGE Abgrenzung
+     eigenstaendiger Felder → solider warmer Ton mit >=3:1 gegen #050506/#0e0d10
+     (WCAG 1.4.11). */
+  --border: rgba(255, 176, 102, 0.11);
+  --border-card: rgba(255, 176, 102, 0.16);
   --input: #7a6a59;
-  /* Fokus-Ring = Mint (auf #0f0b09 ~9:1, hochkontrast). Mint-Buttons setzen lokal
-     einen dunklen Ring + Offset (kein Mint-auf-Mint). */
+  /* Fokus-Ring = Mint (auf #050506 ~9.5:1, hochkontrast). Orange-Buttons setzen lokal
+     keinen eigenen Ring — globale Regel greift. */
   --ring: #34d99a;
   --chart-1: #34d99a;
-  --chart-2: #ED6A33;
+  --chart-2: #ff7a1a;
   --chart-3: #f5b13d;
   --chart-4: #FF8149;
   --chart-5: #F8554B;
-  --sidebar: #0d0a08;
-  --sidebar-foreground: #f7f1ea;
+  --sidebar: #060507;
+  --sidebar-foreground: #f5f2ee;
   --sidebar-primary: #34d99a;
   --sidebar-primary-foreground: #06251a;
-  --sidebar-accent: #120d0a;
-  --sidebar-accent-foreground: #f7f1ea;
-  --sidebar-border: rgba(255, 228, 205, 0.09);
+  --sidebar-accent: #0b0a0d;
+  --sidebar-accent-foreground: #f5f2ee;
+  --sidebar-border: rgba(255, 176, 102, 0.11);
   --sidebar-ring: #34d99a;
 
-  --brand-deepest: #0a0705;
-  --brand-deeper: #0b0807;
-  --brand-deep: #0f0b09;
+  --brand-deepest: #030304;
+  --brand-deeper: #040405;
+  --brand-deep: #050506;
   /* indigo/violet remapped auf die Orange-Familie → Bestands-Glows/Border-Gradient
      werden ohne Massen-Rename orange (Design-Signatur). */
-  --brand-indigo: #ED6A33;
-  --brand-violet: #FF8149;
-  --brand-orange: #ED6A33;
-  --brand-orange-soft: #FFB07A;
+  --brand-indigo: #ff7a1a;
+  --brand-violet: #ff9440;
+  --brand-orange: #ff7a1a;
+  --brand-orange-soft: #ffb066;
   --brand-orange-press: #b8430e;
   --brand-mint: #34d99a;
   --brand-mint-soft: #7fe8bd;
@@ -270,11 +269,11 @@
   }
   body {
     @apply bg-background text-foreground;
-    /* Warmer Fox-Wash: Orange + Amber (KEIN Grün/Mint mehr im Hintergrund —
-       Design-Vorgabe: grünen Hintergrund vollständig entfernen). */
+    /* Dark-Glow-Wash (Vorlagen): warmes Orange-Glimmen oben mittig + dezenter
+       Amber-Schein rechts — auf Near-Black bewusst sehr transparent gehalten. */
     background-image:
-      radial-gradient(at 12% 0%, color-mix(in oklch, var(--brand-orange), transparent 88%) 0px, transparent 50%),
-      radial-gradient(at 92% 6%, color-mix(in oklch, var(--brand-amber), transparent 92%) 0px, transparent 55%);
+      radial-gradient(ellipse 90% 50% at 50% -10%, color-mix(in oklch, var(--brand-orange), transparent 90%) 0px, transparent 60%),
+      radial-gradient(at 92% 6%, color-mix(in oklch, var(--brand-amber), transparent 94%) 0px, transparent 55%);
     /* Kein background-attachment: fixed — erzwingt auf Mobile Full-Viewport-Repaint
        pro Scroll-Frame (INP-/Jank-Killer auf paid-Ads-Traffic). Der Wash sitzt oben
        im Hero, wo er sichtbar ist; mitscrollen ist optisch unkritisch. */
@@ -511,6 +510,143 @@
     mask-composite: exclude;
     pointer-events: none;
   }
+  /* ===== Dark-Glow-Utilities (Redesign 04.07.2026, Owner-Vorlagen) ===== */
+  /* Glow-Card: DIE Standard-Karte des Redesigns — dunkle Glas-Flaeche mit
+     Orange-Verlaufs-Rahmen (mask-composite) + zartem Innen-Glimmen. Toene via
+     --glow-color ueberschreibbar (GlowCard.tsx setzt inline style). */
+  .glow-card {
+    --glow-color: var(--brand-orange);
+    position: relative;
+    border-radius: var(--radius-2xl);
+    background:
+      linear-gradient(180deg, color-mix(in oklch, var(--glow-color), transparent 94%), transparent 40%),
+      color-mix(in oklch, var(--card), transparent 12%);
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklch, var(--glow-color), transparent 82%),
+      0 18px 50px -22px color-mix(in oklch, var(--glow-color), transparent 68%);
+  }
+  .glow-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      160deg,
+      color-mix(in oklch, var(--glow-color), transparent 30%),
+      color-mix(in oklch, var(--glow-color), transparent 78%) 40%,
+      color-mix(in oklch, var(--glow-color), transparent 90%) 70%,
+      color-mix(in oklch, var(--glow-color), transparent 55%)
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  /* Nur der Orange-Verlaufs-Rahmen (fuer Bestandskarten, die ihre Flaeche behalten). */
+  .glow-border {
+    position: relative;
+  }
+  .glow-border::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      160deg,
+      color-mix(in oklch, var(--brand-orange), transparent 35%),
+      color-mix(in oklch, var(--brand-orange), transparent 80%) 45%,
+      color-mix(in oklch, var(--brand-orange), transparent 92%) 75%,
+      color-mix(in oklch, var(--brand-orange), transparent 60%)
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  /* Weicher Orange-Aussenschein fuer hervorgehobene Flaechen (Score-Podest,
+     Featured-Pricing, Hero-Visual). */
+  .glow-ring {
+    box-shadow:
+      0 0 0 1px color-mix(in oklch, var(--brand-orange), transparent 65%),
+      0 0 24px -4px color-mix(in oklch, var(--brand-orange), transparent 55%),
+      0 0 80px -16px color-mix(in oklch, var(--brand-orange), transparent 45%);
+  }
+  /* Dezenter Text-Schein fuer Akzent-Zahlen (Score, KPI) — NICHT fuer Fliesstext. */
+  .text-glow {
+    text-shadow:
+      0 0 18px color-mix(in oklch, var(--brand-orange), transparent 45%),
+      0 0 46px color-mix(in oklch, var(--brand-orange), transparent 70%);
+  }
+  /* Licht-Trail-Ellipsen (Vorlagen-Signatur: orbitale Orange-Schweife um das
+     Hero-Motiv). Rein dekorativ → Caller setzt aria-hidden. Zwei Pseudo-Ringe,
+     langsam rotierend; reduced-motion stellt die Rotation still. */
+  .orbit-trails {
+    position: absolute;
+    pointer-events: none;
+  }
+  .orbit-trails::before,
+  .orbit-trails::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1.5px solid transparent;
+    border-top-color: color-mix(in oklch, var(--brand-orange), transparent 35%);
+    border-right-color: color-mix(in oklch, var(--brand-orange), transparent 82%);
+    /* Kein filter auf dem dauer-rotierenden Element (wuerde pro Frame gerastert);
+       der weiche Schein kommt aus einem einmalig gemalten box-shadow. */
+    box-shadow: 0 0 12px -4px color-mix(in oklch, var(--brand-orange), transparent 45%);
+    animation: orbit-spin 14s linear infinite;
+  }
+  .orbit-trails::after {
+    inset: 12%;
+    transform: rotate(160deg);
+    border-top-color: color-mix(in oklch, var(--brand-orange-soft), transparent 55%);
+    border-right-color: transparent;
+    animation-duration: 22s;
+    animation-direction: reverse;
+  }
+  /* Funken-Feld (Vorlagen: schwebende Glut-Partikel). Reine CSS-Radial-Gradients —
+     kein Canvas, kein JS. Der Drift laeuft als transform:translate auf einer
+     ueberdimensionierten ::before-Kachel (Compositing statt Repaint pro Frame —
+     background-position waere ein Paint-Property). Dekorativ → aria-hidden. */
+  .ember-field {
+    position: absolute;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .ember-field::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: -640px;
+    bottom: -420px;
+    background-image:
+      radial-gradient(2px 2px at 12% 30%, color-mix(in oklch, var(--brand-orange), transparent 25%), transparent 55%),
+      radial-gradient(1.5px 1.5px at 38% 68%, color-mix(in oklch, var(--brand-orange-soft), transparent 35%), transparent 55%),
+      radial-gradient(2.5px 2.5px at 62% 22%, color-mix(in oklch, var(--brand-amber), transparent 45%), transparent 55%),
+      radial-gradient(1.5px 1.5px at 78% 58%, color-mix(in oklch, var(--brand-orange), transparent 40%), transparent 55%),
+      radial-gradient(2px 2px at 90% 35%, color-mix(in oklch, var(--brand-orange-soft), transparent 50%), transparent 55%),
+      radial-gradient(1.5px 1.5px at 25% 85%, color-mix(in oklch, var(--brand-amber), transparent 55%), transparent 55%);
+    background-repeat: repeat;
+    background-size: 640px 420px;
+    animation: ember-drift 26s linear infinite;
+    opacity: 0.7;
+    will-change: transform;
+  }
   /* Scanline-Overlay fuer das Hero-Visual (statisches feines Linienmuster). */
   .scanlines {
     background-image: repeating-linear-gradient(
@@ -558,7 +694,8 @@
     transform: translateY(-1px);
     box-shadow:
       0 6px 0 var(--brand-orange-press),
-      0 16px 30px -8px color-mix(in oklab, var(--brand-orange-press), transparent 40%);
+      0 16px 30px -8px color-mix(in oklab, var(--brand-orange-press), transparent 40%),
+      0 0 34px -6px color-mix(in oklch, var(--brand-orange), transparent 35%);
   }
   .btn-cta:active {
     transform: translateY(3px);
@@ -637,6 +774,17 @@
   0%, 100% { opacity: 0.5; }
   50% { opacity: 1; }
 }
+/* Licht-Trail-Ellipsen rotieren langsam um das Motiv (Dark-Glow-Signatur). */
+@keyframes orbit-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+/* Glut-Partikel driften diagonal (Kachel-Loop ueber transform — eine volle
+   Kachel-Periode 640x420, danach nahtloser Neustart). */
+@keyframes ember-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-640px, -420px, 0); }
+}
 
 /* prefers-reduced-motion: alle dekorativen Endlos-Animationen ruhigstellen. */
 @media (prefers-reduced-motion: reduce) {
@@ -660,7 +808,10 @@
   .animate-bar-eq,
   .animate-travel-dot,
   .animate-warn-pulse,
-  .gradient-text-shimmer {
+  .gradient-text-shimmer,
+  .ember-field::before,
+  .orbit-trails::before,
+  .orbit-trails::after {
     animation: none !important;
   }
 }

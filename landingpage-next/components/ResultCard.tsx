@@ -4,6 +4,7 @@ import * as motion from "motion/react-client";
 import Link from "next/link";
 import { ArrowRightIcon } from "lucide-react";
 
+import { MagneticButton } from "@/components/fx/MagneticButton";
 import { useCheckout } from "@/lib/checkout-context";
 import { EASE } from "@/lib/motion";
 
@@ -30,7 +31,7 @@ export function ResultCard({ result }: { result: ScanResult }) {
       transition={{ duration: 0.55, ease: EASE }}
       role="region"
       aria-live="polite"
-      className="overflow-hidden rounded-2xl border border-border/70 bg-card/90 shadow-card-soft backdrop-blur"
+      className="glow-card overflow-hidden rounded-2xl backdrop-blur"
     >
       <ResultPanel result={result} />
       {/* Value-first-Lead-Capture: erweiterte Befund-Übersicht gegen E-Mail
@@ -70,17 +71,20 @@ export function ResultCard({ result }: { result: ScanResult }) {
             Alle Pakete vergleichen
           </Link>
           {/* Einstiegs-Anker: kostenloser Scan → Basis-Report (129 €), nicht direkt
-              Profi (399 €). Preis am Button sichtbar (Reibung senken). */}
-          <button
-            type="button"
-            onClick={() => openCheckout("basis")}
-            className="btn-cta h-11 gap-1.5 rounded-xl text-sm"
-          >
-            {totalIssues > 0
-              ? "Vollreport sichern — 129 €"
-              : "Bestätigung sichern — 129 €"}
-            <ArrowRightIcon className="size-4" />
-          </button>
+              Profi (399 €). Preis am Button sichtbar (Reibung senken). Magnetisch
+              nur der Wrapper — Klick-/Fokus-Logik des Buttons unverändert. */}
+          <MagneticButton className="w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={() => openCheckout("basis")}
+              className="btn-cta h-11 w-full gap-1.5 rounded-xl text-sm"
+            >
+              {totalIssues > 0
+                ? "Vollreport sichern — 129 €"
+                : "Bestätigung sichern — 129 €"}
+              <ArrowRightIcon className="size-4" />
+            </button>
+          </MagneticButton>
         </div>
       </div>
     </motion.div>

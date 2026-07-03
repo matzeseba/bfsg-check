@@ -4,7 +4,6 @@ import * as React from "react";
 import { Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
@@ -142,7 +141,9 @@ export function CheckoutModal() {
         if (!open) closeCheckout();
       }}
     >
-      <DialogContent className="sm:max-w-lg">
+      {/* Dunkles Glas-Panel (bg-popover) mit Orange-Verlaufs-Rahmen (.glow-border)
+          — nur Optik, Dialog-Verhalten (Fokus-Trap, ESC, Overlay) unveraendert. */}
+      <DialogContent className="glow-border bg-popover sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Bestellung abschließen</DialogTitle>
           <DialogDescription>
@@ -169,9 +170,11 @@ export function CheckoutModal() {
                     htmlFor={`pkg-${p.id}`}
                     className={cn(
                       "flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors",
+                      // Selected-State in Marken-Orange (Dark-Glow-Vorlagen) statt
+                      // Mint — Auswahl-Logik unveraendert.
                       isSelected
-                        ? "border-brand-mint/60 bg-brand-mint/5"
-                        : "border-border hover:border-border/80 hover:bg-muted/40",
+                        ? "border-brand-orange/60 bg-brand-orange/10"
+                        : "border-border hover:border-brand-orange/30 hover:bg-muted/40",
                       isDisabled && "cursor-not-allowed opacity-60",
                     )}
                   >
@@ -305,15 +308,16 @@ export function CheckoutModal() {
             </div>
           )}
 
-          <Button
+          {/* Submit als oranger 3D-Haupt-CTA (.btn-cta) — type/disabled/Inhalt
+              und damit der gesamte Bestell-Flow bleiben identisch. */}
+          <button
             type="submit"
-            size="lg"
-            className="w-full min-h-11"
+            className="btn-cta min-h-11 w-full px-4 py-2 text-sm whitespace-normal"
             disabled={submitting || pkg?.available === false}
           >
             {submitting ? (
               <>
-                <Loader2Icon className="animate-spin" />
+                <Loader2Icon className="size-4 animate-spin" />
                 Weiterleitung...
               </>
             ) : pkg?.available === false ? (
@@ -321,7 +325,7 @@ export function CheckoutModal() {
             ) : (
               `Zahlungspflichtig bestellen · ${pkg?.price ?? ""}${pkg?.priceSuffix ?? ""}`
             )}
-          </Button>
+          </button>
 
           <p className="text-xs text-muted-foreground">
             Mit der Bestellung akzeptieren Sie die{" "}

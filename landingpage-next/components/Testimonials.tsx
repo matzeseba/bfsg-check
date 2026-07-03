@@ -1,15 +1,17 @@
 "use client";
 
 import * as motion from "motion/react-client";
-import Image from "next/image";
 import { GaugeIcon, MicroscopeIcon, SparklesIcon, WalletIcon } from "lucide-react";
 
 import { DIFFERENTIATORS } from "@/lib/config";
-import { EASE } from "@/lib/motion";
+import { revealUp } from "@/lib/motion";
 
+import { AmbientGlow } from "./fx/AmbientGlow";
+import { GlowCard } from "./fx/GlowCard";
+import { Reveal } from "./fx/Reveal";
 import { SectionKicker } from "./SectionKicker";
 
-// Pro Differentiator ein Icon (schneller/tiefer/guenstiger).
+// Pro Differentiator ein Icon (schneller/tiefer/günstiger).
 const ICONS = [GaugeIcon, MicroscopeIcon, WalletIcon] as const;
 
 // Mini-Terminal für die "Tiefer als Gratis-Tools"-Karte: zeigt streng technisch,
@@ -32,7 +34,7 @@ function DiffSnippet() {
         hidden: {},
         show: { transition: { staggerChildren: 0.15, delayChildren: 0.2 } },
       }}
-      className="mt-5 w-full overflow-hidden rounded-xl border border-border/60 bg-brand-deepest/80 p-3.5 font-mono text-[11.5px] leading-relaxed"
+      className="mt-5 w-full overflow-hidden rounded-xl border border-brand-orange/15 bg-brand-deepest/80 p-3.5 font-mono text-[11.5px] leading-relaxed"
     >
       {/* Klar als Beispiel-Auszug gekennzeichnet (analog Hero-Report-Visual) —
           kein echtes Kundenergebnis, spiegelt die HERO_VISUAL-Demodaten. */}
@@ -59,28 +61,18 @@ function DiffSnippet() {
 
 // "Warum der BFSG-Fuchs" — Anchoring gegen die drei Alternativen (Kanzlei,
 // Gratis-Tool, Beratung). Bewusst KEINE Fake-Testimonials.
-// Design "BFSG-Fuchs": Alt-Sektion auf brand-deeper, orange-getoente Icon-Tiles,
-// Karten heben beim Hover mit orange Kante an (card-lift).
+// Dark-Glow-Redesign: drei .glow-card-Glas-Karten mit Kicker-Pill, Fredoka-Titel
+// und gestaffeltem Reveal auf near-black Grund mit dezentem Orange-Ambiente.
 export function Testimonials() {
   return (
     <section
       aria-labelledby="why-heading"
-      // Scoped Dark: die Sektion ist in BEIDEN Themes fest dunkel (brand-deeper) —
-      // die `dark`-Klasse flippt alle Theme-Tokens der Kinder auf die Dark-Palette,
-      // sonst stehen im Light-Mode dunkle Texte auf near-black (WCAG 1.4.3).
-      // `text-foreground` ist Pflicht: color vererbt sich als BERECHNETER Wert vom
-      // body — ohne eigene Utility wuerde die H2 die Light-Farbe erben.
-      className="dark relative overflow-hidden border-y border-border/60 bg-brand-deeper text-foreground"
+      className="relative overflow-hidden border-y border-border/60 bg-brand-deeper"
     >
+      <AmbientGlow toneClassName="opacity-60" />
       <div className="relative z-10 mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-24">
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.55, ease: EASE }}
-          className="mx-auto flex max-w-2xl flex-col items-center text-center"
-        >
-          <SectionKicker icon={SparklesIcon} label="Warum der BFSG-Fuchs" />
+        <Reveal className="mx-auto flex max-w-2xl flex-col items-center text-center">
+          <SectionKicker icon={SparklesIcon} label="Warum der BFSG-Fuchs" tone="on-deep" />
           <h2
             id="why-heading"
             className="mt-4 font-display text-3xl font-bold tracking-tight text-balance sm:text-[2.75rem] sm:leading-[1.05]"
@@ -93,70 +85,28 @@ export function Testimonials() {
             Drei Gründe, warum mittelständische Website-Betreiber den Fuchs
             losschicken — statt in den Stundensatz-Marathon zu starten.
           </p>
-        </motion.div>
+        </Reveal>
 
-        {/* Grid-Wrapper (relative, an max-w-6xl gebunden): die opaken Fuechse haengen
-            an den GRID-Aussenkanten, damit sie bei JEDER Bildschirmbreite an den
-            Aussenkarten kleben (statt an die Viewport-Raender zu driften). Nur ab lg. */}
-        <div className="relative mt-14">
-          <Image
-            src="/mascot-watch.png"
-            alt=""
-            aria-hidden
-            width={1599}
-            height={2496}
-            loading="lazy"
-            className="pointer-events-none absolute -bottom-1 -left-16 z-20 hidden h-auto drop-shadow-[0_18px_30px_rgba(0,0,0,0.45)] lg:block lg:w-44"
-          />
-          <Image
-            src="/mascot-thumbsup.png"
-            alt=""
-            aria-hidden
-            width={680}
-            height={1235}
-            loading="lazy"
-            className="pointer-events-none absolute -bottom-2 -right-16 z-20 hidden h-auto drop-shadow-[0_18px_30px_rgba(0,0,0,0.45)] lg:block lg:w-44"
-          />
-          <ul className="grid gap-6 md:grid-cols-3">
-            {DIFFERENTIATORS.map((item, i) => {
+        <ul className="mt-14 grid gap-6 md:grid-cols-3">
+          {DIFFERENTIATORS.map((item, i) => {
             const Icon = ICONS[i] ?? GaugeIcon;
             return (
-              <motion.li
-                key={item.title}
-                initial={{ opacity: 0, y: 18 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.55, delay: i * 0.08, ease: EASE }}
-                className={
-                  "group/diff card-lift relative flex flex-col items-center overflow-hidden rounded-3xl border border-border/70 bg-card p-7 text-center shadow-card-soft backdrop-blur dark:ring-1 dark:ring-white/5 md:items-start md:text-left " +
-                  // Aussenkarten: Platz fuer die opaken Fuechse links (Uhr) / rechts (Daumen-hoch).
-                  (i === 0 ? "lg:pl-28" : i === 2 ? "lg:pr-28" : "")
-                }
-              >
-                {/* Spotlight-Glow beim Hover (Marken-Orange). */}
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute -top-16 -right-16 size-44 rounded-full bg-brand-orange/0 blur-3xl transition-colors duration-500 group-hover/diff:bg-brand-orange/15"
-                />
-                {/* Orange-getoentes Icon-Tile (Design: rgba(237,106,51,.13)-Kachel). */}
-                <span className="relative inline-flex size-11 items-center justify-center rounded-2xl border border-brand-orange/25 bg-brand-orange/12 text-brand-orange">
-                  <Icon className="size-5" aria-hidden />
-                </span>
-                <p className="relative mt-5 font-mono text-xs font-semibold tracking-[0.16em] text-brand-orange uppercase">
-                  {item.kicker}
-                </p>
-                <h3 className="relative mt-2 font-display text-xl font-semibold tracking-tight text-balance">
-                  {item.title}
-                </h3>
-                <p className="relative mt-3 text-sm leading-relaxed text-muted-foreground text-pretty">
-                  {item.desc}
-                </p>
-                {i === 1 && <DiffSnippet />}
+              <motion.li key={item.title} {...revealUp(i)} className="flex">
+                <GlowCard className="card-lift flex w-full flex-col items-center p-7 text-center md:items-start md:text-left">
+                  {/* Kicker-Pill der Karte (Marken-Orange, Icon je Argument). */}
+                  <SectionKicker icon={Icon} label={item.kicker} />
+                  <h3 className="mt-5 font-display text-xl font-semibold tracking-tight text-balance">
+                    {item.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground text-pretty">
+                    {item.desc}
+                  </p>
+                  {i === 1 && <DiffSnippet />}
+                </GlowCard>
               </motion.li>
             );
           })}
-          </ul>
-        </div>
+        </ul>
 
         <p className="mx-auto mt-10 max-w-xl text-center text-xs text-muted-foreground">
           Der Fuchs zeigt lieber prüfbare Fakten als gekaufte Sternebewertungen —
