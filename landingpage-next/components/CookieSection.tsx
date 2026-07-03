@@ -19,7 +19,12 @@ export function CookieSection() {
       // Dark-Palette nutzen, sonst dunkel-auf-dunkel im Light-Mode (WCAG 1.4.3).
       className="dark relative overflow-hidden border-y border-border bg-brand-deeper text-foreground"
     >
-      <div className="mx-auto max-w-6xl px-5 pt-20 sm:px-6 sm:pt-24">
+      {/* Amber-Ambiente (Pflicht-Baustelle-Nr.-2-Signatur): warmer Radial-Schein
+          oben mittig — rein dekorativ, ein einzelner Blur-Layer. */}
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <div className="absolute top-0 left-1/2 h-[360px] w-[680px] max-w-full -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,color-mix(in_oklch,var(--brand-amber),transparent_86%),transparent_65%)] blur-2xl" />
+      </div>
+      <div className="relative mx-auto max-w-6xl px-5 pt-20 sm:px-6 sm:pt-24">
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           whileInView={{ opacity: 1, y: 0 }}

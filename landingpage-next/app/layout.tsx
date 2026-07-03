@@ -111,13 +111,11 @@ export const metadata: Metadata = {
 };
 
 // Next 16: themeColor/colorScheme gehoeren in den viewport-Export.
-// Dark ist der erzwungene Standard (siehe ThemeProvider) → colorScheme "dark"
-// zuerst und eine dunkle Browser-UI-Farbe als Default. next-themes setzt
-// color-scheme auf <html> beim Theme-Wechsel zusaetzlich dynamisch.
+// Dark-only (Owner-Entscheid 04.07., Dark-Glow-Redesign): colorScheme fest "dark",
+// Browser-UI im Near-Black der Glow-Palette.
 export const viewport: Viewport = {
-  colorScheme: "dark light",
-  // BFSG-Fuchs Dark-Default: warmes Braun-Schwarz der Marken-Palette.
-  themeColor: "#0f0b09",
+  colorScheme: "dark",
+  themeColor: "#050506",
 };
 
 export default function RootLayout({
@@ -131,9 +129,11 @@ export default function RootLayout({
       // data-scroll-behavior="smooth": Next 16 ueberschreibt scroll-behavior
       // sonst nicht mehr bei Navigation (s. Upgrade-Guide v16).
       data-scroll-behavior="smooth"
-      // next-themes setzt .dark vor Hydration via Inline-Script.
+      // Dark-only: .dark serverseitig gesetzt (kein Flash); next-themes haelt
+      // das Theme via forcedTheme="dark" konsistent (suppressHydrationWarning
+      // deckt dessen Attribut-Sync ab).
       suppressHydrationWarning
-      className={`${hankenSans.variable} ${jetbrainsMono.variable} ${fredokaDisplay.variable} ${frauncesItalic.variable} h-full antialiased`}
+      className={`dark ${hankenSans.variable} ${jetbrainsMono.variable} ${fredokaDisplay.variable} ${frauncesItalic.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
         <ThemeProvider>

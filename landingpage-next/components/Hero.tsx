@@ -1,13 +1,28 @@
 "use client";
 
+import Image from "next/image";
 import * as motion from "motion/react-client";
 import { ArrowRightIcon, CheckCircle2Icon } from "lucide-react";
 
+import { AmbientGlow } from "@/components/fx/AmbientGlow";
 import { HERO, HERO_VISUAL } from "@/lib/config";
 import { EASE } from "@/lib/motion";
 
 import { HeroVisual } from "./HeroVisual";
 import { ScanForm } from "./ScanForm";
+
+// Schwebende Befund-Chips um das Report-Panel (Vorlage „Interaktive Prüfung"):
+// Texte kommen 1:1 aus HERO_VISUAL.sample.topIssues (ehrliche Beispieldaten) und
+// stehen bereits lesbar IM Panel → die Chips sind redundant-dekorativ (aria-hidden).
+// Dot-Farben spiegeln die Schwere-Sequenz des Beispiels (2× Kritisch, 1× Schwerwiegend).
+// Bewusst nur ZWEI Chips: ein dritter verdeckte auf 1440px exakt die Panel-
+// Zeile mit demselben Text (redundant + Lesbarkeitsverlust). top-basiert —
+// eine bottom-Referenz loeste gegen die Panel-Oberkante auf und schob den
+// Chip in die Vorschau-Überschrift.
+const FLOAT_CHIPS = [
+  { pos: "-left-5 top-16", float: "animate-float", dot: "bg-brand-rose", delay: "0s" },
+  { pos: "-right-6 top-[38%]", float: "animate-float-slow", dot: "bg-brand-rose", delay: "0.8s" },
+] as const;
 
 export function Hero() {
   // Vorschau-Überschrift am Akzentwort splitten → genau EIN Fraunces-Italic-Wort
@@ -30,28 +45,23 @@ export function Hero() {
       id="scan"
       className="relative isolate overflow-hidden border-b border-border/60"
     >
-      {/* Hintergrund: weicher Wash + Spotlight oben + Blueprint-Grid mit Maske. */}
+      {/* Hintergrund (Dark-Glow): tiefer Grund + Blueprint-Grid mit Maske. */}
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-gradient-to-b from-background via-background to-muted/30"
       />
       <div
         aria-hidden
-        className="absolute inset-x-0 top-0 -z-10 h-[120%] grid-bg-fine opacity-[0.4] mask-fade-y dark:hidden"
+        className="absolute inset-x-0 top-0 -z-10 h-[120%] grid-bg-dark opacity-[0.5] mask-fade-y"
       />
-      <div
-        aria-hidden
-        className="absolute inset-x-0 top-0 -z-10 hidden h-[120%] grid-bg-dark opacity-[0.5] mask-fade-y dark:block"
+      {/* Sektions-Ambiente: warmer Orange-Radial-Schein + Glut-Partikel
+          (AmbientGlow ist aria-hidden + reduced-motion-still). Der einzige
+          Blur-Layer neben dem Panel-Halo im HeroVisual (Budget: max 2). */}
+      <AmbientGlow
+        embers
+        className="-z-10"
+        toneClassName="h-[520px] w-[920px]"
       />
-      {/* Aurora-Spots mit langsamer Drift (Design-Signatur; animate-aurora/float
-          sind reduced-motion-gated). */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-[-30%] -z-10 size-[80vw] max-w-5xl -translate-x-1/2 rounded-full bg-brand-orange/10 blur-[70px] animate-aurora"
-      />
-      {/* Ambient-Reduktion: der zweite (Violett-)Blob entfaellt — der primaere
-          Orange-Aurora reicht als Marken-Wash und spart einen teuren GPU-Blur-Pass
-          hinter dem LCP-Element (v.a. Mobile). */}
 
       <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-5 pt-14 pb-20 sm:px-6 sm:pt-20 sm:pb-28 lg:grid-cols-2 lg:gap-12">
         {/* Linke Spalte: Text + Scan-Form. Mobile zentriert (eigenstaendige Saeule),
@@ -66,11 +76,10 @@ export function Hero() {
             transition={{ duration: 0.5, ease: EASE }}
             className="inline-flex"
           >
-            {/* Fox-Design: Pill ist die Marken-Akzent-Fläche (orange). Produktwert-
-                Badge, NICHT die Frist — daher bewusst nicht-klickbar (<span>, kein
-                href, kein Hover-Pfeil), damit es nicht als Link/CTA missverstanden
-                wird. Dot + Flag-Wort in brand-orange. Mint bleibt Action/CTA. */}
-            <span className="inline-flex items-center gap-2 rounded-full border border-brand-orange/26 bg-brand-orange/[0.09] px-3 py-1.5 font-mono text-xs font-medium tracking-[0.01em] text-foreground/80 shadow-card-soft backdrop-blur">
+            {/* Produktwert-Badge, NICHT die Frist — daher bewusst nicht-klickbar
+                (<span>, kein href, kein Hover-Pfeil), damit es nicht als Link/CTA
+                missverstanden wird. Dot + Flag-Wort in brand-orange. */}
+            <span className="glow-border inline-flex items-center gap-2 rounded-full bg-card/90 px-3 py-1.5 font-mono text-xs font-medium tracking-[0.01em] text-foreground/80">
               <span
                 aria-hidden
                 className="inline-flex size-1.5 rounded-full bg-brand-orange animate-pulse-soft"
@@ -82,21 +91,18 @@ export function Hero() {
             </span>
           </motion.div>
 
-          {/* Editorial-Headline: Fredoka-Display; das Akzentwort „BFSG" leuchtet
-              upright im Orange-Verlauf (gradient-text, kein Italic hier).
+          {/* Dark-Glow-Headline: Fredoka-Display, Lead creme-weiss, das Akzentwort
+              „BFSG" leuchtet upright im Orange-Verlauf (gradient-text + Shimmer).
               Bewusst OHNE Entrance-Animation: die H1 ist das LCP-Element — ein
               opacity:0-Start würde den Largest Contentful Paint künstlich um die
               Animationsdauer verzögern (relevant für paid-Ads-Quality-Score). */}
           {/* EIN fließender Textfluss (kein erzwungener block-Umbruch): der Browser
               bricht via text-balance natürlich um, sodass „bereit fürs BFSG?"
-              zusammenbleibt (Design: „Schlau wie ein Fuchs — bereit fürs BFSG?").
-              Lead inline in gradient-text-soft, gefolgt von Space + Akzent-Span.
-              Design-Signatur: das Akzentwort „BFSG" leuchtet im Orange-Verlauf und
-              shimmert sanft (gradient-text-shimmer). Unterlängen-/Glyph-Überhang-
-              Schutz (g/j/ß, „?") sitzt in .gradient-text → kein Clipping, kein CLS.
-              Shimmer wird bei prefers-reduced-motion stillgestellt. */}
-          <h1 className="mt-6 font-display text-[clamp(2.05rem,6.7vw,4.6rem)] leading-[1.05] font-bold tracking-[-0.025em] text-balance">
-            <span className="gradient-text-soft">{HERO.headlineLead}</span>{" "}
+              zusammenbleibt. Unterlängen-/Glyph-Überhang-Schutz (g/j/ß, „?") sitzt
+              in .gradient-text → kein Clipping, kein CLS. Shimmer wird bei
+              prefers-reduced-motion stillgestellt. */}
+          <h1 className="mt-6 font-display text-[clamp(2.05rem,6.7vw,4.6rem)] leading-[1.05] font-bold tracking-[-0.025em] text-balance text-foreground">
+            {HERO.headlineLead}{" "}
             <span className="gradient-text gradient-text-shimmer">
               {HERO.headlineEmph}?
             </span>
@@ -113,12 +119,9 @@ export function Hero() {
             {HERO.subline}
           </p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.25 }}
-            className="mt-8 w-full max-w-xl"
-          >
+          {/* ScanForm bewusst OHNE Entrance-Animation: der CTA-Button gehört zum
+              LCP-kritischen Above-the-fold-Kern (Spec: Hero-H1 + CTA statisch). */}
+          <div className="mt-8 w-full max-w-xl">
             <ScanForm variant="hero" />
             {/* Dezenter Conversion-Anker: anonymisierter Muster-Report als PDF.
                 Senkt die "Was bekomme ich eigentlich?"-Reibung vor dem Kauf.
@@ -130,7 +133,7 @@ export function Hero() {
                 href="/beispiel-report.pdf"
                 target="_blank"
                 rel="noopener"
-                className="inline-flex items-center gap-1 font-medium text-foreground/80 underline decoration-border underline-offset-4 transition-colors hover:text-foreground hover:decoration-brand-mint"
+                className="inline-flex items-center gap-1 font-medium text-foreground/80 underline decoration-border underline-offset-4 transition-colors hover:text-foreground hover:decoration-brand-orange"
               >
                 Beispiel-Report ansehen
                 <ArrowRightIcon className="size-3" aria-hidden />
@@ -140,8 +143,9 @@ export function Hero() {
                 (PDF)
               </span>
             </p>
-          </motion.div>
+          </div>
 
+          {/* HERO.badges als kleine Glow-Border-Chips (Vorlagen-Optik). */}
           <motion.ul
             initial="hidden"
             animate="show"
@@ -149,7 +153,7 @@ export function Hero() {
               hidden: {},
               show: { transition: { staggerChildren: 0.08, delayChildren: 0.4 } },
             }}
-            className="mt-7 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-muted-foreground lg:justify-start"
+            className="mt-7 flex flex-wrap items-center justify-center gap-2.5 text-sm text-muted-foreground lg:justify-start"
           >
             {HERO.badges.map((badge) => (
               <motion.li
@@ -158,7 +162,7 @@ export function Hero() {
                   hidden: { opacity: 0, y: 8 },
                   show: { opacity: 1, y: 0 },
                 }}
-                className="inline-flex items-center gap-1.5"
+                className="glow-border inline-flex items-center gap-1.5 rounded-full bg-card/90 px-3 py-1.5"
               >
                 <CheckCircle2Icon
                   className="size-4 text-brand-mint"
@@ -168,13 +172,11 @@ export function Hero() {
               </motion.li>
             ))}
           </motion.ul>
-
-          {/* Mini-Trust-Bar entfaellt: die 4 Kennzahlen stehen jetzt im eigenen
-              Trust-Strip-Band (StatsBar) direkt unter dem Hero (Design-Aufbau). */}
         </div>
 
-        {/* Rechte Spalte: Audit-Report-Visual. min-w-0 laesst die Spalte unter
-            ihre min-content-Breite schrumpfen; mx-auto + max-w-md zentriert das
+        {/* Rechte Spalte: schwebendes Report-Panel (Glas + Glow) mit Filo-
+            Maskottchen dahinter. min-w-0 laesst die Spalte unter ihre
+            min-content-Breite schrumpfen; mx-auto + max-w-md zentriert das
             Visual auf Mobile sauber mittig, ohne Desktop (lg+) zu beeinflussen. */}
         <motion.div
           initial={{ opacity: 0, y: 30, scale: 0.97 }}
@@ -211,7 +213,58 @@ export function Hero() {
             </motion.p>
           </div>
 
-          <HeroVisual />
+          <div className="relative">
+            {/* Filo-Maskottchen hinter/neben dem Panel (md+ only; auf Mobile
+                ausgeblendet). Schwarzer PNG-Hintergrund verschwimmt per Radial-
+                Maske in den near-black Seitengrund. Dahinter der dekorative
+                Licht-Trail-Ring (.orbit-trails, reduced-motion-still). */}
+            {/* Kleiner + tiefer positioniert: der Fuchs lugt neben der unteren
+                Panel-Ecke hervor, statt gross hinter der Glas-Flaeche zu
+                "geistern" (das 88%-opake Panel liesse ihn sonst durchscheinen). */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -right-24 -bottom-14 -z-10 hidden md:block"
+            >
+              <span className="orbit-trails -inset-6" />
+              <Image
+                src="/filo-arms-crossed.png"
+                alt=""
+                width={240}
+                height={321}
+                // KEIN priority: dekorativ + auf Mobile via CSS versteckt — ein
+                // Preload wuerde dort gegen das echte LCP-Element konkurrieren.
+                loading="lazy"
+                className="[mask-image:radial-gradient(ellipse_72%_78%_at_50%_45%,black_55%,transparent_80%)]"
+              />
+            </div>
+
+            <HeroVisual />
+
+            {/* Schwebende Befund-Chips (redundant-dekorativ, Texte stehen im
+                Panel selbst → aria-hidden; animate-float ist reduced-motion-
+                gated). md+ only, damit auf Mobile nichts überlappt. */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 hidden md:block"
+            >
+              {HERO_VISUAL.sample.topIssues.slice(0, 3).map((issue, i) => {
+                const chip = FLOAT_CHIPS[i];
+                if (!chip) return null;
+                return (
+                  <span
+                    key={issue}
+                    style={{ animationDelay: chip.delay }}
+                    className={`glow-border absolute inline-flex max-w-60 items-center gap-1.5 rounded-full bg-card px-3 py-1.5 text-xs font-medium text-foreground/90 shadow-glow-orange ${chip.pos} ${chip.float}`}
+                  >
+                    <span
+                      className={`inline-flex size-1.5 shrink-0 rounded-full ${chip.dot}`}
+                    />
+                    <span className="truncate">{issue}</span>
+                  </span>
+                );
+              })}
+            </div>
+          </div>
         </motion.div>
       </div>
     </section>

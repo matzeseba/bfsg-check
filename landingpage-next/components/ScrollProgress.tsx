@@ -36,7 +36,7 @@ export function ScrollProgress() {
       className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-[3px]"
     >
       <div
-        className="h-full w-full origin-left bg-gradient-to-r from-brand-orange to-brand-violet shadow-[0_0_12px_var(--brand-orange)]"
+        className="h-full w-full origin-left bg-gradient-to-r from-brand-orange to-brand-orange-soft shadow-[0_0_12px_var(--brand-orange)]"
         style={{ transform: `scaleX(${pct / 100})` }}
       />
     </div>

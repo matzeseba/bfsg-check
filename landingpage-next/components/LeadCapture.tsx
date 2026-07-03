@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { ArrowRightIcon, MailIcon } from "lucide-react";
 
+import { MagneticButton } from "@/components/fx/MagneticButton";
 import { Input } from "@/components/ui/input";
 import { useCheckout } from "@/lib/checkout-context";
 import type { ScanCounts } from "./ResultCard";
@@ -88,7 +89,9 @@ export function LeadCapture({
           : "";
 
   return (
-    <div className="mx-5 mb-4 rounded-xl border border-brand-indigo/25 bg-brand-indigo/5 px-4 py-4">
+    // Dunkle Glas-Optik (Dark-Glow): Orange-Verlaufs-Rahmen statt Voll-Border,
+    // zarte Orange-Tönung auf der Kartenfläche. Inhalt/Logik unverändert.
+    <div className="glow-border mx-5 mb-4 rounded-xl bg-brand-orange/[0.05] px-4 py-4 backdrop-blur">
       <p className="font-display text-sm font-semibold tracking-tight">
         {totalIssues > 0
           ? "Den vollständigen Befund-Überblick per E-Mail"
@@ -131,14 +134,18 @@ export function LeadCapture({
             disabled={status === "sending"}
           />
         </div>
-        <button
-          type="submit"
-          disabled={status === "sending"}
-          className="btn-cta h-11 shrink-0 px-4 text-sm"
-        >
-          {status === "sending" ? "Sende…" : "Übersicht anfordern"}
-          <ArrowRightIcon className="size-3.5" />
-        </button>
+        {/* Magnetischer CTA: nur der Wrapper folgt dem Cursor, Submit-/
+            Disabled-Logik des Buttons bleibt unverändert. */}
+        <MagneticButton className="w-full shrink-0 sm:w-auto">
+          <button
+            type="submit"
+            disabled={status === "sending"}
+            className="btn-cta h-11 w-full px-4 text-sm"
+          >
+            {status === "sending" ? "Sende…" : "Übersicht anfordern"}
+            <ArrowRightIcon className="size-3.5" />
+          </button>
+        </MagneticButton>
       </form>
 
       {/* Persistente Live-Region (WCAG 4.1.3): immer im DOM, damit Screenreader

@@ -2,6 +2,7 @@ import { Comparison } from "@/components/Comparison";
 import { CookieSection } from "@/components/CookieSection";
 import { CtaSection } from "@/components/CtaSection";
 import { FAQAccordion } from "@/components/FAQAccordion";
+import { FounderSection } from "@/components/FounderSection";
 import { Hero } from "@/components/Hero";
 import { HomeJsonLd } from "@/components/JsonLd";
 import { HowItWorks } from "@/components/HowItWorks";
@@ -29,6 +30,7 @@ export default function Home() {
       <HowItWorks />
       <Comparison />
       <Testimonials />
+      <FounderSection />
       <PricingCards />
       <CookieSection />
       <FAQAccordion />

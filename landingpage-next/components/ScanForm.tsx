@@ -3,6 +3,7 @@
 import * as React from "react";
 import { ArrowRightIcon, Loader2Icon, ScanLineIcon } from "lucide-react";
 
+import { MagneticButton } from "@/components/fx/MagneticButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -174,23 +175,27 @@ export function ScanForm({ initialUrl = "" }: ScanFormProps) {
               autoComplete="url"
             />
           </div>
-          <button
-            type="submit"
-            disabled={loading || !url}
-            className="btn-cta h-12 shrink-0 rounded-xl px-5 text-base"
-          >
-            {loading ? (
-              <>
-                <Loader2Icon className="animate-spin" />
-                <span>Prüfe…</span>
-              </>
-            ) : (
-              <>
-                <span>{HERO.scanCta}</span>
-                <ArrowRightIcon className="size-4" />
-              </>
-            )}
-          </button>
+          {/* Magnetischer CTA (Dark-Glow): nur der Wrapper folgt dem Cursor,
+              Submit-/Disabled-Logik des Buttons bleibt unverändert. */}
+          <MagneticButton className="w-full shrink-0 sm:w-auto">
+            <button
+              type="submit"
+              disabled={loading || !url}
+              className="btn-cta h-12 w-full rounded-xl px-5 text-base"
+            >
+              {loading ? (
+                <>
+                  <Loader2Icon className="animate-spin" />
+                  <span>Prüfe…</span>
+                </>
+              ) : (
+                <>
+                  <span>{HERO.scanCta}</span>
+                  <ArrowRightIcon className="size-4" />
+                </>
+              )}
+            </button>
+          </MagneticButton>
         </div>
       </form>
       <p className="px-1 text-xs text-muted-foreground">

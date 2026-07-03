@@ -3,12 +3,12 @@
 import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
-// Dark-Mode-Provider. attribute="class" → Tailwind v4 .dark-Variante.
-// defaultTheme="dark" + enableSystem={false}: der Dark-Look ist die GARANTIERTE
-// Standard-Optik beim Seitenaufruf (Owner-Wunsch) — unabhaengig von der OS-
-// Praeferenz. Der ThemeToggle bleibt voll funktional und persistiert die Wahl
-// in localStorage; ein Nutzer, der bewusst auf Hell schaltet, behaelt das.
-// disableTransitionOnChange verhindert ein Aufblitzen beim Umschalten.
+// Dark-only-Provider (Owner-Entscheid 04.07.2026, Dark-Glow-Redesign):
+// forcedTheme="dark" erzwingt den Dark-Look fuer ALLE Besucher — der fruehere
+// Light-Toggle ist entfernt (eine Light-Variante der Glow-Optik existiert nicht).
+// Der Provider bleibt bestehen, damit useTheme-Konsumenten (sonner-Toaster)
+// weiter einen konsistenten Wert bekommen. Zusaetzlich traegt <html> die
+// .dark-Klasse serverseitig (layout.tsx) → kein Theme-Flash vor Hydration.
 export function ThemeProvider({
   children,
   ...props
@@ -17,6 +17,7 @@ export function ThemeProvider({
     <NextThemesProvider
       attribute="class"
       defaultTheme="dark"
+      forcedTheme="dark"
       enableSystem={false}
       disableTransitionOnChange
       {...props}

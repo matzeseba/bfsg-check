@@ -4,8 +4,11 @@ import * as React from "react";
 import * as motion from "motion/react-client";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRightIcon, ShieldCheckIcon } from "lucide-react";
+import { ArrowRightIcon, ShieldCheckIcon, TimerIcon } from "lucide-react";
 
+import { AmbientGlow } from "@/components/fx/AmbientGlow";
+import { MagneticButton } from "@/components/fx/MagneticButton";
+import { SectionKicker } from "@/components/SectionKicker";
 import { Button } from "@/components/ui/button";
 import { DEADLINE, HERO } from "@/lib/config";
 import { EASE } from "@/lib/motion";
@@ -42,37 +45,34 @@ export function CtaSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.6, ease: EASE }}
-          // Warmes Orange-Gradient-Panel (Design: #2a1408 → #16110e). Token-
-          // getrieben via color-mix aus brand-orange über brand-deeper (kein
-          // roher Hex), feine Orange-Kante.
-          className="relative grid items-center gap-8 overflow-hidden rounded-[1.5rem] border border-brand-orange/25 bg-[linear-gradient(135deg,color-mix(in_oklab,var(--brand-orange)_18%,var(--brand-deeper)),var(--brand-deeper)_70%)] px-6 py-14 shadow-elevated sm:px-12 sm:py-20 lg:grid-cols-[1.45fr_0.8fr]"
+          // Grosses Glow-Card-Band (Dark-Glow-Redesign): dunkle Glas-Flaeche mit
+          // Orange-Verlaufs-Rahmen + Innen-Glimmen (.glow-card, globals.css).
+          className="glow-card relative grid items-center gap-8 overflow-hidden px-6 py-14 sm:px-12 sm:py-20 lg:grid-cols-[1.45fr_0.8fr]"
         >
-          {/* Orange-Glow oben + Dot-Grid mit radialer Maske (Design). Ambient-
-              Reduktion: statisch (kein animate-float) und kleiner — das war das
-              teuerste Ambient-Element (34rem @ 60px-Blur, dauerhaft animiert). */}
+          {/* Sektions-Ambiente: warmer Orange-Radial + Glut-Partikel (einziger
+              Blur-Layer des Bands) + statisches Dot-Grid mit radialer Maske. */}
+          <AmbientGlow embers className="z-0" />
           <div
             aria-hidden
-            className="pointer-events-none absolute -top-24 left-[30%] size-[24rem] -translate-x-1/2 rounded-full bg-brand-orange/20 blur-[60px]"
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 dot-bg-dark mask-radial"
+            className="pointer-events-none absolute inset-0 z-0 dot-bg-dark mask-radial"
           />
 
           <div className="relative z-10 text-center lg:text-left">
-            {/* Orange Mono-Kicker (kein Pill — Design: nackte Marken-Linie). */}
-            <p className="font-mono text-xs tracking-[0.12em] text-brand-orange-soft uppercase">
-              60 Sekunden bis zur ersten Fährte
-            </p>
+            {/* Einheitliche Kicker-Pill (Spec §5: jede Sektion Kicker→Headline→Subline). */}
+            <SectionKicker
+              icon={TimerIcon}
+              label="60 Sekunden bis zur ersten Fährte"
+              tone="on-deep"
+            />
 
             <h2
               id="cta-heading"
               className="mt-4 max-w-2xl font-display text-3xl font-extrabold tracking-tight text-balance text-on-deep sm:text-[2.75rem] sm:leading-[1.05]"
             >
-              Lassen Sie den Fuchs ran —{" "}
-              <span className="italic gradient-text">bevor andere zuschnappen.</span>
+              Lassen Sie den Fuchs ran — bevor andere{" "}
+              <span className="italic gradient-text">zuschnappen</span>.
             </h2>
-            <p className="mx-auto mt-5 max-w-xl text-base text-[oklch(0.97_0.004_95)]/72 text-pretty lg:mx-0 sm:text-lg">
+            <p className="mx-auto mt-5 max-w-xl text-base text-foreground/70 text-pretty lg:mx-0 sm:text-lg">
               Kostenloser Sofort-Check, Ergebnis in 60 Sekunden. Keine Anmeldung,
               keine generische Tool-Rohliste — sondern priorisierte Mängel mit
               Fix.
@@ -97,43 +97,45 @@ export function CtaSection() {
             </p>
 
             <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
-              {/* Orange 3D-Haupt-CTA (Fuchsbau-Action-Farbe via .btn-cta). */}
-              <Link href="/#scan" className="btn-cta h-12 px-6 text-base">
-                {HERO.cta}
-                <ArrowRightIcon className="size-4" />
-              </Link>
+              {/* Grosser Orange-3D-Haupt-CTA, magnetisch (Dark-Glow-Motion). */}
+              <MagneticButton>
+                <Link href="/#scan" className="btn-cta h-13 px-7 text-lg">
+                  {HERO.cta}
+                  <ArrowRightIcon className="size-4.5" />
+                </Link>
+              </MagneticButton>
               {/* Creme sekundärer CTA. */}
               <Button
                 size="lg"
                 variant="ghost"
-                className="h-12 gap-1.5 rounded-xl border border-[oklch(0.97_0.004_95)]/18 bg-[oklch(0.97_0.004_95)]/[0.06] px-5 text-base font-medium text-on-deep hover:bg-[oklch(0.97_0.004_95)]/12 hover:text-on-deep"
+                className="h-12 gap-1.5 rounded-xl border border-foreground/20 bg-foreground/[0.06] px-5 text-base font-medium text-on-deep hover:bg-foreground/10 hover:text-on-deep"
                 render={<Link href="/#pakete" />}
               >
                 {HERO.ctaSecondary}
               </Button>
             </div>
 
-            <p className="mt-6 inline-flex items-center gap-1.5 text-xs text-[oklch(0.97_0.004_95)]/72">
+            <p className="mt-6 inline-flex items-center gap-1.5 text-xs text-foreground/70">
               <ShieldCheckIcon className="size-3.5 text-brand-mint" />
               Sichere Zahlung über Stripe · Rechnung sofort per E-Mail
             </p>
           </div>
 
-          {/* Maskottchen (Daumen hoch) — groß + transparent als Hintergrund-
-              Backdrop, auch mobil dezent sichtbar. Schwebt sanft (animate-float-
-              slow), unten weich ausgeblendet (mask-fade-b). Dekorativ → aria-hidden,
-              pointer-events-none, liegt HINTER dem Text (z-0). */}
+          {/* Filo (Daumen hoch, Neo-Glow-Render) rechts im Band — nur ab md
+              (mobil traegt der Text). Schwarzer PNG-Grund wird per Radial-Maske
+              in die dunkle Glas-Flaeche eingeblendet; schwebt sanft (transform-
+              only). Dekorativ → aria-hidden, pointer-events-none. */}
           <div
             aria-hidden
-            className="pointer-events-none absolute -right-9 bottom-0 z-0 flex items-end sm:-right-2 lg:right-6"
+            className="pointer-events-none absolute -right-4 bottom-0 z-0 hidden items-end md:flex lg:right-4"
           >
             <Image
-              src="/mascot-thumbsup.png"
+              src="/filo-thumbsup-neo.png"
               alt=""
-              width={680}
-              height={1235}
+              width={821}
+              height={1100}
               loading="lazy"
-              className="h-auto w-28 opacity-90 mask-fade-b animate-float-slow drop-shadow-[0_24px_40px_rgba(0,0,0,0.5)] sm:w-56 lg:w-72"
+              className="h-auto w-60 animate-float-slow lg:w-72 [mask-image:radial-gradient(ellipse_75%_78%_at_50%_48%,black_52%,transparent_76%)]"
             />
           </div>
         </motion.div>

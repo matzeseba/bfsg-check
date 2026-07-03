@@ -1,3 +1,4 @@
+import { GlowCard } from "@/components/fx/GlowCard";
 import { HERO_VISUAL } from "@/lib/config";
 
 import { ResultPanel } from "./ResultPanel";
@@ -20,8 +21,11 @@ export function HeroVisual() {
         <div className="absolute left-1/2 top-1/3 size-[80%] -translate-x-1/2 rounded-full bg-brand-orange/20 blur-[40px] md:blur-[80px]" />
       </div>
 
-      {/* Dokument-Rahmen (App-Chrome-Fenster) um das ResultPanel. */}
-      <div className="border-gradient relative overflow-hidden rounded-[1.7rem] bg-card/90 p-1.5 shadow-elevated shadow-glow-orange backdrop-blur-sm">
+      {/* Dokument-Rahmen (App-Chrome-Fenster) um das ResultPanel — jetzt als
+          Glas-Card mit Orange-Verlaufs-Glow-Rahmen (Dark-Glow-Standardkarte).
+          Kein backdrop-blur: das Blur-Budget der Sektion (max 2) ist durch
+          AmbientGlow + Halo belegt; die glow-card-Flaeche ist ohnehin nahezu opak. */}
+      <GlowCard className="relative overflow-hidden rounded-[1.7rem] p-1.5">
         {/* Kopfleiste: Ampel-Dots (dekorativ) + deutlich sichtbarer
             „Beispiel"-Chip + neutrale Demo-URL (Kunden-Perspektive). */}
         <div className="flex items-center gap-2 rounded-t-[1.4rem] border-b border-border/60 bg-muted/60 px-4 py-3">
@@ -49,7 +53,7 @@ export function HeroVisual() {
         <p className="rounded-b-[1.4rem] border-t border-border/60 bg-muted/40 px-5 py-3 text-xs text-muted-foreground">
           {v.footnote}
         </p>
-      </div>
+      </GlowCard>
     </div>
   );
 }

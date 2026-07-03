@@ -1,12 +1,12 @@
-"use client";
-
-import * as motion from "motion/react-client";
 import {
   GlobeIcon,
   LockKeyholeIcon,
   ScaleIcon,
   ShieldCheckIcon,
 } from "lucide-react";
+
+import { GlowCard } from "./fx/GlowCard";
+import { Reveal } from "./fx/Reveal";
 
 const ITEMS = [
   {
@@ -31,8 +31,9 @@ const ITEMS = [
   },
 ] as const;
 
-// Durchgehendes Vertrauens-Band (vorher ungenutzt). Reduziert Kauf-Angst direkt
-// vor/nach den Preisen.
+// Durchgehendes Vertrauens-Band. Reduziert Kauf-Angst direkt vor/nach den Preisen.
+// Dark-Glow-Redesign: vier kleine Glas-Karten (.glow-card) mit Orange-Icon-Tiles
+// statt der bisherigen Mint-Farbwelt; gestaffelter Reveal, Karten-Lift beim Hover.
 export function TrustSection() {
   return (
     <section
@@ -42,24 +43,19 @@ export function TrustSection() {
       <div className="mx-auto max-w-6xl px-5 py-12 sm:px-6 sm:py-14">
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
           {ITEMS.map(({ icon: Icon, title, desc }, i) => (
-            <motion.div
-              key={title}
-              initial={{ opacity: 0, y: 14 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.45, delay: i * 0.06 }}
-              className="group/trust card-lift flex items-start gap-3 rounded-2xl border border-border/70 bg-card/70 p-4 shadow-card-soft backdrop-blur dark:ring-1 dark:ring-white/5"
-            >
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-mint/12 text-brand-mint transition-transform duration-300 group-hover/trust:scale-110">
-                <Icon className="size-5" aria-hidden />
-              </span>
-              <div>
-                <p className="text-sm font-semibold">{title}</p>
-                <p className="mt-0.5 text-xs leading-snug text-muted-foreground">
-                  {desc}
-                </p>
-              </div>
-            </motion.div>
+            <Reveal key={title} index={i} className="flex">
+              <GlowCard className="group/trust card-lift flex w-full items-start gap-3 p-4">
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-brand-orange/25 bg-brand-orange/12 text-brand-orange transition-transform duration-300 group-hover/trust:scale-110">
+                  <Icon className="size-5" aria-hidden />
+                </span>
+                <div>
+                  <p className="text-sm font-semibold">{title}</p>
+                  <p className="mt-0.5 text-xs leading-snug text-muted-foreground">
+                    {desc}
+                  </p>
+                </div>
+              </GlowCard>
+            </Reveal>
           ))}
         </div>
       </div>
