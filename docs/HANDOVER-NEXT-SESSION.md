@@ -2,7 +2,32 @@
 
 ---
 
-## ▶️ NÄCHSTE SESSION STARTET HIER (02.07.2026, Nacht-Sprint) — Stand nach 5 Merges
+## ▶️ NÄCHSTE SESSION STARTET HIER (03.07.2026, Nacht-Session) — Aktionsplan A–G KOMPLETT LIVE
+
+**8 PRs gemergt + live (alle adversarial reviewt, PR-CI grün, /health ok):**
+- **#120 PR-CI** (endlich CI auf jedem PR: scanner-tests + LP-build + `scripts/legal-grep.mjs`)
+- **#121 Hero-Wahrheits-Fix**: Hero-Vorschau und echtes Gratis-Ergebnis rendern DIESELBE `ResultPanel`-Komponente (`lib/severity.ts` = TS-Spiegel der Mail-Severity-Logik; A11y-Kontrast-Fix beidseitig)
+- **#122 Delay-Notice-Kundenmail** (Owner-freigegebener Wortlaut + HTML)
+- **#123 Apex↔www-Fallback** im Scanner (SSRF-verifiziert)
+- **#124 Abo-Jahresoption 249 €/Jahr KOMPLETT** ('abo-jahr' Backend+Frontend+AGB §5+Doku; Jahres-Ticker für monatliche Re-Checks; 250-€-Rundungsbug gefixt; Live-Beweis cs_live-Session)
+- **#125 `/bfsg-1-jahr-bilanz`** + PM-Rewrite (⚖️ Norm-Fix: Barrierefreiheitserklärung = **§ 14 BFSG**, nicht § 15 BFSGV)
+- **#126 `/bfsg-software-anbieter-vergleich`** (§ 6 UWG; Beweisvorsorge-Archiv lokal `C:\Users\Administrator\bfsg-evidence\2026-07-03\`)
+- **#127 Listings-Rewrite** (10 Plattformen einreichfertig, axe-core statt Pa11y)
+
+**Owner-Checkliste autonom erledigt:** Backup-P0 SCHARF (täglicher Cron 03:00, lokaler Fallback, **Restore-Test bestanden**; GPG-Private-Key lokal `C:\Users\Administrator\bfsg-backup-keys\` → Owner offline sichern!) · Brevo-Templates #1/#7 Reply-To = info@bfsg-fix.de (API-verifiziert, +2,75 Spam-Punkte weg) · INWX-SPF/DMARC-Duplikate waren bereits bereinigt (autoritativ verifiziert) · DOI-Halbtest ok (Bestätigungsklick an matze.seba+doitest0207@outlook.de offen).
+
+### 🔴 NUR-OWNER-PUNKTE (Account-Erstellung ist Claude grundsätzlich untersagt)
+1. **Backblaze-B2-Konto** anlegen (kostenlos, ohne Karte) → danach zieht Claude rclone/`BACKUP_TARGET` nach = Offsite-Backup komplett
+2. **Bing-/Google-Ads- + SaaSHub-Konten** anlegen → Claude übernimmt danach alles in der eingeloggten Session (Kampagnen-Import, Listings — Texte liegen fertig)
+3. GPG-Private-Key offline sichern · Gründer-Foto + 1 Satz · optional Abo-Jahr-Testkauf (249 €, dann Refund)
+
+### 🎨 FRONTEND-REDESIGN — NEUSTART GEPLANT (Owner-Briefing abwarten!)
+Owner-Zielbild = **eigene Higgsfield-Vorlagen** in `Vorlagen Landingpage/` (Dark-Premium: Schwarz, Orange-Glow/Light-Trails, 3D-Filo, Glas-Cards, Score-Donut). „Gutachten"-Konzept + 4 Mocks abgelehnt; bester Prototyp-Stand als Screenshots unter `.claude/fe2-screenshots/darkglow-v2-*`. **PR #128 (Token-Fundament) NICHT mergen — geparkt/obsolet.** ⚖️ Vorlagen-Texte sind teils UWG-widrig („RECHTSSICHER", „100 % konform", Fake-Zahlen, Fremdlogos Allianz/SAP) → Optik ja, Claims IMMER ehrlich ersetzen. **Der Owner erklärt in der nächsten Session genau, wie der Umbau laufen soll — nicht vorher losbauen.**
+Offene Follow-ups: Verdict-Text Seite↔Mail vereinheitlichen (`result.verdict` bevorzugen) · § 15 BFSGV → § 14 BFSG auf `barrierefreiheitserklaerung-muster` (8 Stellen inkl. SEO-Title, eigener PR).
+
+---
+
+## (Historie) Stand 02.07.2026, Nacht-Sprint — nach 5 Merges
 
 **Diese Session (autonomer 4h-Sprint) hat gemergt + live deployt (alle Deploys grün, `/health` ok):**
 - **#111** docs: DNS-Doku korrigiert (Brevo-DKIM = brevo1/brevo2-CNAMEs, bfsg-fuchs-Zone dokumentiert) + Preis-Sync W2 (OFFER.md/pricing-experiments auf 129/399/24,99)
