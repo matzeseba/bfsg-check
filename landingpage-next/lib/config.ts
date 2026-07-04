@@ -190,7 +190,10 @@ export const RISK_BAND = {
   points: [
     { value: "28.06.2025", label: "Stichtag bereits überschritten" },
     { value: "WCAG 2.1 AA", label: "geforderter Mindeststandard" },
-    { value: "Verbände", label: "klagebefugt nach §15 BFSG" },
+    // Norm-Fix 04.07.2026 (amtl. Inhaltsübersicht gesetze-im-internet.de/bfsg):
+    // § 15 BFSG = Beratungsangebot der Bundesfachstelle — NICHT Klagebefugnis.
+    // Verbands-/Einrichtungsrechte: § 32 (Verwaltungsverfahren) + § 33 (Rechtsbehelfe).
+    { value: "Verbände", label: "Antrags- & Klagerechte (§§ 32, 33 BFSG)" },
   ],
 } as const;
 

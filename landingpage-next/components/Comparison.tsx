@@ -6,7 +6,8 @@ import { COMPARISON } from "@/lib/config";
 import { cn } from "@/lib/utils";
 
 import { GlowCard } from "./fx/GlowCard";
-import { Reveal } from "./fx/Reveal";
+import { ScrollScrub } from "./fx/ScrollScrub";
+import { TiltCard } from "./fx/TiltCard";
 import { SectionKicker } from "./SectionKicker";
 
 // Direktvergleich — UWG-§5/§6-sauber: qualitativer, sachlicher Vergleich
@@ -14,6 +15,9 @@ import { SectionKicker } from "./SectionKicker";
 // herabsetzende Wertung. Dark-Glow-Redesign: Mittelspalte als Glow-Card
 // mit Orange-Aussenschein hervorgehoben (rein visuell, Texte unveraendert
 // aus config.COMPARISON), Aussenspalten als ruhige dunkle Karten.
+// Scroll-Story-Modus: Spalten bauen sich scroll-gekoppelt gestaffelt auf
+// (ScrollScrub) und neigen sich dem Cursor entgegen (TiltCard, Feinzeiger,
+// reduced-motion-still — die Primitive gaten das selbst).
 // A11y: Werte als Text (nicht nur Farbe/Balken), Haekchen aria-hidden.
 export function Comparison() {
   const accentIdx = COMPARISON.title.indexOf(COMPARISON.titleAccent);
@@ -61,7 +65,10 @@ export function Comparison() {
             const inner = (
               <>
                 {col.highlight && (
-                  <span className="absolute -top-3 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full bg-brand-amber px-3 py-1 font-mono text-[10px] font-bold tracking-wide text-brand-deep uppercase shadow-glow-orange">
+                  /* z-10: der ::after-Glow-Rahmen der glow-card malt in der
+                     Paint-Order sonst ÜBER den Badge — die Orange-Linie schien
+                     durch die Pill (Owner-Finding 04.07.). */
+                  <span className="absolute -top-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 rounded-full bg-brand-amber px-3 py-1 font-mono text-[10px] font-bold tracking-wide text-brand-deep uppercase shadow-glow-orange">
                     <span aria-hidden>★</span>
                     Unser Ansatz
                   </span>
@@ -116,22 +123,29 @@ export function Comparison() {
               </>
             );
             return (
-              <Reveal key={col.name} index={i} className="flex">
-                {col.highlight ? (
-                  // Hervorgehobene Fuchs-Spalte: Glas-Card mit Orange-Glow-
-                  // Rahmen + weichem Aussenschein (KEIN neuer Text-Superlativ).
-                  <GlowCard
-                    ring
-                    className="card-lift relative flex w-full flex-col p-7"
-                  >
-                    {inner}
-                  </GlowCard>
-                ) : (
-                  <div className="card-lift relative flex w-full flex-col rounded-3xl border border-border-card bg-card p-7 shadow-card-soft">
-                    {inner}
-                  </div>
-                )}
-              </Reveal>
+              <ScrollScrub
+                key={col.name}
+                from={56}
+                fromX={i * 16}
+                className="flex"
+              >
+                <TiltCard max={col.highlight ? 6 : 5} className="flex w-full">
+                  {col.highlight ? (
+                    // Hervorgehobene Fuchs-Spalte: Glas-Card mit Orange-Glow-
+                    // Rahmen + weichem Aussenschein (KEIN neuer Text-Superlativ).
+                    <GlowCard
+                      ring
+                      className="card-lift relative flex w-full flex-col p-7"
+                    >
+                      {inner}
+                    </GlowCard>
+                  ) : (
+                    <div className="card-lift relative flex w-full flex-col rounded-3xl border border-border-card bg-card p-7 shadow-card-soft">
+                      {inner}
+                    </div>
+                  )}
+                </TiltCard>
+              </ScrollScrub>
             );
           })}
         </div>

@@ -5,6 +5,8 @@ import * as motion from "motion/react-client";
 import { ArrowRightIcon, CheckCircle2Icon } from "lucide-react";
 
 import { AmbientGlow } from "@/components/fx/AmbientGlow";
+import { MouseLayer, MouseParallax } from "@/components/fx/MouseParallax";
+import { ParallaxLayer } from "@/components/fx/ParallaxLayer";
 import { HERO, HERO_VISUAL } from "@/lib/config";
 import { EASE } from "@/lib/motion";
 
@@ -14,14 +16,19 @@ import { ScanForm } from "./ScanForm";
 // Schwebende Befund-Chips um das Report-Panel (Vorlage „Interaktive Prüfung"):
 // Texte kommen 1:1 aus HERO_VISUAL.sample.topIssues (ehrliche Beispieldaten) und
 // stehen bereits lesbar IM Panel → die Chips sind redundant-dekorativ (aria-hidden).
-// Dot-Farben spiegeln die Schwere-Sequenz des Beispiels (2× Kritisch, 1× Schwerwiegend).
+// Dot-Farben spiegeln die Schwere-Sequenz des Beispiels (2× Kritisch).
 // Bewusst nur ZWEI Chips: ein dritter verdeckte auf 1440px exakt die Panel-
 // Zeile mit demselben Text (redundant + Lesbarkeitsverlust). top-basiert —
 // eine bottom-Referenz loeste gegen die Panel-Oberkante auf und schob den
-// Chip in die Vorschau-Überschrift.
+// Chip in die Vorschau-Überschrift. Beide Chips ankern an der LINKEN Panel-
+// Kante: rechts steht jetzt der freigestellte Filo, und den duerfen keine
+// Chips ueberdecken (Maskottchen-Regeln v2).
+// Bewusst nur EIN Chip: Das Panel ist seit dem Filo-Umbau schmal und die
+// Spaltenluecke ~50px — ein zweiter Chip kollidierte auf 1440px wahlweise
+// mit der Hero-Subline (links) oder den Severity-Badges (im Panel).
+// Der eine Chip an der linken Panel-Oberkante traegt die Vorlagen-Optik.
 const FLOAT_CHIPS = [
-  { pos: "-left-5 top-16", float: "animate-float", dot: "bg-brand-rose", delay: "0s" },
-  { pos: "-right-6 top-[38%]", float: "animate-float-slow", dot: "bg-brand-rose", delay: "0.8s" },
+  { pos: "-left-20 top-14", float: "animate-float", dot: "bg-brand-rose", delay: "0s" },
 ] as const;
 
 export function Hero() {
@@ -56,7 +63,8 @@ export function Hero() {
       />
       {/* Sektions-Ambiente: warmer Orange-Radial-Schein + Glut-Partikel
           (AmbientGlow ist aria-hidden + reduced-motion-still). Der einzige
-          Blur-Layer neben dem Panel-Halo im HeroVisual (Budget: max 2). */}
+          Blur-Layer neben dem Panel-Halo im HeroVisual (Budget: max 2 —
+          der Fuchs-Glow rechts ist deshalb bewusst blur-frei). */}
       <AmbientGlow
         embers
         className="-z-10"
@@ -174,97 +182,141 @@ export function Hero() {
           </motion.ul>
         </div>
 
-        {/* Rechte Spalte: schwebendes Report-Panel (Glas + Glow) mit Filo-
-            Maskottchen dahinter. min-w-0 laesst die Spalte unter ihre
-            min-content-Breite schrumpfen; mx-auto + max-w-md zentriert das
-            Visual auf Mobile sauber mittig, ohne Desktop (lg+) zu beeinflussen. */}
+        {/* Rechte Spalte: schwebendes Report-Panel (Glas + Glow) mit Filo GROSS
+            daneben (Maskottchen-Regeln v2: PNG echt freigestellt → keine Maske,
+            unverdeckt NEBEN dem Inhalt statt dahinter). Der Inhalt reserviert
+            dem Fuchs Platz via md:pr-40/xl:pr-52 auf dem MouseParallax-Wrapper;
+            nur die Panel-KANTE wird minimal ueberlappt (z-20, GlowCard-Rahmen +
+            ResultPanel-px-5 fangen die ~25px ab — kein Inhalt verdeckt).
+            min-w-0 laesst die Spalte unter ihre min-content-Breite schrumpfen;
+            mx-auto + max-w-md zentriert auf Mobile, md:max-w-2xl gibt der
+            Komposition auf md Breite fuer Panel + Fuchs-Zone. Der Entrance
+            bleibt (Owner-ok): LCP-Element ist die H1 links, nicht das Panel. */}
         <motion.div
           initial={{ opacity: 0, y: 30, scale: 0.97 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
-          className="relative mx-auto w-full min-w-0 max-w-md lg:max-w-none"
+          className="relative mx-auto w-full min-w-0 max-w-md md:max-w-2xl lg:max-w-none"
         >
-          {/* Vorschau-Kopf: eigene Sub-Überschrift über dem Report-Visual.
-              Bewusst ein <p> (kein <h2>): visuelle Größe ≠ Heading-Semantik, sonst
-              kippt die Screenreader-Outline (WCAG 1.3.1). Klar kleiner als die H1
-              (max ~1.6rem → kein LCP-Kandidat), aber deutlich als Vorschau erkennbar
-              (Chip "Vorschau" + "Beispiel"-Kennzeichnung im Report selbst). */}
-          <div className="mb-5 text-center lg:text-left">
-            <span
-              aria-hidden
-              className="inline-flex items-center gap-1.5 rounded-full bg-brand-amber px-2.5 py-1 font-mono text-[10px] font-bold tracking-[0.16em] text-brand-deep uppercase"
-            >
-              <span className="inline-flex size-1.5 rounded-full bg-brand-deep/70" />
-              Vorschau
-            </span>
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.15 }}
-              className="mt-2.5 font-display text-[clamp(1.2rem,2.7vw,1.6rem)] leading-snug font-semibold tracking-tight text-foreground text-balance"
-            >
-              {pvPre}
-              {pvIdx >= 0 && (
-                <span className="italic gradient-text">
-                  {HERO_VISUAL.previewAccent}
-                </span>
-              )}
-              {pvPost}
-            </motion.p>
-          </div>
-
-          <div className="relative">
-            {/* Filo-Maskottchen hinter/neben dem Panel (md+ only; auf Mobile
-                ausgeblendet). Schwarzer PNG-Hintergrund verschwimmt per Radial-
-                Maske in den near-black Seitengrund. Dahinter der dekorative
-                Licht-Trail-Ring (.orbit-trails, reduced-motion-still). */}
-            {/* Kleiner + tiefer positioniert: der Fuchs lugt neben der unteren
-                Panel-Ecke hervor, statt gross hinter der Glas-Flaeche zu
-                "geistern" (das 88%-opake Panel liesse ihn sonst durchscheinen). */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -right-24 -bottom-14 -z-10 hidden md:block"
-            >
-              <span className="orbit-trails -inset-6" />
-              <Image
-                src="/filo-arms-crossed.png"
-                alt=""
-                width={240}
-                height={321}
-                // KEIN priority: dekorativ + auf Mobile via CSS versteckt — ein
-                // Preload wuerde dort gegen das echte LCP-Element konkurrieren.
-                loading="lazy"
-                className="[mask-image:radial-gradient(ellipse_72%_78%_at_50%_45%,black_55%,transparent_80%)]"
-              />
-            </div>
-
-            <HeroVisual />
-
-            {/* Schwebende Befund-Chips (redundant-dekorativ, Texte stehen im
-                Panel selbst → aria-hidden; animate-float ist reduced-motion-
-                gated). md+ only, damit auf Mobile nichts überlappt. */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0 hidden md:block"
-            >
-              {HERO_VISUAL.sample.topIssues.slice(0, 3).map((issue, i) => {
-                const chip = FLOAT_CHIPS[i];
-                if (!chip) return null;
-                return (
-                  <span
-                    key={issue}
-                    style={{ animationDelay: chip.delay }}
-                    className={`glow-border absolute inline-flex max-w-60 items-center gap-1.5 rounded-full bg-card px-3 py-1.5 text-xs font-medium text-foreground/90 shadow-glow-orange ${chip.pos} ${chip.float}`}
-                  >
-                    <span
-                      className={`inline-flex size-1.5 shrink-0 rounded-full ${chip.dot}`}
-                    />
-                    <span className="truncate">{issue}</span>
+          {/* Cursor-Tiefenebenen (Dynamik 2.0): MouseParallax normalisiert die
+              Mausposition auf dem gesamten Kompositions-Wrapper, die MouseLayer
+              staffeln Panel (8) / Glow+Trails (12) / Fuchs (18) / Chips (28) in
+              die Tiefe. Nur Feinzeiger (Maus), gefedert, reduced-motion-still —
+              alles im Primitiv selbst geregelt, MotionValues statt State. */}
+          {/* lg:pr-48: bei 1024–1279px waechst der Fuchs auf 400px (~187px Einzug),
+              md:pr-40 (160px) liesse ihn ~27px in den Panel-Inhalt ragen
+              (Review-Fund) — 192px Reserve schliesst die Luecke. */}
+          <MouseParallax className="relative md:pr-40 lg:pr-48 xl:pr-52">
+            {/* Vorschau-Kopf: eigene Sub-Überschrift über dem Report-Visual.
+                Bewusst ein <p> (kein <h2>): visuelle Größe ≠ Heading-Semantik, sonst
+                kippt die Screenreader-Outline (WCAG 1.3.1). Klar kleiner als die H1
+                (max ~1.6rem → kein LCP-Kandidat), aber deutlich als Vorschau erkennbar
+                (Chip "Vorschau" + "Beispiel"-Kennzeichnung im Report selbst). */}
+            <div className="mb-5 text-center lg:text-left">
+              <span
+                aria-hidden
+                className="inline-flex items-center gap-1.5 rounded-full bg-brand-amber px-2.5 py-1 font-mono text-[10px] font-bold tracking-[0.16em] text-brand-deep uppercase"
+              >
+                <span className="inline-flex size-1.5 rounded-full bg-brand-deep/70" />
+                Vorschau
+              </span>
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.15 }}
+                className="mt-2.5 font-display text-[clamp(1.2rem,2.7vw,1.6rem)] leading-snug font-semibold tracking-tight text-foreground text-balance"
+              >
+                {pvPre}
+                {pvIdx >= 0 && (
+                  <span className="italic gradient-text">
+                    {HERO_VISUAL.previewAccent}
                   </span>
-                );
-              })}
+                )}
+                {pvPost}
+              </motion.p>
             </div>
-          </div>
+
+            {/* Glow-Ebenen HINTER dem Fuchs (Maskottchen-Regeln v2): radialer
+                Orange-Schein als reines radial-gradient — bewusst KEIN
+                filter-blur, das Sektions-Budget (max 2) ist durch AmbientGlow +
+                Panel-Halo belegt (Konvention wie RiskBand) — plus der
+                .orbit-trails-Ring. Grob auf den Fuchs-Torso zentriert; -z-10 →
+                liegt hinter Panel UND Fuchs, nie darueber. */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -right-24 -bottom-4 -z-10 hidden size-80 md:block lg:-right-32 lg:size-[440px] xl:size-[490px]"
+            >
+              <MouseLayer depth={12} className="relative h-full w-full">
+                <span className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_center,color-mix(in_oklch,var(--brand-orange),transparent_72%),transparent_68%)]" />
+                <span className="orbit-trails inset-8" />
+              </MouseLayer>
+            </div>
+
+            <div className="relative">
+              {/* Report-Panel: Maus-Tiefe 8 + scroll-gekoppeltes Treiben
+                  (ParallaxLayer 18, Scroll-Story) — beides reine Compositor-
+                  Transforms via MotionValues, kein Re-Render pro Frame. */}
+              <MouseLayer depth={8}>
+                <ParallaxLayer distance={18}>
+                  <HeroVisual />
+                </ParallaxLayer>
+              </MouseLayer>
+
+              {/* Schwebende Befund-Chips (redundant-dekorativ, Texte stehen im
+                  Panel selbst → aria-hidden; animate-float ist reduced-motion-
+                  gated). md+ only, damit auf Mobile nichts überlappt. Maus-Tiefe
+                  28 + eigenes Scroll-Treiben (distance 24 ≠ Panel 18 → leichte
+                  Relativ-Drift der Chips gegen das Panel beim Scrollen). */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 hidden md:block"
+              >
+                <ParallaxLayer distance={24} className="absolute inset-0">
+                  <MouseLayer depth={28} className="absolute inset-0">
+                    {HERO_VISUAL.sample.topIssues.slice(0, 3).map((issue, i) => {
+                      const chip = FLOAT_CHIPS[i];
+                      if (!chip) return null;
+                      return (
+                        <span
+                          key={issue}
+                          style={{ animationDelay: chip.delay }}
+                          className={`glow-border absolute inline-flex max-w-60 items-center gap-1.5 rounded-full bg-card px-3 py-1.5 text-xs font-medium text-foreground/90 shadow-glow-orange ${chip.pos} ${chip.float}`}
+                        >
+                          <span
+                            className={`inline-flex size-1.5 shrink-0 rounded-full ${chip.dot}`}
+                          />
+                          <span className="truncate">{issue}</span>
+                        </span>
+                      );
+                    })}
+                  </MouseLayer>
+                </ParallaxLayer>
+              </div>
+            </div>
+
+            {/* Filo GROSS neben dem Panel (freigestelltes PNG 537×1100 — keine
+                CSS-Maske mehr noetig): bottom-buendig mit der Panel-Unterkante,
+                z-20 → VOR der Panel-Kante, dank reserviertem pr-* aber ohne
+                Panel-Inhalt zu verdecken. Maus-Tiefe 18. Auf md kleiner neben
+                dem Panel, auf Mobile hidden. */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute bottom-0 -right-2 z-20 hidden md:block"
+            >
+              <MouseLayer depth={18}>
+                <Image
+                  src="/filo-arms-crossed.png"
+                  alt=""
+                  width={537}
+                  height={1100}
+                  // KEIN priority: dekorativ + auf Mobile via CSS versteckt — ein
+                  // Preload wuerde dort gegen das echte LCP-Element konkurrieren.
+                  loading="lazy"
+                  className="h-[300px] w-auto lg:h-[400px] xl:h-[460px]"
+                />
+              </MouseLayer>
+            </div>
+          </MouseParallax>
         </motion.div>
       </div>
     </section>

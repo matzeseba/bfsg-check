@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
 import { Reveal } from "@/components/fx/Reveal";
+import { ScrollScrub } from "@/components/fx/ScrollScrub";
 import { FAQ_ITEMS, SITE } from "@/lib/config";
 
 export function FAQAccordion() {
@@ -88,38 +89,42 @@ export function FAQAccordion() {
           )}
         </Reveal>
 
-        {filtered.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-border bg-card/40 px-6 py-12 text-center text-sm text-muted-foreground">
-            Keine Treffer — schreiben Sie uns Ihre Frage einfach per E-Mail.
-          </p>
-        ) : (
-          // Dark-Glow: einzelne dunkle Karten (kein durchgehender Block); Hover
-          // und offener Zustand bekommen die Orange-Kante, offen zusaetzlich ein
-          // weiches Orange-Glimmen. base-ui setzt data-open am Item-Element.
-          <Accordion className="grid gap-2.5">
-            {filtered.map((item, idx) => (
-              <AccordionItem
-                key={item.q}
-                value={`faq-${idx}`}
-                className="rounded-xl border border-border bg-card px-5 transition-[border-color,box-shadow] duration-200 hover:border-brand-orange/25 data-open:border-brand-orange/40 data-open:shadow-[0_14px_44px_-20px_color-mix(in_oklch,var(--brand-orange),transparent_35%)] sm:px-6"
-              >
-                {/* Built-in Chevron der Trigger-Primitive ausblenden — wir nutzen
-                    stattdessen das Design-"+"-Icon (rotiert zu ×). */}
-                <AccordionTrigger className="gap-4 py-5 font-display text-base font-semibold text-foreground hover:no-underline [&_[data-slot=accordion-trigger-icon]]:hidden">
-                  {item.q}
-                  {/* Orange "+" das beim Öffnen zu × rotiert (45deg). */}
-                  <PlusIcon
-                    aria-hidden
-                    className="ml-auto size-5 shrink-0 text-brand-orange transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-aria-expanded/accordion-trigger:rotate-45"
-                  />
-                </AccordionTrigger>
-                <AccordionContent className="max-w-[40rem] pb-5 text-sm leading-relaxed text-muted-foreground">
-                  <p>{item.a}</p>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        )}
+        {/* Items-Liste scroll-gekoppelt (Scroll-Story): baut sich beim Scrollen
+            auf, Rueckwaerts-Scrollen spult zurueck; reduced-motion = statisch. */}
+        <ScrollScrub from={40}>
+          {filtered.length === 0 ? (
+            <p className="rounded-2xl border border-dashed border-border bg-card/40 px-6 py-12 text-center text-sm text-muted-foreground">
+              Keine Treffer — schreiben Sie uns Ihre Frage einfach per E-Mail.
+            </p>
+          ) : (
+            // Dark-Glow: einzelne dunkle Karten (kein durchgehender Block); Hover
+            // und offener Zustand bekommen die Orange-Kante, offen zusaetzlich ein
+            // weiches Orange-Glimmen. base-ui setzt data-open am Item-Element.
+            <Accordion className="grid gap-2.5">
+              {filtered.map((item, idx) => (
+                <AccordionItem
+                  key={item.q}
+                  value={`faq-${idx}`}
+                  className="rounded-xl border border-border bg-card px-5 transition-[border-color,box-shadow] duration-200 hover:border-brand-orange/25 data-open:border-brand-orange/40 data-open:shadow-[0_14px_44px_-20px_color-mix(in_oklch,var(--brand-orange),transparent_35%)] sm:px-6"
+                >
+                  {/* Built-in Chevron der Trigger-Primitive ausblenden — wir nutzen
+                      stattdessen das Design-"+"-Icon (rotiert zu ×). */}
+                  <AccordionTrigger className="gap-4 py-5 font-display text-base font-semibold text-foreground hover:no-underline [&_[data-slot=accordion-trigger-icon]]:hidden">
+                    {item.q}
+                    {/* Orange "+" das beim Öffnen zu × rotiert (45deg). */}
+                    <PlusIcon
+                      aria-hidden
+                      className="ml-auto size-5 shrink-0 text-brand-orange transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-aria-expanded/accordion-trigger:rotate-45"
+                    />
+                  </AccordionTrigger>
+                  <AccordionContent className="max-w-[40rem] pb-5 text-sm leading-relaxed text-muted-foreground">
+                    <p>{item.a}</p>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          )}
+        </ScrollScrub>
       </div>
     </section>
   );

@@ -516,7 +516,6 @@
      --glow-color ueberschreibbar (GlowCard.tsx setzt inline style). */
   .glow-card {
     --glow-color: var(--brand-orange);
-    position: relative;
     border-radius: var(--radius-2xl);
     background:
       linear-gradient(180deg, color-mix(in oklch, var(--glow-color), transparent 94%), transparent 40%),
@@ -548,8 +547,15 @@
     mask-composite: exclude;
     pointer-events: none;
   }
-  /* Nur der Orange-Verlaufs-Rahmen (fuer Bestandskarten, die ihre Flaeche behalten). */
-  .glow-border {
+  /* Nur der Orange-Verlaufs-Rahmen (fuer Bestandskarten, die ihre Flaeche behalten).
+     WICHTIG: position via :where() mit Null-Spezifitaet — ein nacktes
+     `.glow-border { position: relative }` hat dieselbe Spezifitaet wie Tailwinds
+     `.fixed`/`.absolute` und gewinnt per Quell-Reihenfolge → genau das hat
+     CookieBanner (fixed) und MobileStickyCta (fixed) in den Seitenfluss gerissen
+     (Owner-Finding 04.07.). :where() verliert gegen JEDE Utility, liefert aber
+     weiterhin den Default fuer unpositionierte Karten. Gleiches Schema fuer
+     .glow-card. */
+  :where(.glow-card, .glow-border) {
     position: relative;
   }
   .glow-border::after {

@@ -3,7 +3,8 @@ import { CheckIcon, MapPinIcon, UserRoundIcon } from "lucide-react";
 
 import { AmbientGlow } from "./fx/AmbientGlow";
 import { GlowCard } from "./fx/GlowCard";
-import { Reveal } from "./fx/Reveal";
+import { ParallaxLayer } from "./fx/ParallaxLayer";
+import { ScrollScrub } from "./fx/ScrollScrub";
 import { SectionKicker } from "./SectionKicker";
 
 // Drei ehrliche Selbst-Tatsachen (keine erfundenen Kundenzahlen/Titel) —
@@ -14,9 +15,10 @@ const FOUNDER_POINTS = [
   "Betrieb & Hosting vollständig in Deutschland",
 ] as const;
 
-// "Wer dahintersteht" — Founder-Sektion (Dark-Glow-Redesign, Spec §1/§5).
+// "Wer dahintersteht" — Founder-Sektion (Dark-Glow-Redesign, Spec §1/§5/§6).
 // Server-Component; Motion kommt ausschließlich aus den fertigen fx-Primitiven
-// (Reveal links/rechts), das Portrait sitzt in einer GlowCard mit .glow-ring.
+// (ParallaxLayer fürs Portrait, ScrollScrub für die Zitat-Spalte), das Portrait
+// sitzt in einer GlowCard mit .glow-ring.
 export function FounderSection() {
   return (
     <section
@@ -25,8 +27,9 @@ export function FounderSection() {
     >
       <AmbientGlow toneClassName="opacity-60" />
       <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-12 px-5 py-20 sm:px-6 sm:py-24 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
-        {/* Links: Portrait-Karte mit Name, Rolle, Standort. */}
-        <Reveal variant="left" className="mx-auto w-full max-w-sm">
+        {/* Links: Portrait-Karte mit Name, Rolle, Standort — subtiler
+            scroll-gekoppelter Tiefenversatz (Scroll-Story, Spec §6). */}
+        <ParallaxLayer distance={26} className="mx-auto w-full max-w-sm">
           <GlowCard ring className="p-3">
             <Image
               src="/founder-matthias.jpg"
@@ -47,10 +50,11 @@ export function FounderSection() {
               </p>
             </div>
           </GlowCard>
-        </Reveal>
+        </ParallaxLayer>
 
-        {/* Rechts: Kicker → Headline → Zitat → ehrliche Checkliste. */}
-        <Reveal variant="right">
+        {/* Rechts: Kicker → Headline → Zitat → ehrliche Checkliste — baut sich
+            scroll-gekoppelt von rechts auf. */}
+        <ScrollScrub fromX={32}>
           <SectionKicker icon={UserRoundIcon} label="Wer dahintersteht" tone="on-deep" />
           <h2
             id="founder-heading"
@@ -80,7 +84,7 @@ export function FounderSection() {
               </li>
             ))}
           </ul>
-        </Reveal>
+        </ScrollScrub>
       </div>
     </section>
   );
