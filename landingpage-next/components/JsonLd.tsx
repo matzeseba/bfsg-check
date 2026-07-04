@@ -1,6 +1,6 @@
 import { FAQ_ITEMS, SITE } from "@/lib/config";
 
-// canonical/OG-Domain bleibt bis zum DNS-Cutover bfsg-fix.de (SITE.url);
+// canonical/OG-Domain = SITE.url (seit Cutover 29.06.2026: bfsg-fuchs.de);
 // die MARKE ist "BFSG-Fuchs" (SITE.name) — single source of truth aus lib/config.ts.
 const siteUrl = SITE.url;
 const organizationName = SITE.name;
@@ -15,8 +15,9 @@ const organizationSchema: JsonLdSchema = {
   // TODO: dediziertes quadratisches Logo (kein quadratisches Asset in public/
   // vorhanden — bis dahin auf das OG-Banner zeigen, das immerhin existiert).
   logo: `${siteUrl}/logo-fox.png`,
+  email: SITE.email,
   description:
-    "Der BFSG-Fuchs ist der automatisierte Barrierefreiheits-Scanner für deutsche Websites mit verständlichem Fix-Plan und laufendem Monitoring.",
+    "Der BFSG-Fuchs ist ein automatisierter Barrierefreiheits-Scanner für deutsche Websites mit verständlichem Fix-Plan und laufendem Monitoring.",
 };
 
 const websiteSchema: JsonLdSchema = {
@@ -48,7 +49,7 @@ const products: ProductInput[] = [
   {
     name: "BFSG-Report Basis",
     description:
-      "Einmaliger automatischer BFSG- und WCAG-2.1-AA-Scan Ihrer Website inklusive priorisiertem Fix-Plan mit Code-Snippets.",
+      "Einmaliger automatisierter WCAG-2.1-AA-Scan von bis zu 5 Unterseiten inklusive priorisiertem Fix-Plan mit Code-Snippets und Entwurf der Barrierefreiheitserklärung.",
     price: "129.00",
     category: "Barrierefreiheits-Audit",
     sku: "bfsg-basis",
@@ -57,7 +58,7 @@ const products: ProductInput[] = [
   {
     name: "BFSG-Report Profi",
     description:
-      "Tiefenscan mit manueller Prüfung kritischer Flows, ausführlichem Fix-Plan, Entwickler-Checkliste und 30 Tagen E-Mail-Support.",
+      "Automatisierter WCAG-2.1-AA-Scan von bis zu 25 Unterseiten mit priorisiertem Umsetzungsplan, menschlicher Sichtung vor Auslieferung und 30 Tagen E-Mail-Support.",
     price: "399.00",
     category: "Barrierefreiheits-Audit",
     sku: "bfsg-profi",
@@ -75,7 +76,7 @@ const products: ProductInput[] = [
   {
     name: "Cookie-Check Profi",
     description:
-      "Erweiterter Cookie- und Tracking-Audit inklusive Dokumentation für Datenschutzbeauftragte sowie Konfigurations-Vorschlag.",
+      "Technische Cookie- und Tracking-Messung gem. § 25 TDDDG mit manueller Sichtung vor Auslieferung und individueller Handlungsempfehlung pro Fund.",
     price: "69.00",
     category: "Cookie-Compliance",
     sku: "cookie-profi",
@@ -84,7 +85,7 @@ const products: ProductInput[] = [
   {
     name: "Fuchs Re-Check Abo",
     description:
-      "Monatliches Re-Audit Ihrer Website mit Veränderungs-Report. Sofortige Warnung, wenn neue Inhalte Sie aus der Compliance werfen.",
+      "Monatlicher Re-Check Ihrer Website mit Alarm bei neuen Mängeln und aktualisierter Barrierefreiheitserklärung. Jederzeit zum Monatsende kündbar.",
     price: "24.99",
     priceSpecification: {
       "@type": "UnitPriceSpecification",
@@ -108,7 +109,7 @@ const products: ProductInput[] = [
     // Re-Check), jährliche Abrechnung zu 249 €. unitCode ANN = Jahr (UN/CEFACT).
     name: "Fuchs Re-Check Abo (jährlich)",
     description:
-      "Monatliches Re-Audit Ihrer Website mit Veränderungs-Report bei jährlicher Abrechnung. Erstlaufzeit 12 Monate, danach monatlich kündbar.",
+      "Monatlicher Re-Check Ihrer Website bei jährlicher Abrechnung — Alarm bei neuen Mängeln, aktualisierte Barrierefreiheitserklärung. Erstlaufzeit 12 Monate, danach mit Frist von einem Monat kündbar.",
     price: "249.00",
     priceSpecification: {
       "@type": "UnitPriceSpecification",

@@ -1,13 +1,20 @@
 "use client";
 
+import { useRef } from "react";
 import Image from "next/image";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "motion/react";
 import { CheckCircle2Icon, GlobeIcon, ScanLineIcon } from "lucide-react";
 
 import { HOW_IT_WORKS } from "@/lib/config";
 
 import { AmbientGlow } from "./fx/AmbientGlow";
 import { GlowCard } from "./fx/GlowCard";
-import { Reveal } from "./fx/Reveal";
+import { ScrollScrub } from "./fx/ScrollScrub";
 import { SectionKicker } from "./SectionKicker";
 
 const ICON_BY_KEY = {
@@ -18,17 +25,32 @@ const ICON_BY_KEY = {
 
 // Prozess-Sektion im Dark-Glow-Stil (Vorlage "Dein Weg zur digitalen
 // Barrierefreiheit"): drei Glas-Karten mit großer Orange-Schrittnummer,
-// verbunden durch eine Fortschrittslinie mit Lauflicht. Texte unverändert
+// verbunden durch eine Fortschrittslinie, die sich scroll-gekoppelt füllt
+// (Scroll-Story-Modus). Rechts daneben steht Filo (freigestelltes PNG) groß
+// und unverdeckt in einer eigenen Grid-Spalte — Inhalt reserviert Platz,
+// statt den Fuchs zu überlagern (Owner-Finding 04.07.). Texte unverändert
 // aus lib/config.ts (HOW_IT_WORKS, UWG-geprüft).
 export function HowItWorks() {
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const prefersReduced = useReducedMotion();
+  // Scroll-gekoppelte Füllung der Fortschrittslinie: füllt sich orange von
+  // links nach rechts, während die Sektion durch den Viewport wandert.
+  // Läuft als MotionValue auf scaleX (Compositor, kein Re-Render pro Frame).
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start 0.8", "end 0.5"],
+  });
+  const lineScaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
+
   return (
     <section
+      ref={sectionRef}
       id="ablauf"
       aria-labelledby="how-heading"
       className="relative isolate overflow-hidden bg-background"
     >
-      {/* Ambiente: warmer Orange-Radial oben + Punktraster (einziger Blur-Layer
-          der Sektion). Rein dekorativ. */}
+      {/* Ambiente: warmer Orange-Radial oben + Punktraster (Blur-Layer 1 von
+          max. 2 der Sektion). Rein dekorativ. */}
       <AmbientGlow className="-z-10" />
       <div
         aria-hidden
@@ -54,79 +76,98 @@ export function HowItWorks() {
           </p>
         </div>
 
-        <div className="relative mt-14">
-          {/* Filo-Begleiter (zeigt nach oben Richtung Schritte). Schwarzer
-              PNG-Grund verschwimmt per Radial-Maske in den Seitengrund.
-              Nur ab lg; Section overflow-hidden clippt sauber. */}
-          <Image
-            src="/filo-pointing.png"
-            alt=""
-            aria-hidden
-            width={821}
-            height={1100}
-            loading="lazy"
-            className="pointer-events-none absolute -right-12 -bottom-6 z-20 hidden h-auto lg:block lg:w-44 [mask-image:radial-gradient(ellipse_72%_72%_at_50%_45%,black_52%,transparent_76%)]"
-          />
-          {/* Fortschrittslinie (Design-Signatur): Orange-Verlauf mit Lauflicht-
-              Punkt, der von links nach rechts wandert (animate-travel-dot,
-              reduced-motion-gated). Verbindet 01 → 02 → 03. Nur Desktop (md+),
-              aria-hidden, rein dekorativ. */}
-          <div
-            aria-hidden
-            className="absolute top-16 right-[12%] left-[12%] hidden h-px overflow-visible rounded-full bg-gradient-to-r from-brand-orange/10 via-brand-orange/45 to-brand-orange/10 md:block"
-          >
-            <span
+        {/* Auf xl+ reserviert eine rechte Grid-Spalte (~280px) echten Platz
+            für Filo — der Fuchs steht NEBEN den Karten, nie darüber, nichts
+            wird verdeckt oder abgeschnitten. Unter xl ist er ausgeblendet. */}
+        <div className="mt-14 xl:grid xl:grid-cols-[minmax(0,1fr)_280px] xl:items-start xl:gap-8">
+          <div className="relative">
+            {/* Fortschrittslinie (Design-Signatur): dezenter Track, der sich
+                scroll-gekoppelt orange von links nach rechts füllt (scaleX,
+                transform-origin left; reduced-motion = statisch voll gefüllt).
+                Das Lauflicht-Pünktchen (animate-travel-dot, reduced-motion-
+                gated) läuft zusätzlich darüber. Verbindet 01 → 02 → 03.
+                Nur Desktop (md+), aria-hidden, rein dekorativ. */}
+            <div
               aria-hidden
-              className="absolute top-1/2 size-2.5 -translate-y-1/2 rounded-full bg-brand-orange shadow-[0_0_16px_2px_var(--brand-orange)] animate-travel-dot"
-            />
-          </div>
+              className="absolute top-16 right-[12%] left-[12%] hidden h-px overflow-visible rounded-full bg-gradient-to-r from-brand-orange/10 via-brand-orange/25 to-brand-orange/10 md:block"
+            >
+              <motion.span
+                aria-hidden
+                style={{ scaleX: prefersReduced ? 1 : lineScaleX }}
+                className="absolute inset-0 origin-left rounded-full bg-gradient-to-r from-brand-orange/15 via-brand-orange/70 to-brand-orange will-change-transform"
+              />
+              <span
+                aria-hidden
+                className="absolute top-1/2 size-2.5 -translate-y-1/2 rounded-full bg-brand-orange shadow-[0_0_16px_2px_var(--brand-orange)] animate-travel-dot"
+              />
+            </div>
 
-          <ol className="relative grid gap-6 md:grid-cols-3">
-            {HOW_IT_WORKS.map((step, i) => {
-              const Icon = ICON_BY_KEY[step.icon as keyof typeof ICON_BY_KEY];
-              return (
-                <li key={step.step} className="flex">
-                  <Reveal index={i} className="flex w-full">
-                    <GlowCard
-                      className={
-                        "group/step card-lift relative flex w-full flex-col p-7 " +
-                        // Karte 3 laesst rechts Platz fuer den Filo-Begleiter,
-                        // der daneben steht (Text weicht aus, keine Verdeckung).
-                        (i === 2 ? "lg:pr-24" : "")
-                      }
+            <ol className="relative grid gap-6 md:grid-cols-3">
+              {HOW_IT_WORKS.map((step, i) => {
+                const Icon = ICON_BY_KEY[step.icon as keyof typeof ICON_BY_KEY];
+                return (
+                  <li key={step.step} className="flex">
+                    <ScrollScrub
+                      from={56}
+                      fromX={i * 16}
+                      className="flex w-full"
                     >
-                      <div className="flex w-full items-start justify-between gap-4">
-                        {/* Grosse Schrittnummer (Vorlagen-Signatur 01/02/03) —
-                            dekorativ, Reihenfolge traegt die <ol>. */}
+                      <GlowCard className="group/step card-lift relative flex w-full flex-col p-7">
+                        <div className="flex w-full items-start justify-between gap-4">
+                          {/* Große Schrittnummer (Vorlagen-Signatur 01/02/03) —
+                              dekorativ, Reihenfolge trägt die <ol>. */}
+                          <span
+                            aria-hidden
+                            className="font-mono text-4xl font-bold tracking-tight text-brand-orange text-glow"
+                          >
+                            {step.step}
+                          </span>
+                          {/* Icon im kleinen Glow-Ring. */}
+                          <span className="glow-ring flex size-11 shrink-0 items-center justify-center rounded-2xl border border-brand-orange/40 bg-brand-orange/10 text-brand-orange transition-transform duration-300 group-hover/step:scale-110">
+                            {Icon ? (
+                              <Icon aria-hidden className="size-5" />
+                            ) : null}
+                          </span>
+                        </div>
                         <span
                           aria-hidden
-                          className="font-mono text-4xl font-bold tracking-tight text-brand-orange text-glow"
-                        >
-                          {step.step}
-                        </span>
-                        {/* Icon im kleinen Glow-Ring. */}
-                        <span className="glow-ring flex size-11 shrink-0 items-center justify-center rounded-2xl border border-brand-orange/40 bg-brand-orange/10 text-brand-orange transition-transform duration-300 group-hover/step:scale-110">
-                          {Icon ? (
-                            <Icon aria-hidden className="size-5" />
-                          ) : null}
-                        </span>
-                      </div>
-                      <span
-                        aria-hidden
-                        className="mt-4 h-px w-full bg-gradient-to-r from-brand-orange/40 to-transparent"
-                      />
-                      <h3 className="mt-5 font-display text-xl font-semibold tracking-tight">
-                        {step.title}
-                      </h3>
-                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                        {step.desc}
-                      </p>
-                    </GlowCard>
-                  </Reveal>
-                </li>
-              );
-            })}
-          </ol>
+                          className="mt-4 h-px w-full bg-gradient-to-r from-brand-orange/40 to-transparent"
+                        />
+                        <h3 className="mt-5 font-display text-xl font-semibold tracking-tight">
+                          {step.title}
+                        </h3>
+                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                          {step.desc}
+                        </p>
+                      </GlowCard>
+                    </ScrollScrub>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+
+          {/* Filo-Begleiter (freigestelltes PNG, zeigt nach oben Richtung
+              Schritte): steht groß und unverdeckt in der reservierten Spalte,
+              beginnt leicht unterhalb der Kartenoberkante (pt-12) — nichts
+              wird abgeschnitten, KEIN overflow-hidden an diesem Container.
+              CSS-Glow-Ebenen liegen HINTER dem Fuchs (DOM-Reihenfolge):
+              radialer Orange-Schein (Blur-Layer 2 von 2) + .orbit-trails. */}
+          <div
+            aria-hidden
+            className="pointer-events-none relative hidden xl:block xl:pt-12"
+          >
+            <div className="absolute top-28 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_center,color-mix(in_oklch,var(--brand-orange),transparent_78%),transparent_70%)] blur-2xl" />
+            <span className="orbit-trails top-24 left-1/2 h-64 w-64 -translate-x-1/2" />
+            <Image
+              src="/filo-pointing.png"
+              alt=""
+              width={704}
+              height={1100}
+              loading="lazy"
+              className="relative mx-auto h-auto w-64"
+            />
+          </div>
         </div>
       </div>
     </section>

@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "BFSG-Software im Vergleich: Anbieter, Preise, Leistungen 2026",
+  title: "BFSG-Software im Vergleich: 5 Anbieter & Preise 2026",
   description:
-    "BFSG-Tool-Anbieter im Vergleich: Scan-Reports, Monitoring-Abos und Auto-Fix-Widgets — Preise, Prüf-Umfang und Leistungen von 5 Anbietern, sachlich gegenübergestellt.",
+    "BFSG-Tool-Anbieter im Vergleich: Scan-Reports, Monitoring-Abos und Auto-Fix-Widgets — Preise und Leistungen von 5 Anbietern, sachlich gegenübergestellt.",
   alternates: {
     canonical: "/bfsg-software-anbieter-vergleich",
   },
@@ -12,7 +12,8 @@ export const metadata: Metadata = {
     title: "BFSG-Software-Anbieter im Vergleich: Preise und Leistungen 2026",
     description:
       "Einmalkauf oder Abo? Scan-Report, Monitoring oder Widget? Fünf BFSG-Tool-Anbieter im sachlichen Vergleich — nur objektiv nachprüfbare Kriterien.",
-    url: "https://bfsg-fuchs.de/bfsg-software-anbieter-vergleich",
+    // relativ — Next resolved gegen metadataBase (SITE.url = bfsg-fuchs.de)
+    url: "/bfsg-software-anbieter-vergleich",
     type: "article",
   },
 };

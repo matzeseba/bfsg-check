@@ -4,11 +4,12 @@ import * as motion from "motion/react-client";
 import { GaugeIcon, MicroscopeIcon, SparklesIcon, WalletIcon } from "lucide-react";
 
 import { DIFFERENTIATORS } from "@/lib/config";
-import { revealUp } from "@/lib/motion";
 
 import { AmbientGlow } from "./fx/AmbientGlow";
 import { GlowCard } from "./fx/GlowCard";
 import { Reveal } from "./fx/Reveal";
+import { ScrollScrub } from "./fx/ScrollScrub";
+import { TiltCard } from "./fx/TiltCard";
 import { SectionKicker } from "./SectionKicker";
 
 // Pro Differentiator ein Icon (schneller/tiefer/günstiger).
@@ -61,8 +62,9 @@ function DiffSnippet() {
 
 // "Warum der BFSG-Fuchs" — Anchoring gegen die drei Alternativen (Kanzlei,
 // Gratis-Tool, Beratung). Bewusst KEINE Fake-Testimonials.
-// Dark-Glow-Redesign: drei .glow-card-Glas-Karten mit Kicker-Pill, Fredoka-Titel
-// und gestaffeltem Reveal auf near-black Grund mit dezentem Orange-Ambiente.
+// Dark-Glow-Redesign (Scroll-Story, Spec §6): drei .glow-card-Glas-Karten mit
+// Kicker-Pill und Fredoka-Titel, scroll-gekoppelt gestaffelt eingeblendet
+// (ScrollScrub) und mit 3D-Cursor-Neigung (TiltCard) auf near-black Grund.
 export function Testimonials() {
   return (
     <section
@@ -91,19 +93,25 @@ export function Testimonials() {
           {DIFFERENTIATORS.map((item, i) => {
             const Icon = ICONS[i] ?? GaugeIcon;
             return (
-              <motion.li key={item.title} {...revealUp(i)} className="flex">
-                <GlowCard className="card-lift flex w-full flex-col items-center p-7 text-center md:items-start md:text-left">
-                  {/* Kicker-Pill der Karte (Marken-Orange, Icon je Argument). */}
-                  <SectionKicker icon={Icon} label={item.kicker} />
-                  <h3 className="mt-5 font-display text-xl font-semibold tracking-tight text-balance">
-                    {item.title}
-                  </h3>
-                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground text-pretty">
-                    {item.desc}
-                  </p>
-                  {i === 1 && <DiffSnippet />}
-                </GlowCard>
-              </motion.li>
+              <li key={item.title} className="flex">
+                {/* Scroll-gekoppelter Aufbau, gestaffelt über fromX 0/20/40;
+                    TiltCard fängt nur pointermove — Inhalte bleiben klickbar. */}
+                <ScrollScrub from={64} fromX={i * 20} className="flex w-full">
+                  <TiltCard max={5} className="flex w-full">
+                    <GlowCard className="card-lift flex w-full flex-col items-center p-7 text-center md:items-start md:text-left">
+                      {/* Kicker-Pill der Karte (Marken-Orange, Icon je Argument). */}
+                      <SectionKicker icon={Icon} label={item.kicker} />
+                      <h3 className="mt-5 font-display text-xl font-semibold tracking-tight text-balance">
+                        {item.title}
+                      </h3>
+                      <p className="mt-3 text-sm leading-relaxed text-muted-foreground text-pretty">
+                        {item.desc}
+                      </p>
+                      {i === 1 && <DiffSnippet />}
+                    </GlowCard>
+                  </TiltCard>
+                </ScrollScrub>
+              </li>
             );
           })}
         </ul>

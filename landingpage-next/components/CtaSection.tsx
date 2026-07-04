@@ -8,6 +8,8 @@ import { ArrowRightIcon, ShieldCheckIcon, TimerIcon } from "lucide-react";
 
 import { AmbientGlow } from "@/components/fx/AmbientGlow";
 import { MagneticButton } from "@/components/fx/MagneticButton";
+import { ParallaxLayer } from "@/components/fx/ParallaxLayer";
+import { ScrollScrub } from "@/components/fx/ScrollScrub";
 import { SectionKicker } from "@/components/SectionKicker";
 import { Button } from "@/components/ui/button";
 import { DEADLINE, HERO } from "@/lib/config";
@@ -47,17 +49,48 @@ export function CtaSection() {
           transition={{ duration: 0.6, ease: EASE }}
           // Grosses Glow-Card-Band (Dark-Glow-Redesign): dunkle Glas-Flaeche mit
           // Orange-Verlaufs-Rahmen + Innen-Glimmen (.glow-card, globals.css).
-          className="glow-card relative grid items-center gap-8 overflow-hidden px-6 py-14 sm:px-12 sm:py-20 lg:grid-cols-[1.45fr_0.8fr]"
+          // min-h ab md: der freigestellte Filo (bis 400px + Parallax-Hub) darf
+          // oben nie angeschnitten werden (Maskottchen-Regeln v2).
+          className="glow-card relative overflow-hidden px-6 py-14 sm:px-12 sm:py-20 md:min-h-[27.5rem]"
         >
-          {/* Sektions-Ambiente: warmer Orange-Radial + Glut-Partikel (einziger
-              Blur-Layer des Bands) + statisches Dot-Grid mit radialer Maske. */}
+          {/* Sektions-Ambiente: warmer Orange-Radial + Glut-Partikel + statisches
+              Dot-Grid mit radialer Maske. (Blur-Budget des Bands: dieser Radial +
+              der Fuchs-Glow unten = genau 2 Blur-Layer.) */}
           <AmbientGlow embers className="z-0" />
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0 z-0 dot-bg-dark mask-radial"
           />
 
-          <div className="relative z-10 text-center lg:text-left">
+          {/* Filo (Daumen hoch, freigestelltes PNG — KEINE Maske mehr) steht
+              gross und unverdeckt rechts im Band, bottom-buendig wie in den
+              Vorlagen; der Content reserviert den Platz per pr (unten). Der
+              Glow kommt als CSS-Ebenen HINTER dem Fuchs: radialer Orange-Schein
+              + rotierende .orbit-trails (Maskottchen-Regeln v2). Scroll-Parallax
+              via ParallaxLayer + sanftes Float. Dekorativ → aria-hidden. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 right-0 z-0 hidden items-end justify-end pr-3 md:flex lg:pr-10"
+          >
+            {/* Radialer Orange-Schein hinter dem Fuchs (2. Blur-Layer des Bands). */}
+            <div className="absolute right-2 bottom-8 size-72 rounded-full bg-[radial-gradient(circle_at_center,color-mix(in_oklch,var(--brand-orange),transparent_70%),transparent_72%)] blur-2xl lg:size-80" />
+            {/* Orbitale Licht-Trails (globals.css, reduced-motion-still). */}
+            <div className="orbit-trails right-0 bottom-12 size-60 lg:size-72" />
+            <ParallaxLayer distance={24} className="relative">
+              <Image
+                src="/filo-thumbsup-neo.png"
+                alt=""
+                width={598}
+                height={1100}
+                loading="lazy"
+                className="h-[22.5rem] w-auto animate-float-slow lg:h-[25rem]"
+              />
+            </ParallaxLayer>
+          </div>
+
+          {/* Headline-Block scroll-gekoppelt (Scroll-Story); pr ab md reserviert
+              die Buehne fuer den unverdeckten Fuchs. */}
+          <ScrollScrub className="relative z-10 text-center md:pr-56 md:text-left lg:pr-72">
             {/* Einheitliche Kicker-Pill (Spec §5: jede Sektion Kicker→Headline→Subline). */}
             <SectionKicker
               icon={TimerIcon}
@@ -69,10 +102,10 @@ export function CtaSection() {
               id="cta-heading"
               className="mt-4 max-w-2xl font-display text-3xl font-extrabold tracking-tight text-balance text-on-deep sm:text-[2.75rem] sm:leading-[1.05]"
             >
-              Lassen Sie den Fuchs ran — bevor andere{" "}
-              <span className="italic gradient-text">zuschnappen</span>.
+              Lassen Sie den Fuchs ran — bevor eine Abmahnung{" "}
+              <span className="italic gradient-text">zuschnappt</span>.
             </h2>
-            <p className="mx-auto mt-5 max-w-xl text-base text-foreground/70 text-pretty lg:mx-0 sm:text-lg">
+            <p className="mx-auto mt-5 max-w-xl text-base text-foreground/70 text-pretty md:mx-0 sm:text-lg">
               Kostenloser Sofort-Check, Ergebnis in 60 Sekunden. Keine Anmeldung,
               keine generische Tool-Rohliste — sondern priorisierte Mängel mit
               Fix.
@@ -96,7 +129,7 @@ export function CtaSection() {
               )}
             </p>
 
-            <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
+            <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row md:justify-start">
               {/* Grosser Orange-3D-Haupt-CTA, magnetisch (Dark-Glow-Motion). */}
               <MagneticButton>
                 <Link href="/#scan" className="btn-cta h-13 px-7 text-lg">
@@ -119,25 +152,7 @@ export function CtaSection() {
               <ShieldCheckIcon className="size-3.5 text-brand-mint" />
               Sichere Zahlung über Stripe · Rechnung sofort per E-Mail
             </p>
-          </div>
-
-          {/* Filo (Daumen hoch, Neo-Glow-Render) rechts im Band — nur ab md
-              (mobil traegt der Text). Schwarzer PNG-Grund wird per Radial-Maske
-              in die dunkle Glas-Flaeche eingeblendet; schwebt sanft (transform-
-              only). Dekorativ → aria-hidden, pointer-events-none. */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -right-4 bottom-0 z-0 hidden items-end md:flex lg:right-4"
-          >
-            <Image
-              src="/filo-thumbsup-neo.png"
-              alt=""
-              width={821}
-              height={1100}
-              loading="lazy"
-              className="h-auto w-60 animate-float-slow lg:w-72 [mask-image:radial-gradient(ellipse_75%_78%_at_50%_48%,black_52%,transparent_76%)]"
-            />
-          </div>
+          </ScrollScrub>
         </motion.div>
       </div>
     </section>

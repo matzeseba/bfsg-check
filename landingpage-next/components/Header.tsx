@@ -89,6 +89,9 @@ export function Header() {
             alt=""
             width={418}
             height={512}
+            // priority: Markenzeichen im allerersten Paint (Header ist immer
+            // above-the-fold); next/image liefert ohnehin nur die ~36px-Variante.
+            priority
             className="h-9 w-auto shrink-0 rounded-md [filter:drop-shadow(0_2px_10px_color-mix(in_oklch,var(--brand-orange),transparent_55%))]"
           />
           <span className="flex items-baseline gap-0.5">

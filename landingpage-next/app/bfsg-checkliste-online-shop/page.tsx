@@ -12,7 +12,8 @@ export const metadata: Metadata = {
     title: "BFSG-Checkliste 2026 für Online-Shops — 25 Prüfpunkte",
     description:
       "Seit 28.06.2025 gilt das BFSG. Prüfen Sie mit dieser Checkliste, ob Ihr Shop die WCAG-2.1-AA-Anforderungen erfüllt.",
-    url: "https://bfsg-fix.de/bfsg-checkliste-online-shop",
+    // relativ — Next resolved gegen metadataBase (SITE.url = bfsg-fuchs.de)
+    url: "/bfsg-checkliste-online-shop",
     type: "article",
   },
 };
@@ -42,7 +43,7 @@ const CHECK_ITEMS = [
   { nr: 22, kategorie: "Checkout", pruefpunkt: "Zahlungsformular mit autocomplete-Attributen für Screenreader", wcag: "1.3.5", prio: "Hoch" },
   { nr: 23, kategorie: "Cookie-Banner", pruefpunkt: "Banner mit Tastatur vollständig bedienbar", wcag: "2.1.1", prio: "Hoch" },
   { nr: 24, kategorie: "PDF/Dokumente", pruefpunkt: "AGBs und Datenblätter als barrierefreie PDFs oder HTML", wcag: "1.1.1", prio: "Mittel" },
-  { nr: 25, kategorie: "Barrierefreiheitserklärung", pruefpunkt: "Barrierefreiheitserklärung gemäß § 15 BFSGV verlinkt", wcag: "BFSGV §15", prio: "Kritisch" },
+  { nr: 25, kategorie: "Barrierefreiheitserklärung", pruefpunkt: "Barrierefreiheitserklärung gemäß § 14 BFSG verlinkt", wcag: "§ 14 BFSG", prio: "Kritisch" },
 ];
 
 const FAQ = [
@@ -60,7 +61,7 @@ const FAQ = [
   },
   {
     q: "Muss ich eine Barrierefreiheitserklärung veröffentlichen?",
-    a: "Ja. Betreiber von Websites im Anwendungsbereich des BFSG sind verpflichtet, eine Barrierefreiheitserklärung gemäß § 15 BFSGV zu veröffentlichen. Diese muss Konformitätsstatus, bekannte Mängel, einen Feedback-Mechanismus und Kontaktdaten einer Schlichtungsstelle enthalten.",
+    a: "Ja. Betreiber von Websites im Anwendungsbereich des BFSG sind verpflichtet, eine Barrierefreiheitserklärung gemäß § 14 BFSG zu veröffentlichen. Diese muss Konformitätsstatus, bekannte Mängel, einen Feedback-Mechanismus und Kontaktdaten einer Schlichtungsstelle enthalten.",
   },
   {
     q: "Was passiert bei Nichterfüllung der BFSG-Anforderungen?",
@@ -84,8 +85,8 @@ export default function BfsgChecklisteOnlineShopPage() {
     "@type": "Article",
     headline: "BFSG-Checkliste 2026: 25 Punkte, die jeder Online-Shop prüfen muss",
     description: "25-Punkte-Checkliste für BFSG- und WCAG-2.1-Anforderungen im Online-Shop.",
-    url: "https://bfsg-fix.de/bfsg-checkliste-online-shop",
-    publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fix.de" },
+    url: "https://bfsg-fuchs.de/bfsg-checkliste-online-shop",
+    publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fuchs.de" },
     dateModified: "2026-06-21",
   };
 

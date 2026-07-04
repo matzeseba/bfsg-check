@@ -12,7 +12,8 @@ export const metadata: Metadata = {
     title: "Cookie-Banner 2026: 7 Fehler die Abmahnungen auslösen",
     description:
       "§ 25 TDDDG, EuGH Planet49, gleichwertige Buttons: Was Cookie-Banner wirklich erfüllen müssen und welche 7 Fehler typische Abmahn-Auslöser sind.",
-    url: "https://bfsg-fix.de/cookie-banner-fehler",
+    // relativ — Next resolved gegen metadataBase (SITE.url = bfsg-fuchs.de)
+    url: "/cookie-banner-fehler",
     type: "article",
   },
 };
@@ -108,8 +109,8 @@ export default function CookieBannerFehlerPage() {
     "@type": "Article",
     headline: "Cookie-Banner 2026: Die 7 häufigsten Fehler, die Abmahnungen auslösen",
     description: "§ 25 TDDDG, EuGH Planet49, gleichwertige Buttons: Cookie-Banner-Fehler mit Abmahn-Risiko.",
-    url: "https://bfsg-fix.de/cookie-banner-fehler",
-    publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fix.de" },
+    url: "https://bfsg-fuchs.de/cookie-banner-fehler",
+    publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fuchs.de" },
     dateModified: "2026-06-21",
   };
 

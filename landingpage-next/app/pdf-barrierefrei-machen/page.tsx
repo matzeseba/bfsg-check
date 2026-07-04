@@ -12,7 +12,8 @@ export const metadata: Metadata = {
     title: "PDF barrierefrei machen: Tagging, Lesereihenfolge, Sprach-Tag",
     description:
       "AGB, Datenblätter und Rechnungen auf der Website sind BFSG-relevant. So werden PDFs nach PDF/UA-Grundsätzen zugänglich — Schritt für Schritt.",
-    url: "https://bfsg-fix.de/pdf-barrierefrei-machen",
+    // relativ — Next resolved gegen metadataBase (SITE.url = bfsg-fuchs.de)
+    url: "/pdf-barrierefrei-machen",
     type: "article",
   },
 };
@@ -89,8 +90,8 @@ export default function PdfBarrierefreiMachenPage() {
     "@type": "Article",
     headline: "PDF barrierefrei machen: Tagging, Lesereihenfolge, Sprach-Tag",
     description: "Anleitung für zugängliche PDFs nach PDF/UA: Tagging, Alt-Texte, Werkzeuge und häufige Fehler.",
-    url: "https://bfsg-fix.de/pdf-barrierefrei-machen",
-    publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fix.de" },
+    url: "https://bfsg-fuchs.de/pdf-barrierefrei-machen",
+    publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fuchs.de" },
     dateModified: "2026-07-02",
   };
 

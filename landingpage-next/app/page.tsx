@@ -24,6 +24,11 @@ export default function Home() {
     <>
       <HomeJsonLd />
       <Hero />
+      {/* Ticker direkt unter dem Hero (Owner-Wunsch 04.07.): der laufende
+          WCAG-Streifen entschärft den harten Übergang zwischen Hero-Grid-Muster
+          und schwarzem Grund. Komponente ist aria-hidden + id-frei → die zweite
+          Instanz weiter unten (nach StatsBar) bleibt unverändert bestehen. */}
+      <RuleTicker />
       <RiskBand />
       <StatsBar />
       <RuleTicker />

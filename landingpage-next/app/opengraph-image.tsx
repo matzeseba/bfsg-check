@@ -55,7 +55,7 @@ export default async function OpengraphImage() {
             <span style={{ fontSize: "30px", fontWeight: 700, letterSpacing: "-0.01em" }}>
               BFSG·Fuchs
             </span>
-            <span style={{ fontSize: "18px", color: "#a99f93" }}>bfsg-fix.de</span>
+            <span style={{ fontSize: "18px", color: "#a99f93" }}>bfsg-fuchs.de</span>
           </div>
         </div>
 

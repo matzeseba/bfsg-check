@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "1 Jahr BFSG: Bilanz 2026 — Markt, Abmahnrisiko, Marktüberwachung",
+  title: "1 Jahr BFSG: Bilanz 2026 — Marktstand & Abmahnrisiko",
   description:
-    "Ein Jahr BFSG seit 28.06.2025: Wo der Markt steht (rund 49 % Kriterienerfüllung laut itiko.de), was die Marktüberwachung MLBF macht und wie das Abmahnrisiko 2026 aussieht.",
+    "Ein Jahr BFSG seit 28.06.2025: Wo der Markt steht (rund 49 % Kriterienerfüllung laut itiko.de), was die MLBF macht und wie das Abmahnrisiko 2026 aussieht.",
   alternates: {
     canonical: "/bfsg-1-jahr-bilanz",
   },
@@ -12,7 +12,8 @@ export const metadata: Metadata = {
     title: "1 Jahr BFSG: Die Bilanz 2026 — was sich getan hat und was jetzt zählt",
     description:
       "BFSG-Bilanz nach einem Jahr: Marktstand, Marktüberwachungsstelle MLBF, professionellere Abmahnwellen mit Prüfberichten — sachlich eingeordnet mit Quellen.",
-    url: "https://bfsg-fuchs.de/bfsg-1-jahr-bilanz",
+    // relativ — Next resolved gegen metadataBase (SITE.url = bfsg-fuchs.de)
+    url: "/bfsg-1-jahr-bilanz",
     type: "article",
   },
 };

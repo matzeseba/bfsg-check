@@ -50,9 +50,9 @@ export const SITE = {
   // Ziel-Marken-Domain nach Cutover (rein dokumentarisch, NICHT funktional verlinkt,
   // solange sie nicht aufgelöst/TLS-gesichert ist).
   brandDomain: "bfsg-fuchs.de",
-  title: "BFSG-Fuchs — Ist Ihre Website bereit fürs BFSG? | Kostenloser WCAG-Sofort-Check",
+  title: "BFSG-Test: Website kostenlos auf WCAG prüfen | BFSG-Fuchs",
   description:
-    "Der BFSG-Fuchs prüft in 60 Sekunden, wo Ihre Website die Anforderungen des Barrierefreiheitsstärkungsgesetzes (BFSG) noch verfehlt — automatisierte WCAG-2.1-AA-Analyse mit menschlicher Sichtung, ausführlicher Report auf Wunsch.",
+    "BFSG-Test in 60 Sekunden: automatisierte WCAG-2.1-AA-Analyse mit 80+ Prüfregeln, menschlicher Sichtung und priorisiertem Fix-Plan. Kostenlos & ohne Anmeldung.",
   email: "info@bfsg-fix.de",
 } as const;
 
@@ -84,7 +84,7 @@ export const HERO = {
   // KEINE verbotene Konformitäts-/Garantie-Aussage ("BFSG-konform", UWG §5).
   // Das "?" wird in Hero.tsx an das Akzentwort gehängt; Clip-Schutz sitzt in
   // .gradient-text (padding-/margin-right) → kein Glyph-Clipping, kein CLS.
-  headlineLead: "Schlau wie ein Fuchs — bereit fürs",
+  headlineLead: "Schlau wie ein Fuchs — ist Ihre Website bereit fürs",
   headlineEmph: "BFSG",
   // Tail leer: die Pointe "bevor es eine Kanzlei tut" steht in der Subline.
   // Hero.tsx rendert das Tail-Span nur, wenn der String nicht leer ist.
@@ -94,7 +94,7 @@ export const HERO = {
   cta: "Kostenlos prüfen",
   // Aktionsspezifisches Label am Scan-Feld (Design: "Gratis-Check starten") —
   // verb-getrieben auf die Mikro-Conversion gemünzt; cta bleibt für Header/Final-CTA.
-  scanCta: "Gratis-Check starten",
+  scanCta: "Kostenlosen Check starten",
   ctaSecondary: "Pakete ansehen",
   placeholder: "ihre-website.de",
   badges: [
@@ -190,7 +190,10 @@ export const RISK_BAND = {
   points: [
     { value: "28.06.2025", label: "Stichtag bereits überschritten" },
     { value: "WCAG 2.1 AA", label: "geforderter Mindeststandard" },
-    { value: "Verbände", label: "klagebefugt nach §15 BFSG" },
+    // Norm-Fix 04.07.2026 (amtl. Inhaltsübersicht gesetze-im-internet.de/bfsg):
+    // § 15 BFSG = Beratungsangebot der Bundesfachstelle — NICHT Klagebefugnis.
+    // Verbands-/Einrichtungsrechte: § 32 (Verwaltungsverfahren) + § 33 (Rechtsbehelfe).
+    { value: "Verbände", label: "Antrags- & Klagerechte (§§ 32, 33 BFSG)" },
   ],
 } as const;
 
@@ -198,7 +201,7 @@ export const HOW_IT_WORKS = [
   {
     step: "01",
     title: "Website-URL eingeben",
-    desc: "Adresse einfügen, Branche optional angeben — der Fuchs spitzt die Ohren und bereitet Crawler & Audit-Regeln vor.",
+    desc: "Nur die Adresse eintippen, mehr nicht — der Fuchs spitzt die Ohren und bereitet Crawler & Audit-Regeln vor.",
     icon: "globe",
   },
   {
@@ -516,7 +519,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: "Wie kündige ich das Re-Check-Abo?",
-    a: "Das Monats-Abo ist jederzeit zum Monatsende ohne Angabe von Gründen kündbar. Das Jahres-Abo (249 €/Jahr) hat eine Erstlaufzeit von 12 Monaten und ist danach jederzeit mit einer Frist von einem Monat kündbar. Eine formlose E-Mail oder das Formular auf der Seite /kündigen genügt. Die Kündigung bestätigen wir per E-Mail.",
+    a: "Das Monats-Abo ist jederzeit zum Monatsende ohne Angabe von Gründen kündbar. Das Jahres-Abo (249 €/Jahr) hat eine Erstlaufzeit von 12 Monaten und ist danach jederzeit mit einer Frist von einem Monat kündbar. Eine formlose E-Mail oder das Formular auf der Seite /kuendigen genügt. Die Kündigung bestätigen wir per E-Mail.",
   },
   {
     q: "Was passiert mit meinen Daten?",

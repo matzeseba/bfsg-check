@@ -1,6 +1,9 @@
 import type { MetadataRoute } from "next";
 
-const siteUrl = "https://bfsg-fuchs.de";
+import { SITE } from "@/lib/config";
+
+// Domain aus lib/config.ts (SITE.url = Single Source of Truth für canonical/OG/sitemap).
+const siteUrl = SITE.url;
 
 export default function robots(): MetadataRoute.Robots {
   return {

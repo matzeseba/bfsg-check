@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Partnerprogramm für Webagenturen — BFSG-Reports für Ihre Kunden",
+  title: "BFSG-Partnerprogramm für Webagenturen: 15 % Provision",
   description:
-    "Liefern Sie Ihren Kunden BFSG-/WCAG-Prüfberichte, ohne selbst zu auditieren: 15 % Provision, Mengenstaffel, echtes Audit statt Overlay. Für Webagenturen, Freelancer und IT-Dienstleister.",
+    "BFSG-/WCAG-Prüfberichte für Ihre Kunden, ohne selbst zu auditieren: 15 % Provision, Mengenstaffel ab 5 Reports/Monat, echtes Audit statt Overlay-Widget.",
   alternates: {
     canonical: "/partner",
   },
@@ -12,7 +12,8 @@ export const metadata: Metadata = {
     title: "Partnerprogramm für Webagenturen — BFSG-Reports für Ihre Kunden",
     description:
       "15 % Provision, Mengenstaffel, Reports zur Weitergabe an Ihre Kunden. Echtes WCAG-Audit statt Overlay-Widget.",
-    url: "https://bfsg-fix.de/partner",
+    // relativ — Next resolved gegen metadataBase (SITE.url = bfsg-fuchs.de)
+    url: "/partner",
     type: "website",
   },
 };

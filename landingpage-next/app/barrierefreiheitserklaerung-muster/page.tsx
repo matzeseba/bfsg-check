@@ -2,17 +2,18 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Barrierefreiheitserklärung Muster + Pflicht-Inhalte 2026",
+  title: "Barrierefreiheitserklärung: Muster + Pflichtangaben",
   description:
-    "Barrierefreiheitserklärung erstellen: vollständiges Muster nach § 15 BFSGV mit allen Pflichtangaben, häufige Fehler und Generator-CTA.",
+    "Barrierefreiheitserklärung erstellen: vollständiges Muster mit allen Pflichtangaben nach BFSG, die häufigsten Fehler und eine Copy-Paste-Vorlage.",
   alternates: {
     canonical: "/barrierefreiheitserklaerung-muster",
   },
   openGraph: {
-    title: "Barrierefreiheitserklärung Muster 2026 — Copy-Paste nach § 15 BFSGV",
+    title: "Barrierefreiheitserklärung Muster 2026 — alle Pflichtangaben zum Copy-Paste",
     description:
-      "Alle 8 Pflicht-Felder laut BFSGV, vollständiges Muster und häufige Fehler bei der Barrierefreiheitserklärung.",
-    url: "https://bfsg-fix.de/barrierefreiheitserklaerung-muster",
+      "Alle 8 Pflicht-Felder, vollständiges Muster und häufige Fehler bei der Barrierefreiheitserklärung.",
+    // relativ — Next resolved gegen metadataBase (SITE.url = bfsg-fuchs.de)
+    url: "/barrierefreiheitserklaerung-muster",
     type: "article",
   },
 };
@@ -70,7 +71,7 @@ const PFLICHT_FELDER = [
 const FAQ = [
   {
     q: "Ist eine Barrierefreiheitserklärung wirklich Pflicht für private Unternehmen?",
-    a: "Für private Unternehmen, die unter den Anwendungsbereich des BFSG fallen, ist eine Barrierefreiheitserklärung nach § 15 BFSGV vorgeschrieben. Das betrifft vor allem Online-Shops und Dienstleister im elektronischen Geschäftsverkehr. Kleinstunternehmen unter 10 Beschäftigte und 2 Mio. Euro Umsatz können eine Ausnahme geltend machen — die müssen sie aber dokumentieren.",
+    a: "Für private Unternehmen, die unter den Anwendungsbereich des BFSG fallen, ist eine Barrierefreiheitserklärung nach § 14 BFSG vorgeschrieben. Das betrifft vor allem Online-Shops und Dienstleister im elektronischen Geschäftsverkehr. Kleinstunternehmen unter 10 Beschäftigte und 2 Mio. Euro Umsatz können eine Ausnahme geltend machen — die müssen sie aber dokumentieren.",
   },
   {
     q: "Wie oft muss die Erklärung aktualisiert werden?",
@@ -152,7 +153,7 @@ export default function BarrierefreiheitserklaerungMusterPage() {
   const howToSchema = {
     "@context": "https://schema.org",
     "@type": "HowTo",
-    name: "Barrierefreiheitserklärung nach § 15 BFSGV erstellen",
+    name: "Barrierefreiheitserklärung nach § 14 BFSG erstellen",
     description: "Schritt-für-Schritt-Anleitung zur Erstellung einer gesetzeskonformen Barrierefreiheitserklärung",
     step: [
       { "@type": "HowToStep", name: "Konformitätsstatus bestimmen", text: "Website technisch prüfen und Konformitätsgrad festlegen: vollständig, teilweise oder nicht konform." },
@@ -182,7 +183,7 @@ export default function BarrierefreiheitserklaerungMusterPage() {
       <article className="mx-auto w-full max-w-3xl px-6 py-16">
         <header>
           <p className="font-mono text-xs font-semibold tracking-widest text-muted-foreground uppercase">
-            BFSG · § 15 BFSGV · Barrierefreiheitserklärung
+            § 14 BFSG · Barrierefreiheitserklärung · Muster
           </p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
             Barrierefreiheitserklärung erstellen: Muster, Pflicht-Inhalte und häufige Fehler
@@ -200,7 +201,7 @@ export default function BarrierefreiheitserklaerungMusterPage() {
 
         {/* Pflicht-Inhalte */}
         <section className="mt-12">
-          <h2 className="text-2xl font-semibold">Die 8 Pflichtangaben nach § 15 BFSGV</h2>
+          <h2 className="text-2xl font-semibold">Die 8 Pflichtangaben nach § 14 BFSG</h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
             Die BFSGV (Barrierefreiheitsstärkungsgesetz-Verordnung) schreibt vor, was in einer
             Barrierefreiheitserklärung stehen muss. Fehlen Pflichtangaben, ist die Erklärung formal unvollständig
@@ -254,7 +255,7 @@ export default function BarrierefreiheitserklaerungMusterPage() {
 
           <h3 className="mt-6 text-lg font-semibold">Fehler 3: Fehlende Schlichtungsstellen-Angabe</h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            Die Angabe der zuständigen Schlichtungsstelle (BFIT-Bund) ist Pflichtbestandteil nach § 15 BFSGV und
+            Die Angabe der zuständigen Schlichtungsstelle (BFIT-Bund) ist Pflichtbestandteil nach § 14 BFSG und
             wird in vielen Eigenversuchen vergessen.
           </p>
 

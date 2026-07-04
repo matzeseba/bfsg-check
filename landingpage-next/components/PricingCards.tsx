@@ -16,6 +16,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MagneticButton } from "@/components/fx/MagneticButton";
+import { ScrollScrub } from "@/components/fx/ScrollScrub";
+import { TiltCard } from "@/components/fx/TiltCard";
 import {
   PACKAGES,
   PLAN_FINDER,
@@ -210,25 +212,29 @@ export function PricingCards({
           }`}
         >
           {packages.map((pkg, i) => (
-            <motion.div
+            // Scroll-Story (Spec §6): Karten bauen sich scroll-gekoppelt auf
+            // (ScrollScrub, gestaffelt über fromX 0/20/40) und neigen sich dem
+            // Cursor entgegen (TiltCard — fängt nur pointermove, die Checkout-
+            // Buttons in der Karte bleiben voll klickbar).
+            <ScrollScrub
               key={pkg.id}
-              initial={{ opacity: 0, y: 22 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.55, delay: i * 0.08, ease: EASE }}
+              from={64}
+              fromX={i * 20}
               className="relative"
             >
-              <PricingCard
-                pkg={pkg}
-                annual={annual}
-                accent={accent}
-                // Jahres-Toggle aktiv + Paket hat eine Jahres-Variante → das
-                // Backend-Paket 'abo-jahr' in den Checkout geben, sonst wie gehabt.
-                onSelect={() =>
-                  openCheckout(annual && pkg.annualId ? pkg.annualId : pkg.id)
-                }
-              />
-            </motion.div>
+              <TiltCard max={pkg.featured ? 6 : 5} className="h-full">
+                <PricingCard
+                  pkg={pkg}
+                  annual={annual}
+                  accent={accent}
+                  // Jahres-Toggle aktiv + Paket hat eine Jahres-Variante → das
+                  // Backend-Paket 'abo-jahr' in den Checkout geben, sonst wie gehabt.
+                  onSelect={() =>
+                    openCheckout(annual && pkg.annualId ? pkg.annualId : pkg.id)
+                  }
+                />
+              </TiltCard>
+            </ScrollScrub>
           ))}
         </div>
 

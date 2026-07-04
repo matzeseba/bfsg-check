@@ -1,9 +1,8 @@
-import * as motion from "motion/react-client";
 import { CookieIcon } from "lucide-react";
 
 import { COOKIE_PACKAGES } from "@/lib/config";
-import { EASE } from "@/lib/motion";
 
+import { ScrollScrub } from "./fx/ScrollScrub";
 import { PricingCards } from "./PricingCards";
 import { SectionKicker } from "./SectionKicker";
 
@@ -25,13 +24,10 @@ export function CookieSection() {
         <div className="absolute top-0 left-1/2 h-[360px] w-[680px] max-w-full -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,color-mix(in_oklch,var(--brand-amber),transparent_86%),transparent_65%)] blur-2xl" />
       </div>
       <div className="relative mx-auto max-w-6xl px-5 pt-20 sm:px-6 sm:pt-24">
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.55, ease: EASE }}
-          className="mx-auto flex max-w-2xl flex-col items-center text-center"
-        >
+        {/* Scroll-Story (Spec §6): Headline-Block baut sich scroll-gekoppelt
+            auf. Die Karten darunter (eingebettete PricingCards) laufen bereits
+            über ScrollScrub + TiltCard. */}
+        <ScrollScrub className="mx-auto flex max-w-2xl flex-col items-center text-center">
           <SectionKicker
             icon={CookieIcon}
             label="Pflicht-Baustelle Nr. 2"
@@ -50,7 +46,7 @@ export function CookieSection() {
             Tracker und Cookies dürfen erst NACH aktiver Einwilligung laden. Wir
             messen technisch, ob Ihre Seite das einhält — statt zu raten.
           </p>
-        </motion.div>
+        </ScrollScrub>
       </div>
       <PricingCards
         id="cookie-pakete"

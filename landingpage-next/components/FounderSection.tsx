@@ -3,7 +3,8 @@ import { CheckIcon, MapPinIcon, UserRoundIcon } from "lucide-react";
 
 import { AmbientGlow } from "./fx/AmbientGlow";
 import { GlowCard } from "./fx/GlowCard";
-import { Reveal } from "./fx/Reveal";
+import { ParallaxLayer } from "./fx/ParallaxLayer";
+import { ScrollScrub } from "./fx/ScrollScrub";
 import { SectionKicker } from "./SectionKicker";
 
 // Drei ehrliche Selbst-Tatsachen (keine erfundenen Kundenzahlen/Titel) —
@@ -14,9 +15,10 @@ const FOUNDER_POINTS = [
   "Betrieb & Hosting vollständig in Deutschland",
 ] as const;
 
-// "Wer dahintersteht" — Founder-Sektion (Dark-Glow-Redesign, Spec §1/§5).
+// "Wer dahintersteht" — Founder-Sektion (Dark-Glow-Redesign, Spec §1/§5/§6).
 // Server-Component; Motion kommt ausschließlich aus den fertigen fx-Primitiven
-// (Reveal links/rechts), das Portrait sitzt in einer GlowCard mit .glow-ring.
+// (ParallaxLayer fürs Portrait, ScrollScrub für die Zitat-Spalte), das Portrait
+// sitzt in einer GlowCard mit .glow-ring.
 export function FounderSection() {
   return (
     <section
@@ -25,8 +27,9 @@ export function FounderSection() {
     >
       <AmbientGlow toneClassName="opacity-60" />
       <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-12 px-5 py-20 sm:px-6 sm:py-24 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
-        {/* Links: Portrait-Karte mit Name, Rolle, Standort. */}
-        <Reveal variant="left" className="mx-auto w-full max-w-sm">
+        {/* Links: Portrait-Karte mit Name, Rolle, Standort — subtiler
+            scroll-gekoppelter Tiefenversatz (Scroll-Story, Spec §6). */}
+        <ParallaxLayer distance={26} className="mx-auto w-full max-w-sm">
           <GlowCard ring className="p-3">
             <Image
               src="/founder-matthias.jpg"
@@ -39,7 +42,7 @@ export function FounderSection() {
             <div className="px-2 pt-4 pb-2">
               <p className="font-display text-lg font-semibold">Matthias Seba</p>
               <p className="mt-0.5 text-sm font-medium text-brand-orange">
-                Gründer &amp; Prüfer, BFSG-Fuchs
+                Gründer &amp; Inhaber, BFSG-Fuchs
               </p>
               <p className="mt-1.5 flex items-center gap-1.5 text-xs text-muted-foreground">
                 <MapPinIcon className="size-3.5 shrink-0" aria-hidden />
@@ -47,10 +50,11 @@ export function FounderSection() {
               </p>
             </div>
           </GlowCard>
-        </Reveal>
+        </ParallaxLayer>
 
-        {/* Rechts: Kicker → Headline → Zitat → ehrliche Checkliste. */}
-        <Reveal variant="right">
+        {/* Rechts: Kicker → Headline → Zitat → ehrliche Checkliste — baut sich
+            scroll-gekoppelt von rechts auf. */}
+        <ScrollScrub fromX={32}>
           <SectionKicker icon={UserRoundIcon} label="Wer dahintersteht" tone="on-deep" />
           <h2
             id="founder-heading"
@@ -60,12 +64,12 @@ export function FounderSection() {
             <span className="italic gradient-text">Mensch</span>.
           </h2>
           <p className="mt-4 text-base text-muted-foreground text-pretty">
-            BFSG-Fuchs ist ein Ein-Personen-Betrieb aus Niedersachsen — Scan,
+            BFSG-Fuchs ist ein Unternehmen aus Niedersachsen — Scan,
             Sichtung und Support kommen aus einer Hand.
           </p>
           <blockquote className="mt-8 border-l-2 border-brand-orange/50 pl-5">
             <p className="[font-family:var(--font-display-italic),Georgia,serif] text-2xl leading-snug text-foreground italic sm:text-[1.75rem]">
-              „Ich prüfe jeden Report persönlich, bevor er rausgeht.“
+              „Wir prüfen jeden Report persönlich, bevor er rausgeht.“
             </p>
           </blockquote>
           <ul className="mt-8 space-y-3.5">
@@ -80,7 +84,7 @@ export function FounderSection() {
               </li>
             ))}
           </ul>
-        </Reveal>
+        </ScrollScrub>
       </div>
     </section>
   );

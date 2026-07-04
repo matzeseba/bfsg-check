@@ -2,14 +2,15 @@ import { STATS } from "@/lib/config";
 
 import { CountUp } from "./CountUp";
 import { GlowCard } from "./fx/GlowCard";
-import { Reveal } from "./fx/Reveal";
+import { ScrollScrub } from "./fx/ScrollScrub";
 
 // Kompakte KPI-Leiste im Vorlagen-Stil (Dark-Glow): EIN flaches GlowCard-Band
 // mit 4 EHRLICHEN Kennzahlen aus config.STATS (keine erfundenen Kundenzahlen,
 // UWG §5). Grosse Mono-Zahlen in Orange mit Text-Glow + Count-up, Labels muted,
 // zwischen den Zellen feine Orange-Hairlines (nur md+, mobil 2-spaltig ohne
 // Trenner). KEIN grosser Sektions-Kopf — nur das leise Mono-Label.
-// dl/dt/dd-Semantik beibehalten.
+// dl/dt/dd-Semantik beibehalten. Scroll-Story: das ganze Band baut sich
+// scroll-gekoppelt auf (ScrollScrub), die Zahlen zählen weiter per CountUp.
 export function StatsBar() {
   return (
     <section
@@ -23,7 +24,7 @@ export function StatsBar() {
       />
 
       <div className="mx-auto max-w-6xl px-5 py-12 sm:px-6 sm:py-16">
-        <Reveal variant="up">
+        <ScrollScrub from={48}>
           <GlowCard className="px-6 py-8 sm:px-10 sm:py-10">
             {/* Dezentes Mono-Label (kein Sektions-Kopf): leise Einordnung. */}
             <p className="text-center font-mono text-[11px] font-medium tracking-[0.18em] text-muted-foreground uppercase">
@@ -54,7 +55,7 @@ export function StatsBar() {
               ))}
             </dl>
           </GlowCard>
-        </Reveal>
+        </ScrollScrub>
       </div>
     </section>
   );

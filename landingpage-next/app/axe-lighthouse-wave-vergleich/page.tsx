@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "axe vs. Lighthouse vs. WAVE: Welches A11y-Tool ist besser?",
+  title: "axe vs. Lighthouse vs. WAVE: Welches Tool ist besser?",
   description:
-    "axe, Lighthouse oder WAVE? Stärken, Schwächen und Abdeckungsrate im Vergleich — und warum kein Tool allein ausreicht. Mit Gratis-Scan-CTA.",
+    "axe, Lighthouse oder WAVE? Stärken, Schwächen und Abdeckungsrate der Barrierefreiheits-Tools im Vergleich — und warum kein Tool allein ausreicht.",
   alternates: {
     canonical: "/axe-lighthouse-wave-vergleich",
   },
@@ -12,7 +12,8 @@ export const metadata: Metadata = {
     title: "axe vs. Lighthouse vs. WAVE: Welches Tool findet die meisten Mängel?",
     description:
       "Detaillierter Vergleich: Abdeckungsrate, False Positives, Browser-Integration und was jedes Tool am besten kann.",
-    url: "https://bfsg-fix.de/axe-lighthouse-wave-vergleich",
+    // relativ — Next resolved gegen metadataBase (SITE.url = bfsg-fuchs.de)
+    url: "/axe-lighthouse-wave-vergleich",
     type: "article",
   },
 };
@@ -69,8 +70,8 @@ export default function AxeLighthouseWaveVergleichPage() {
     "@type": "Article",
     headline: "axe vs. Lighthouse vs. WAVE: Welches A11y-Tool findet die meisten Mängel?",
     description: "Detaillierter Vergleich der drei wichtigsten kostenlosen Accessibility-Tools.",
-    url: "https://bfsg-fix.de/axe-lighthouse-wave-vergleich",
-    publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fix.de" },
+    url: "https://bfsg-fuchs.de/axe-lighthouse-wave-vergleich",
+    publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fuchs.de" },
     dateModified: "2026-06-21",
   };
 

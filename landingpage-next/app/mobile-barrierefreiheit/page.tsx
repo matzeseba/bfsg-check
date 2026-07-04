@@ -12,7 +12,8 @@ export const metadata: Metadata = {
     title: "Mobile Barrierefreiheit: Die unterschätzte Hälfte der WCAG-Prüfung",
     description:
       "Viele Barrieren zeigen sich erst am Smartphone: zu kleine Touch-Targets, kaputter Reflow, unbedienbare Slider. So testen Sie mobil — inkl. Screenreader-Kurzanleitung.",
-    url: "https://bfsg-fix.de/mobile-barrierefreiheit",
+    // relativ — Next resolved gegen metadataBase (SITE.url = bfsg-fuchs.de)
+    url: "/mobile-barrierefreiheit",
     type: "article",
   },
 };
@@ -95,8 +96,8 @@ export default function MobileBarrierefreiheitPage() {
     "@type": "Article",
     headline: "Mobile Barrierefreiheit: Die unterschätzte Hälfte der WCAG-Prüfung",
     description: "Touch-Targets, Reflow, Gesten und Screenreader-Tests: mobile Barrierefreiheit praxisnah erklärt.",
-    url: "https://bfsg-fix.de/mobile-barrierefreiheit",
-    publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fix.de" },
+    url: "https://bfsg-fuchs.de/mobile-barrierefreiheit",
+    publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fuchs.de" },
     dateModified: "2026-07-02",
   };
 

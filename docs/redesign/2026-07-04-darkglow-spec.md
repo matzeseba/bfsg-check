@@ -96,3 +96,41 @@ Score-Beispiel bleibt `HERO_VISUAL.sample` (62/100, Note C) und ist als „Beisp
   existiert), CTAs magnetisch + Glow-Pulse, Score-Donut animiert.
 - Jede Sektion: Kicker-Pill (`SectionKicker`, tone="on-deep") → Headline (weiß, GENAU EIN
   Akzentwort in `.gradient-text.italic`) → Subline (`text-muted-foreground`).
+
+## 6. Dynamik 2.0 — Scroll-Story (Owner-Entscheid 04.07., 2. Runde)
+
+Der Owner hat das Dynamik-Level auf **„Scroll-Story (Scrubbing)"** angehoben und
+**reduced-motion = respektieren** bestätigt. Neue Primitive (fertig, `components/fx/`):
+
+- `ScrollScrub` — scroll-GEKOPPELTE Einblendung (`from`/`fromX` px): Element baut sich
+  beim Scrollen sichtbar auf, Rückwärts-Scrollen spult zurück. ERSETZT `Reveal` für die
+  Haupt-Bausteine der Sektionen (Karten, Panels, Headlines-Blöcke). `Reveal` bleibt für
+  Kleinkram ok.
+- `ParallaxLayer` — scroll-gekoppelter Tiefenversatz (`distance` px) für Deko/Bilder.
+- `MouseParallax` + `MouseLayer` — Cursor-Tiefenebenen (`depth` px): Hero-Panel ~8,
+  Maskottchen ~18, Float-Chips ~28, Trails ~12. Nur Maus, gefedert.
+- `TiltCard` — 3D-Neigung zum Cursor (`max` 5–7°) für Glow-Cards (Pricing, Vergleich,
+  Differentiators, Cookie).
+
+**Regeln:** Alles läuft über MotionValues (kein Re-Render/Frame), nur transform/opacity,
+KEIN Scroll-Jacking (natives Scrollen bleibt), Hero-H1+CTA weiterhin OHNE Einstiegs-
+Animation (LCP), reduced-motion rendert überall den statischen Endzustand (die
+Primitive tun das bereits selbst).
+
+## 7. Maskottchen-Regeln v2 (Owner-Findings 04.07.)
+
+Die 4 Filo-PNGs sind jetzt ECHT FREIGESTELLT (transparenter Hintergrund, getrimmt,
+Higgsfield remove_background). Konsequenzen:
+- **Alle `[mask-image:...]`-Arbitrary-Masken auf Filo-Bildern ENTFERNEN** (sie würden
+  jetzt den Fuchs selbst anschneiden).
+- Filo darf (und soll) GROSS und UNVERDECKT stehen — Vorlagen-Referenz: Fuchs steht
+  NEBEN dem Inhalt, nie dahinter versteckt, nie von Karten/Chips überdeckt. Inhalt
+  reserviert Platz (Grid-Spalte oder padding), statt den Fuchs zu überlagern.
+- Den früheren Bild-Glow ersetzen CSS-Ebenen HINTER dem Fuchs: radialer Orange-Schein
+  (AmbientGlow/eigenes div) + `.orbit-trails` + ggf. `.ember-field` — nichts davon
+  über dem Fuchs.
+- Positionierungs-Falle: `bottom-*` auf absolut positionierten Chips/Deko innerhalb
+  von Panels löste gegen falsche Referenzen auf — top-basierte Werte bevorzugen und
+  im Browser verifizieren.
+- Badges/Pills, die auf `glow-card`-Kanten sitzen, brauchen `z-10` (der `::after`-
+  Glow-Rahmen malt sonst über sie).

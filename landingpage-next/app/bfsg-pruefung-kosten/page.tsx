@@ -12,7 +12,8 @@ export const metadata: Metadata = {
     title: "Was kostet eine BFSG-Prüfung? Marktpreise 2026 ehrlich verglichen",
     description:
       "Gratis-Tools, automatisierte Reports (129–399 €) und manuelle Audits (1.500–5.000 €) — welcher Ansatz lohnt sich wann?",
-    url: "https://bfsg-fix.de/bfsg-pruefung-kosten",
+    // relativ — Next resolved gegen metadataBase (SITE.url = bfsg-fuchs.de)
+    url: "/bfsg-pruefung-kosten",
     type: "article",
   },
 };
@@ -56,8 +57,8 @@ export default function BfsgPruefungKostenPage() {
     "@type": "Article",
     headline: "Was kostet eine BFSG-Prüfung? Marktpreise 2026 ehrlich verglichen",
     description: "Überblick über BFSG-Audit-Kosten: Gratis-Tools, automatisierte Reports und manuelle Audits.",
-    url: "https://bfsg-fix.de/bfsg-pruefung-kosten",
-    publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fix.de" },
+    url: "https://bfsg-fuchs.de/bfsg-pruefung-kosten",
+    publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fuchs.de" },
     dateModified: "2026-06-21",
   };
 
