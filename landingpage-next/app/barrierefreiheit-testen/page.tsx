@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Website-Barrierefreiheit testen: kostenlos",
+  title: "Barrierefreiheit testen: 5 kostenlose Selbsttests",
   description:
     "Barrierefreiheit der Website kostenlos testen: 5 Selbsttests ohne Tools, Gratis-Checker im Vergleich und die Grenzen automatisierter Prüfungen.",
   alternates: {
@@ -12,7 +12,8 @@ export const metadata: Metadata = {
     title: "Website auf Barrierefreiheit testen: kostenlose Wege im Überblick",
     description:
       "Tastatur-Test, Kontrast, Zoom, Alt-Texte: Was Sie selbst prüfen können, welche Gratis-Tools helfen — und wo automatisierte Tests aufhören.",
-    url: "https://bfsg-fix.de/barrierefreiheit-testen",
+    // relativ — Next resolved gegen metadataBase (SITE.url = bfsg-fuchs.de)
+    url: "/barrierefreiheit-testen",
     type: "article",
   },
 };
@@ -94,8 +95,8 @@ export default function BarrierefreiheitTestenPage() {
     "@type": "Article",
     headline: "Website auf Barrierefreiheit testen: kostenlose Wege im Überblick",
     description: "Fünf Selbsttests, Gratis-Tools und die Grenzen automatisierter Barrierefreiheits-Prüfungen.",
-    url: "https://bfsg-fix.de/barrierefreiheit-testen",
-    publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fix.de" },
+    url: "https://bfsg-fuchs.de/barrierefreiheit-testen",
+    publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fuchs.de" },
     dateModified: "2026-07-02",
   };
 

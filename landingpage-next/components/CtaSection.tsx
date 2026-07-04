@@ -102,8 +102,8 @@ export function CtaSection() {
               id="cta-heading"
               className="mt-4 max-w-2xl font-display text-3xl font-extrabold tracking-tight text-balance text-on-deep sm:text-[2.75rem] sm:leading-[1.05]"
             >
-              Lassen Sie den Fuchs ran — bevor andere{" "}
-              <span className="italic gradient-text">zuschnappen</span>.
+              Lassen Sie den Fuchs ran — bevor eine Abmahnung{" "}
+              <span className="italic gradient-text">zuschnappt</span>.
             </h2>
             <p className="mx-auto mt-5 max-w-xl text-base text-foreground/70 text-pretty md:mx-0 sm:text-lg">
               Kostenloser Sofort-Check, Ergebnis in 60 Sekunden. Keine Anmeldung,

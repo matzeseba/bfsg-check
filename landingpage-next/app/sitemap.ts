@@ -1,7 +1,13 @@
 import type { MetadataRoute } from "next";
 
-const siteUrl = "https://bfsg-fuchs.de";
+import { SITE } from "@/lib/config";
 
+// Domain aus lib/config.ts (SITE.url = Single Source of Truth für canonical/OG/sitemap).
+const siteUrl = SITE.url;
+
+// HINWEIS: /widerruf, /kuendigen und /datenschutz/anfrage tragen robots
+// noindex (Formular-Seiten) und gehören deshalb NICHT in die Sitemap —
+// eingereichte noindex-URLs erzeugen in der Search Console Konflikt-Meldungen.
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
 
@@ -11,18 +17,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified,
       changeFrequency: "weekly",
       priority: 1,
-    },
-    {
-      url: `${siteUrl}/widerruf`,
-      lastModified,
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
-    {
-      url: `${siteUrl}/kuendigen`,
-      lastModified,
-      changeFrequency: "yearly",
-      priority: 0.3,
     },
     {
       url: `${siteUrl}/datenschutz`,
@@ -47,12 +41,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified,
       changeFrequency: "yearly",
       priority: 0.3,
-    },
-    {
-      url: `${siteUrl}/datenschutz/anfrage`,
-      lastModified,
-      changeFrequency: "yearly",
-      priority: 0.2,
     },
     // Partnerprogramm (Agentur-Inbound)
     {
@@ -111,7 +99,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
-      url: `${siteUrl}/bfsg-fuer-webagenturen`,
+      url: `${siteUrl}/bfsg-für-webagenturen`,
       lastModified,
       changeFrequency: "monthly",
       priority: 0.8,

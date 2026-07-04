@@ -42,7 +42,7 @@ export function FounderSection() {
             <div className="px-2 pt-4 pb-2">
               <p className="font-display text-lg font-semibold">Matthias Seba</p>
               <p className="mt-0.5 text-sm font-medium text-brand-orange">
-                Gründer &amp; Prüfer, BFSG-Fuchs
+                Gründer &amp; Inhaber, BFSG-Fuchs
               </p>
               <p className="mt-1.5 flex items-center gap-1.5 text-xs text-muted-foreground">
                 <MapPinIcon className="size-3.5 shrink-0" aria-hidden />
@@ -64,12 +64,12 @@ export function FounderSection() {
             <span className="italic gradient-text">Mensch</span>.
           </h2>
           <p className="mt-4 text-base text-muted-foreground text-pretty">
-            BFSG-Fuchs ist ein Ein-Personen-Betrieb aus Niedersachsen — Scan,
+            BFSG-Fuchs ist ein Unternehmen aus Niedersachsen — Scan,
             Sichtung und Support kommen aus einer Hand.
           </p>
           <blockquote className="mt-8 border-l-2 border-brand-orange/50 pl-5">
             <p className="[font-family:var(--font-display-italic),Georgia,serif] text-2xl leading-snug text-foreground italic sm:text-[1.75rem]">
-              „Ich prüfe jeden Report persönlich, bevor er rausgeht.“
+              „Wir prüfen jeden Report persönlich, bevor er rausgeht.“
             </p>
           </blockquote>
           <ul className="mt-8 space-y-3.5">

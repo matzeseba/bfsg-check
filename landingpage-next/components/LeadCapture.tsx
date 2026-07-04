@@ -100,10 +100,10 @@ export function LeadCapture({
       <p className="mt-1 text-xs text-muted-foreground">
         {totalIssues > 0 ? (
           <>
-            Übersicht aller gefundenen Befund-Kategorien, eine Aktionsplan-Vorschau
-            und die Einordnung Ihres WCAG-Scores — kostenlos per E-Mail. (Der
-            Vollreport mit jeder Fundstelle + Umsetzungsdetails bleibt den Paketen
-            vorbehalten.)
+            Alle gefundenen Befund-Kategorien, eine Aktionsplan-Vorschau und die
+            Einordnung Ihres WCAG-Scores — kostenlos per E-Mail. Der Vollreport
+            mit jeder Fundstelle und Umsetzungsdetails bleibt den
+            kostenpflichtigen Paketen vorbehalten.
           </>
         ) : (
           <>

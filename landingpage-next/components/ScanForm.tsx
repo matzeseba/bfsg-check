@@ -199,7 +199,7 @@ export function ScanForm({ initialUrl = "" }: ScanFormProps) {
         </div>
       </form>
       <p className="px-1 text-xs text-muted-foreground">
-        Kostenlos · ohne Anmeldung · ohne Tracker. Bei Bestellung Stripe-Checkout.
+        Kostenlos · ohne Anmeldung · ohne Tracker · Bestellung später per Stripe-Checkout.
       </p>
       {/* Scan-Lauf-Zustand (Fox-Design): oranger Spinner + animierte orange
           Progress-Bar + bar-eq-Equalizer. Dekorativ (aria-hidden) — die

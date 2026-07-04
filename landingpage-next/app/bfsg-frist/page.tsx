@@ -12,7 +12,8 @@ export const metadata: Metadata = {
     title: "BFSG-Frist: Was seit dem 28.06.2025 gilt — und was jetzt zu tun ist",
     description:
       "28.06.2025 Geltungsbeginn, 26.09.2025 Marktüberwachungsstelle aktiv, erste Abmahnwellen: die BFSG-Zeitleiste sachlich erklärt.",
-    url: "https://bfsg-fix.de/bfsg-frist",
+    // relativ — Next resolved gegen metadataBase (SITE.url = bfsg-fuchs.de)
+    url: "/bfsg-frist",
     type: "article",
   },
 };
@@ -63,7 +64,7 @@ const FAQ = [
   },
   {
     q: "Die Frist ist verpasst — was sollte ich jetzt zuerst tun?",
-    a: "Erstens: den Ist-Zustand technisch erfassen (automatisierter Scan plus Sichtung). Zweitens: kritische Mängel priorisiert beheben — Kontraste, Alt-Texte, Tastaturbedienbarkeit und Formular-Labels sind häufig schnell umsetzbar. Drittens: eine Barrierefreiheitserklärung gemäß § 15 BFSGV veröffentlichen und den Fortschritt dokumentieren. Eine dokumentierte, laufende Verbesserung ist besser als Stillstand.",
+    a: "Erstens: den Ist-Zustand technisch erfassen (automatisierter Scan plus Sichtung). Zweitens: kritische Mängel priorisiert beheben — Kontraste, Alt-Texte, Tastaturbedienbarkeit und Formular-Labels sind häufig schnell umsetzbar. Drittens: eine Barrierefreiheitserklärung gemäß § 14 BFSG veröffentlichen und den Fortschritt dokumentieren. Eine dokumentierte, laufende Verbesserung ist besser als Stillstand.",
   },
 ];
 
@@ -83,8 +84,8 @@ export default function BfsgFristPage() {
     "@type": "Article",
     headline: "BFSG-Frist: Was seit dem 28.06.2025 gilt — und was jetzt zu tun ist",
     description: "Zeitleiste zum BFSG: Geltungsbeginn, Marktüberwachung, Abmahnwellen und nächste Schritte.",
-    url: "https://bfsg-fix.de/bfsg-frist",
-    publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fix.de" },
+    url: "https://bfsg-fuchs.de/bfsg-frist",
+    publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fuchs.de" },
     dateModified: "2026-07-02",
   };
 
@@ -164,7 +165,7 @@ export default function BfsgFristPage() {
             Maßstab ist die EN 301 549, die im Kern WCAG 2.1 Stufe AA fordert. Dazu gehören unter anderem
             ausreichende Kontraste (mindestens 4,5:1 für normalen Text), Alt-Texte für Bilder, vollständige
             Tastaturbedienbarkeit, verknüpfte Formular-Labels und eine korrekte Überschriften-Hierarchie.
-            Zusätzlich verlangt § 15 BFSGV eine öffentlich zugängliche Barrierefreiheitserklärung mit
+            Zusätzlich verlangt § 14 BFSG eine öffentlich zugängliche Barrierefreiheitserklärung mit
             Konformitätsstatus, bekannten Mängeln, Feedback-Mechanismus und Schlichtungsstellen-Kontakt.
           </p>
         </section>
@@ -188,7 +189,7 @@ export default function BfsgFristPage() {
               priorisierter Fix-Plan spart hier Entwicklerstunden.
             </li>
             <li>
-              <strong>Dokumentieren und erklären:</strong> Barrierefreiheitserklärung gemäß § 15 BFSGV
+              <strong>Dokumentieren und erklären:</strong> Barrierefreiheitserklärung gemäß § 14 BFSG
               veröffentlichen, bekannte Mängel benennen und den Behebungsfortschritt festhalten. Das zeigt
               der Marktüberwachung und möglichen Abmahnern, dass das Thema aktiv bearbeitet wird.
             </li>

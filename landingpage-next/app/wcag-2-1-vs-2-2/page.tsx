@@ -12,7 +12,8 @@ export const metadata: Metadata = {
     title: "WCAG 2.1 vs. WCAG 2.2 — Die 9 neuen Kriterien für Shop-Betreiber",
     description:
       "Übersicht der 9 neuen WCAG-2.2-Erfolgskriterien, welche das BFSG fordert und was Entwickler jetzt tun sollten.",
-    url: "https://bfsg-fix.de/wcag-2-1-vs-2-2",
+    // relativ — Next resolved gegen metadataBase (SITE.url = bfsg-fuchs.de)
+    url: "/wcag-2-1-vs-2-2",
     type: "article",
   },
 };
@@ -131,8 +132,8 @@ export default function Wcag21vs22Page() {
     "@type": "Article",
     headline: "WCAG 2.1 vs. 2.2: Die 9 neuen Erfolgskriterien einfach erklärt",
     description: "Was hat sich von WCAG 2.1 zu 2.2 geändert? Alle Neuerungen und BFSG-Relevanz erklärt.",
-    url: "https://bfsg-fix.de/wcag-2-1-vs-2-2",
-    publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fix.de" },
+    url: "https://bfsg-fuchs.de/wcag-2-1-vs-2-2",
+    publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fuchs.de" },
     dateModified: "2026-06-21",
   };
 

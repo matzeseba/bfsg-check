@@ -1,6 +1,6 @@
 # BFSG-Fuchs
 
-> BFSG-Fuchs (bfsg-fuchs.de, auch erreichbar über bfsg-fix.de) ist ein automatisierter Barrierefreiheits-Scan für deutsche Websites und Online-Shops. Der Dienst prüft Seiten gegen über 80 Regeln nach WCAG 2.1 AA / EN 301 549 (axe-core-basiert, mit menschlicher Sichtung vor Auslieferung) und liefert priorisierte PDF-Reports mit konkreten Fix-Hinweisen sowie einem Entwurf der Barrierefreiheitserklärung gemäß § 15 BFSGV. Hintergrund: Das Barrierefreiheitsstärkungsgesetz (BFSG) gilt in Deutschland seit dem 28.06.2025.
+> BFSG-Fuchs (bfsg-fuchs.de, auch erreichbar über bfsg-fix.de) ist ein automatisierter Barrierefreiheits-Scan für deutsche Websites und Online-Shops. Der Dienst prüft Seiten gegen über 80 Regeln nach WCAG 2.1 AA / EN 301 549 (axe-core-basiert, mit menschlicher Sichtung vor Auslieferung) und liefert priorisierte PDF-Reports mit konkreten Fix-Hinweisen sowie einem Entwurf der Barrierefreiheitserklärung gemäß § 14 BFSG (i. V. m. der BFSGV). Hintergrund: Das Barrierefreiheitsstärkungsgesetz (BFSG) gilt in Deutschland seit dem 28.06.2025.
 
 Wichtig: BFSG-Fuchs liefert eine automatisierte technische Analyse mit menschlicher Sichtung — keine Rechtsberatung und keine Zusicherung rechtlicher Anforderungserfüllung. Zielgruppe sind deutsche KMU, Online-Shops und Webagenturen.
 
@@ -19,7 +19,7 @@ Wichtig: BFSG-Fuchs liefert eine automatisierte technische Analyse mit menschlic
 - [BFSG-Checkliste für Online-Shops](https://bfsg-fuchs.de/bfsg-checkliste-online-shop): 25 Prüfpunkte mit WCAG-Referenz und Priorität.
 - [Was kostet eine BFSG-Prüfung?](https://bfsg-fuchs.de/bfsg-pruefung-kosten): Marktpreise 2026 — Gratis-Tools, Auto-Reports, manuelle Audits.
 - [Website-Barrierefreiheit testen](https://bfsg-fuchs.de/barrierefreiheit-testen): Fünf Selbsttests und Gratis-Tools im Überblick.
-- [Barrierefreiheitserklärung: Muster](https://bfsg-fuchs.de/barrierefreiheitserklaerung-muster): Pflicht-Inhalte nach § 15 BFSGV mit Vorlage.
+- [Barrierefreiheitserklärung: Muster](https://bfsg-fuchs.de/barrierefreiheitserklaerung-muster): Pflicht-Inhalte nach § 14 BFSG mit Vorlage.
 - [BFSG für Webagenturen](https://bfsg-fuchs.de/bfsg-fuer-webagenturen): Verantwortlichkeiten, typische Mängel, Agentur-Workflow.
 - [PDF barrierefrei machen](https://bfsg-fuchs.de/pdf-barrierefrei-machen): Tagging, Lesereihenfolge, PDF/UA, Werkzeuge.
 - [Mobile Barrierefreiheit](https://bfsg-fuchs.de/mobile-barrierefreiheit): Touch-Targets, Reflow, Screenreader-Test mit VoiceOver/TalkBack.

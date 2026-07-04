@@ -69,7 +69,10 @@ export function RiskBand() {
               <Image
                 src="/filo-running.png"
                 alt=""
-                width={848}
+                // 907x1100 = Masse nach der Schwanz-Reparatur (Luma-Restore
+                // aus dem Original, 04.07.) — der wiederhergestellte Schwanz
+                // verbreitert die Bounding-Box gegenueber dem Remover-Cut.
+                width={907}
                 height={1100}
                 loading="lazy"
                 className="relative h-[330px] w-auto -rotate-2"
@@ -100,7 +103,7 @@ export function RiskBand() {
                   href="/#scan"
                   className="btn-cta h-12 rounded-xl px-6 text-base"
                 >
-                  In 60 Sekunden prüfen
+                  Kostenlos prüfen
                   <ArrowRightIcon className="size-4" />
                 </Link>
               </MagneticButton>

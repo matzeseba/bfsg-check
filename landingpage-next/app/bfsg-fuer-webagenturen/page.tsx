@@ -12,7 +12,8 @@ export const metadata: Metadata = {
     title: "BFSG für Webagenturen: Pflichten, typische Mängel und das Geschäftsmodell dahinter",
     description:
       "Kundenwebsites fallen unters BFSG — Agenturen sitzen zwischen den Stühlen. So wird aus der Pflicht eine wiederkehrende Leistung.",
-    url: "https://bfsg-fix.de/bfsg-fuer-webagenturen",
+    // relativ — Next resolved gegen metadataBase (SITE.url = bfsg-fuchs.de)
+    url: "/bfsg-fuer-webagenturen",
     type: "article",
   },
 };
@@ -56,8 +57,8 @@ export default function BfsgFuerWebagenturenPage() {
     "@type": "Article",
     headline: "BFSG für Webagenturen: Pflichten, typische Mängel und das Geschäftsmodell dahinter",
     description: "Wie Webagenturen mit dem BFSG umgehen: Verantwortlichkeiten, Workflow und Barrierefreiheit als Leistung.",
-    url: "https://bfsg-fix.de/bfsg-fuer-webagenturen",
-    publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fix.de" },
+    url: "https://bfsg-fuchs.de/bfsg-fuer-webagenturen",
+    publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fuchs.de" },
     dateModified: "2026-07-02",
   };
 
@@ -135,7 +136,7 @@ export default function BfsgFuerWebagenturenPage() {
               alt-Attribut leer bleibt oder den Dateinamen enthält (WCAG 1.1.1).
             </li>
             <li>
-              <strong>Fehlende Barrierefreiheitserklärung:</strong> Die Erklärung gemäß § 15 BFSGV mit
+              <strong>Fehlende Barrierefreiheitserklärung:</strong> Die Erklärung gemäß § 14 BFSG mit
               Konformitätsstatus, bekannten Mängeln, Feedback-Mechanismus und Schlichtungsstellen-Kontakt
               fehlt auf den meisten Bestandsseiten komplett.
             </li>
