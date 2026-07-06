@@ -158,42 +158,17 @@ export function PricingCards({
             {subtitle}
           </p>
 
+          {/* Desktop-Instanz des Toggles: zentriert über allen 3 Karten — dort
+              ist die Abo-Karte im md:grid-cols-3 gleichzeitig sichtbar. Mobil
+              (einspaltig, Abo-Karte zuletzt) sähe man hier keinen Effekt →
+              zweite Instanz direkt über der Abo-Karte (s. Karten-Loop unten). */}
           {showToggle && (
-            <div className="mt-6 inline-flex items-center gap-3 rounded-full border border-border/70 bg-card/70 p-1 shadow-card-soft backdrop-blur">
-              <button
-                type="button"
-                onClick={() => setAnnual(false)}
-                aria-pressed={!annual}
-                className={cn(
-                  "inline-flex min-h-11 items-center rounded-full px-5 text-xs font-medium transition-colors",
-                  // Aktiver Zustand im Orange-Selected-State (Dark-Glow-Vorlagen);
-                  // #2b1206 auf #f4641e ist AA (~4.9:1).
-                  !annual
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                Monatlich
-              </button>
-              <button
-                type="button"
-                onClick={() => setAnnual(true)}
-                aria-pressed={annual}
-                className={cn(
-                  "inline-flex min-h-11 items-center gap-1.5 rounded-full px-5 text-xs font-medium transition-colors",
-                  annual
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                Jährlich
-                {annualSavings && (
-                  <span className="rounded-full bg-brand-mint px-1.5 py-0.5 text-[10px] font-semibold text-brand-deep">
-                    spart {annualSavings}
-                  </span>
-                )}
-              </button>
-            </div>
+            <BillingToggle
+              annual={annual}
+              setAnnual={setAnnual}
+              savings={annualSavings}
+              className="mt-6 hidden md:inline-flex"
+            />
           )}
         </motion.div>
 
@@ -222,6 +197,18 @@ export function PricingCards({
               fromX={i * 20}
               className="relative"
             >
+              {/* Mobil-Instanz des Toggles: direkt über der Abo-Karte, deren
+                  Preis er umschaltet (Desktop-Instanz sitzt im Header, beide
+                  teilen denselben annual-State). */}
+              {showToggle && pkg.id === subWithAnnual?.id && (
+                <div className="md:hidden mb-4 flex justify-center">
+                  <BillingToggle
+                    annual={annual}
+                    setAnnual={setAnnual}
+                    savings={annualSavings}
+                  />
+                </div>
+              )}
               <TiltCard max={pkg.featured ? 6 : 5} className="h-full">
                 <PricingCard
                   pkg={pkg}
@@ -261,6 +248,65 @@ export function PricingCards({
         </p>
       </div>
     </section>
+  );
+}
+
+// Monatlich/Jährlich-Pill. Wird ZWEIMAL gerendert (EIN gemeinsamer annual-State
+// in PricingCards): Desktop im Sektions-Header, mobil direkt über der Abo-Karte
+// — Markup/Verhalten identisch, nur die Position unterscheidet sich per
+// Breakpoint (className). Ein Klick wirkt in beiden Instanzen.
+function BillingToggle({
+  annual,
+  setAnnual,
+  savings,
+  className,
+}: {
+  annual: boolean;
+  setAnnual: (v: boolean) => void;
+  savings: string | null;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "inline-flex items-center gap-3 rounded-full border border-border/70 bg-card/70 p-1 shadow-card-soft backdrop-blur",
+        className,
+      )}
+    >
+      <button
+        type="button"
+        onClick={() => setAnnual(false)}
+        aria-pressed={!annual}
+        className={cn(
+          "inline-flex min-h-11 items-center rounded-full px-5 text-xs font-medium transition-colors",
+          // Aktiver Zustand im Orange-Selected-State (Dark-Glow-Vorlagen);
+          // #2b1206 auf #f4641e ist AA (~4.9:1).
+          !annual
+            ? "bg-primary text-primary-foreground"
+            : "text-muted-foreground hover:text-foreground",
+        )}
+      >
+        Monatlich
+      </button>
+      <button
+        type="button"
+        onClick={() => setAnnual(true)}
+        aria-pressed={annual}
+        className={cn(
+          "inline-flex min-h-11 items-center gap-1.5 rounded-full px-5 text-xs font-medium transition-colors",
+          annual
+            ? "bg-primary text-primary-foreground"
+            : "text-muted-foreground hover:text-foreground",
+        )}
+      >
+        Jährlich
+        {savings && (
+          <span className="rounded-full bg-brand-mint px-1.5 py-0.5 text-[10px] font-semibold text-brand-deep">
+            spart {savings}
+          </span>
+        )}
+      </button>
+    </div>
   );
 }
 

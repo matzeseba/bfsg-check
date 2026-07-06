@@ -81,14 +81,15 @@ export function Header() {
           className="group/logo -my-2 flex min-h-11 items-center gap-2.5 py-2 font-display text-xl font-bold tracking-tight"
           aria-label={`${SITE.name} Startseite`}
         >
-          {/* Eckiges Glow-Fuchskopf-Logo (Dark-Glow-Redesign), dekorativ → leeres
-              alt, da die nebenstehende Wortmarke den Namen traegt. Klein (~36px),
-              mit orangem Drop-Shadow. */}
+          {/* Offizielles Fuchs-Wappen (aus docs/brand/bfsg-fuchs-logo-final.png
+              zugeschnitten, Glow eingebrannt + transparenter Rand), dekorativ →
+              leeres alt, da die nebenstehende Wortmarke den Namen traegt. Klein
+              (~36px), mit orangem Drop-Shadow. */}
           <Image
-            src="/logo-fox-glow.png"
+            src="/logo-fuchs-wappen.png"
             alt=""
-            width={418}
-            height={512}
+            width={217}
+            height={256}
             // priority: Markenzeichen im allerersten Paint (Header ist immer
             // above-the-fold); next/image liefert ohnehin nur die ~36px-Variante.
             priority

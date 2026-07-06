@@ -157,8 +157,9 @@ export const HERO_VISUAL = {
   // (Editorial-Rhythmus); Hero.tsx splittet die Überschrift an diesem Wort.
   previewHeading: "Ihr Sofort-Ergebnis — exakt in diesem Format",
   previewAccent: "Sofort-Ergebnis",
-  // Wahr: nach dem Gratis-Check gibt es die Übersicht zusätzlich per
-  // Double-Opt-in-Mail (Value-Mail, scanner/lib/mailer.js buildLeadTeaser).
+  // Wahr: nach der Double-Opt-in-Bestätigung verschickt die Brevo-Automation
+  // (Template #8, „Deine Barrierefreiheits-Übersicht ist da") die Übersicht
+  // per E-Mail — der frühere Backend-Teaser wurde entfernt (Doppel-Mail-Fix).
   footnote:
     "Diese Übersicht erhalten Sie nach dem Gratis-Check zusätzlich per E-Mail.",
   // ScanResult-förmige, in sich konsistente Beispieldaten:

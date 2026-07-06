@@ -30,9 +30,6 @@ const INVOICE_FROM_NAME = process.env.INVOICE_FROM_NAME || FROM_NAME;
 const INVOICE_FROM_ADDRESS = process.env.INVOICE_FROM_ADDRESS || '';
 const PUBLIC_HOST = (process.env.PUBLIC_URL || 'https://bfsg-fix.de')
   .replace(/^https?:\/\//, '').replace(/\/+$/, '');
-// Voll-URL (mit Schema) fuer Links in HTML-Mails; CTA der Value-Mail (PR2).
-const PUBLIC_URL = (process.env.PUBLIC_URL || 'https://bfsg-fix.de').replace(/\/+$/, '');
-const LEAD_TEASER_CTA_URL = process.env.LEAD_TEASER_CTA_URL || `${PUBLIC_URL}/#pakete`;
 
 // Exportiert fuer Unit-Tests (reine Funktion, keine Seiteneffekte).
 export function legalFooter() {
@@ -247,239 +244,12 @@ ${FROM_NAME}`;
   return deliver({ to, subject, text, attachments: [] });
 }
 
-// --- PR2: Value-E-Mail nach dem Gratis-Scan --------------------------------
-// Minimal-HTML-Escape fuer nutzergelieferte Strings (URL/Host/Befund-Titel).
+// Minimal-HTML-Escape fuer nutzergelieferte Strings — genutzt von buildDelayNotice
+// und sendOwnerReview.
 function escHtml(s = '') {
   return String(s)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-}
-// Note aus Score — identische Schwellen wie scanner/lib/report.js computeScore,
-// damit die Mail-Note nie der Report-Note widerspricht. Fallback, falls der
-// Client keine grade mitschickt.
-function gradeFromScore(score) {
-  if (!Number.isFinite(score)) return '—';
-  if (score >= 90) return 'A';
-  if (score >= 75) return 'B';
-  if (score >= 50) return 'C';
-  return 'D';
-}
-function verdictFromScore(score) {
-  if (!Number.isFinite(score)) return 'Erste automatisierte Einschätzung deiner Seite.';
-  if (score >= 90) return 'Weitgehend konform — nur Feinschliff nötig.';
-  if (score >= 75) return 'Solide Basis, aber relevante Lücken mit Handlungsbedarf.';
-  if (score >= 50) return 'Deutliche Mängel — Handlungsbedarf.';
-  return 'Kritisch — viele Mängel, dringender Handlungsbedarf.';
-}
-// Reine, host-tolerante URL→Host-Extraktion (kein Throw bei krummer Eingabe).
-function hostFromUrl(url = '') {
-  const raw = String(url).trim();
-  if (!raw) return '';
-  try {
-    return new URL(/^https?:\/\//i.test(raw) ? raw : 'https://' + raw).host;
-  } catch {
-    return oneLine(raw).replace(/^https?:\/\//i, '').split('/')[0].slice(0, 80);
-  }
-}
-// Grad → Ampel-Farben (Score-Badge im HTML).
-function toneForGrade(grade) {
-  if (grade === 'A') return { bg: '#ecfdf5', fg: '#047857' };
-  if (grade === 'D') return { bg: '#fef2f2', fg: '#b91c1c' };
-  if (grade === '—') return { bg: '#f3f4f6', fg: '#374151' };
-  return { bg: '#fffbeb', fg: '#b45309' }; // B/C = amber
-}
-
-// Schwere-Stufen für die Top-Befunde — identische Stufen/Farben wie die Zähler-Tabelle.
-const SEVERITY_ORDER = ['critical', 'serious', 'moderate', 'minor'];
-const SEVERITY_LABEL = { critical: 'KRITISCH', serious: 'SCHWERWIEGEND', moderate: 'MITTEL', minor: 'GERING' };
-// Solide Füll-Farben → in hellen UND dunklen Mail-Clients (Outlook Dark) kontraststark.
-// Keine hellgrau-auf-weiß-Chips, die in Dark-Mode verschwinden. Textfarbe je Fläche:
-// WCAG 1.4.3 (AA, Normaltext 4,5:1): Weiß auf Rot/Orange/Amber läge nur bei
-// ~3,3:1 / ~3,1:1 / ~1,9:1 → dunkler Text #2b1206 auf den hellen Flächen
-// (KRITISCH 5,36:1, SCHWERWIEGEND 5,63:1, MITTEL ~7:1); nur GERING (#6b7280)
-// trägt weißen Text (4,54:1). GESPIEGELT in landingpage-next/lib/severity.ts —
-// bei Änderungen hier dort nachziehen.
-const SEVERITY_COLOR = { critical: '#F8554B', serious: '#ED6A33', moderate: '#f5b13d', minor: '#6b7280' };
-const SEVERITY_TEXT = { critical: '#2b1206', serious: '#2b1206', moderate: '#2b1206', minor: '#ffffff' };
-
-// Leitet je Top-Befund den Schweregrad her. renderTeaser (report.js) sortiert die
-// Befunde streng nach IMPACT_WEIGHT absteigend (critical>serious>moderate>minor) und
-// schickt die Top-3. Genau diese Reihenfolge entsteht, wenn man die counts in derselben
-// Schwere-Ordnung expandiert — der i-te Top-Befund trägt also die i-te Schwere dieser
-// Sequenz. So zeigt die Mail dieselbe Schwere wie die Website-Übersicht, ohne Re-Scan
-// oder Frontend-Umbau. Ein künftig explizit mitgeschickter severity/impact hat Vorrang.
-function severitySequence(counts) {
-  const seq = [];
-  for (const sev of SEVERITY_ORDER) {
-    const n = Math.max(0, Number(counts?.[sev]) || 0);
-    for (let i = 0; i < n; i++) seq.push(sev);
-  }
-  return seq;
-}
-
-// Baut Betreff + text/plain + HTML der Value-Mail. PURE Funktion (keine
-// Seiteneffekte) → deterministisch unit-testbar. ZEIGT: Score/Note + Einordnung,
-// ALLE Befund-Kategorien mit Zählern, Top-3-Prioritäten (nur das WAS, keine
-// Selektoren/Fixes). SPERRT (nur Vollreport): exakte Fundstellen, Copy-Paste-Fixes,
-// Umsetzungsplan, Erklärung. Keine verbotenen Claims (UWG §5).
-export function buildLeadTeaser({ url = '', score, grade = '', counts = {}, topIssues = [], totalIssues = 0 } = {}) {
-  const s = Number.isFinite(Number(score)) ? Math.round(Number(score)) : null;
-  const g = grade || gradeFromScore(s);
-  const verdict = verdictFromScore(s);
-  const host = hostFromUrl(url);
-  const c = {
-    critical: Math.max(0, Number(counts?.critical) || 0),
-    serious: Math.max(0, Number(counts?.serious) || 0),
-    moderate: Math.max(0, Number(counts?.moderate) || 0),
-    minor: Math.max(0, Number(counts?.minor) || 0)
-  };
-  const sumCounts = c.critical + c.serious + c.moderate + c.minor;
-  const total = Number.isFinite(Number(totalIssues)) && Number(totalIssues) >= 0
-    ? Math.round(Number(totalIssues)) : sumCounts;
-  const sevSeq = severitySequence(c);
-  const tops = (Array.isArray(topIssues) ? topIssues : [])
-    .slice(0, 3)
-    .map((item, i) => {
-      const rawTitle = typeof item === 'string' ? item : (item?.title || item?.label || item?.text || '');
-      const explicit = item && typeof item === 'object' ? (item.severity || item.impact) : null;
-      const sev = SEVERITY_LABEL[explicit] ? explicit : (sevSeq[i] || null);
-      return { title: oneLine(rawTitle), severity: SEVERITY_LABEL[sev] ? sev : null };
-    })
-    .filter((t) => t.title);
-  const remaining = Math.max(0, total - tops.length);
-  const cta = LEAD_TEASER_CTA_URL;
-  const ctaTarget = host || 'deine Seite';
-  const subject = `Ihre WCAG-Erstprüfung: Note ${g}${s !== null ? ` (${s}/100)` : ''}${host ? ` für ${host}` : ''}`;
-  // Preheader (Vorschautext) mit konkretem Befund-Bezug — kein Clickbait.
-  const lead0 = tops[0];
-  const preheader = lead0
-    ? `Note ${g}${s !== null ? ` (${s}/100)` : ''} — ${lead0.severity ? `${SEVERITY_LABEL[lead0.severity]}: ` : ''}${lead0.title}`
-    : `Deine automatisierte WCAG-2.1-AA-Erstprüfung${host ? ` für ${host}` : ''}: Note ${g}`;
-
-  const topsText = tops.length
-    ? `DEINE TOP-${tops.length}-PRIORITÄTEN (nach Schwere, was zuerst anzupacken ist)
-${tops.map((t, i) => `  ${i + 1}. [${t.severity ? SEVERITY_LABEL[t.severity] : 'BEFUND'}] ${t.title}`).join('\n')}
-
-`
-    : '';
-  const text = `Hallo,
-
-hier ist Filo, der BFSG-Fuchs. Danke, dass du deine Seite${host ? ` (${host})` : ''} durch die
-kostenlose WCAG-2.1-AA-Erstprüfung geschickt hast. Hier ist deine Übersicht:
-
-DEINE NOTE: ${g}${s !== null ? ` — ${s} von 100 Punkten` : ''}
-${verdict}
-
-GEFUNDENE BEFUNDE NACH SCHWERE
-  Kritisch:       ${c.critical}
-  Schwerwiegend:  ${c.serious}
-  Mittel:         ${c.moderate}
-  Gering:         ${c.minor}
-  ------------------------------
-  Gesamt:         ${total}
-
-${topsText}WAS DAS KONKRET BEDEUTET
-Seit dem 28. Juni 2025 gelten die Anforderungen des BFSG für viele Websites und
-Online-Dienste. Nach § 15 BFSG können auch anerkannte Verbände festgestellte
-Verstöße geltend machen. Die oben gefundenen Punkte sind technische Ansatzpunkte,
-an denen eine Prüfung typischerweise zuerst ansetzt.
-
-GRATIS-CHECK vs. VOLLREPORT
-Gratis-Check (diese Mail):
-  - Note & Score, Befunde nach Schwere, Top-${tops.length || 3}-Prioritäten
-Vollreport:
-  - jede einzelne Fundstelle (genaue Stelle im Code)
-  - fertiger Copy-Paste-Fix je Befund${remaining > 0 ? `\n  - ${remaining} weitere Fundstellen über die Top-${tops.length} hinaus` : ''}
-  - priorisierter Umsetzungsplan
-  - Entwurf deiner Erklärung zur Barrierefreiheit
-  - alles als PDF zum Weitergeben
-
-Vollreport für ${ctaTarget} sichern:
-${cta}
-
-Diese Übersicht ist eine automatisierte technische Erstprüfung nach WCAG 2.1 AA
-und ersetzt keine vollständige manuelle Prüfung und keine Rechtsberatung.
-
-Viele Grüße
-Filo & das Team von ${FROM_NAME}
-
-${legalFooter()}`;
-
-  const tone = toneForGrade(g);
-  const countRow = (label, val, emoji) =>
-    `<tr><td style="padding:7px 0;border-bottom:1px solid #f1f1f1;font-size:14px;color:#1f2430;">${emoji} ${label}</td>` +
-    `<td align="right" style="padding:7px 0;border-bottom:1px solid #f1f1f1;font-size:14px;font-weight:700;color:#1f2430;">${val}</td></tr>`;
-  const chipHtml = (sev) => sev
-    ? `<span style="display:inline-block;background:${SEVERITY_COLOR[sev]};color:${SEVERITY_TEXT[sev]};font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:6px;">${SEVERITY_LABEL[sev]}</span>`
-    : '';
-  const topsHtml = tops.length
-    ? `<p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;margin:22px 0 8px;">Deine Top-${tops.length}-Prioritäten (nach Schwere)</p>
-      <table role="presentation" width="100%" style="border-collapse:collapse;margin:0 0 4px;">
-        ${tops.map((t) => `<tr>
-          <td style="padding:6px 10px 6px 0;vertical-align:top;white-space:nowrap;">${chipHtml(t.severity)}</td>
-          <td style="padding:6px 0;font-size:14px;line-height:1.5;color:#1f2430;vertical-align:top;">${escHtml(t.title)}</td>
-        </tr>`).join('')}
-      </table>`
-    : '';
-  const html = `<!doctype html>
-<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><meta name="supported-color-schemes" content="light"></head>
-<body style="margin:0;padding:0;background:#f5f3ef;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1f2430;">
-  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#f5f3ef;font-size:1px;line-height:1px;">${escHtml(preheader)}</div>
-  <div style="max-width:560px;margin:0 auto;padding:24px 14px;">
-    <div style="background:#ffffff;border-radius:16px;padding:26px 24px;border:1px solid #ececec;">
-      <p style="font-size:15px;margin:0 0 12px;color:#1f2430;">Hallo,</p>
-      <p style="font-size:15px;line-height:1.55;margin:0 0 20px;color:#1f2430;">hier ist <strong>Filo, der BFSG-Fuchs</strong> — danke, dass du ${host ? `<strong>${escHtml(host)}</strong>` : 'deine Seite'} durch die kostenlose WCAG-2.1-AA-Erstprüfung geschickt hast. Hier ist deine Übersicht.</p>
-      <div style="text-align:center;background:${tone.bg};border-radius:14px;padding:20px 16px;margin:0 0 22px;">
-        <div style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:${tone.fg};">Deine Note</div>
-        <div style="font-size:46px;font-weight:800;color:${tone.fg};line-height:1.05;margin:2px 0;">${escHtml(g)}</div>
-        ${s !== null ? `<div style="font-size:15px;color:${tone.fg};font-weight:600;">${s} / 100 Punkten</div>` : ''}
-        <div style="font-size:13px;color:${tone.fg};margin-top:6px;line-height:1.4;">${escHtml(verdict)}</div>
-      </div>
-      <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;margin:0 0 6px;">Gefundene Befunde nach Schwere</p>
-      <table role="presentation" width="100%" style="border-collapse:collapse;margin:0;">
-        ${countRow('Kritisch', c.critical, '🔴')}
-        ${countRow('Schwerwiegend', c.serious, '🟠')}
-        ${countRow('Mittel', c.moderate, '🟡')}
-        ${countRow('Gering', c.minor, '⚪')}
-        <tr><td style="padding:9px 0;font-size:14px;font-weight:800;color:#1f2430;">Gesamt</td><td align="right" style="padding:9px 0;font-size:14px;font-weight:800;color:#1f2430;">${total}</td></tr>
-      </table>
-      ${topsHtml}
-      <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;margin:24px 0 6px;">Was das konkret bedeutet</p>
-      <p style="font-size:13px;line-height:1.55;color:#4b5563;margin:0 0 20px;">Seit dem <strong>28. Juni 2025</strong> gelten die Anforderungen des BFSG für viele Websites und Online-Dienste. Nach <strong>§ 15 BFSG</strong> können auch anerkannte Verbände festgestellte Verstöße geltend machen. Die gefundenen Punkte sind technische Ansatzpunkte, an denen eine Prüfung typischerweise zuerst ansetzt.</p>
-      <table role="presentation" width="100%" style="border-collapse:separate;border-spacing:0;margin:0 0 20px;">
-        <tr>
-          <td width="50%" style="background:#f3f4f6;border-radius:12px 0 0 12px;padding:14px 14px;vertical-align:top;">
-            <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;margin:0 0 6px;">Gratis-Check</div>
-            <div style="font-size:12px;line-height:1.55;color:#4b5563;">Note &amp; Score · Befunde nach Schwere · Top-${tops.length || 3}-Prioritäten</div>
-          </td>
-          <td width="50%" style="background:#fff7ed;border:1px solid #fed7aa;border-radius:0 12px 12px 0;padding:14px 14px;vertical-align:top;">
-            <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#c2410c;margin:0 0 6px;">Vollreport</div>
-            <div style="font-size:12px;line-height:1.55;color:#7c2d12;">Jede genaue Fundstelle · Copy-Paste-Fix je Befund${remaining > 0 ? ` · ${remaining} weitere Fundstellen` : ''} · Umsetzungsplan · Entwurf der Erklärung zur Barrierefreiheit · PDF</div>
-          </td>
-        </tr>
-      </table>
-      <div style="text-align:center;margin:0 0 6px;">
-        <a href="${escHtml(cta)}" style="display:inline-block;background:#ea580c;color:#ffffff;text-decoration:none;font-weight:700;font-size:16px;padding:14px 30px;border-radius:12px;">Vollreport für ${escHtml(ctaTarget)} sichern →</a>
-      </div>
-      <p style="font-size:12px;line-height:1.5;color:#9ca3af;margin:22px 0 0;">Diese Übersicht ist eine automatisierte technische Erstprüfung nach WCAG 2.1 AA und ersetzt keine vollständige manuelle Prüfung und keine Rechtsberatung.</p>
-      <p style="font-size:14px;margin:16px 0 0;color:#1f2430;">Viele Grüße<br>Filo &amp; das Team von ${escHtml(FROM_NAME)}</p>
-    </div>
-    <div style="white-space:pre-line;font-size:11px;color:#9ca3af;padding:16px 10px 0;line-height:1.5;">${escHtml(legalFooter())}</div>
-  </div>
-</body></html>`;
-
-  return { subject, text, html };
-}
-
-// Versendet die Value-Mail. Der Lead hat über den Button „Übersicht anfordern"
-// die schriftliche Übersicht AUSDRÜCKLICH angefordert → einmalige, angeforderte
-// Service-Mail (kein § 7 UWG-Problem; der Newsletter-DOI läuft getrennt über
-// Brevo). Ungültige Adresse → Dry-Run-Skip (kein Throw), damit /api/lead robust
-// bleibt. Best-Effort: Aufrufer kapselt den Call in try/catch.
-export async function sendLeadTeaser({ to, url = '', score, grade = '', counts = {}, topIssues = [], totalIssues = 0 }) {
-  if (!isEmail(to)) return { dryRun: true, skipped: 'invalid-recipient' };
-  const { subject, text, html } = buildLeadTeaser({ url, score, grade, counts, topIssues, totalIssues });
-  return deliver({ to, subject, text, html, attachments: [] });
 }
 
 // MF5: Best-Effort-Eingangs-/Verzögerungs-Mail an den ZAHLENDEN Kunden, wenn der
@@ -487,7 +257,7 @@ export async function sendLeadTeaser({ to, url = '', score, grade = '', counts =
 // im Fehlerfall kein PDF) und KEINE Termin-/Refund-Zusage — nur „wir haben es bemerkt
 // und ein Mensch übernimmt". Verhindert, dass ein Kunde nach der Zahlung im Schweigen
 // sitzt (Trust-/Chargeback-Schutz). Wortlaut vom Owner freigegeben (03.07.2026).
-// PURE Builder (analog buildLeadTeaser) → Betreff/Text/HTML deterministisch testbar.
+// PURE Builder → Betreff/Text/HTML deterministisch testbar.
 // Bewusst OHNE Score-/Befund-Tabelle, Vergleichs-Grid und CTA-Button: diese Mail
 // hat kein Klick-/Verkaufsziel, sie soll ausschließlich beruhigen.
 export function buildDelayNotice({ company = '' } = {}) {

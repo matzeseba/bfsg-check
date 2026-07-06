@@ -54,7 +54,7 @@ async function write(rec) {
 }
 
 /**
- * Neuen Lead-Teaser-Job persistieren. `lead` trägt alles, was sendLeadTeaser braucht
+ * Neuen Pending-Lead persistieren. `lead` trägt die Gratis-Scan-Übersicht
  * (to, url, score, counts, topIssues, totalIssues) plus createdAt/expiresAt.
  * @returns {Promise<object>} der persistierte Record
  */
