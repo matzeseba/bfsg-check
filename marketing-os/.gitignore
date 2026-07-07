@@ -1,0 +1,14 @@
+# --- Marketing-OS: Laufzeit-State + Build-Artefakte (nicht versioniert) ---
+node_modules/
+dashboard/dist/
+
+# Laufzeit-Datenbank (JSON) — Bootstrap erzeugt sie aus data/seed/
+data/*.json
+
+# Outbox + Logs: Inhalt ignorieren, leere Struktur behalten
+data/outbox/*
+!data/outbox/.gitkeep
+data/logs/*
+!data/logs/.gitkeep
+
+# data/seed/ bleibt versioniert (Team B) — nicht ignorieren

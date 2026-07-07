@@ -1,0 +1,17 @@
+{
+  "name": "marketing-os-engine",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Marketing-Agent-OS Engine (Scheduler/Runner/Gate/API) fuer BFSG-Fuchs",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
