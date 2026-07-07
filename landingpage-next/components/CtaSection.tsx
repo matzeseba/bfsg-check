@@ -7,7 +7,6 @@ import Link from "next/link";
 import { ArrowRightIcon, ShieldCheckIcon, TimerIcon } from "lucide-react";
 
 import { AmbientGlow } from "@/components/fx/AmbientGlow";
-import { MagneticButton } from "@/components/fx/MagneticButton";
 import { ParallaxLayer } from "@/components/fx/ParallaxLayer";
 import { ScrollScrub } from "@/components/fx/ScrollScrub";
 import { SectionKicker } from "@/components/SectionKicker";
@@ -145,13 +144,13 @@ export function CtaSection() {
             </p>
 
             <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row md:justify-start">
-              {/* Grosser Orange-3D-Haupt-CTA, magnetisch (Dark-Glow-Motion). */}
-              <MagneticButton>
-                <Link href="/#scan" className="btn-cta h-13 px-7 text-lg">
-                  {HERO.cta}
-                  <ArrowRightIcon className="size-4.5" />
-                </Link>
-              </MagneticButton>
+              {/* Grosser Orange-3D-Haupt-CTA: ruhiger Schwebeeffekt +
+                  Hintergrundschimmer wie der "Abonnieren"-Button im Footer
+                  (Owner-Feedback 08.07.: kein magnetischer Cursor-Effekt mehr). */}
+              <Link href="/#scan" className="btn-cta h-13 px-7 text-lg">
+                {HERO.cta}
+                <ArrowRightIcon className="size-4.5" />
+              </Link>
               {/* Creme sekundärer CTA. */}
               <Button
                 size="lg"

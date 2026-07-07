@@ -167,14 +167,14 @@ export function CookieBanner() {
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-1 items-start gap-3.5">
-          {/* Glow-Fuchskopf (rein dekorativ → alt="" + aria-hidden, der Titel
-              trägt die Bedeutung). Kein Layout-Shift dank fixer width/height. */}
+          {/* Offizielles Fuchs-Wappen (rein dekorativ → alt="" + aria-hidden, der
+              Titel trägt die Bedeutung). Kein Layout-Shift dank fixer width/height. */}
           <Image
-            src="/logo-fox-glow.png"
+            src="/logo-fuchs-wappen.png"
             alt=""
             aria-hidden="true"
-            width={418}
-            height={512}
+            width={217}
+            height={256}
             className="mt-0.5 hidden h-9 w-auto shrink-0 rounded-md select-none sm:block"
           />
           <div>

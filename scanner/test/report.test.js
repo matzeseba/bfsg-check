@@ -186,11 +186,14 @@ test('renderReport (F6/F16): Fundstellen offen sichtbar (kein <details>), mit Se
   assert.match(html, /Fix: alt-Attribut ergänzen\./);
 });
 
-test('renderReport (F15): ab dem 6. Beispiel wandert der Rest in den Anhang "Vollständige Fundstellenliste"', () => {
+test('renderReport (F15/F3-Redesign): ab dem 6. Beispiel werden die restlichen Fundstellen kompakt DIREKT unter dem Befund gruppiert — kein separater Anhang mehr', () => {
   const v = viol('image-alt', 'serious', 7);
   const html = renderReport(scanStub([v]));
-  assert.match(html, /Anhang: Vollständige Fundstellenliste/);
-  // Alle 7 Selektoren müssen irgendwo im Dokument vorkommen (5 offen + Rest im Anhang).
+  // Der alte "Rest im Anhang"-Seitenumbruch ist abgeschafft (Owner-Feedback #3):
+  // ALLE Fundstellen stehen unter der Kategorie/dem Befund selbst.
+  assert.doesNotMatch(html, /Anhang: Vollständige Fundstellenliste/);
+  assert.match(html, /ex-more-list/);
+  // Alle 7 Selektoren müssen irgendwo im Dokument vorkommen (5 im Detail + Rest kompakt).
   for (let i = 0; i < 7; i++) assert.match(html, new RegExp(`#n${i}`));
   assert.match(html, /weitere Stelle/);
 });

@@ -4,7 +4,6 @@ import * as React from "react";
 import Link from "next/link";
 import { ArrowRightIcon, MailIcon } from "lucide-react";
 
-import { MagneticButton } from "@/components/fx/MagneticButton";
 import { Input } from "@/components/ui/input";
 import { useCheckout } from "@/lib/checkout-context";
 import type { ScanCounts } from "./ResultCard";
@@ -134,18 +133,17 @@ export function LeadCapture({
             disabled={status === "sending"}
           />
         </div>
-        {/* Magnetischer CTA: nur der Wrapper folgt dem Cursor, Submit-/
-            Disabled-Logik des Buttons bleibt unverändert. */}
-        <MagneticButton className="w-full shrink-0 sm:w-auto">
-          <button
-            type="submit"
-            disabled={status === "sending"}
-            className="btn-cta h-11 w-full px-4 text-sm"
-          >
-            {status === "sending" ? "Sende…" : "Übersicht anfordern"}
-            <ArrowRightIcon className="size-3.5" />
-          </button>
-        </MagneticButton>
+        {/* Ruhiger Schwebeeffekt + Hintergrundschimmer wie der "Abonnieren"-
+            Button im Footer (Owner-Feedback 08.07.: kein magnetischer
+            Cursor-Effekt mehr). */}
+        <button
+          type="submit"
+          disabled={status === "sending"}
+          className="btn-cta h-11 w-full shrink-0 px-4 text-sm sm:w-auto"
+        >
+          {status === "sending" ? "Sende…" : "Übersicht anfordern"}
+          <ArrowRightIcon className="size-3.5" />
+        </button>
       </form>
 
       {/* Persistente Live-Region (WCAG 4.1.3): immer im DOM, damit Screenreader
