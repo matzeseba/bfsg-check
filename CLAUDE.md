@@ -1,7 +1,7 @@
 # CLAUDE.md — Arbeits-Regeln für dieses Projekt
 
 > Diese Datei wird von Claude Code automatisch beim Session-Start gelesen.
-> **Lies sie ZUERST. Dann lies `docs/HANDOVER-NEXT-SESSION.md` für den aktuellen Status.**
+> **Lies sie ZUERST. Der aktuelle Projekt-Stand kommt aus dem Auto-Memory (MEMORY.md-Index, wird automatisch geladen) + `git log origin/main` — NICHT aus `docs/HANDOVER-NEXT-SESSION.md` (nur Meilenstein-Archiv, kann veraltet sein).**
 
 ---
 
@@ -128,13 +128,14 @@ scripts/          PDF-Generator + Helper-Scripts
 
 ## 🧠 Wenn du eine neue Aufgabe bekommst
 
-1. **Lies `docs/HANDOVER-NEXT-SESSION.md` ZUERST** für aktuellen Stand
-2. Prüfe `git log origin/main --oneline -10` für letzte Änderungen
+1. **Aktueller Stand = Auto-Memory + Git.** Der MEMORY.md-Index wird bei jedem Session-Start automatisch geladen — relevante Memory-Dateien bei Bedarf lesen. `docs/HANDOVER-NEXT-SESSION.md` ist nur Meilenstein-Archiv (Datum im Kopf prüfen, kann veraltet sein)
+2. Prüfe `git log origin/main --oneline -10` für letzte Änderungen (Session-Branches/Disk-Docs hängen oft hinter origin/main)
 3. Bei Marketing-Tasks: `marketing/` + `docs/SALES-DAY-1-V2.md`
 4. Bei Code-Änderungen: TypeScript-Strikt-Mode, ESLint-No-ASCII-Umlaute-Rule (echte ä/ö/ü/ß!)
 5. Bei Deploy: nur via PR-Merge auf main (Auto-Deploy via GitHub Actions)
 6. Multi-Agent-Sprints: nutze die **Agency-Agents** (siehe unten) + Explore + Plan parallel
 7. **Computer Use ist aktiviert** (seit 20.06.2026) — Claude Code kann Browser nativ steuern
+8. **Vor Session-Ende (FESTE REGEL):** Ergebnisse, Entscheidungen und offene Punkte ins Auto-Memory schreiben (neue/aktualisierte Memory-Datei + MEMORY.md-Indexzeile) — das ist der einzige verbindliche Handoff-Kanal. Wichtig: in der YAML-`description` kein ` #` verwenden (YAML-Kommentar, schneidet den Text ab)
 
 ---
 

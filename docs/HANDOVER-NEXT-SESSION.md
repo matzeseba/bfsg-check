@@ -1,5 +1,8 @@
 # 🤝 Handover für die nächste Session
 
+> ⚠️ **ARCHIV-STATUS (seit 07.07.2026):** Diese Datei ist nur noch ein **Meilenstein-Archiv** und wird nicht mehr pro Session gepflegt — der Inhalt unten kann veraltet sein.
+> **Der aktuelle Projekt-Stand lebt im Auto-Memory** (`~/.claude/projects/…bfsg-check/memory/MEMORY.md`, wird bei jedem Session-Start automatisch geladen) **+ `git log origin/main`.** Siehe CLAUDE.md → „Wenn du eine neue Aufgabe bekommst".
+
 ---
 
 ## ▶️ NÄCHSTE SESSION STARTET HIER (03.07.2026, Nacht-Session) — Aktionsplan A–G KOMPLETT LIVE
