@@ -135,7 +135,7 @@ scripts/          PDF-Generator + Helper-Scripts
 5. Bei Deploy: nur via PR-Merge auf main (Auto-Deploy via GitHub Actions)
 6. Multi-Agent-Sprints: nutze die **Agency-Agents** (siehe unten) + Explore + Plan parallel
 7. **Computer Use ist aktiviert** (seit 20.06.2026) — Claude Code kann Browser nativ steuern
-8. **Vor Session-Ende (FESTE REGEL):** Ergebnisse, Entscheidungen und offene Punkte ins Auto-Memory schreiben (neue/aktualisierte Memory-Datei + MEMORY.md-Indexzeile) — das ist der einzige verbindliche Handoff-Kanal. Wichtig: in der YAML-`description` kein ` #` verwenden (YAML-Kommentar, schneidet den Text ab)
+8. **Memory sofort pflegen (FESTE REGEL):** Nach jedem abgeschlossenen Meilenstein (PR offen/gemergt, Entscheidung gefallen, Blocker entdeckt) SOFORT ins Auto-Memory schreiben (neue/aktualisierte Memory-Datei + MEMORY.md-Indexzeile) — NICHT erst „am Session-Ende": ein Session-Ende (/clear, Fenster zu) kündigt sich nicht an. So ist das Memory jederzeit übergabefähig, egal wann die Session endet. Wichtig: in der YAML-`description` kein ` #` verwenden (YAML-Kommentar, schneidet den Text ab)
 
 ---
 
