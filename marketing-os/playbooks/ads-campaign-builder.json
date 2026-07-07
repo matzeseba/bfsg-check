@@ -1,0 +1,13 @@
+{
+  "id": "ads-campaign-builder",
+  "name": "Ads-Kampagnen-Builder (Google/Bing)",
+  "goal": "Vollständige Google-/Bing-Ads-Kampagne (Headlines, Descriptions, Keywords, Anzeigengruppen, Budget-Aufteilung, LP-Empfehlung) für eine vom Owner angeforderte Kampagne ausarbeiten.",
+  "channel": "paid_ads_google",
+  "agent": "ads-campaign-builder",
+  "cadence": { "type": "once" },
+  "promptTemplate": "Erarbeite eine vollständige Google-/Bing-Ads-Kampagne für {product} ({domain}), Stand {date}. Nutze die vom Owner übergebenen Kampagnen-Parameter (Ziel, Kanal, Tagesbudget, Hinweise) aus dem konkreten Job-Kontext. Liefere: 15 RSA-Headlines (max. 30 Zeichen), 4 Descriptions (max. 90 Zeichen), Keyword-Liste (Exact+Phrase) inkl. Negativ-Keywords, Anzeigengruppen-Struktur, Budget-Aufteilung je Anzeigengruppe, Landingpage-Empfehlung. Stil-Referenz: marketing/google-ads-rsa-headlines.md. Verwende ausschließlich die in policy/compliance.json erlaubte Sprache.",
+  "outputType": "markdown",
+  "autoPublish": false,
+  "enabled": false,
+  "legalNotes": "Wird NICHT über den Scheduler automatisch ausgelöst (enabled=false) — Jobs entstehen ausschließlich über POST /api/ads/campaigns/generate mit konkreten Kampagnen-Parametern (Ziel/Kanal/Budget). Das statische channel-Feld hier ist nur ein Platzhalter; der tatsächliche Job-Kanal wird zur Laufzeit aus campaign.channel gesetzt (google -> paid_ads_google, bing -> paid_ads_bing). Legal-Gate: BFSG-konform/rechtssicher/garantiert/TÜV/DEKRA bleiben verboten; erlaubt: automatisierte technische Analyse / WCAG-2.1-AA-Audit. Kein Disclaimer-Zwang auf diesem Kanal (RSA-Zeichenlimits erlauben keinen vollen Disclaimer-Satz) — die Verbotsmuster-Prüfung greift trotzdem unverändert."
+}

@@ -4,8 +4,10 @@ import { useFetch } from '../hooks/useFetch';
 import { usePolling } from '../hooks/usePolling';
 import { AsyncBoundary } from '../components/StateViews';
 import { GateBadge } from '../components/GateBadge';
+import { StatusBadge } from '../components/StatusBadge';
+import { JobDrawer } from '../components/JobDrawer';
 import { useToast } from '../components/Toast';
-import { channelLabel, relativeTime, statusLabel } from '../lib/format';
+import { channelLabel, formatDateTime, publishActionTypeLabel, relativeTime, statusLabel } from '../lib/format';
 import type { Job, JobStatus } from '../types';
 
 const MAIN_COLUMNS: JobStatus[] = ['queued', 'running', 'review', 'approved', 'published'];
@@ -17,13 +19,15 @@ function JobCard({
   job,
   busy,
   onAction,
+  onOpen,
 }: {
   job: Job;
   busy: boolean;
   onAction: (action: Action, job: Job) => void;
+  onOpen: (job: Job) => void;
 }): ReactNode {
   return (
-    <div className="job-card">
+    <div className="job-card job-card-clickable" onClick={() => onOpen(job)}>
       <div className="job-card-head">
         <span className="job-title">{job.title}</span>
         <GateBadge gate={job.gate} />
@@ -43,7 +47,10 @@ function JobCard({
             type="button"
             className="btn btn-approve"
             disabled={busy}
-            onClick={() => onAction('approve', job)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onAction('approve', job);
+            }}
           >
             Freigeben
           </button>
@@ -51,7 +58,10 @@ function JobCard({
             type="button"
             className="btn btn-reject"
             disabled={busy}
-            onClick={() => onAction('reject', job)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onAction('reject', job);
+            }}
           >
             Ablehnen
           </button>
@@ -64,7 +74,10 @@ function JobCard({
             type="button"
             className="btn btn-primary"
             disabled={busy}
-            onClick={() => onAction('published', job)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onAction('published', job);
+            }}
           >
             Als veröffentlicht markieren
           </button>
@@ -79,11 +92,13 @@ function Column({
   jobs,
   busyIds,
   onAction,
+  onOpen,
 }: {
   status: JobStatus;
   jobs: Job[];
   busyIds: Set<string>;
   onAction: (action: Action, job: Job) => void;
+  onOpen: (job: Job) => void;
 }): ReactNode {
   return (
     <div className="kanban-col">
@@ -101,9 +116,58 @@ function Column({
               job={job}
               busy={busyIds.has(job.id)}
               onAction={onAction}
+              onOpen={onOpen}
             />
           ))
         )}
+      </div>
+    </div>
+  );
+}
+
+function PublishedTable({ jobs, onOpen }: { jobs: Job[]; onOpen: (job: Job) => void }): ReactNode {
+  const published = jobs.filter((j) => j.status === 'published');
+  if (published.length === 0) return null;
+  return (
+    <div className="card secondary-jobs">
+      <h2 className="card-title">Veröffentlicht</h2>
+      <div className="table-wrap">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Was</th>
+              <th>Wo</th>
+              <th>Wann</th>
+            </tr>
+          </thead>
+          <tbody>
+            {published.map((job) => (
+              <tr key={job.id} className="clickable-row" onClick={() => onOpen(job)}>
+                <td>
+                  <div className="job-title">{job.title}</div>
+                  <span className="chip chip-channel">{channelLabel(job.channel)}</span>
+                </td>
+                <td>
+                  {job.publishedUrl ? (
+                    <a
+                      href={job.publishedUrl}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {job.publishedUrl}
+                    </a>
+                  ) : job.publishAction ? (
+                    publishActionTypeLabel(job.publishAction.type)
+                  ) : (
+                    <span className="muted">—</span>
+                  )}
+                </td>
+                <td className="muted">{formatDateTime(job.publishedAt ?? job.updatedAt)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
@@ -116,6 +180,7 @@ export function Pipeline(): ReactNode {
 
   const [optimistic, setOptimistic] = useState<Record<string, JobStatus>>({});
   const [busyIds, setBusyIds] = useState<Set<string>>(new Set());
+  const [openJob, setOpenJob] = useState<Job | null>(null);
 
   const runAction = useCallback(
     async (action: Action, job: Job) => {
@@ -184,9 +249,12 @@ export function Pipeline(): ReactNode {
                     jobs={byStatus(status)}
                     busyIds={busyIds}
                     onAction={runAction}
+                    onOpen={setOpenJob}
                   />
                 ))}
               </div>
+
+              <PublishedTable jobs={jobs} onOpen={setOpenJob} />
 
               {secondaryJobs.length > 0 ? (
                 <div className="card secondary-jobs">
@@ -203,12 +271,10 @@ export function Pipeline(): ReactNode {
                       </thead>
                       <tbody>
                         {secondaryJobs.map((job) => (
-                          <tr key={job.id}>
+                          <tr key={job.id} className="clickable-row" onClick={() => setOpenJob(job)}>
                             <td>{job.title}</td>
                             <td>
-                              <span className={`status-pill status-${job.status}`}>
-                                {statusLabel(job.status)}
-                              </span>
+                              <StatusBadge status={job.status} />
                             </td>
                             <td>{channelLabel(job.channel)}</td>
                             <td className="muted">{relativeTime(job.updatedAt)}</td>
@@ -223,6 +289,10 @@ export function Pipeline(): ReactNode {
           );
         }}
       </AsyncBoundary>
+
+      {openJob ? (
+        <JobDrawer key={openJob.id} job={openJob} onClose={() => setOpenJob(null)} onChanged={reload} />
+      ) : null}
     </div>
   );
 }

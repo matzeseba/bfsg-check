@@ -14,6 +14,7 @@ import { api, ApiError } from '../api/client';
 import { useFetch } from '../hooks/useFetch';
 import { AsyncBoundary } from '../components/StateViews';
 import { useToast } from '../components/Toast';
+import { DemoBanner, DemoTag } from '../components/DemoBanner';
 import { channelLabel, daysAgoISO, metricLabel, METRIC_ORDER, todayISO } from '../lib/format';
 import type { Kpi, KpiMetric } from '../types';
 
@@ -129,7 +130,11 @@ function ImportDialog({ onImported }: { onImported: () => void }): ReactNode {
 export function Analytics(): ReactNode {
   const from = useMemo(() => daysAgoISO(29), []);
   const to = useMemo(() => todayISO(), []);
-  const { data, error, loading, reload } = useFetch(() => api.getKpis(from, to), [from, to]);
+  const [includeDemo, setIncludeDemo] = useState(false);
+  const { data, error, loading, reload } = useFetch(
+    () => api.getKpis(from, to, includeDemo),
+    [from, to, includeDemo],
+  );
   const [metric, setMetric] = useState<KpiMetric>('leads');
 
   return (
@@ -159,7 +164,9 @@ export function Analytics(): ReactNode {
       </header>
 
       <AsyncBoundary loading={loading} error={error} data={data} onRetry={reload}>
-        {(kpis) => {
+        {(wrapped) => {
+          const kpis = wrapped.data;
+          const showDemoTag = wrapped.meta.hasDemo;
           const overTime = aggregateByDate(kpis, metric).map((d) => ({
             ...d,
             label: shortDate(d.date),
@@ -167,21 +174,46 @@ export function Analytics(): ReactNode {
           const byChannel = aggregateByChannel(kpis, metric);
           const hasData = kpis.some((k) => k.metric === metric);
 
+          const demoControls = wrapped.meta.hasDemo ? (
+            <DemoBanner
+              demoCount={wrapped.meta.demoCount}
+              showingDemo={includeDemo}
+              onToggle={() => setIncludeDemo((v) => !v)}
+            />
+          ) : !includeDemo ? (
+            <div className="demo-toggle-hint">
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={() => setIncludeDemo(true)}
+              >
+                Demo-Daten anzeigen
+              </button>
+            </div>
+          ) : null;
+
           if (!hasData) {
             return (
-              <div className="card">
-                <p className="muted">
-                  Keine Daten für „{metricLabel(metric)}" im Zeitraum {from} bis {to}. KPIs
-                  über den Import-Dialog hinzufügen.
-                </p>
-              </div>
+              <>
+                {demoControls}
+                <div className="card">
+                  <p className="muted">
+                    Noch keine echten Daten für „{metricLabel(metric)}" im Zeitraum {from} bis{' '}
+                    {to}. KPIs über den Import-Dialog hinzufügen{includeDemo ? '' : ' oder Demo-Daten anzeigen'}.
+                  </p>
+                </div>
+              </>
             );
           }
 
           return (
-            <div className="analytics-grid">
+            <>
+              {demoControls}
+              <div className={`analytics-grid${demoControls ? ' stack-gap' : ''}`}>
               <div className="card chart-card">
-                <h2 className="card-title">{metricLabel(metric)} über Zeit</h2>
+                <h2 className="card-title">
+                  {metricLabel(metric)} über Zeit {showDemoTag ? <DemoTag /> : null}
+                </h2>
                 <ResponsiveContainer width="100%" height={280}>
                   <LineChart data={overTime} margin={{ top: 8, right: 16, bottom: 4, left: -12 }}>
                     <CartesianGrid stroke="#272e3b" strokeDasharray="3 3" />
@@ -210,7 +242,9 @@ export function Analytics(): ReactNode {
               </div>
 
               <div className="card chart-card">
-                <h2 className="card-title">{metricLabel(metric)} nach Kanal</h2>
+                <h2 className="card-title">
+                  {metricLabel(metric)} nach Kanal {showDemoTag ? <DemoTag /> : null}
+                </h2>
                 <ResponsiveContainer width="100%" height={280}>
                   <BarChart data={byChannel} margin={{ top: 8, right: 16, bottom: 4, left: -12 }}>
                     <CartesianGrid stroke="#272e3b" strokeDasharray="3 3" />
@@ -239,7 +273,8 @@ export function Analytics(): ReactNode {
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-            </div>
+              </div>
+            </>
           );
         }}
       </AsyncBoundary>

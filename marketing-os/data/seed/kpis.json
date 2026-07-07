@@ -3,384 +3,448 @@
     "date": "2026-06-08",
     "channel": "seo_pillar",
     "metric": "visits",
-    "value": 42
+    "value": 42,
+    "demo": true
   },
   {
     "date": "2026-06-08",
     "channel": "seo_pillar",
     "metric": "leads",
-    "value": 3
+    "value": 3,
+    "demo": true
   },
   {
     "date": "2026-06-15",
     "channel": "seo_pillar",
     "metric": "visits",
-    "value": 66
+    "value": 66,
+    "demo": true
   },
   {
     "date": "2026-06-15",
     "channel": "seo_pillar",
     "metric": "leads",
-    "value": 5
+    "value": 5,
+    "demo": true
   },
   {
     "date": "2026-06-22",
     "channel": "seo_pillar",
     "metric": "visits",
-    "value": 90
+    "value": 90,
+    "demo": true
   },
   {
     "date": "2026-06-22",
     "channel": "seo_pillar",
     "metric": "leads",
-    "value": 7
+    "value": 7,
+    "demo": true
   },
   {
     "date": "2026-06-29",
     "channel": "seo_pillar",
     "metric": "visits",
-    "value": 114
+    "value": 114,
+    "demo": true
   },
   {
     "date": "2026-06-29",
     "channel": "seo_pillar",
     "metric": "leads",
-    "value": 9
+    "value": 9,
+    "demo": true
   },
   {
     "date": "2026-07-06",
     "channel": "seo_pillar",
     "metric": "visits",
-    "value": 138
+    "value": 138,
+    "demo": true
   },
   {
     "date": "2026-07-06",
     "channel": "seo_pillar",
     "metric": "leads",
-    "value": 11
+    "value": 11,
+    "demo": true
   },
   {
     "date": "2026-06-08",
     "channel": "aeo_answer",
     "metric": "visits",
-    "value": 9
+    "value": 9,
+    "demo": true
   },
   {
     "date": "2026-06-08",
     "channel": "aeo_answer",
     "metric": "leads",
-    "value": 1
+    "value": 1,
+    "demo": true
   },
   {
     "date": "2026-06-15",
     "channel": "aeo_answer",
     "metric": "visits",
-    "value": 15
+    "value": 15,
+    "demo": true
   },
   {
     "date": "2026-06-15",
     "channel": "aeo_answer",
     "metric": "leads",
-    "value": 2
+    "value": 2,
+    "demo": true
   },
   {
     "date": "2026-06-22",
     "channel": "aeo_answer",
     "metric": "visits",
-    "value": 21
+    "value": 21,
+    "demo": true
   },
   {
     "date": "2026-06-22",
     "channel": "aeo_answer",
     "metric": "leads",
-    "value": 3
+    "value": 3,
+    "demo": true
   },
   {
     "date": "2026-06-29",
     "channel": "aeo_answer",
     "metric": "visits",
-    "value": 27
+    "value": 27,
+    "demo": true
   },
   {
     "date": "2026-06-29",
     "channel": "aeo_answer",
     "metric": "leads",
-    "value": 4
+    "value": 4,
+    "demo": true
   },
   {
     "date": "2026-07-06",
     "channel": "aeo_answer",
     "metric": "visits",
-    "value": 33
+    "value": 33,
+    "demo": true
   },
   {
     "date": "2026-07-06",
     "channel": "aeo_answer",
     "metric": "leads",
-    "value": 5
+    "value": 5,
+    "demo": true
   },
   {
     "date": "2026-06-08",
     "channel": "comparison_page",
     "metric": "visits",
-    "value": 6
+    "value": 6,
+    "demo": true
   },
   {
     "date": "2026-06-08",
     "channel": "comparison_page",
     "metric": "leads",
-    "value": 0
+    "value": 0,
+    "demo": true
   },
   {
     "date": "2026-06-15",
     "channel": "comparison_page",
     "metric": "visits",
-    "value": 11
+    "value": 11,
+    "demo": true
   },
   {
     "date": "2026-06-15",
     "channel": "comparison_page",
     "metric": "leads",
-    "value": 1
+    "value": 1,
+    "demo": true
   },
   {
     "date": "2026-06-22",
     "channel": "comparison_page",
     "metric": "visits",
-    "value": 16
+    "value": 16,
+    "demo": true
   },
   {
     "date": "2026-06-22",
     "channel": "comparison_page",
     "metric": "leads",
-    "value": 2
+    "value": 2,
+    "demo": true
   },
   {
     "date": "2026-06-29",
     "channel": "comparison_page",
     "metric": "visits",
-    "value": 21
+    "value": 21,
+    "demo": true
   },
   {
     "date": "2026-06-29",
     "channel": "comparison_page",
     "metric": "leads",
-    "value": 3
+    "value": 3,
+    "demo": true
   },
   {
     "date": "2026-07-06",
     "channel": "comparison_page",
     "metric": "visits",
-    "value": 26
+    "value": 26,
+    "demo": true
   },
   {
     "date": "2026-07-06",
     "channel": "comparison_page",
     "metric": "leads",
-    "value": 4
+    "value": 4,
+    "demo": true
   },
   {
     "date": "2026-06-08",
     "channel": "listings",
     "metric": "visits",
-    "value": 16
+    "value": 16,
+    "demo": true
   },
   {
     "date": "2026-06-08",
     "channel": "listings",
     "metric": "leads",
-    "value": 1
+    "value": 1,
+    "demo": true
   },
   {
     "date": "2026-06-15",
     "channel": "listings",
     "metric": "visits",
-    "value": 25
+    "value": 25,
+    "demo": true
   },
   {
     "date": "2026-06-15",
     "channel": "listings",
     "metric": "leads",
-    "value": 2
+    "value": 2,
+    "demo": true
   },
   {
     "date": "2026-06-22",
     "channel": "listings",
     "metric": "visits",
-    "value": 34
+    "value": 34,
+    "demo": true
   },
   {
     "date": "2026-06-22",
     "channel": "listings",
     "metric": "leads",
-    "value": 3
+    "value": 3,
+    "demo": true
   },
   {
     "date": "2026-06-29",
     "channel": "listings",
     "metric": "visits",
-    "value": 43
+    "value": 43,
+    "demo": true
   },
   {
     "date": "2026-06-29",
     "channel": "listings",
     "metric": "leads",
-    "value": 4
+    "value": 4,
+    "demo": true
   },
   {
     "date": "2026-07-06",
     "channel": "listings",
     "metric": "visits",
-    "value": 52
+    "value": 52,
+    "demo": true
   },
   {
     "date": "2026-07-06",
     "channel": "listings",
     "metric": "leads",
-    "value": 5
+    "value": 5,
+    "demo": true
   },
   {
     "date": "2026-06-08",
     "channel": "newsletter_brevo",
     "metric": "clicks",
-    "value": 12
+    "value": 12,
+    "demo": true
   },
   {
     "date": "2026-06-08",
     "channel": "newsletter_brevo",
     "metric": "leads",
-    "value": 2
+    "value": 2,
+    "demo": true
   },
   {
     "date": "2026-06-15",
     "channel": "newsletter_brevo",
     "metric": "clicks",
-    "value": 17
+    "value": 17,
+    "demo": true
   },
   {
     "date": "2026-06-15",
     "channel": "newsletter_brevo",
     "metric": "leads",
-    "value": 3
+    "value": 3,
+    "demo": true
   },
   {
     "date": "2026-06-22",
     "channel": "newsletter_brevo",
     "metric": "clicks",
-    "value": 22
+    "value": 22,
+    "demo": true
   },
   {
     "date": "2026-06-22",
     "channel": "newsletter_brevo",
     "metric": "leads",
-    "value": 4
+    "value": 4,
+    "demo": true
   },
   {
     "date": "2026-06-29",
     "channel": "newsletter_brevo",
     "metric": "clicks",
-    "value": 27
+    "value": 27,
+    "demo": true
   },
   {
     "date": "2026-06-29",
     "channel": "newsletter_brevo",
     "metric": "leads",
-    "value": 5
+    "value": 5,
+    "demo": true
   },
   {
     "date": "2026-07-06",
     "channel": "newsletter_brevo",
     "metric": "clicks",
-    "value": 32
+    "value": 32,
+    "demo": true
   },
   {
     "date": "2026-07-06",
     "channel": "newsletter_brevo",
     "metric": "leads",
-    "value": 6
+    "value": 6,
+    "demo": true
   },
   {
     "date": "2026-06-29",
     "channel": "pr_free",
     "metric": "impressions",
-    "value": 1400
+    "value": 1400,
+    "demo": true
   },
   {
     "date": "2026-07-06",
     "channel": "pr_free",
     "metric": "impressions",
-    "value": 2100
+    "value": 2100,
+    "demo": true
   },
   {
     "date": "2026-06-29",
     "channel": "pr_free",
     "metric": "visits",
-    "value": 58
+    "value": 58,
+    "demo": true
   },
   {
     "date": "2026-07-06",
     "channel": "pr_free",
     "metric": "visits",
-    "value": 73
+    "value": 73,
+    "demo": true
   },
   {
     "date": "2026-07-06",
     "channel": "awesome_lists",
     "metric": "visits",
-    "value": 22
+    "value": 22,
+    "demo": true
   },
   {
     "date": "2026-07-06",
     "channel": "awesome_lists",
     "metric": "clicks",
-    "value": 14
+    "value": 14,
+    "demo": true
   },
   {
     "date": "2026-06-22",
     "channel": "haro_recherchescout",
     "metric": "impressions",
-    "value": 320
+    "value": 320,
+    "demo": true
   },
   {
     "date": "2026-07-06",
     "channel": "haro_recherchescout",
     "metric": "impressions",
-    "value": 540
+    "value": 540,
+    "demo": true
   },
   {
     "date": "2026-06-15",
     "channel": "seo_pillar",
     "metric": "sales_eur",
-    "value": 129
+    "value": 129,
+    "demo": true
   },
   {
     "date": "2026-06-22",
     "channel": "comparison_page",
     "metric": "sales_eur",
-    "value": 399
+    "value": 399,
+    "demo": true
   },
   {
     "date": "2026-07-06",
     "channel": "seo_pillar",
     "metric": "sales_eur",
-    "value": 69
+    "value": 69,
+    "demo": true
   },
   {
     "date": "2026-07-06",
     "channel": "newsletter_brevo",
     "metric": "sales_eur",
-    "value": 249
+    "value": 249,
+    "demo": true
   },
   {
     "date": "2026-06-29",
     "channel": "listings",
     "metric": "sales_eur",
-    "value": 0
+    "value": 0,
+    "demo": true
   },
   {
     "date": "2026-06-08",
     "channel": "aeo_answer",
     "metric": "sales_eur",
-    "value": 0
+    "value": 0,
+    "demo": true
   }
 ]

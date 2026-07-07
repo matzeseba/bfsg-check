@@ -6,11 +6,14 @@ import { pathExists } from './util.js';
 import { makeJob } from './jobs.js';
 
 // Kanonische Laufzeitdateien + ihre Leer-Defaults (falls kein Seed vorhanden).
+// ads/ads-metrics haben bewusst KEIN Seed-Pendant (data/seed/) — ehrlich leer starten.
 const FILES = {
   jobs: [],
   leads: [],
   kpis: [],
   state: { playbooks: {} },
+  ads: [],
+  'ads-metrics': [],
 };
 
 async function writeJsonAtomic(filePath, data) {
@@ -70,6 +73,10 @@ export function createStore(cfg) {
   const writeKpis = (v) => writeJsonAtomic(fileFor('kpis'), v);
   const readState = () => readJsonOr(fileFor('state'), FILES.state);
   const writeState = (v) => writeJsonAtomic(fileFor('state'), v);
+  const readAds = () => readJsonOr(fileFor('ads'), FILES.ads);
+  const writeAds = (v) => writeJsonAtomic(fileFor('ads'), v);
+  const readAdsMetrics = () => readJsonOr(fileFor('ads-metrics'), FILES['ads-metrics']);
+  const writeAdsMetrics = (v) => writeJsonAtomic(fileFor('ads-metrics'), v);
 
   /** Erzeugt Job mit fortlaufender ID (read+write in einem Schritt). */
   async function createJob(fields) {
@@ -119,6 +126,8 @@ export function createStore(cfg) {
     readLeads, writeLeads,
     readKpis, writeKpis,
     readState, writeState,
+    readAds, writeAds,
+    readAdsMetrics, writeAdsMetrics,
     createJob, updateJob, getJob,
     writeArtifact, readArtifact,
   };
