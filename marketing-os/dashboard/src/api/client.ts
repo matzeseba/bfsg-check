@@ -2,15 +2,22 @@
 // Fehlerformat der Engine ist immer { "error": "<meldung>" } mit 4xx/5xx.
 
 import type {
+  AdCampaign,
+  AdChannel,
+  AdMetricEntry,
+  AdsSummary,
   ComplianceResponse,
+  DataSourcesResponse,
   Funnel,
   HealthResponse,
   Job,
   JobStatus,
   Kpi,
   Lead,
+  NewAdMetricEntry,
   NewLead,
   PlaybookWithState,
+  WithMeta,
 } from '../types';
 
 const BASE = '/api';
@@ -93,8 +100,11 @@ export const api = {
     post<{ job: Job }>(`/jobs/${encodeURIComponent(id)}/approve`).then((r) => r.job),
   rejectJob: (id: string): Promise<Job> =>
     post<{ job: Job }>(`/jobs/${encodeURIComponent(id)}/reject`).then((r) => r.job),
-  publishJob: (id: string): Promise<Job> =>
-    post<{ job: Job }>(`/jobs/${encodeURIComponent(id)}/published`).then((r) => r.job),
+  publishJob: (id: string, url?: string): Promise<Job> =>
+    post<{ job: Job }>(
+      `/jobs/${encodeURIComponent(id)}/published`,
+      url && url.trim() !== '' ? { url: url.trim() } : undefined,
+    ).then((r) => r.job),
   getJobOutput: (id: string): Promise<string> =>
     request<{ content: string }>(`/jobs/${encodeURIComponent(id)}/output`).then(
       (r) => r.content,
@@ -110,22 +120,57 @@ export const api = {
   runPlaybookNow: (id: string): Promise<Job> =>
     post<{ job: Job }>(`/playbooks/${encodeURIComponent(id)}/run-now`).then((r) => r.job),
 
-  // Leads
-  getLeads: (): Promise<Lead[]> =>
-    request<{ leads: Lead[] }>('/leads').then((r) => r.leads),
+  // Leads (§4b: { data, meta } — hasDemo/demoCount/totalCount statt Fake-Zahlen ohne Kennzeichnung)
+  getLeads: (includeDemo = false): Promise<WithMeta<Lead[]>> =>
+    request<WithMeta<Lead[]>>(`/leads?includeDemo=${includeDemo}`),
   createLead: (input: NewLead): Promise<Lead> =>
     post<{ lead: Lead }>('/leads', input).then((r) => r.lead),
 
   // KPIs
-  getKpis: (from: string, to: string): Promise<Kpi[]> =>
-    request<{ kpis: Kpi[] }>(
-      `/kpis?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`,
-    ).then((r) => r.kpis),
+  getKpis: (from: string, to: string, includeDemo = false): Promise<WithMeta<Kpi[]>> =>
+    request<WithMeta<Kpi[]>>(
+      `/kpis?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&includeDemo=${includeDemo}`,
+    ),
   importKpis: (kpis: Kpi[]): Promise<number> =>
     post<{ imported: number }>('/kpis/import', { kpis }).then((r) => r.imported),
 
   // Funnel + Compliance
-  getFunnel: (): Promise<Funnel> => request<Funnel>('/funnel'),
+  getFunnel: (includeDemo = false): Promise<WithMeta<Funnel>> =>
+    request<WithMeta<Funnel>>(`/funnel?includeDemo=${includeDemo}`),
   getCompliance: (): Promise<ComplianceResponse> =>
     request<ComplianceResponse>('/compliance'),
+
+  // Datenquellen — welche Zahlen sind echt, welche Integrationen sind verbunden.
+  getDataSources: (): Promise<DataSourcesResponse> =>
+    request<DataSourcesResponse>('/datasources'),
+
+  // Paid Ads
+  getAdsSummary: (from: string, to: string): Promise<AdsSummary> =>
+    request<AdsSummary>(
+      `/ads/summary?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`,
+    ),
+  getAdsCampaigns: (): Promise<AdCampaign[]> =>
+    request<{ data: AdCampaign[] }>('/ads/campaigns').then((r) => r.data),
+  generateAdsCampaign: (input: {
+    goal: string;
+    channel: AdChannel;
+    budgetPerDay: number;
+    notes: string;
+  }): Promise<AdCampaign> =>
+    post<{ campaign: AdCampaign }>('/ads/campaigns/generate', input).then((r) => r.campaign),
+  setCampaignLive: (id: string, liveUrl?: string): Promise<AdCampaign> =>
+    post<{ campaign: AdCampaign }>(
+      `/ads/campaigns/${encodeURIComponent(id)}/live`,
+      liveUrl && liveUrl.trim() !== '' ? { liveUrl: liveUrl.trim() } : undefined,
+    ).then((r) => r.campaign),
+  pauseCampaign: (id: string): Promise<AdCampaign> =>
+    post<{ campaign: AdCampaign }>(
+      `/ads/campaigns/${encodeURIComponent(id)}/pause`,
+    ).then((r) => r.campaign),
+  getCampaignMetrics: (id: string): Promise<AdMetricEntry[]> =>
+    request<{ data: AdMetricEntry[] }>(
+      `/ads/campaigns/${encodeURIComponent(id)}/metrics`,
+    ).then((r) => r.data),
+  postAdMetrics: (input: NewAdMetricEntry): Promise<void> =>
+    post<void>('/ads/metrics', input),
 };

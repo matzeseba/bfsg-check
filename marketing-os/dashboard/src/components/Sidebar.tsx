@@ -15,6 +15,7 @@ const NAV: NavItem[] = [
   { to: '/', label: 'Übersicht', icon: '📊', end: true },
   { to: '/pipeline', label: 'Pipeline', icon: '🗂️' },
   { to: '/review', label: 'Content-Review', icon: '📝' },
+  { to: '/ads', label: 'Paid Ads', icon: '💰' },
   { to: '/playbooks', label: 'Playbooks', icon: '⚙️' },
   { to: '/analytics', label: 'Analytics', icon: '📈' },
   { to: '/compliance', label: 'Compliance', icon: '🛡️' },

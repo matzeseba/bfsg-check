@@ -1,6 +1,6 @@
 // Formatierungs- und Label-Helfer. Deutsche Texte mit echten Umlauten (ä/ö/ü/ß).
 
-import type { Cadence, JobStatus, KpiMetric } from '../types';
+import type { AdCampaignStatus, AdChannel, Cadence, JobStatus, KpiMetric, PublishActionType } from '../types';
 
 const WEEKDAYS = [
   'Sonntag',
@@ -28,14 +28,59 @@ const CHANNEL_LABELS: Record<string, string> = {
 };
 
 const STATUS_LABELS: Record<JobStatus, string> = {
-  queued: 'In Warteschlange',
+  queued: 'Entwurf',
   running: 'Läuft',
-  review: 'Prüfung',
-  approved: 'Freigegeben',
+  review: 'Wartet auf Freigabe',
+  approved: 'Freigegeben — noch nicht veröffentlicht',
   published: 'Veröffentlicht',
-  failed: 'Fehlgeschlagen',
-  skipped: 'Abgelehnt',
+  failed: 'Fehler',
+  skipped: 'Übersprungen',
 };
+
+const STATUS_TOOLTIPS: Record<JobStatus, string> = {
+  queued: 'Job wurde angelegt, die Erstellung läuft noch nicht.',
+  running: 'Der Agent erstellt gerade den Inhalt.',
+  review: 'Inhalt ist fertig und wartet auf deine Freigabe im Content-Review.',
+  approved: 'Von dir freigegeben, aber noch nicht als veröffentlicht bestätigt.',
+  published: 'Von dir als veröffentlicht bestätigt — inkl. Datum und ggf. Link.',
+  failed: 'Bei der Erstellung ist ein Fehler aufgetreten.',
+  skipped: 'Abgelehnt bzw. übersprungen — wird nicht veröffentlicht.',
+};
+
+export function statusTooltip(status: JobStatus): string {
+  return STATUS_TOOLTIPS[status] ?? '';
+}
+
+const PUBLISH_ACTION_LABELS: Record<PublishActionType, string> = {
+  'manual-browser': 'Manuell im Browser veröffentlichen',
+  'repo-pr': 'Per Pull-Request im Repo veröffentlichen',
+  none: 'Keine gesonderte Veröffentlichung nötig',
+};
+
+export function publishActionTypeLabel(type: PublishActionType): string {
+  return PUBLISH_ACTION_LABELS[type] ?? type;
+}
+
+const AD_CAMPAIGN_STATUS_LABELS: Record<AdCampaignStatus, string> = {
+  entwurf: 'Entwurf',
+  review: 'Wartet auf Freigabe',
+  freigegeben: 'Freigegeben',
+  live: 'Live',
+  pausiert: 'Pausiert',
+};
+
+export function adCampaignStatusLabel(status: AdCampaignStatus): string {
+  return AD_CAMPAIGN_STATUS_LABELS[status] ?? status;
+}
+
+const AD_CHANNEL_LABELS: Record<AdChannel, string> = {
+  google: 'Google Ads',
+  bing: 'Bing Ads',
+};
+
+export function adChannelLabel(channel: AdChannel): string {
+  return AD_CHANNEL_LABELS[channel] ?? channel;
+}
 
 const METRIC_LABELS: Record<KpiMetric, string> = {
   visits: 'Besuche',
@@ -136,4 +181,22 @@ export function formatEur(value: number): string {
 
 export function formatNumber(value: number): string {
   return new Intl.NumberFormat('de-DE').format(value);
+}
+
+/** Rendert null/undefined als „—" statt einer irreführenden 0. */
+export function formatOrDash(
+  value: number | null | undefined,
+  formatter: (v: number) => string = formatNumber,
+): string {
+  if (value === null || value === undefined || Number.isNaN(value)) return '—';
+  return formatter(value);
+}
+
+/**
+ * Formatiert einen Anteil als Prozentzahl. Erwartet einen Bruch (0–1, z. B. 0,05 = 5 %) —
+ * passend zur Engine-Konvention (siehe engine/src/ads.js: safeDiv(clicks, impressions)).
+ * Übergib niemals einen bereits skalierten 0–100-Wert.
+ */
+export function formatPercent(value: number): string {
+  return `${new Intl.NumberFormat('de-DE', { maximumFractionDigits: 1 }).format(value * 100)} %`;
 }

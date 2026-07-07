@@ -45,6 +45,9 @@ export interface Job {
   gate: Gate | null;
   publishAction: PublishAction | null;
   error: string | null;
+  // Optional: von der Engine erst gesetzt, sobald ein Job als veröffentlicht bestätigt wurde.
+  publishedAt?: string | null;
+  publishedUrl?: string | null;
 }
 
 export type LeadKind = 'scan' | 'newsletter' | 'contact' | 'sale';
@@ -168,3 +171,77 @@ export interface ComplianceResponse {
   policy: CompliancePolicy;
   recentFindings: RecentFinding[];
 }
+
+// --- Ehrliche Daten: Demo- vs. Echt-Kennzeichnung (§4b, neuer Kontrakt Team A) ---
+
+export interface DataMeta {
+  hasDemo: boolean;
+  demoCount: number;
+  totalCount: number;
+}
+
+export interface WithMeta<T> {
+  data: T;
+  meta: DataMeta;
+}
+
+export type DataSourceOrigin = 'demo' | 'real' | 'none';
+
+export interface DataSourceStatus {
+  source: DataSourceOrigin;
+}
+
+export interface IntegrationStatus {
+  connected: boolean;
+}
+
+export interface DataSourcesResponse {
+  kpis: DataSourceStatus;
+  leads: DataSourceStatus;
+  integrations: {
+    stripe: IntegrationStatus;
+    brevo: IntegrationStatus;
+    googleAds: IntegrationStatus;
+    bingAds: IntegrationStatus;
+  };
+}
+
+// --- Paid Ads ---
+
+export type AdChannel = 'google' | 'bing';
+
+export type AdCampaignStatus = 'entwurf' | 'review' | 'freigegeben' | 'live' | 'pausiert';
+
+export interface AdCampaign {
+  id: string;
+  name: string;
+  channel: AdChannel;
+  goal: string;
+  budgetPerDay: number;
+  notes: string;
+  status: AdCampaignStatus;
+  jobId: string | null;
+  createdAt: string;
+  liveAt: string | null;
+  liveUrl: string | null;
+}
+
+export interface AdsSummary {
+  spend: number | null;
+  impressions: number | null;
+  clicks: number | null;
+  cpc: number | null;
+  ctr: number | null;
+  conversions: number | null;
+  cac: number | null;
+}
+
+export interface AdMetricEntry {
+  date: string; // YYYY-MM-DD
+  impressions: number;
+  clicks: number;
+  costEur: number;
+  conversions: number;
+}
+
+export type NewAdMetricEntry = AdMetricEntry & { campaignId: string };

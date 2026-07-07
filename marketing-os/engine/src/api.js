@@ -4,6 +4,16 @@ import express from 'express';
 import fs from 'node:fs';
 import path from 'node:path';
 import { ymdDash, withinDays } from './util.js';
+import { demoMeta, filterDemo, parseIncludeDemo } from './demo.js';
+import { datasourcesSnapshot } from './datasources.js';
+import {
+  makeCampaign,
+  jobChannelFor,
+  buildAdsPromptTemplate,
+  upsertMetric,
+  summarize,
+  metricsForCampaign,
+} from './ads.js';
 
 const ALLOWED_ORIGINS = new Set(['http://localhost:5183', 'http://127.0.0.1:5183']);
 
@@ -20,6 +30,18 @@ function sortNewestFirst(jobs) {
     if (t !== 0 && !Number.isNaN(t)) return t;
     return String(b.id).localeCompare(String(a.id));
   });
+}
+
+// Kopplung Job<->Ads-Kampagne: Approve des zugehörigen Jobs treibt die Kampagne von
+// "review" nach "freigegeben". Wahl: expliziter Persistenz-Write statt abgeleiteter Status
+// (Kampagne bliebe sonst inkonsistent mit ihrem eigenen `status`-Feld, das Team C direkt anzeigt).
+async function syncCampaignAfterApprove(store, job, log) {
+  const campaigns = await store.readAds();
+  const idx = campaigns.findIndex((c) => c.jobId === job.id);
+  if (idx === -1 || campaigns[idx].status !== 'review') return;
+  campaigns[idx] = { ...campaigns[idx], status: 'freigegeben' };
+  await store.writeAds(campaigns);
+  if (log) await log.event(`API: Ads-Kampagne ${campaigns[idx].id} review -> freigegeben (Job ${job.id} approved)`);
 }
 
 function mergePlaybook(pb, state, scheduler, now = new Date()) {
@@ -92,6 +114,15 @@ export function createApi(cfg, deps) {
     res.status(201).json({ job });
   }));
 
+  app.get('/api/jobs/:id', wrap(async (req, res) => {
+    const job = await store.getJob(req.params.id);
+    if (!job) {
+      res.status(404).json({ error: `Job ${req.params.id} nicht gefunden` });
+      return;
+    }
+    res.json({ job });
+  }));
+
   app.get('/api/jobs/:id/output', wrap(async (req, res) => {
     try {
       const content = await store.readArtifact(req.params.id);
@@ -116,9 +147,41 @@ export function createApi(cfg, deps) {
     res.json({ job: updated });
   });
 
-  app.post('/api/jobs/:id/approve', transition('review', 'approved'));
+  app.post('/api/jobs/:id/approve', wrap(async (req, res) => {
+    const job = await store.getJob(req.params.id);
+    if (!job) {
+      res.status(404).json({ error: `Job ${req.params.id} nicht gefunden` });
+      return;
+    }
+    if (job.status !== 'review') {
+      res.status(409).json({ error: `Übergang nur aus Status "review" möglich (aktuell: "${job.status}")` });
+      return;
+    }
+    const updated = await store.updateJob(job.id, { status: 'approved' });
+    await syncCampaignAfterApprove(store, updated, log);
+    if (log) await log.event(`API: Job ${job.id} review -> approved`);
+    res.json({ job: updated });
+  }));
+
   app.post('/api/jobs/:id/reject', transition('review', 'skipped'));
-  app.post('/api/jobs/:id/published', transition('approved', 'published'));
+
+  app.post('/api/jobs/:id/published', wrap(async (req, res) => {
+    const job = await store.getJob(req.params.id);
+    if (!job) {
+      res.status(404).json({ error: `Job ${req.params.id} nicht gefunden` });
+      return;
+    }
+    if (job.status !== 'approved') {
+      res.status(409).json({ error: `Übergang nur aus Status "approved" möglich (aktuell: "${job.status}")` });
+      return;
+    }
+    const url = typeof req.body?.url === 'string' && req.body.url.trim() ? req.body.url.trim() : null;
+    const patch = { status: 'published', publishedAt: new Date().toISOString() };
+    if (url) patch.publishedUrl = url;
+    const updated = await store.updateJob(job.id, patch);
+    if (log) await log.event(`API: Job ${job.id} approved -> published`, url ? { url } : undefined);
+    res.json({ job: updated });
+  }));
 
   // ---------------- Playbooks ----------------
   app.get('/api/playbooks', wrap(async (req, res) => {
@@ -162,7 +225,9 @@ export function createApi(cfg, deps) {
 
   // ---------------- Leads ----------------
   app.get('/api/leads', wrap(async (req, res) => {
-    res.json({ leads: await store.readLeads() });
+    const all = await store.readLeads();
+    const filtered = filterDemo(all, parseIncludeDemo(req.query));
+    res.json({ data: filtered, meta: demoMeta(filtered) });
   }));
 
   app.post('/api/leads', wrap(async (req, res) => {
@@ -189,12 +254,12 @@ export function createApi(cfg, deps) {
   app.get('/api/kpis', wrap(async (req, res) => {
     const all = await store.readKpis();
     const { from, to } = req.query;
-    const filtered = all.filter((k) => {
+    const filtered = filterDemo(all, parseIncludeDemo(req.query)).filter((k) => {
       if (from && k.date < from) return false;
       if (to && k.date > to) return false;
       return true;
     });
-    res.json({ kpis: filtered });
+    res.json({ data: filtered, meta: demoMeta(filtered) });
   }));
 
   app.post('/api/kpis/import', wrap(async (req, res) => {
@@ -214,8 +279,13 @@ export function createApi(cfg, deps) {
   }));
 
   // ---------------- Funnel ----------------
+  // Abweichung vom wörtlichen "data: [...]"-Kontrakt: Funnel ist ein Aggregat (totals +
+  // byChannel), kein flaches Array — { data: { totals, byChannel }, meta } transportiert die
+  // gleiche Demo-Ehrlichkeit wie bei /api/leads und /api/kpis (meta bezieht sich auf die
+  // zugrunde liegenden, nach includeDemo gefilterten Leads).
   app.get('/api/funnel', wrap(async (req, res) => {
-    const [jobs, leads] = await Promise.all([store.readJobs(), store.readLeads()]);
+    const [jobs, allLeads] = await Promise.all([store.readJobs(), store.readLeads()]);
+    const leads = filterDemo(allLeads, parseIncludeDemo(req.query));
     const now = Date.now();
 
     const leads7d = leads.filter((l) => withinDays(l.date, 7, now)).length;
@@ -236,8 +306,11 @@ export function createApi(cfg, deps) {
     }));
 
     res.json({
-      totals: { leads7d, leads30d, jobsInReview, published30d, salesValue30d },
-      byChannel,
+      data: {
+        totals: { leads7d, leads30d, jobsInReview, published30d, salesValue30d },
+        byChannel,
+      },
+      meta: demoMeta(leads),
     });
   }));
 
@@ -250,6 +323,122 @@ export function createApi(cfg, deps) {
       .slice(0, 25)
       .map((j) => ({ jobId: j.id, title: j.title, findings: j.gate.findings, at: j.updatedAt }));
     res.json({ policy, recentFindings });
+  }));
+
+  // ---------------- Datenquellen ----------------
+  app.get('/api/datasources', wrap(async (req, res) => {
+    res.json(await datasourcesSnapshot(store));
+  }));
+
+  // ---------------- Paid Ads ----------------
+  app.get('/api/ads/campaigns', wrap(async (req, res) => {
+    res.json({ data: await store.readAds() });
+  }));
+
+  app.post('/api/ads/campaigns/generate', wrap(async (req, res) => {
+    const { goal, channel, budgetPerDay, notes } = req.body || {};
+    if (!goal || typeof goal !== 'string') {
+      res.status(400).json({ error: 'goal (String) ist erforderlich' });
+      return;
+    }
+    if (channel !== 'google' && channel !== 'bing') {
+      res.status(400).json({ error: 'channel muss "google" oder "bing" sein' });
+      return;
+    }
+    if (typeof budgetPerDay !== 'number' || !(budgetPerDay > 0)) {
+      res.status(400).json({ error: 'budgetPerDay (Zahl > 0) ist erforderlich' });
+      return;
+    }
+
+    const job = await store.createJob({
+      playbookId: 'ads-campaign-builder',
+      agent: 'ads-campaign-builder',
+      title: `Ads-Kampagne (${channel}): ${goal}`,
+      channel: jobChannelFor(channel),
+      promptTemplate: buildAdsPromptTemplate({ goal, channel, budgetPerDay, notes }),
+    });
+
+    const campaigns = await store.readAds();
+    const campaign = makeCampaign({ existingCampaigns: campaigns, channel, goal, budgetPerDay, notes, jobId: job.id });
+    campaigns.push(campaign);
+    await store.writeAds(campaigns);
+
+    if (log) await log.event(`API: Ads-Kampagne ${campaign.id} erzeugt (Job ${job.id})`, { channel, budgetPerDay });
+    res.status(201).json({ campaign, jobId: job.id });
+  }));
+
+  app.post('/api/ads/campaigns/:id/live', wrap(async (req, res) => {
+    const campaigns = await store.readAds();
+    const idx = campaigns.findIndex((c) => c.id === req.params.id);
+    if (idx === -1) {
+      res.status(404).json({ error: `Kampagne ${req.params.id} nicht gefunden` });
+      return;
+    }
+    if (campaigns[idx].status !== 'freigegeben') {
+      res.status(409).json({ error: `Übergang nur aus Status "freigegeben" möglich (aktuell: "${campaigns[idx].status}")` });
+      return;
+    }
+    const liveUrl = typeof req.body?.liveUrl === 'string' && req.body.liveUrl.trim() ? req.body.liveUrl.trim() : null;
+    campaigns[idx] = { ...campaigns[idx], status: 'live', liveAt: new Date().toISOString(), liveUrl };
+    await store.writeAds(campaigns);
+    if (log) await log.event(`API: Ads-Kampagne ${campaigns[idx].id} freigegeben -> live`);
+    res.json({ campaign: campaigns[idx] });
+  }));
+
+  app.post('/api/ads/campaigns/:id/pause', wrap(async (req, res) => {
+    const campaigns = await store.readAds();
+    const idx = campaigns.findIndex((c) => c.id === req.params.id);
+    if (idx === -1) {
+      res.status(404).json({ error: `Kampagne ${req.params.id} nicht gefunden` });
+      return;
+    }
+    if (campaigns[idx].status !== 'live') {
+      res.status(409).json({ error: `Übergang nur aus Status "live" möglich (aktuell: "${campaigns[idx].status}")` });
+      return;
+    }
+    campaigns[idx] = { ...campaigns[idx], status: 'pausiert' };
+    await store.writeAds(campaigns);
+    if (log) await log.event(`API: Ads-Kampagne ${campaigns[idx].id} live -> pausiert`);
+    res.json({ campaign: campaigns[idx] });
+  }));
+
+  app.get('/api/ads/campaigns/:id/metrics', wrap(async (req, res) => {
+    const campaigns = await store.readAds();
+    if (!campaigns.some((c) => c.id === req.params.id)) {
+      res.status(404).json({ error: `Kampagne ${req.params.id} nicht gefunden` });
+      return;
+    }
+    const metrics = await store.readAdsMetrics();
+    res.json({ data: metricsForCampaign(metrics, req.params.id) });
+  }));
+
+  app.post('/api/ads/metrics', wrap(async (req, res) => {
+    // Feldname costEur (nicht cost) nach Kontrakt dashboard/src/types.ts NewAdMetricEntry.
+    const { campaignId, date, impressions, clicks, costEur, conversions } = req.body || {};
+    const validDate = typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date);
+    const numericFields = { impressions, clicks, costEur, conversions };
+    const allNumeric = Object.values(numericFields).every((n) => typeof n === 'number' && Number.isFinite(n));
+    if (!campaignId || typeof campaignId !== 'string' || !validDate || !allNumeric) {
+      res.status(400).json({
+        error: 'campaignId (String), date (YYYY-MM-DD) sowie impressions, clicks, costEur, conversions (Zahlen) sind erforderlich',
+      });
+      return;
+    }
+    const metrics = await store.readAdsMetrics();
+    const entry = { campaignId, date, impressions, clicks, costEur, conversions };
+    await store.writeAdsMetrics(upsertMetric(metrics, entry));
+    res.status(201).json({ metric: entry });
+  }));
+
+  // Antwortform folgt dashboard/src/types.ts AdsSummary: flaches Gesamt-Objekt
+  // (spend/impressions/clicks/cpc/ctr/conversions/cac) auf Top-Level, nicht unter .totals
+  // verschachtelt — PaidAds.tsx liest z. B. `s.spend` direkt. perCampaign/timeseries bleiben
+  // als zusätzliche Felder erhalten (aktuell von keiner Dashboard-Komponente gelesen).
+  app.get('/api/ads/summary', wrap(async (req, res) => {
+    const [campaigns, metrics] = await Promise.all([store.readAds(), store.readAdsMetrics()]);
+    const { from, to } = req.query;
+    const { totals, perCampaign, timeseries } = summarize(campaigns, metrics, { from, to });
+    res.json({ ...totals, perCampaign, timeseries });
   }));
 
   // ---------------- Statisches Dashboard (falls gebaut) ----------------

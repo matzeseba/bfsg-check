@@ -8,6 +8,7 @@
     "node": ">=20"
   },
   "scripts": {
+    "prestart": "node src/ensure-dashboard.js",
     "start": "node src/server.js",
     "test": "node --test test/*.test.js"
   },

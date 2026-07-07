@@ -10,7 +10,7 @@ Vollautomatisiertes, lokales Marketing-Operating-System für BFSG-Fuchs (bfsg-fi
 Fokus: **Organic Growth Engine** — schnellstmöglich kostenlose Leads über UWG-sichere 0-€-Kanäle,
 maximale Automatisierung der Content-Produktion, Distribution als vorbereitete Action-Cards,
 vollständige Visualisierung/Steuerung/Auswertung in einem professionellen Dashboard.
-**Keine Abhängigkeit von bezahlten Ads.**
+**Keine Abhängigkeit von bezahlten Ads** — Organic bleibt der Kern. *Ergänzung (Owner-Beschluss 08.07.2026):* Paid-Ads ist als eigenständiges Modul erlaubt (Kampagnen-Recherche/-Ausarbeitung per Playbook, manuelles Metrik-Tracking CPC/CTR/CAC, Live-Schaltung ausschließlich manuell durch den Owner) — es gilt weiterhin: kein Auto-Publishing, keine Live-API-Calls zu Ad-Plattformen.
 
 ## 2. Nicht-Ziele (v1, hart)
 
