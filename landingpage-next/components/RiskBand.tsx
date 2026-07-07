@@ -16,7 +16,6 @@ import { EASE } from "@/lib/motion";
 
 import { DeadlineCounter } from "./DeadlineCounter";
 import { GlowCard } from "./fx/GlowCard";
-import { MagneticButton } from "./fx/MagneticButton";
 import { ParallaxLayer } from "./fx/ParallaxLayer";
 import { ScrollScrub } from "./fx/ScrollScrub";
 import { SectionKicker } from "./SectionKicker";
@@ -98,15 +97,16 @@ export function RiskBand() {
               <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground text-pretty">
                 {RISK_BAND.desc}
               </p>
-              <MagneticButton className="mt-6">
-                <Link
-                  href="/#scan"
-                  className="btn-cta h-12 rounded-xl px-6 text-base"
-                >
-                  Kostenlos prüfen
-                  <ArrowRightIcon className="size-4" />
-                </Link>
-              </MagneticButton>
+              {/* Ruhiger Schwebeeffekt + Hintergrundschimmer wie der
+                  "Abonnieren"-Button im Footer (Owner-Feedback 08.07.: kein
+                  magnetischer Cursor-Effekt mehr). */}
+              <Link
+                href="/#scan"
+                className="btn-cta mt-6 h-12 rounded-xl px-6 text-base"
+              >
+                Kostenlos prüfen
+                <ArrowRightIcon className="size-4" />
+              </Link>
             </ScrollScrub>
 
             <div className="grid gap-4">

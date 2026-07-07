@@ -15,9 +15,7 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MagneticButton } from "@/components/fx/MagneticButton";
 import { ScrollScrub } from "@/components/fx/ScrollScrub";
-import { TiltCard } from "@/components/fx/TiltCard";
 import {
   PACKAGES,
   PLAN_FINDER,
@@ -188,20 +186,22 @@ export function PricingCards({
         >
           {packages.map((pkg, i) => (
             // Scroll-Story (Spec §6): Karten bauen sich scroll-gekoppelt auf
-            // (ScrollScrub, gestaffelt über fromX 0/20/40) und neigen sich dem
-            // Cursor entgegen (TiltCard — fängt nur pointermove, die Checkout-
-            // Buttons in der Karte bleiben voll klickbar).
-            <ScrollScrub
-              key={pkg.id}
-              from={64}
-              fromX={i * 20}
-              className="relative"
-            >
-              {/* Mobil-Instanz des Toggles: direkt über der Abo-Karte, deren
-                  Preis er umschaltet (Desktop-Instanz sitzt im Header, beide
-                  teilen denselben annual-State). */}
+            // (ScrollScrub, gestaffelt über fromX 0/20/40). Ruhiger, statischer
+            // Kartenkoerper (kein 3D-Tilt mehr, Owner-Feedback 08.07.: Preis-
+            // Container wirkten zu dynamisch) — Hover bleibt beim dezenten
+            // .card-lift der Karte selbst.
+            <React.Fragment key={pkg.id}>
+              {/* Mobil-Instanz des Toggles: EIGENE Grid-Reihe direkt über der
+                  Abo-Karte (Desktop-Instanz sitzt im Header, beide teilen
+                  denselben annual-State). War frueher IN die ScrollScrub der
+                  Karte verschachtelt — dort zog die h-full-Kette der Karte
+                  (fuer gleich hohe Karten im Desktop-3er-Grid) die Karte auf
+                  100% dieser Hoehe INKLUSIVE Toggle hoch, wodurch die Karte
+                  auf Mobile unten ueber ihre Grid-Zelle hinausragte und den
+                  Preis-Anker darunter ueberlagerte (Owner-Fund 08.07.). Als
+                  eigene Grid-Zeile bleibt die Karten-Zelle exakt kartenhoch. */}
               {showToggle && pkg.id === subWithAnnual?.id && (
-                <div className="md:hidden mb-4 flex justify-center">
+                <div className="md:hidden flex justify-center">
                   <BillingToggle
                     annual={annual}
                     setAnnual={setAnnual}
@@ -209,7 +209,7 @@ export function PricingCards({
                   />
                 </div>
               )}
-              <TiltCard max={pkg.featured ? 6 : 5} className="h-full">
+              <ScrollScrub from={64} fromX={i * 20} className="relative">
                 <PricingCard
                   pkg={pkg}
                   annual={annual}
@@ -220,8 +220,8 @@ export function PricingCards({
                     openCheckout(annual && pkg.annualId ? pkg.annualId : pkg.id)
                   }
                 />
-              </TiltCard>
-            </ScrollScrub>
+              </ScrollScrub>
+            </React.Fragment>
           ))}
         </div>
 
@@ -375,16 +375,14 @@ function PlanFinder({ packages }: { packages: PackageConfig[] }) {
           {recName}
         </p>
         <p className="mt-0.5 text-xs text-muted-foreground">{recSub}</p>
-        <MagneticButton className="mt-3 w-full">
-          <button
-            type="button"
-            onClick={() => openCheckout(recId)}
-            className="btn-cta min-h-11 w-full text-sm"
-          >
-            {recName} wählen
-            <ArrowRightIcon className="size-4" />
-          </button>
-        </MagneticButton>
+        <button
+          type="button"
+          onClick={() => openCheckout(recId)}
+          className="btn-cta mt-3 min-h-11 w-full text-sm"
+        >
+          {recName} wählen
+          <ArrowRightIcon className="size-4" />
+        </button>
       </div>
     </div>
   );
@@ -467,24 +465,25 @@ function PricingCard({
           Badge. Featured-Karte etwas größer. animate-float-slow ist
           reduced-motion-gated. */}
       <Image
-        src="/logo-fox.png"
+        src="/logo-fuchs-wappen.png"
         alt=""
         aria-hidden
-        width={96}
-        height={144}
+        width={217}
+        height={256}
         loading="lazy"
         className={cn(
           "pointer-events-none absolute -top-5 right-4 z-20 h-auto animate-float-slow drop-shadow-[0_8px_14px_rgba(0,0,0,0.5)]",
           pkg.featured ? "w-16 sm:w-20" : "w-14 sm:w-16",
         )}
       />
-      {/* Warn-Puls-Ring um die Featured-Karte (Design-Signatur, dekorativ →
-          reduced-motion stellt animate-warn-pulse still). */}
+      {/* Akzent-Ring um die Featured-Karte (Design-Signatur). Statt Dauer-
+          Puls (animate-warn-pulse) jetzt ruhig stehend — Owner-Feedback
+          08.07.: Preis-Container wirkten zu dynamisch. */}
       {pkg.featured && (
         <div
           aria-hidden
           className={cn(
-            "pointer-events-none absolute inset-[-2px] z-10 rounded-[calc(var(--radius-3xl)+2px)] border-2 opacity-70 animate-warn-pulse",
+            "pointer-events-none absolute inset-[-2px] z-10 rounded-[calc(var(--radius-3xl)+2px)] border-2 opacity-70",
             A.ring,
           )}
         />
@@ -597,24 +596,25 @@ function PricingCard({
             Bald verfügbar
           </Button>
         ) : pkg.featured ? (
-          // Featured-Karte: orange 3D-Haupt-CTA (.btn-cta), magnetisch.
-          <MagneticButton className="w-full">
-            <button
-              type="button"
-              onClick={onSelect}
-              className="btn-cta h-11 w-full text-sm"
-            >
-              {isSub ? "Abo starten" : "Paket kaufen"}
-              <ArrowRightIcon className="size-4" />
-            </button>
-          </MagneticButton>
+          // Featured-Karte: orange 3D-Haupt-CTA (.btn-cta) — ruhiger Schwebe-
+          // effekt + Hintergrundschimmer wie der "Abonnieren"-Button im Footer
+          // (Owner-Feedback 08.07.: kein magnetischer Cursor-Effekt mehr).
+          <button
+            type="button"
+            onClick={onSelect}
+            className="btn-cta h-11 w-full text-sm"
+          >
+            {isSub ? "Abo starten" : "Paket kaufen"}
+            <ArrowRightIcon className="size-4" />
+          </button>
         ) : (
           // Nicht-Featured: creme-getoenter Outline-Button (Design: dezente
-          // Sekundaer-Aktion, kein Mint-/Orange-Vollton).
+          // Sekundaer-Aktion, kein Mint-/Orange-Vollton). Dezenter Hub statt
+          // Scale-Pop (Owner-Feedback 08.07.: zu dynamisch).
           <Button
             onClick={onSelect}
             size="lg"
-            className="h-11 w-full gap-1.5 rounded-xl border border-foreground/15 bg-foreground/[0.06] text-sm font-semibold text-foreground transition-transform hover:scale-[1.015] hover:bg-foreground/10 focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+            className="h-11 w-full gap-1.5 rounded-xl border border-foreground/15 bg-foreground/[0.06] text-sm font-semibold text-foreground transition-transform hover:-translate-y-px hover:bg-foreground/10 focus-visible:ring-offset-2 focus-visible:ring-offset-card"
           >
             {isSub ? "Abo starten" : "Paket kaufen"}
             <ArrowRightIcon className="size-4" />

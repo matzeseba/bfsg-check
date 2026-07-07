@@ -17,10 +17,10 @@ export function AnnouncementBar() {
         {/* Mini-Fuchs-Wappen (Design-Signatur des Streifens). Rein dekorativ →
             leeres alt, da der nebenstehende Text die Botschaft traegt. */}
         <Image
-          src="/logo-fox.png"
+          src="/logo-fuchs-wappen.png"
           alt=""
-          width={15}
-          height={22}
+          width={217}
+          height={256}
           className="hidden h-[22px] w-auto shrink-0 sm:block"
         />
         <span

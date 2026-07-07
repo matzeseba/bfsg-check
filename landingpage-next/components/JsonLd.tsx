@@ -13,8 +13,8 @@ const organizationSchema: JsonLdSchema = {
   name: organizationName,
   url: siteUrl,
   // TODO: dediziertes quadratisches Logo (kein quadratisches Asset in public/
-  // vorhanden — bis dahin auf das OG-Banner zeigen, das immerhin existiert).
-  logo: `${siteUrl}/logo-fox.png`,
+  // vorhanden — bis dahin auf das offizielle Fuchs-Wappen zeigen).
+  logo: `${siteUrl}/logo-fuchs-wappen.png`,
   email: SITE.email,
   description:
     "Der BFSG-Fuchs ist ein automatisierter Barrierefreiheits-Scanner für deutsche Websites mit verständlichem Fix-Plan und laufendem Monitoring.",

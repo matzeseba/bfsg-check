@@ -67,8 +67,10 @@ const scan = {
       nodes: [node('.sidebar h4.widget-title')]
     },
     {
-      // Gering: doppelte ID-Attribute
-      id: 'duplicate-id',
+      // Gering: doppelte ID in ARIA-Referenz/Label (axe 4.10: 'duplicate-id' wurde
+      // durch 'duplicate-id-aria' ersetzt, s. rules-de.test.js — die alte, tote
+      // Regel-ID hier hätte im Report nur den "Weitere Befunde"-Fallback gezeigt).
+      id: 'duplicate-id-aria',
       impact: 'minor',
       nodes: [node('#submit'), node('#email')]
     }
@@ -82,7 +84,7 @@ async function main() {
   // Marketing-Muster soll nicht weniger Branding zeigen als das echte Produkt.
   let logo = '';
   try {
-    const buf = await readFile(path.join(__dirname, '..', 'assets', 'logo-fox.png'));
+    const buf = await readFile(path.join(__dirname, '..', 'assets', 'logo-fuchs-wappen.png'));
     logo = `data:image/png;base64,${buf.toString('base64')}`;
   } catch { /* Logo fehlt (anderes Deploy-Layout) — Report ohne Logo, kein Abbruch. */ }
 

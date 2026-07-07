@@ -102,15 +102,16 @@ export function Footer() {
               className="inline-flex min-h-11 items-center gap-2.5 py-2 font-display text-lg font-bold tracking-tight"
               aria-label={`${SITE.name} Startseite`}
             >
-              {/* Glow-Fuchskopf-Logo (dekorativ → leeres alt, Wortmarke traegt
-                  den Namen). */}
+              {/* Offizielles Fuchs-Wappen (dekorativ → leeres alt, Wortmarke traegt
+                  den Namen). Glow ist im Asset selbst eingebrannt, daher kein
+                  zusaetzlicher CSS-Drop-Shadow (wie im Header). */}
               <Image
-                src="/logo-fox-glow.png"
+                src="/logo-fuchs-wappen.png"
                 alt=""
-                width={418}
-                height={512}
+                width={217}
+                height={256}
                 loading="lazy"
-                className="h-10 w-auto shrink-0 rounded-md [filter:drop-shadow(0_2px_10px_color-mix(in_oklch,var(--brand-orange),transparent_55%))]"
+                className="h-10 w-auto shrink-0 rounded-md"
               />
               <span className="flex items-baseline gap-0.5">
                 <span>BFSG</span>

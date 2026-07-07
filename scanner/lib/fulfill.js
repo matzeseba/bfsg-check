@@ -49,11 +49,16 @@ export const PKG_CONFIG = {
 // bleibt bei der einfachen Checkliste).
 const PLAN_PACKAGES = new Set(['profi', 'abo', 'abo-jahr']);
 
-// D5: offizielles Logo als data-URI in den Report einbetten (Kunden-PDF trug
-// bisher keinerlei Marken-/Kontaktbezug). Lazy + gecacht, damit das Bild nur
-// einmal pro Prozesslaufzeit von Platte gelesen wird. Fehlt die Datei (anderes
-// Deploy-Layout), liefert renderReport ohne Logo weiter — kein harter Fehler.
-const LOGO_PATH = path.join(__dirname, '..', 'assets', 'logo-fox.png');
+// D5: offizielles Logo (Wappen-Ausschnitt des BFSG-Fuchs-Markenzeichens) als
+// data-URI in den Report einbetten (Kunden-PDF trug bisher keinerlei Marken-/
+// Kontaktbezug). Lazy + gecacht, damit das Bild nur einmal pro Prozesslaufzeit
+// von Platte gelesen wird. Fehlt die Datei (anderes Deploy-Layout), liefert
+// renderReport ohne Logo weiter — kein harter Fehler. Datei liegt lokal unter
+// scanner/assets (eigener Docker-Build-Context — kein Zugriff auf
+// landingpage-next/public zur Laufzeit), Quelle: landingpage-next/public/
+// logo-fuchs-wappen.png (identisch zu docs/brand/bfsg-fuchs-logo-final.png,
+// hier bereits transparent freigestellt).
+const LOGO_PATH = path.join(__dirname, '..', 'assets', 'logo-fuchs-wappen.png');
 let cachedLogoDataUri;
 async function getLogoDataUri() {
   if (cachedLogoDataUri !== undefined) return cachedLogoDataUri;
