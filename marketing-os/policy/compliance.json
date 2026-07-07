@@ -1,0 +1,41 @@
+{
+  "version": "1.0.0",
+  "updatedAt": "2026-07-07",
+  "source": "CLAUDE.md + docs/LEGAL-REALITY-CHECK-2026.md + legal-copy-grep",
+  "language": {
+    "required": ["automatisierte technische Analyse", "WCAG"],
+    "disclaimerHint": "Automatisierte technische Analyse — ersetzt keine Rechtsberatung.",
+    "disclaimerRequiredForChannels": ["pr_free", "seo_pillar", "comparison_page", "aeo_answer"]
+  },
+  "forbiddenPatterns": [
+    { "pattern": "BFSG[- ]?konform", "severity": "block", "hint": "UWG §5 Irreführung — stattdessen: automatisierte technische Analyse nach WCAG 2.1 AA" },
+    { "pattern": "rechtssicher", "severity": "block", "hint": "UWG §5 — keine Rechtssicherheits-Zusagen" },
+    { "pattern": "garantiert\\w*", "severity": "block", "hint": "keine Garantie-Aussagen im Compliance-Kontext" },
+    { "pattern": "T\\u00dcV|TUEV|DEKRA", "severity": "block", "hint": "kein Siegel-Bezug ohne echte Zertifizierung" },
+    { "pattern": "100\\s?%\\s?barrierefrei", "severity": "block", "hint": "absolute Aussagen unzulässig — Score/Audit-Ergebnis nennen" },
+    { "pattern": "abmahnsicher", "severity": "block", "hint": "UWG §5 — unzulässiges Sicherheitsversprechen" },
+    { "pattern": "zertifiziert", "severity": "warn", "hint": "nur verwenden, wenn echte Zertifizierung vorliegt" },
+    { "pattern": "Testsieger", "severity": "warn", "hint": "nur mit nachweisbarem Test verwendbar" },
+    { "pattern": "risikofrei", "severity": "warn", "hint": "Risiko-Aussagen vermeiden" },
+    { "pattern": "\\u00a7\\s?15\\s?BFSGV", "severity": "warn", "hint": "Barrierefreiheitserklärung ist §14 BFSG, nicht §15 BFSGV (Memory: barrierefreiheitserklaerung-norm)" }
+  ],
+  "allowedChannels": [
+    "seo_pillar", "aeo_answer", "comparison_page", "pr_free", "listings",
+    "haro_recherchescout", "show_hn", "awesome_lists", "newsletter_brevo",
+    "badge_distribution", "social_own_channels", "analytics_internal"
+  ],
+  "forbiddenChannels": [
+    { "channel": "cold_email", "reason": "UWG §7 II Nr.2 — 270-800 € Abmahnung pro Mail" },
+    { "channel": "linkedin_dm", "reason": "OLG Hamm 18 U 154/22 — auch 1:1 personalisiert unzulässig" },
+    { "channel": "xing_dm", "reason": "wie linkedin_dm" },
+    { "channel": "forum_seeding", "reason": "UWG §5a IV + §22 MStV — Schleichwerbung, bis 500.000 € Strafrahmen" },
+    { "channel": "paid_ads", "reason": "v1-Design-Vorgabe: keine Abhängigkeit von bezahlten Ads" }
+  ],
+  "publishing": {
+    "autoPublish": false,
+    "rule": "Jede Veröffentlichung nach außen erfordert Owner-Approval im Dashboard und wird danach manuell bzw. per separater Computer-Use-Session ausgeführt."
+  },
+  "comparativeAdvertising": {
+    "rule": "§ 6 UWG: nur objektiv messbare Kriterien (WCAG-Scores, Preise, Feature-Listen), nicht herabsetzend, Quellen und Messdatum nennen."
+  }
+}
