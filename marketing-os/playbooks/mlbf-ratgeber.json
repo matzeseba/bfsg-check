@@ -1,0 +1,13 @@
+{
+  "id": "mlbf-ratgeber",
+  "name": "MLBF-Prüfstrategie-Ratgeber",
+  "goal": "Einmalige Ratgeber-/Pillar-Seite zur MLBF-Prüfstrategie — höchster thematischer Produkt-Fit: die Aufsicht prüft laut eigener Aussage automatisiert, genau das leistet der Scanner.",
+  "channel": "seo_pillar",
+  "agent": "seo-pillar-writer",
+  "cadence": { "type": "once" },
+  "promptTemplate": "Schreibe eine deutschsprachige Ratgeber-/Pillar-Seite (1.800-2.500 Wörter) mit dem Arbeitstitel \"MLBF-Prüfstrategie erklärt: So kontrolliert die Aufsicht Websites — und so prüfst du vorher selbst\" für {product} ({domain}), Stand {date}. Kontext, belegbar und sachlich mit Quelle + Datum zitieren: Die Marktüberwachungsstelle der Länder (MLBF, Magdeburg) ist seit 05.01.2026 in der aktiven Kontrollphase und hat 06/2026 ihre öffentliche Prüfstrategie veröffentlicht — risikobasiert, reaktiv (Beschwerden zuerst) plus aktiv (automatisierte Software-Checks); Verbraucher können Barrieren über ein Formular melden. Dieser automatisierte Prüfansatz entspricht dem Produkt: einer automatisierten technischen Analyse nach WCAG 2.1 AA. Struktur: (1) Wie prüft die MLBF? (2) Was heißt risikobasiert/reaktiv/aktiv konkret? (3) Selbst vorab prüfen — WCAG-2.1-AA-Audit-Checkliste; (4) Barrierefreiheitserklärung nach § 14 BFSG; (5) FAQ + nächste Schritte. Baue FAQ-Block und JSON-LD (Article + FAQPage) ein. Produkt-Fakten: Gratis-Sofort-Check ohne Login, Basis 129 €, Profi 399 €, Cookie-Check 39 €/69 €, Re-Check-Abo 24,99 €/Monat bzw. 249 €/Jahr, Engine axe-core via Playwright, Hosting Deutschland (Hetzner, Nürnberg). Genau 1 Scan-CTA auf {domain}. Belege jede rechtliche/behördliche Aussage mit Quelle + Abrufdatum. Verwende ausschließlich die in policy/compliance.json erlaubte Sprache und schließe mit dem Pflicht-Disclaimer.",
+  "outputType": "markdown",
+  "autoPublish": false,
+  "enabled": true,
+  "legalNotes": "seo_pillar erfordert Disclaimer (compliance.json). MLBF-Fakten nur sachlich, mit Quelle + Datum. Barrierefreiheitserklärung = § 14 BFSG. Publish via repo-pr in landingpage-next, erst nach Owner-Approval."
+}

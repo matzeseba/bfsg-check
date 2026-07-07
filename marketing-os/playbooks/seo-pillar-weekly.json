@@ -1,0 +1,13 @@
+{
+  "id": "seo-pillar-weekly",
+  "name": "SEO-Pillar-Artikel (wöchentlich)",
+  "goal": "Jede Woche eine noch offene Artikel-Outline aus dem SEO-Content-Plan zu einem fertigen Pillar-Artikel ausarbeiten — kompoundierender Long-Tail-Traffic.",
+  "channel": "seo_pillar",
+  "agent": "seo-pillar-writer",
+  "cadence": { "type": "weekly", "hour": 6, "weekday": 1 },
+  "promptTemplate": "Wähle aus marketing/seo-content-plan.md die nächste noch nicht veröffentlichte Artikel-Outline (prüfe per Grep/Glob, was in landingpage-next/ bereits existiert) und schreibe daraus einen fertigen deutschsprachigen Pillar-Artikel (1.500-2.500 Wörter) für {product} ({domain}), Stand {date}. Nutze die vorgegebene 5-Punkt-Outline, das Ziel-Keyword und die interne Verlinkung aus dem Plan. Sachlich, ohne Angst-Verkauf; maximal 1 Scan-CTA plus 1 weicher Download-CTA. Baue FAQ-Block und JSON-LD (Article + FAQPage) ein; belege Fakten mit Quelle + Abrufdatum. Produkt-Fakten: Gratis-Sofort-Check, Basis 129 €, Profi 399 €, Cookie-Check 39 €/69 €, Re-Check-Abo 24,99 €/Monat bzw. 249 €/Jahr, axe-core via Playwright, Hosting Deutschland. Barrierefreiheitserklärung als § 14 BFSG zitieren. Verwende ausschließlich die in policy/compliance.json erlaubte Sprache und schließe mit dem Pflicht-Disclaimer.",
+  "outputType": "markdown",
+  "autoPublish": false,
+  "enabled": true,
+  "legalNotes": "seo_pillar erfordert Disclaimer. Max. 1 harter CTA + 1 weicher CTA (Editorial Standards seo-content-plan.md). Publish via repo-pr nach Owner-Approval."
+}

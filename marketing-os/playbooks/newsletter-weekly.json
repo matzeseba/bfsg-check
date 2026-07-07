@@ -1,0 +1,13 @@
+{
+  "id": "newsletter-weekly",
+  "name": "Newsletter Opt-in-Brevo (wöchentlich)",
+  "goal": "Wöchentlicher Newsletter an die Opt-in-Brevo-Liste — ein nützlicher Wissens-Happen plus weicher CTA, hält warme Leads im Funnel.",
+  "channel": "newsletter_brevo",
+  "agent": "newsletter-writer",
+  "cadence": { "type": "weekly", "hour": 9, "weekday": 4 },
+  "promptTemplate": "Schreibe den wöchentlichen Newsletter für die Opt-in-Brevo-Liste von {product} ({domain}), Stand {date}. Inhalt: ein nützlicher Wissens-Happen (1 Thema, konkret umsetzbar) aus den letzten 7 Tagen Content — finde eigene Inhalte per Grep/Glob im Repo — plus optional 2 Kurz-Links auf eigene Ratgeber. Genau 1 weicher CTA (Gratis-Scan oder Ratgeber), nicht verkäuferisch. Footer: Abmelde-Hinweis-Platzhalter plus Impressum-Verweis. NUR Opt-in-Liste, niemals Cold-Mail oder gekaufte Adressen. Produkt-Fakten dezent: Gratis-Sofort-Check, Basis 129 €, Profi 399 €, Re-Check-Abo 24,99 €/Monat bzw. 249 €/Jahr. Barrierefreiheitserklärung als § 14 BFSG. Betreff maximal 60 Zeichen plus Preheader. Verwende ausschließlich die in policy/compliance.json erlaubte Sprache und schließe mit dem Pflicht-Disclaimer.",
+  "outputType": "markdown",
+  "autoPublish": false,
+  "enabled": true,
+  "legalNotes": "newsletter_brevo: ausschließlich Double-Opt-in-Liste. Abmelde-Link + Impressum Pflicht. Versand erst nach Owner-Approval (manual-browser)."
+}

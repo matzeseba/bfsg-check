@@ -1,0 +1,13 @@
+{
+  "id": "analytics-weekly",
+  "name": "Analytics-Wochenreview (intern)",
+  "goal": "Wöchentliche interne Auswertung von KPIs und Leads mit genau 3 priorisierten Empfehlungen — datenbasierte Steuerung entlang der KPI-Leitplanken.",
+  "channel": "analytics_internal",
+  "agent": "analytics-reviewer",
+  "cadence": { "type": "weekly", "hour": 8, "weekday": 1 },
+  "promptTemplate": "Werte die Marketing-Kennzahlen aus: lies data/kpis.json und data/leads.json (bzw. data/seed/). Erzeuge für {date} einen internen Wochen-Report für {product}: KPI-Tabelle je Kanal (Leads, Klicks/Impressionen soweit vorhanden, Umsatz in EUR), Funnel-Snapshot (Leads 7d/30d, Umsatz 30d, Scan-zu-Lead-Quote soweit ableitbar) und genau 3 priorisierte Empfehlungen (P1/P2/P3) mit Kennzahl-Bezug, erwartetem Effekt und nächstem Schritt. KPI-Leitplanken: CPL qualifizierter Lead < 30 €, CAC/Sale < 177 €, Scan-zu-Lead >= 10 %, Tagesbudget-Deckel 20 €. Rechne nur mit den vorliegenden Zahlen und kennzeichne Annahmen. Rein intern, keine nach außen gerichtete Copy. Verwende ausschließlich die in policy/compliance.json erlaubte Sprache und schließe mit dem internen Disclaimer.",
+  "outputType": "markdown",
+  "autoPublish": false,
+  "enabled": true,
+  "legalNotes": "analytics_internal: rein interne Auswertung, kein Disclaimer-Zwang für Außen-Publikation, aber saubere Sprache. Kein Live-API-Zugriff — nur data/*.json lesen. publishAction: none."
+}

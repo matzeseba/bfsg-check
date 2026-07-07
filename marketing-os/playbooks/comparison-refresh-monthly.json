@@ -1,0 +1,13 @@
+{
+  "id": "comparison-refresh-monthly",
+  "name": "Vergleichsseite § 6 UWG (monatlich)",
+  "goal": "Objektive Vergleichsseite nach § 6 UWG erstellen/aktualisieren — messbare Kriterien statt Herabsetzung, für Commercial-Investigation-Suchen und AI-Zitate.",
+  "channel": "comparison_page",
+  "agent": "comparison-page-writer",
+  "cadence": { "type": "interval", "everyHours": 720 },
+  "promptTemplate": "Aktualisiere bzw. erstelle eine Vergleichsseite nach § 6 UWG für {product} ({domain}), Stand {date}: {product} im objektiven Vergleich zu anderen Barrierefreiheits-Werkzeugen (z. B. Eye-Able, axe DevTools, Siteimprove, WAVE sowie Overlay-Anbieter). Vergleiche nur objektiv messbare Kriterien: WCAG-2.1-AA-Prüfumfang, Quellcode-Prüfung vs. Overlay-Widget, Report-Sprache (Deutsch), Mehrseiten-Audit, Preise (Basis 129 €, Profi 399 €, Cookie-Check 39 €/69 €, Re-Check-Abo 24,99 €/Monat bzw. 249 €/Jahr), Hosting-Standort, Owner-Review. Jede Vergleichszeile mit Quelle + Messdatum; Mitbewerber nicht herabsetzen; wo nicht belegbar, Kriterium weglassen. Anti-Overlay-Einordnung nur sachlich (AccessiBe FTC-Vergleich 1 Mio USD, 04/2025). Liefere Vergleichstabelle + Methodik-Abschnitt + Quellen (mit Abrufdatum) + genau 1 Scan-CTA. Verwende ausschließlich die in policy/compliance.json erlaubte Sprache und schließe mit dem Pflicht-Disclaimer.",
+  "outputType": "markdown",
+  "autoPublish": false,
+  "enabled": true,
+  "legalNotes": "comparison_page: § 6 UWG bindend — objektiv, messbar, nicht herabsetzend, Quelle + Messdatum je Zeile. Disclaimer Pflicht. Publish via repo-pr nach Owner-Approval."
+}

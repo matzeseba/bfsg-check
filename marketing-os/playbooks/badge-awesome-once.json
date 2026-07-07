@@ -1,0 +1,13 @@
+{
+  "id": "badge-awesome-once",
+  "name": "BFSG-Score-Badge + Awesome-List-PRs (einmalig)",
+  "goal": "Zwei Distribution-Artefakte: einbettbarer BFSG-Score-Badge (nofollow) plus Awesome-List-PR-Entwürfe für a11y-Repos — seltene dofollow-Backlinks + Badge-Reichweite.",
+  "channel": "awesome_lists",
+  "agent": "seo-pillar-writer",
+  "cadence": { "type": "once" },
+  "promptTemplate": "Erzeuge zwei Artefakte für {product} ({domain}), Stand {date}. (A) Einbettbarer BFSG-Score-Badge: ein HTML-Snippet mit einem rel=\"nofollow\"-Link auf {domain}, das Website-Betreiber freiwillig einbinden, plus eine WordPress-Shortcode-Variante und ein kurzer Erklärtext — was der Badge sachlich aussagt: das Ergebnis einer automatisierten technischen Analyse nach WCAG 2.1 AA, ausdrücklich kein Prüfsiegel. (B) Awesome-List-PR-Entwürfe (4-6) für a11y-Repos gemäß marketing/awesome-lists-pr-template.md: je Branch-Name, README-Zeile, PR-Titel und PR-Body — jeweils mit klarer Founder-Disclosure (\"I'm the founder\"). Produkt-Fakten: Gratis-Sofort-Check, Basis 129 €, Profi 399 €, Re-Check-Abo 24,99 €/Monat bzw. 249 €/Jahr, axe-core via Playwright, Made in Germany. Keine Konformitäts- oder Erfolgs-Behauptung, kein Siegel-Anspruch. Verwende ausschließlich die in policy/compliance.json erlaubte Sprache und schließe mit dem Pflicht-Disclaimer.",
+  "outputType": "markdown",
+  "autoPublish": false,
+  "enabled": true,
+  "legalNotes": "awesome_lists + badge_distribution: Founder-Disclosure Pflicht in jedem PR. Badge rel=nofollow, ausdrücklich kein Siegel. PRs manuell durch Owner (repo-pr / manual-browser)."
+}

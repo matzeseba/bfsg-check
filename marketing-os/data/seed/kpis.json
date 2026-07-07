@@ -1,0 +1,386 @@
+[
+  {
+    "date": "2026-06-08",
+    "channel": "seo_pillar",
+    "metric": "visits",
+    "value": 42
+  },
+  {
+    "date": "2026-06-08",
+    "channel": "seo_pillar",
+    "metric": "leads",
+    "value": 3
+  },
+  {
+    "date": "2026-06-15",
+    "channel": "seo_pillar",
+    "metric": "visits",
+    "value": 66
+  },
+  {
+    "date": "2026-06-15",
+    "channel": "seo_pillar",
+    "metric": "leads",
+    "value": 5
+  },
+  {
+    "date": "2026-06-22",
+    "channel": "seo_pillar",
+    "metric": "visits",
+    "value": 90
+  },
+  {
+    "date": "2026-06-22",
+    "channel": "seo_pillar",
+    "metric": "leads",
+    "value": 7
+  },
+  {
+    "date": "2026-06-29",
+    "channel": "seo_pillar",
+    "metric": "visits",
+    "value": 114
+  },
+  {
+    "date": "2026-06-29",
+    "channel": "seo_pillar",
+    "metric": "leads",
+    "value": 9
+  },
+  {
+    "date": "2026-07-06",
+    "channel": "seo_pillar",
+    "metric": "visits",
+    "value": 138
+  },
+  {
+    "date": "2026-07-06",
+    "channel": "seo_pillar",
+    "metric": "leads",
+    "value": 11
+  },
+  {
+    "date": "2026-06-08",
+    "channel": "aeo_answer",
+    "metric": "visits",
+    "value": 9
+  },
+  {
+    "date": "2026-06-08",
+    "channel": "aeo_answer",
+    "metric": "leads",
+    "value": 1
+  },
+  {
+    "date": "2026-06-15",
+    "channel": "aeo_answer",
+    "metric": "visits",
+    "value": 15
+  },
+  {
+    "date": "2026-06-15",
+    "channel": "aeo_answer",
+    "metric": "leads",
+    "value": 2
+  },
+  {
+    "date": "2026-06-22",
+    "channel": "aeo_answer",
+    "metric": "visits",
+    "value": 21
+  },
+  {
+    "date": "2026-06-22",
+    "channel": "aeo_answer",
+    "metric": "leads",
+    "value": 3
+  },
+  {
+    "date": "2026-06-29",
+    "channel": "aeo_answer",
+    "metric": "visits",
+    "value": 27
+  },
+  {
+    "date": "2026-06-29",
+    "channel": "aeo_answer",
+    "metric": "leads",
+    "value": 4
+  },
+  {
+    "date": "2026-07-06",
+    "channel": "aeo_answer",
+    "metric": "visits",
+    "value": 33
+  },
+  {
+    "date": "2026-07-06",
+    "channel": "aeo_answer",
+    "metric": "leads",
+    "value": 5
+  },
+  {
+    "date": "2026-06-08",
+    "channel": "comparison_page",
+    "metric": "visits",
+    "value": 6
+  },
+  {
+    "date": "2026-06-08",
+    "channel": "comparison_page",
+    "metric": "leads",
+    "value": 0
+  },
+  {
+    "date": "2026-06-15",
+    "channel": "comparison_page",
+    "metric": "visits",
+    "value": 11
+  },
+  {
+    "date": "2026-06-15",
+    "channel": "comparison_page",
+    "metric": "leads",
+    "value": 1
+  },
+  {
+    "date": "2026-06-22",
+    "channel": "comparison_page",
+    "metric": "visits",
+    "value": 16
+  },
+  {
+    "date": "2026-06-22",
+    "channel": "comparison_page",
+    "metric": "leads",
+    "value": 2
+  },
+  {
+    "date": "2026-06-29",
+    "channel": "comparison_page",
+    "metric": "visits",
+    "value": 21
+  },
+  {
+    "date": "2026-06-29",
+    "channel": "comparison_page",
+    "metric": "leads",
+    "value": 3
+  },
+  {
+    "date": "2026-07-06",
+    "channel": "comparison_page",
+    "metric": "visits",
+    "value": 26
+  },
+  {
+    "date": "2026-07-06",
+    "channel": "comparison_page",
+    "metric": "leads",
+    "value": 4
+  },
+  {
+    "date": "2026-06-08",
+    "channel": "listings",
+    "metric": "visits",
+    "value": 16
+  },
+  {
+    "date": "2026-06-08",
+    "channel": "listings",
+    "metric": "leads",
+    "value": 1
+  },
+  {
+    "date": "2026-06-15",
+    "channel": "listings",
+    "metric": "visits",
+    "value": 25
+  },
+  {
+    "date": "2026-06-15",
+    "channel": "listings",
+    "metric": "leads",
+    "value": 2
+  },
+  {
+    "date": "2026-06-22",
+    "channel": "listings",
+    "metric": "visits",
+    "value": 34
+  },
+  {
+    "date": "2026-06-22",
+    "channel": "listings",
+    "metric": "leads",
+    "value": 3
+  },
+  {
+    "date": "2026-06-29",
+    "channel": "listings",
+    "metric": "visits",
+    "value": 43
+  },
+  {
+    "date": "2026-06-29",
+    "channel": "listings",
+    "metric": "leads",
+    "value": 4
+  },
+  {
+    "date": "2026-07-06",
+    "channel": "listings",
+    "metric": "visits",
+    "value": 52
+  },
+  {
+    "date": "2026-07-06",
+    "channel": "listings",
+    "metric": "leads",
+    "value": 5
+  },
+  {
+    "date": "2026-06-08",
+    "channel": "newsletter_brevo",
+    "metric": "clicks",
+    "value": 12
+  },
+  {
+    "date": "2026-06-08",
+    "channel": "newsletter_brevo",
+    "metric": "leads",
+    "value": 2
+  },
+  {
+    "date": "2026-06-15",
+    "channel": "newsletter_brevo",
+    "metric": "clicks",
+    "value": 17
+  },
+  {
+    "date": "2026-06-15",
+    "channel": "newsletter_brevo",
+    "metric": "leads",
+    "value": 3
+  },
+  {
+    "date": "2026-06-22",
+    "channel": "newsletter_brevo",
+    "metric": "clicks",
+    "value": 22
+  },
+  {
+    "date": "2026-06-22",
+    "channel": "newsletter_brevo",
+    "metric": "leads",
+    "value": 4
+  },
+  {
+    "date": "2026-06-29",
+    "channel": "newsletter_brevo",
+    "metric": "clicks",
+    "value": 27
+  },
+  {
+    "date": "2026-06-29",
+    "channel": "newsletter_brevo",
+    "metric": "leads",
+    "value": 5
+  },
+  {
+    "date": "2026-07-06",
+    "channel": "newsletter_brevo",
+    "metric": "clicks",
+    "value": 32
+  },
+  {
+    "date": "2026-07-06",
+    "channel": "newsletter_brevo",
+    "metric": "leads",
+    "value": 6
+  },
+  {
+    "date": "2026-06-29",
+    "channel": "pr_free",
+    "metric": "impressions",
+    "value": 1400
+  },
+  {
+    "date": "2026-07-06",
+    "channel": "pr_free",
+    "metric": "impressions",
+    "value": 2100
+  },
+  {
+    "date": "2026-06-29",
+    "channel": "pr_free",
+    "metric": "visits",
+    "value": 58
+  },
+  {
+    "date": "2026-07-06",
+    "channel": "pr_free",
+    "metric": "visits",
+    "value": 73
+  },
+  {
+    "date": "2026-07-06",
+    "channel": "awesome_lists",
+    "metric": "visits",
+    "value": 22
+  },
+  {
+    "date": "2026-07-06",
+    "channel": "awesome_lists",
+    "metric": "clicks",
+    "value": 14
+  },
+  {
+    "date": "2026-06-22",
+    "channel": "haro_recherchescout",
+    "metric": "impressions",
+    "value": 320
+  },
+  {
+    "date": "2026-07-06",
+    "channel": "haro_recherchescout",
+    "metric": "impressions",
+    "value": 540
+  },
+  {
+    "date": "2026-06-15",
+    "channel": "seo_pillar",
+    "metric": "sales_eur",
+    "value": 129
+  },
+  {
+    "date": "2026-06-22",
+    "channel": "comparison_page",
+    "metric": "sales_eur",
+    "value": 399
+  },
+  {
+    "date": "2026-07-06",
+    "channel": "seo_pillar",
+    "metric": "sales_eur",
+    "value": 69
+  },
+  {
+    "date": "2026-07-06",
+    "channel": "newsletter_brevo",
+    "metric": "sales_eur",
+    "value": 249
+  },
+  {
+    "date": "2026-06-29",
+    "channel": "listings",
+    "metric": "sales_eur",
+    "value": 0
+  },
+  {
+    "date": "2026-06-08",
+    "channel": "aeo_answer",
+    "metric": "sales_eur",
+    "value": 0
+  }
+]

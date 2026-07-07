@@ -1,0 +1,13 @@
+{
+  "id": "haro-daily-draft",
+  "name": "HARO/Recherchescout-Antwort-Entwürfe (werktäglich)",
+  "goal": "Werktäglich anpassbare Antwort-Entwürfe für journalisten-initiierte Anfragen vorbereiten — Backlinks + Brand über Recherchescout/HARO, UWG-sicher (Journalist fragt zuerst).",
+  "channel": "haro_recherchescout",
+  "agent": "haro-responder",
+  "cadence": { "type": "daily", "hour": 8 },
+  "promptTemplate": "Bereite für {date} 1-2 Recherchescout/HARO-Antwort-Entwürfe vor, die der Owner an eine passende, journalisten-initiierte Anfrage anpassen kann. Nutze Profil, Bio und Pitch-Vorlagen aus marketing/recherchescout-profil.md. Wähle die erfolgversprechendsten wiederkehrenden Themen (BFSG/EAA-Praxis, Anti-Overlay-Wirksamkeit, WCAG-2.1-AA-Methodik, Solo-Founder-Bootstrap, TDDDG-Cookie). Jeder Entwurf: Betreff plus Pitch-Body (300-400 Zeichen, Antwort-zuerst, ein belegbarer Punkt, Link statt Anhang) plus Zitat-Freigabe-Satz. Keine erfundenen Statistiken — nur belegbare Aussagen oder ehrlich-qualitativ; den frühe-Phase-Status offen benennen. Produkt {product} ({domain}), Kontakt info@matthias-seba.de. Markiere klar: \"Entwurf — nur an echte, journalisten-initiierte Anfragen, vom Owner selbst zu senden.\" Verwende ausschließlich die in policy/compliance.json erlaubte Sprache und schließe mit dem Pflicht-Disclaimer.",
+  "outputType": "markdown",
+  "autoPublish": false,
+  "enabled": true,
+  "legalNotes": "haro_recherchescout: nur journalisten-initiiert (kein Cold-Pitch). Keine erfundenen Zahlen. Nur Entwurf, Owner sendet selbst (manual-browser)."
+}
