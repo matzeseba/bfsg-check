@@ -45,6 +45,7 @@ export function createRunner(cfg, store, deps) {
       const reviewed = await store.updateJob(target.id, {
         status: 'review',
         error: null,
+        outputFile: `data/outbox/${target.id}.md`,
         gate: { checked: true, passed: result.passed, findings: result.findings },
       });
 
