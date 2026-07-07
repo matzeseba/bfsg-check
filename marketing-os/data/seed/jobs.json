@@ -1,0 +1,141 @@
+[
+  {
+    "id": "job_20260703_0001",
+    "playbookId": "mlbf-ratgeber",
+    "agent": "seo-pillar-writer",
+    "title": "Ratgeber: MLBF-Prüfstrategie 2026 — so kontrolliert die Aufsicht",
+    "channel": "seo_pillar",
+    "status": "published",
+    "createdAt": "2026-07-03T06:00:12.000Z",
+    "updatedAt": "2026-07-05T14:22:41.000Z",
+    "outputFile": "data/outbox/job_20260703_0001.md",
+    "gate": {
+      "checked": true,
+      "passed": true,
+      "findings": []
+    },
+    "publishAction": {
+      "type": "repo-pr",
+      "instructions": "Als neue Ratgeber-Seite in landingpage-next/ anlegen (Slug /ratgeber/mlbf-pruefstrategie), FAQ-Schema übernehmen, PR gegen main öffnen. Erst nach Owner-Approval gemergt."
+    },
+    "error": null
+  },
+  {
+    "id": "job_20260706_0002",
+    "playbookId": "seo-pillar-weekly",
+    "agent": "seo-pillar-writer",
+    "title": "Pillar: BFSG-Checkliste für Online-Shops 2026 (25 Punkte)",
+    "channel": "seo_pillar",
+    "status": "approved",
+    "createdAt": "2026-07-06T06:00:09.000Z",
+    "updatedAt": "2026-07-07T08:11:03.000Z",
+    "outputFile": "data/outbox/job_20260706_0002.md",
+    "gate": {
+      "checked": true,
+      "passed": true,
+      "findings": []
+    },
+    "publishAction": {
+      "type": "repo-pr",
+      "instructions": "Als /blog/bfsg-checkliste-shops-2026 in landingpage-next/ anlegen, interne Links auf Ratgeber + /check setzen, PR öffnen."
+    },
+    "error": null
+  },
+  {
+    "id": "job_20260707_0003",
+    "playbookId": "aeo-faq-weekly",
+    "agent": "aeo-answer-writer",
+    "title": "AEO-FAQ: Wie prüft die MLBF Websites? (6 Antworten)",
+    "channel": "aeo_answer",
+    "status": "review",
+    "createdAt": "2026-07-07T07:00:05.000Z",
+    "updatedAt": "2026-07-07T07:04:58.000Z",
+    "outputFile": "data/outbox/job_20260707_0003.md",
+    "gate": {
+      "checked": true,
+      "passed": true,
+      "findings": []
+    },
+    "publishAction": {
+      "type": "repo-pr",
+      "instructions": "FAQPage-Block in bestehende Ratgeber-Seite einbetten oder als eigene /faq/mlbf-pruefung-Seite, JSON-LD übernehmen."
+    },
+    "error": null
+  },
+  {
+    "id": "job_20260707_0004",
+    "playbookId": "comparison-refresh-monthly",
+    "agent": "comparison-page-writer",
+    "title": "Vergleich: BFSG-Fuchs vs. Overlay-Tools (§ 6 UWG)",
+    "channel": "comparison_page",
+    "status": "review",
+    "createdAt": "2026-07-07T09:00:11.000Z",
+    "updatedAt": "2026-07-07T09:06:22.000Z",
+    "outputFile": "data/outbox/job_20260707_0004.md",
+    "gate": {
+      "checked": true,
+      "passed": false,
+      "findings": [
+        {
+          "severity": "block",
+          "pattern": "BFSG[- ]?konform",
+          "match": "BFSG-konform",
+          "hint": "UWG §5 Irreführung — stattdessen: automatisierte technische Analyse nach WCAG 2.1 AA"
+        },
+        {
+          "severity": "warn",
+          "pattern": "zertifiziert",
+          "match": "zertifiziert",
+          "hint": "nur verwenden, wenn echte Zertifizierung vorliegt"
+        }
+      ]
+    },
+    "publishAction": {
+      "type": "none",
+      "instructions": "Blockiert durch Gate — Entwurf muss überarbeitet werden (Konformitäts-Behauptung entfernen), bevor Approve möglich ist."
+    },
+    "error": null
+  },
+  {
+    "id": "job_20260707_0005",
+    "playbookId": "haro-daily-draft",
+    "agent": "haro-responder",
+    "title": "HARO-Entwurf: Sind Accessibility-Overlays wirksam?",
+    "channel": "haro_recherchescout",
+    "status": "running",
+    "createdAt": "2026-07-07T08:00:03.000Z",
+    "updatedAt": "2026-07-07T08:00:47.000Z",
+    "outputFile": null,
+    "gate": {
+      "checked": false,
+      "passed": false,
+      "findings": []
+    },
+    "publishAction": {
+      "type": "manual-browser",
+      "instructions": "Nur Entwurf — Owner passt an eine echte, journalisten-initiierte Anfrage an und sendet selbst."
+    },
+    "error": null
+  },
+  {
+    "id": "job_20260707_0006",
+    "playbookId": "newsletter-weekly",
+    "agent": "newsletter-writer",
+    "title": "Newsletter KW28: Ein Kontrast-Fehler, den fast jeder Shop hat",
+    "channel": "newsletter_brevo",
+    "status": "queued",
+    "createdAt": "2026-07-07T09:00:15.000Z",
+    "updatedAt": "2026-07-07T09:00:15.000Z",
+    "outputFile": null,
+    "gate": {
+      "checked": false,
+      "passed": false,
+      "findings": []
+    },
+    "publishAction": {
+      "type": "manual-browser",
+      "instructions": "Nach Owner-Approval in Brevo als Kampagne an die Opt-in-Liste anlegen und versenden."
+    },
+    "error": null
+  }
+]

@@ -1,0 +1,22 @@
+[
+  { "id": "lead_0001", "date": "2026-06-08", "source": "seo_pillar", "kind": "scan", "value": null, "note": "Scan über Pillar-Artikel BFSG-Checkliste" },
+  { "id": "lead_0002", "date": "2026-06-10", "source": "listings", "kind": "scan", "value": null, "note": "Referrer SaaSHub-Listing" },
+  { "id": "lead_0003", "date": "2026-06-11", "source": "aeo_answer", "kind": "scan", "value": null, "note": "AI-Referral (utm_source=perplexity)" },
+  { "id": "lead_0004", "date": "2026-06-13", "source": "newsletter_brevo", "kind": "newsletter", "value": null, "note": "Double-Opt-in bestätigt" },
+  { "id": "lead_0005", "date": "2026-06-15", "source": "seo_pillar", "kind": "scan", "value": null, "note": "Scan über /blog/cookie-banner-fehler-2026" },
+  { "id": "lead_0006", "date": "2026-06-16", "source": "seo_pillar", "kind": "sale", "value": 129, "note": "Basis-Report nach Gratis-Scan" },
+  { "id": "lead_0007", "date": "2026-06-18", "source": "haro_recherchescout", "kind": "contact", "value": null, "note": "Journalisten-Anfrage Anti-Overlay" },
+  { "id": "lead_0008", "date": "2026-06-19", "source": "aeo_answer", "kind": "scan", "value": null, "note": "AI-Referral (utm_source=chatgpt)" },
+  { "id": "lead_0009", "date": "2026-06-21", "source": "newsletter_brevo", "kind": "newsletter", "value": null, "note": "Opt-in über Ratgeber-Download" },
+  { "id": "lead_0010", "date": "2026-06-23", "source": "comparison_page", "kind": "scan", "value": null, "note": "Scan über Vergleichsseite Overlay" },
+  { "id": "lead_0011", "date": "2026-06-24", "source": "comparison_page", "kind": "sale", "value": 399, "note": "Profi-Report, Mehrseiten-Audit" },
+  { "id": "lead_0012", "date": "2026-06-26", "source": "listings", "kind": "scan", "value": null, "note": "Referrer OMR Reviews" },
+  { "id": "lead_0013", "date": "2026-06-28", "source": "pr_free", "kind": "scan", "value": null, "note": "Traffic-Schub freie PM openPR" },
+  { "id": "lead_0014", "date": "2026-06-29", "source": "newsletter_brevo", "kind": "newsletter", "value": null, "note": "Opt-in nach PM-Klick" },
+  { "id": "lead_0015", "date": "2026-07-01", "source": "seo_pillar", "kind": "scan", "value": null, "note": "Scan über /blog/barrierefreiheitserklaerung-muster" },
+  { "id": "lead_0016", "date": "2026-07-02", "source": "seo_pillar", "kind": "sale", "value": 69, "note": "Cookie-Check Profi" },
+  { "id": "lead_0017", "date": "2026-07-03", "source": "aeo_answer", "kind": "scan", "value": null, "note": "AI-Referral MLBF-Frage" },
+  { "id": "lead_0018", "date": "2026-07-04", "source": "awesome_lists", "kind": "scan", "value": null, "note": "Referrer awesome-a11y PR-Merge" },
+  { "id": "lead_0019", "date": "2026-07-05", "source": "newsletter_brevo", "kind": "sale", "value": 249, "note": "Re-Check-Abo Jahresoption aus Nurture" },
+  { "id": "lead_0020", "date": "2026-07-06", "source": "seo_pillar", "kind": "contact", "value": null, "note": "Kontaktformular Profi-Anfrage KMU" }
+]

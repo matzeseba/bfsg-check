@@ -1,0 +1,14 @@
+{
+  "playbooks": {
+    "mlbf-ratgeber": { "lastRun": null, "enabled": true },
+    "seo-pillar-weekly": { "lastRun": null, "enabled": true },
+    "aeo-faq-weekly": { "lastRun": null, "enabled": true },
+    "comparison-refresh-monthly": { "lastRun": null, "enabled": true },
+    "pr-monthly-hook": { "lastRun": null, "enabled": true },
+    "listings-checklist-once": { "lastRun": null, "enabled": true },
+    "haro-daily-draft": { "lastRun": null, "enabled": true },
+    "newsletter-weekly": { "lastRun": null, "enabled": true },
+    "analytics-weekly": { "lastRun": null, "enabled": true },
+    "badge-awesome-once": { "lastRun": null, "enabled": true }
+  }
+}
