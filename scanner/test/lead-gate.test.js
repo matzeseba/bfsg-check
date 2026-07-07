@@ -1,9 +1,10 @@
 // Tests fürs DOI-Gate des Gratis-Reports (02.07.): Signatur-Token (7-Tage-Gültigkeit
-// über expiresAt), durable Pending-Lead-Queue + atomarer Claim (kein Doppelversand),
-// sowie der Confirm-Endpoint gegen die ECHTE Express-App (supertest). Kein SMTP —
-// services.sendLeadTeaser wird gemockt; die Queue läuft echt gegen eine tmp-JSONL.
+// über expiresAt), durable Pending-Lead-Queue + atomarer Claim, sowie der Confirm-
+// Endpoint gegen die ECHTE Express-App (supertest). Seit 07.07. versendet Confirm
+// NICHTS mehr (die Übersicht kommt allein über die Brevo-Automation) — er markiert
+// den Lead nur terminal SENT; die Queue läuft echt gegen eine tmp-JSONL.
 
-import { test, beforeEach, after } from 'node:test';
+import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
@@ -101,82 +102,52 @@ test('queue: Pending-Persistenz überlebt Neuladen aus der Datei', async () => {
 });
 
 // --- Confirm-Endpoint (supertest gegen die echte App) -----------------------
+// Confirm versendet keine Mail mehr (kein Mock nötig): gültiger Token markiert
+// den Lead terminal als SENT und redirectet auf /anmeldung-bestaetigt.
 const request = (await import('supertest')).default;
-const { app, services } = await import('../app.js');
-const REAL = { ...services };
-after(() => Object.assign(services, REAL));
+const { app } = await import('../app.js');
 
 const confirm = (id, token) => request(app).get(`/api/lead/confirm?id=${id}&token=${token}`);
 
-test('confirm: gültiger Token → 302 auf /anmeldung-bestaetigt + Versand genau 1×', async () => {
+test('confirm: gültiger Token → 302 auf /anmeldung-bestaetigt + Lead terminal SENT (kein Versand)', async () => {
   const id = 'c_ok';
   await leadQueue.enqueue(baseLead(id));
-  let sent = 0;
-  services.sendLeadTeaser = async () => { sent += 1; return { dryRun: true }; };
 
   const res = await confirm(id, signLead(id));
   assert.equal(res.status, 302);
   assert.match(res.headers.location, /\/anmeldung-bestaetigt$/);
-  assert.equal(sent, 1);
   assert.equal((await leadQueue.getLead(id)).status, 'SENT');
 
-  // Doppelklick: idempotent, KEIN Zweitversand.
+  // Doppelklick: idempotent, Status bleibt terminal SENT.
   const res2 = await confirm(id, signLead(id));
   assert.equal(res2.status, 302);
-  assert.equal(sent, 1);
+  assert.match(res2.headers.location, /\/anmeldung-bestaetigt$/);
+  assert.equal((await leadQueue.getLead(id)).status, 'SENT');
 });
 
-test('confirm: parallele Klicks senden nur 1× (atomarer Claim)', async () => {
+test('confirm: parallele Klicks → beide 302, Record genau 1× terminal SENT (atomarer Claim)', async () => {
   const id = 'c_race';
   await leadQueue.enqueue(baseLead(id));
-  let sent = 0;
-  services.sendLeadTeaser = async () => { sent += 1; return { dryRun: true }; };
 
   const [a, b] = await Promise.all([confirm(id, signLead(id)), confirm(id, signLead(id))]);
-  assert.equal(sent, 1);
   assert.deepEqual([a.status, b.status].sort(), [302, 302]);
   assert.equal((await leadQueue.getLead(id)).status, 'SENT');
 });
 
-test('confirm: ungültiger Token → 302 ?status=abgelaufen, kein Versand', async () => {
+test('confirm: ungültiger Token → 302 ?status=abgelaufen, kein markSent', async () => {
   const id = 'c_bad';
   await leadQueue.enqueue(baseLead(id));
-  let sent = 0;
-  services.sendLeadTeaser = async () => { sent += 1; };
   const res = await confirm(id, 'deadbeef');
   assert.equal(res.status, 302);
   assert.match(res.headers.location, /status=abgelaufen/);
-  assert.equal(sent, 0);
+  assert.equal((await leadQueue.getLead(id)).status, 'PENDING');
 });
 
-test('confirm: abgelaufener Record (expiresAt < now) → 302 ?status=abgelaufen', async () => {
+test('confirm: abgelaufener Record (expiresAt < now) → 302 ?status=abgelaufen, kein markSent', async () => {
   const id = 'c_exp';
   await leadQueue.enqueue(baseLead(id, past()));
-  let sent = 0;
-  services.sendLeadTeaser = async () => { sent += 1; };
   const res = await confirm(id, signLead(id));
   assert.equal(res.status, 302);
   assert.match(res.headers.location, /status=abgelaufen/);
-  assert.equal(sent, 0);
-});
-
-test('confirm: transienter Mailfehler → PENDING bleibt, ?status=verzoegert, nächster Klick sendet', async () => {
-  const id = 'c_tr';
-  await leadQueue.enqueue(baseLead(id));
-  let attempts = 0;
-  services.sendLeadTeaser = async () => {
-    attempts += 1;
-    if (attempts === 1) { const e = new Error('temporär, try again'); e.responseCode = 421; throw e; }
-    return { dryRun: true };
-  };
-  const res1 = await confirm(id, signLead(id));
-  assert.equal(res1.status, 302);
-  assert.match(res1.headers.location, /status=verzoegert/);
-  assert.equal((await leadQueue.getLead(id)).status, 'PENDING'); // zurück in der Queue
-
-  const res2 = await confirm(id, signLead(id));
-  assert.equal(res2.status, 302);
-  assert.match(res2.headers.location, /\/anmeldung-bestaetigt$/);
-  assert.equal(attempts, 2);
-  assert.equal((await leadQueue.getLead(id)).status, 'SENT');
+  assert.equal((await leadQueue.getLead(id)).status, 'PENDING');
 });

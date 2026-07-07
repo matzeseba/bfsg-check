@@ -91,6 +91,21 @@ export function CtaSection() {
           {/* Headline-Block scroll-gekoppelt (Scroll-Story); pr ab md reserviert
               die Buehne fuer den unverdeckten Fuchs. */}
           <ScrollScrub className="relative z-10 text-center md:pr-56 md:text-left lg:pr-72">
+            {/* Filo mobil (einzige mobile Instanz auf der Seite): kleiner
+                Daumen-hoch-Akzent oberhalb der Headline. Gleiches Asset wie die
+                Desktop-Komposition rechts (konsistente Bildsprache), kein
+                priority (weit unter dem Fold → natives Lazy-Loading), explizite
+                width/height gegen CLS, dekorativ → leeres alt + aria-hidden. */}
+            <div aria-hidden="true" className="md:hidden flex justify-center">
+              <Image
+                src="/filo-thumbsup-neo.png"
+                alt=""
+                width={598}
+                height={1100}
+                sizes="96px"
+                className="h-40 w-auto mb-6"
+              />
+            </div>
             {/* Einheitliche Kicker-Pill (Spec §5: jede Sektion Kicker→Headline→Subline). */}
             <SectionKicker
               icon={TimerIcon}

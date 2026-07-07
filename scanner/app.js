@@ -19,7 +19,7 @@ import { renderTeaser } from './lib/report.js';
 import { fulfillOrder, PKG_CONFIG } from './lib/fulfill.js';
 import {
   sendReportFor, sendAlert, sendCancellationConfirmation, sendDsgvoToken, sendDelayNotice,
-  sendLeadTeaser, sendOwnerReview, sendOrderReceived, isTransientMailError,
+  sendOwnerReview, sendOrderReceived, isTransientMailError,
   mailerStatus, requireMailerOrExit, isStripeLive, isEmail
 } from './lib/mailer.js';
 import * as reportQueue from './lib/report-queue.js';
@@ -74,7 +74,7 @@ const isMain = !!process.argv[1] && import.meta.url === pathToFileURL(process.ar
 // echte /api/checkout-Route (Paket-/Consent-Validierung, price_data, interval) ohne
 // Netz-Call zu Stripe.
 export const services = {
-  fulfillOrder, sendReportFor, generateInvoicePdf, sendOwnerReview, sendOrderReceived, sendLeadTeaser, reportQueue,
+  fulfillOrder, sendReportFor, generateInvoicePdf, sendOwnerReview, sendOrderReceived, reportQueue,
   createCheckoutSession: (params) => stripe.checkout.sessions.create(params)
 };
 
@@ -805,7 +805,9 @@ app.post('/api/checkout', rateLimit({ windowMs: 60_000, max: 10 }), async (req, 
       metadata: baseMeta,
       subscription_data,
       submit_type: p.mode === 'payment' ? 'pay' : undefined,
-      success_url: `${PUBLIC_URL}/danke.html?session_id={CHECKOUT_SESSION_ID}`,
+      // pkg in der success_url: danke.html blendet damit den Upsell-Block des
+      // soeben gekauften Produkts aus (pkg ist whitelist-validiert, s. o.).
+      success_url: `${PUBLIC_URL}/danke.html?session_id={CHECKOUT_SESSION_ID}&pkg=${pkg}`,
       cancel_url: `${PUBLIC_URL}/?abbruch=1`
     });
     res.json({ url: session.url });
@@ -962,12 +964,14 @@ app.post('/api/lead', rateLimit({ windowMs: 60_000, max: 5 }), async (req, res) 
   }
 });
 
-// --- DOI-Bestätigung des Gratis-Reports (02.07.) ---
+// --- DOI-Bestätigung des Gratis-Reports (02.07.; Backend-Teaser entfernt 07.07.) ---
 // Ziel der Brevo-Double-Opt-in-redirectionUrl: Der Klick auf den Bestätigungslink
-// löst hier den einmaligen Teaser-Versand aus (Idempotenz über terminalen SENT-Status
-// + atomaren Claim → Doppelklick sendet nur 1×). Kein Webhook nötig. Immer freundlicher
-// 302-Redirect auf die Bestätigungsseite — Fehler werden über den ?status-Parameter
-// signalisiert (abgelaufen = ungültiger/abgelaufener Token, verzoegert = Versand hakt).
+// markiert den Lead terminal als SENT (Idempotenz über SENT-Status + atomaren Claim →
+// Doppelklick ändert nichts). Die inhaltliche Übersicht kommt AUSSCHLIESSLICH über die
+// Brevo-Automation (Template #8, „Deine Barrierefreiheits-Übersicht ist da") — der
+// frühere Backend-Teaser („Ihre WCAG-Erstprüfung: Note …") ist entfernt (Doppel-Mail-
+// Fix). Immer freundlicher 302-Redirect auf die Bestätigungsseite — ungültiger/
+// abgelaufener Token wird über ?status=abgelaufen signalisiert.
 app.get('/api/lead/confirm', rateLimit({ windowMs: 60_000, max: 10 }), async (req, res) => {
   const base = `${PUBLIC_URL}/anmeldung-bestaetigt`;
   const id = String(req.query.id || '').trim().slice(0, 120);
@@ -984,7 +988,7 @@ app.get('/api/lead/confirm', rateLimit({ windowMs: 60_000, max: 10 }), async (re
   // Bereits versendet → idempotenter Erfolg (kein Zweitversand).
   if (lead.status === 'SENT') return res.redirect(302, base);
 
-  // Atomarer Claim: nur der Gewinner sendet. Verlierer eines parallelen Klicks
+  // Atomarer Claim: nur der Gewinner markiert. Verlierer eines parallelen Klicks
   // (oder ein bereits terminaler Record) landet hier mit null.
   const claimed = leadQueue.claimForSend(id);
   if (!claimed) {
@@ -992,26 +996,16 @@ app.get('/api/lead/confirm', rateLimit({ windowMs: 60_000, max: 10 }), async (re
     return res.redirect(302, cur?.status === 'SENT' ? base : `${base}?status=verzoegert`);
   }
 
+  // markSent ist seit dem Teaser-Entfall reine Buchhaltung (Übersicht kommt aus
+  // der Brevo-Automation) — ein JSONL-Schreibfehler darf den Redirect nicht
+  // blockieren, sonst hängt der DOI-Klick ohne Antwort.
   try {
-    await services.sendLeadTeaser({
-      to: lead.to, url: lead.url, score: lead.score,
-      counts: lead.counts, topIssues: lead.topIssues, totalIssues: lead.totalIssues
-    });
     await leadQueue.markSent(id);
-    return res.redirect(302, base);
+    logger.info({ id, url: lead.url }, 'Lead-DOI bestätigt (SENT) — Übersicht via Brevo-Automation Template #8');
   } catch (err) {
-    if (isTransientMailError(err)) {
-      // Transient → PENDING lassen, nächster Klick versucht erneut. Freundliche Seite.
-      await leadQueue.requeue(id, { error: err.message });
-      logger.warn({ err: err.message, id }, 'Lead-Confirm: transienter Mailfehler — requeued');
-      return res.redirect(302, `${base}?status=verzoegert`);
-    }
-    // Permanent → terminal markieren + Owner alarmieren (angeforderter Report ging verloren).
-    await leadQueue.markFailed(id, { error: err.message });
-    logger.error({ err: err.message, id }, 'Lead-Confirm: permanenter Mailfehler');
-    try { await sendAlert('Gratis-Report-Versand fehlgeschlagen', `Lead ${id} (${lead.to}): ${err.message}`); } catch { /* best-effort */ }
-    return res.redirect(302, `${base}?status=verzoegert`);
+    logger.error({ err: err.message, id }, 'Lead-Confirm: markSent fehlgeschlagen');
   }
+  return res.redirect(302, base);
 });
 
 app.get('/health', (req, res) => {

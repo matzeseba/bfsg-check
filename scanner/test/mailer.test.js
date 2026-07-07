@@ -15,7 +15,7 @@ delete process.env.SMTP_HOST;
 delete process.env.SMTP_USER;
 delete process.env.SMTP_PASS;
 
-const { sendReportFor, sendReport, sendCookieReport, sendRecheckReport, sendDelayNotice, buildDelayNotice, sendLeadTeaser, buildLeadTeaser, isEmail, legalFooter, widerrufHinweis } = await import('../lib/mailer.js');
+const { sendReportFor, sendReport, sendCookieReport, sendRecheckReport, sendDelayNotice, buildDelayNotice, isEmail, legalFooter, widerrufHinweis } = await import('../lib/mailer.js');
 
 const tmp = mkdtempSync(path.join(os.tmpdir(), 'bfsg-mailer-'));
 const reportPdf = path.join(tmp, 'report.pdf');
@@ -181,99 +181,4 @@ test('sendReport: Verbraucher-Mail laeuft mit customerType/consentTs durch (Dry-
     customerType: 'consumer', consentTs: '2026-06-28T10:00:00Z'
   });
   assert.equal(res.dryRun, true);
-});
-
-// --- PR2: Value-Mail nach Gratis-Scan ---------------------------------------
-const teaserArgs = {
-  url: 'https://muster-shop.de/kategorie',
-  score: 42,
-  counts: { critical: 3, serious: 5, moderate: 4, minor: 2 },
-  topIssues: ['Unzureichender Farbkontrast', 'Fehlende Alternativtexte', 'Formularfelder ohne Label'],
-  totalIssues: 14
-};
-
-test('buildLeadTeaser: Betreff traegt Note + Score + Host', () => {
-  const { subject } = buildLeadTeaser(teaserArgs);
-  assert.match(subject, /Note D/);          // 42 → D (Schwellen wie report.js)
-  assert.match(subject, /42\/100/);
-  assert.match(subject, /muster-shop\.de/); // Host aus URL extrahiert
-});
-
-test('buildLeadTeaser: zeigt Score, ALLE Kategorie-Zaehler und Top-3-Prioritaeten (text+html)', () => {
-  const { text, html } = buildLeadTeaser(teaserArgs);
-  for (const body of [text, html]) {
-    // Alle vier Kategorie-Zahlen vorhanden.
-    assert.match(body, /Kritisch/);
-    assert.match(body, /Schwerwiegend/);
-    assert.match(body, /Mittel/);
-    assert.match(body, /Gering/);
-    // Top-3-Prioritaeten (das WAS) — Titel, keine Selektoren.
-    assert.match(body, /Unzureichender Farbkontrast/);
-    assert.match(body, /Fehlende Alternativtexte/);
-    assert.match(body, /Formularfelder ohne Label/);
-  }
-  // HTML hat die CTA als klickbaren Link auf #pakete.
-  assert.match(html, /href="[^"]*#pakete"/);
-  // "N weitere Fundstellen" = totalIssues(14) - gezeigte 3 = 11.
-  assert.match(text, /11 weitere Fundstellen/);
-});
-
-test('buildLeadTeaser: leakt KEINE gesperrten Inhalte + KEINE verbotenen Claims', () => {
-  const { text, html } = buildLeadTeaser(teaserArgs);
-  for (const body of [text, html]) {
-    // Verbotene Marketing-Claims (UWG §5 / CLAUDE.md).
-    assert.doesNotMatch(body, /BFSG-konform/i);
-    assert.doesNotMatch(body, /rechtssicher/i);
-    assert.doesNotMatch(body, /\bgarantiert\b/i);
-    assert.doesNotMatch(body, /T[ÜU]V|DEKRA/i);
-    // Kein CSS-/DOM-Selektor-Leak (Vollreport-only). Grobe Heuristik: keine
-    // typischen Selektor-Muster wie ".class", "#id" oder "<tag>"-Fundstellen.
-    assert.doesNotMatch(body, /nth-child|querySelector|::before|\bdiv\.[a-z]/i);
-  }
-});
-
-test('buildLeadTeaser: Top-Befunde tragen Schweregrad-Chips (aus counts + Rang abgeleitet)', () => {
-  const { text, html } = buildLeadTeaser({
-    url: 'https://x.de', score: 55,
-    counts: { critical: 1, serious: 1, moderate: 1, minor: 0 },
-    topIssues: ['A-Fehler', 'B-Fehler', 'C-Fehler'], totalIssues: 3
-  });
-  // Rang folgt IMPACT_WEIGHT absteigend → 1. kritisch, 2. schwerwiegend, 3. mittel.
-  assert.match(text, /\[KRITISCH\] A-Fehler/);
-  assert.match(text, /\[SCHWERWIEGEND\] B-Fehler/);
-  assert.match(text, /\[MITTEL\] C-Fehler/);
-  for (const chip of [/KRITISCH/, /SCHWERWIEGEND/, /MITTEL/]) assert.match(html, chip);
-  // Sachlicher Risiko-Bezug ohne verbotene Claims.
-  assert.match(html, /28\.\s*Juni\s*2025/);
-  assert.match(html, /§\s*15\s*BFSG/);
-});
-
-test('buildLeadTeaser: expliziter severity im topIssue-Objekt hat Vorrang', () => {
-  const { text } = buildLeadTeaser({
-    score: 80, counts: { critical: 5, serious: 0, moderate: 0, minor: 0 },
-    topIssues: [{ title: 'Nur gering', severity: 'minor' }], totalIssues: 5
-  });
-  assert.match(text, /\[GERING\] Nur gering/);
-});
-
-test('buildLeadTeaser: Note-Fallback aus Score, wenn keine grade uebergeben', () => {
-  assert.match(buildLeadTeaser({ score: 95 }).subject, /Note A/);
-  assert.match(buildLeadTeaser({ score: 80 }).subject, /Note B/);
-  assert.match(buildLeadTeaser({ score: 60 }).subject, /Note C/);
-  assert.match(buildLeadTeaser({ score: 10 }).subject, /Note D/);
-});
-
-test('buildLeadTeaser: robust bei fehlenden Feldern (kein Throw, keine NaN)', () => {
-  const { subject, text, html } = buildLeadTeaser({});
-  assert.ok(subject && text && html);
-  assert.doesNotMatch(text, /NaN/);
-  assert.doesNotMatch(html, /NaN/);
-});
-
-test('sendLeadTeaser: laeuft im Dry-Run durch; ungueltige Adresse wird uebersprungen', async () => {
-  const ok = await sendLeadTeaser({ to: 'lead@firma.de', ...teaserArgs });
-  assert.equal(ok.dryRun, true);
-  const bad = await sendLeadTeaser({ to: 'keine-email', ...teaserArgs });
-  assert.equal(bad.dryRun, true);
-  assert.equal(bad.skipped, 'invalid-recipient');
 });
