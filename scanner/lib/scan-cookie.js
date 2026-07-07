@@ -37,7 +37,7 @@ function hostInList(host, list) {
   return list.find((h) => host === h || host.endsWith('.' + h));
 }
 
-export async function scanCookie(url, { timeout = 45000, lenientTls = false } = {}) {
+export async function scanCookie(url, { timeout = 45000, lenientTls = false, maxPages = 1 } = {}) {
   if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
   // SSRF + Rebinding-Pin
   const safe = await assertPublicHttpUrl(url);
@@ -47,6 +47,7 @@ export async function scanCookie(url, { timeout = 45000, lenientTls = false } = 
   // eigener Auflösung (1:1 wie scanUrl/scanSite in scan.js).
   const pinArg = pinnedHostResolverArg(new URL(safe.url).hostname, safe.addresses);
   const siteReg = regDomain(reqHost(url));
+  const origin = new URL(url).origin;
   const browser = await chromium.launch({
     args: ['--no-sandbox', '--disable-dev-shm-usage', ...(pinArg ? [pinArg] : [])]
   });
@@ -76,19 +77,93 @@ export async function scanCookie(url, { timeout = 45000, lenientTls = false } = 
     if (f) fontHits.add(f);
   });
 
+  // F19: schlankes same-origin Multi-Page (Startseite + bis zu maxPages-1 auf der
+  // Startseite gefundene interne Links, sequentiell in DERSELBEN Page/Browser-Context
+  // — Cookies akkumulieren im selben Cookie-Jar wie bei einem echten Website-Besuch,
+  // Tracker-Requests werden über den bereits registrierten 'request'-Listener über
+  // ALLE Navigationen hinweg mitgezählt). Kein voller BFS-Crawl wie scanSite: das
+  // Consent-Signal ist praxisnah site-weit ähnlich, ein tiefer Crawl lohnt hier nicht.
+  maxPages = Math.max(1, Math.min(10, Number(maxPages) || 1));
+  const targets = [url];
+  const visited = new Set();
+  let bannerPresent = false;
+  let title = '';
+
   try {
-    // Rebinding-Verify VOR dem try — darf nicht vom networkidle-Fallback
-    // verschluckt werden (sonst Rebinding-/SSRF-Schutz umgangen).
-    await verifyNoDnsRebinding(url, safe.addresses);
-    try {
-      await page.goto(url, { waitUntil: 'networkidle', timeout });
-    } catch {
-      // networkidle kann auf Tracking-lastigen Seiten nie eintreten → Fallback.
-      await page.goto(url, { waitUntil: 'domcontentloaded', timeout });
+    for (let i = 0; i < targets.length && visited.size < maxPages; i++) {
+      const target = targets[i];
+      if (visited.has(target)) continue;
+      // Jedes Ziel frisch gegen SSRF/DNS-Rebinding prüfen (analog scanSite) —
+      // same-origin heißt nicht zwingend gleiche IP über die Zeit.
+      let safeTarget;
+      try {
+        safeTarget = i === 0 ? safe : await assertPublicHttpUrl(target);
+      } catch {
+        continue; // Ziel nicht erreichbar/erlaubt — überspringen, Rest weiterlaufen lassen.
+      }
+      visited.add(target);
+      // Rebinding-Verify VOR dem try — darf nicht vom networkidle-Fallback
+      // verschluckt werden (sonst Rebinding-/SSRF-Schutz umgangen).
+      await verifyNoDnsRebinding(safeTarget.url, safeTarget.addresses);
+      let resp;
+      try {
+        resp = await page.goto(safeTarget.url, { waitUntil: 'networkidle', timeout });
+      } catch {
+        // networkidle kann auf Tracking-lastigen Seiten nie eintreten → Fallback.
+        resp = await page.goto(safeTarget.url, { waitUntil: 'domcontentloaded', timeout });
+      }
+      // F5: HTTP-Fehlerstatus (4xx/5xx) NICHT als sauberen Cookie-Scan werten
+      // (analog scan.js) — sonst liefert eine 404-/WAF-Seite ein "sauberes"
+      // bezahltes Cookie-Ergebnis. Auf der Startseite fatal, auf einer Folgeseite
+      // wird nur diese Seite übersprungen (Startseiten-Messung bleibt gültig).
+      if (resp && resp.status() >= 400) {
+        if (i === 0) throw new Error(`http-status-${resp.status()}`);
+        continue;
+      }
+      // Scroll-getriggerte/lazy Tags anstoßen, dann setteln lassen.
+      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight)).catch(() => {});
+      await page.waitForTimeout(4000);
+
+      // Banner-/CMP-Erkennung: bekannte CMP-Signaturen + voller Text + Shadow-Roots.
+      const bannerInfo = await page.evaluate(() => {
+        const CMP_SELECTORS = ['#usercentrics-root', '#CybotCookiebotDialog', '#onetrust-banner-sdk',
+          '[id*="cookie"]', '[class*="consent"]', '[class*="cookie"]', '[aria-label*="ookie"]'];
+        if (CMP_SELECTORS.some((s) => document.querySelector(s))) return { present: true };
+        const rx = /(cookie|consent|datenschutz|zustimm|akzeptier|einwillig)/i;
+        const scan = (root) => Array.from(root.querySelectorAll('div,section,aside,dialog,[role="dialog"]'))
+          .some((e) => {
+            const r = e.getBoundingClientRect ? e.getBoundingClientRect() : { height: 99, width: 999 };
+            return rx.test(e.textContent || '') && r.height > 30 && r.width > 180;
+          });
+        if (scan(document)) return { present: true };
+        // Best-effort Shadow-DOM
+        const hosts = Array.from(document.querySelectorAll('*')).filter((e) => e.shadowRoot).slice(0, 50);
+        for (const h of hosts) { try { if (scan(h.shadowRoot)) return { present: true }; } catch {} }
+        return { present: false };
+      });
+      if (bannerInfo.present) bannerPresent = true;
+      if (i === 0) title = await page.title();
+
+      // Folge-Links nur auf der Startseite sammeln (same-origin, ohne Fragment/Mailto/JS).
+      if (i === 0 && targets.length < maxPages) {
+        const links = await page.evaluate((org) => {
+          const out = new Set();
+          for (const a of document.querySelectorAll('a[href]')) {
+            try {
+              const u = new URL(a.getAttribute('href'), location.href);
+              if (u.origin !== org) continue;
+              if (!/^https?:$/.test(u.protocol)) continue;
+              u.hash = '';
+              out.add(u.toString());
+            } catch { /* ignore */ }
+          }
+          return [...out];
+        }, origin);
+        for (const l of links) {
+          if (!targets.includes(l)) targets.push(l);
+        }
+      }
     }
-    // Scroll-getriggerte/lazy Tags anstoßen, dann setteln lassen.
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight)).catch(() => {});
-    await page.waitForTimeout(4000);
 
     const cookies = await context.cookies();
     const preConsentCookies = cookies
@@ -97,26 +172,6 @@ export async function scanCookie(url, { timeout = 45000, lenientTls = false } = 
         TRACKING_COOKIE_PREFIX.some((p) => n.startsWith(p)) ||
         TRACKING_COOKIE_EXACT.includes(n)
       );
-
-    // Banner-/CMP-Erkennung: bekannte CMP-Signaturen + voller Text + Shadow-Roots.
-    const bannerInfo = await page.evaluate(() => {
-      const CMP_SELECTORS = ['#usercentrics-root', '#CybotCookiebotDialog', '#onetrust-banner-sdk',
-        '[id*="cookie"]', '[class*="consent"]', '[class*="cookie"]', '[aria-label*="ookie"]'];
-      if (CMP_SELECTORS.some((s) => document.querySelector(s))) return { present: true };
-      const rx = /(cookie|consent|datenschutz|zustimm|akzeptier|einwillig)/i;
-      const scan = (root) => Array.from(root.querySelectorAll('div,section,aside,dialog,[role="dialog"]'))
-        .some((e) => {
-          const r = e.getBoundingClientRect ? e.getBoundingClientRect() : { height: 99, width: 999 };
-          return rx.test(e.textContent || '') && r.height > 30 && r.width > 180;
-        });
-      if (scan(document)) return { present: true };
-      // Best-effort Shadow-DOM
-      const hosts = Array.from(document.querySelectorAll('*')).filter((e) => e.shadowRoot).slice(0, 50);
-      for (const h of hosts) { try { if (scan(h.shadowRoot)) return { present: true }; } catch {} }
-      return { present: false };
-    });
-    const bannerPresent = bannerInfo.present;
-    const title = await page.title();
 
     const violations = [];
     // HARTES Signal: nicht-notwendige Cookies vor Consent.
@@ -164,6 +219,7 @@ export async function scanCookie(url, { timeout = 45000, lenientTls = false } = 
     return {
       url, scannedAt: new Date().toISOString(), reportKind: 'cookie',
       meta: { title, bannerPresent, trackerCount: trackerHits.size, cookieCount: cookies.length },
+      pagesScanned: visited.size,
       violations, passes, incomplete: 0
     };
   } finally {

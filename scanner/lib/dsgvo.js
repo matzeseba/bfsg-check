@@ -123,7 +123,7 @@ export async function exportUserData(email) {
     orders,
     subscriptionCount: subscriptions.length,
     subscriptions,
-    notice: 'Diese Daten umfassen alle in BFSG-Check persistierten Records zu Ihrer E-Mail. Stripe-Daten + E-Mail-Versand-Logs (Brevo) müssen separat angefragt werden.'
+    notice: 'Diese Daten umfassen alle in BFSG-Fuchs persistierten Records zu Ihrer E-Mail. Stripe-Daten + E-Mail-Versand-Logs (Brevo) müssen separat angefragt werden.'
   };
 }
 

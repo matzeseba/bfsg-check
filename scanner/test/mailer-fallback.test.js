@@ -106,7 +106,7 @@ test('(a) SMTP 535 + API 201 → zugestellt via Brevo-API, fetch 1× mit korrekt
     assert.equal(calls[0].opts.method, 'POST');
     assert.equal(calls[0].opts.headers['api-key'], 'test-key');
     const payload = JSON.parse(calls[0].opts.body);
-    assert.deepEqual(payload.sender, { name: 'BFSG-Check', email: 'no-reply@bfsg-check.de' });
+    assert.deepEqual(payload.sender, { name: 'BFSG-Fuchs', email: 'no-reply@bfsg-fix.de' });
     assert.deepEqual(payload.to, [{ email: 'kunde@beispiel.de' }]);
     assert.equal(payload.subject, 'Ihr BFSG-Report');
     assert.equal(payload.textContent, 'Hallo, Ihr Report haengt an.');

@@ -37,6 +37,15 @@ services:
       - BREVO_LEAD_DOI_REDIRECT_URL=${BREVO_LEAD_DOI_REDIRECT_URL:-}
       - ENABLE_ABO=${ENABLE_ABO:-false}
       - MAX_CONCURRENT_SCANS=${MAX_CONCURRENT_SCANS:-2}
+      # Scan-Queue/Rate-Limits + Bezahl-Concurrency (Defaults = Code-Defaults aus
+      # app.js, ohne Server-.env-Eintrag ändert sich also nichts).
+      - SCAN_QUEUE_MAX=${SCAN_QUEUE_MAX:-40}
+      - SCAN_RATE_MAX=${SCAN_RATE_MAX:-15}
+      - MAX_CONCURRENT_PAID_SCANS=${MAX_CONCURRENT_PAID_SCANS:-1}
+      # DNS-Pinning-Strenge (Anti-Rebinding). Default strict=true (Code-Default in
+      # lib/url-guard.js: alles außer "false" gilt als strict). Nur auf "false" setzen,
+      # wenn CDN-Multi-A-Host-Drift die Set-Drift-Prüfung fälschlich blockiert.
+      - DNS_PIN_STRICT=${DNS_PIN_STRICT:-true}
       # Gratis-Teaser-TLS-Toleranz (env-gated, Default aus). Wird in app.js gelesen
       # und nur an den kostenlosen Teaser-Scan durchgereicht.
       - SCAN_TEASER_LENIENT_TLS=${SCAN_TEASER_LENIENT_TLS:-false}

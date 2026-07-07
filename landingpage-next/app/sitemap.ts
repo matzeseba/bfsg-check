@@ -99,7 +99,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
-      url: `${siteUrl}/bfsg-für-webagenturen`,
+      url: `${siteUrl}/bfsg-fuer-webagenturen`,
       lastModified,
       changeFrequency: "monthly",
       priority: 0.8,

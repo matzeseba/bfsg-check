@@ -12,8 +12,8 @@ const {
   SMTP_PORT = '587',
   SMTP_USER,
   SMTP_PASS,
-  FROM_EMAIL = 'no-reply@bfsg-check.de',
-  FROM_NAME = 'BFSG-Check',
+  FROM_EMAIL = 'no-reply@bfsg-fix.de',
+  FROM_NAME = 'BFSG-Fuchs',
   REPLY_TO,
   INVOICE_CONTACT_EMAIL = 'info@bfsg-fix.de',
   ADMIN_EMAIL
@@ -40,7 +40,7 @@ export function legalFooter() {
 ${anschrift}
 Kontakt: ${REPLY_TO_ADDR} · ${PUBLIC_HOST}
 
-BFSG-Check liefert eine automatisierte technische Analyse nach WCAG 2.1 AA.
+${FROM_NAME} liefert eine automatisierte technische Analyse nach WCAG 2.1 AA.
 Keine Rechtsberatung, keine Konformitätsgarantie. Empfehlungen ersetzen nicht
 die anwaltliche Prüfung.`;
 }
@@ -240,7 +240,60 @@ durchgeführt. Sollte das nicht in Ihrem Sinne sein, antworten Sie einfach
 auf diese E-Mail.
 
 Mit freundlichen Grüßen
-${FROM_NAME}`;
+${FROM_NAME}
+
+${legalFooter()}`;
+  return deliver({ to, subject, text, attachments: [] });
+}
+
+// Kündigungs-Eingangsbestätigung (§ 312k Abs. 2 BGB): Inhalt sowie Datum/Uhrzeit des
+// Zugangs der Kündigungserklärung müssen dem Verbraucher unverzüglich in Textform
+// bestätigt werden. Best-effort — der Formular-Endpoint (app.js /api/kuendigung)
+// sendet zusätzlich einen Owner-Alarm, der auch bei einem Mailfehler hier greift.
+export async function sendKuendigungEingang({ to, name = '', vertrag = '', effective = '', receivedAt = new Date() }) {
+  if (!isEmail(to)) return { dryRun: true, skipped: 'invalid-recipient' };
+  const when = new Date(receivedAt).toLocaleString('de-DE', { timeZone: 'Europe/Berlin', dateStyle: 'medium', timeStyle: 'short' });
+  const zeitpunkt = effective === 'sofort'
+    ? 'zum nächstmöglichen Zeitpunkt (sofort, wie von Ihnen gewählt)'
+    : 'zum Ende der laufenden Abrechnungsperiode (wie von Ihnen gewählt)';
+  const subject = 'Bestätigung: Ihre Kündigung ist bei uns eingegangen';
+  const text = `Guten Tag${name ? ' ' + oneLine(name) : ''},
+
+hiermit bestätigen wir den Zugang Ihrer Kündigungserklärung${vertrag ? ` (Vertrag/Bestellung: ${oneLine(vertrag)})` : ''}
+am ${when} Uhr.
+
+Ihre Kündigung wird ${zeitpunkt} umgesetzt. Wir bearbeiten Ihre Kündigung und
+melden uns, falls noch Rückfragen bestehen.
+
+Bei Fragen antworten Sie einfach auf diese E-Mail.
+
+Mit freundlichen Grüßen
+${FROM_NAME}
+
+${legalFooter()}`;
+  return deliver({ to, subject, text, attachments: [] });
+}
+
+// Widerrufs-Zugangsbestätigung (§ 356 Abs. 1 S. 2 BGB): der Zugang der Widerrufs-
+// erklärung ist dem Verbraucher unverzüglich zu bestätigen. Best-effort — der
+// Formular-Endpoint (app.js /api/widerruf) sendet zusätzlich einen Owner-Alarm.
+export async function sendWiderrufEingang({ to, name = '', vertrag = '', receivedAt = new Date() }) {
+  if (!isEmail(to)) return { dryRun: true, skipped: 'invalid-recipient' };
+  const when = new Date(receivedAt).toLocaleString('de-DE', { timeZone: 'Europe/Berlin', dateStyle: 'medium', timeStyle: 'short' });
+  const subject = 'Bestätigung: Ihr Widerruf ist bei uns eingegangen';
+  const text = `Guten Tag${name ? ' ' + oneLine(name) : ''},
+
+hiermit bestätigen wir den Zugang Ihrer Widerrufserklärung${vertrag ? ` (Vertrag/Bestellung: ${oneLine(vertrag)})` : ''}
+am ${when} Uhr.
+
+Wir bearbeiten Ihren Widerruf und melden uns, falls noch Rückfragen bestehen.
+
+Bei Fragen antworten Sie einfach auf diese E-Mail.
+
+Mit freundlichen Grüßen
+${FROM_NAME}
+
+${legalFooter()}`;
   return deliver({ to, subject, text, attachments: [] });
 }
 
@@ -395,7 +448,7 @@ export async function sendDsgvoToken({ to, action, link, expiresAt }) {
   if (!isEmail(to)) return { dryRun: true, skipped: 'invalid-recipient' };
   const aktion = action === 'delete' ? 'Löschung' : 'Auskunft';
   const subject = `Ihre DSGVO-Anfrage (${aktion}) — Bestätigung erforderlich`;
-  const text = `Sie haben eine ${aktion} Ihrer bei BFSG-Check gespeicherten Daten angefragt.
+  const text = `Sie haben eine ${aktion} Ihrer bei ${FROM_NAME} gespeicherten Daten angefragt.
 
 Bitte bestätigen Sie die Anfrage über folgenden Link (gültig bis ${expiresAt}):
 
@@ -405,7 +458,9 @@ Wenn Sie diese Anfrage nicht gestellt haben, ignorieren Sie diese E-Mail —
 ohne Bestätigung passiert nichts.
 
 Mit freundlichen Grüßen
-${FROM_NAME}`;
+${FROM_NAME}
+
+${legalFooter()}`;
   return deliver({ to, subject, text, attachments: [] });
 }
 
@@ -592,19 +647,23 @@ async function deliver({ to, subject, text, html = null, attachments = [] }) {
 }
 
 // Betreiber-Alarm bei bezahlt-aber-nicht-geliefert (an ADMIN_EMAIL).
+// F23/F34: läuft über dieselbe Kette wie deliver() (Retry + Brevo-API-Fallback bei
+// permanentem SMTP-Auth-Fehler) — vorher ein einziger transporter.sendMail-Versuch,
+// wodurch genau im dokumentierten Prod-Ausfall (Brevo-SMTP-Key ungueltig, 535) auch
+// der Alarm-Kanal starb, obwohl die Brevo-REST-API funktioniert haette.
 export async function sendAlert(subject, body) {
   const to = ADMIN_EMAIL || FROM_EMAIL;
   if (!enabled) {
     console.error(`[ALERT DRY-RUN] ${subject} :: ${body}`);
     return;
   }
+  const fullSubject = '[BFSG-ALERT] ' + oneLine(subject);
   try {
-    await transporter.sendMail({
-      from: `"${FROM_NAME} ALERT" <${FROM_EMAIL}>`,
-      to,
-      subject: '[BFSG-ALERT] ' + oneLine(subject),
-      text: body
-    });
+    const { fallback } = await sendWithFallback(
+      () => transporter.sendMail({ from: `"${FROM_NAME} ALERT" <${FROM_EMAIL}>`, to, subject: fullSubject, text: body }),
+      { to, subject: fullSubject, text: body }
+    );
+    if (fallback) console.warn(`[ALERT] via Brevo-API-Fallback an ${to} zugestellt`);
   } catch (e) {
     console.error('[ALERT] konnte nicht gesendet werden:', e.message);
     // SF9: Der Alarm-Kanal selbst ist ausgefallen — ein stiller Totalausfall (bezahlt-

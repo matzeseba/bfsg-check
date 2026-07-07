@@ -43,7 +43,7 @@ export function KuendigungForm() {
     } catch {
       setStatus("error");
       toast.error(
-        "Übermittlung fehlgeschlagen. Bitte E-Mail an kuendigen@bfsg-fix.de senden.",
+        "Übermittlung fehlgeschlagen. Bitte E-Mail an info@bfsg-fix.de senden.",
       );
     }
   }

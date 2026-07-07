@@ -175,6 +175,35 @@ test('recoverInDoubt: meldet in-doubt-Jobs beim Start + markiert sie terminal', 
   assert.equal(c2.alerts.length, 0);
 });
 
+// --- F21(b): enqueue() darf einen bereits terminalen Job nicht zurücksetzen ---------
+test('enqueue: überschreibt einen RELEASED-Job NICHT (Redelivery nach Neustart darf keinen Doppelversand erzeugen)', async () => {
+  await reportQueue.enqueue(baseJob('term_1', past()));
+  const { deps } = makeDeps();
+  await releaseJob('term_1', deps); // -> RELEASED (terminal)
+  const before = await reportQueue.getJob('term_1');
+  assert.equal(before.status, 'RELEASED');
+
+  const after = await reportQueue.enqueue(baseJob('term_1', past()));
+  assert.equal(after.status, 'RELEASED', 'enqueue darf einen terminalen Job nicht auf SCHEDULED zurücksetzen');
+  const due = await reportQueue.listDue();
+  assert.equal(due.find((j) => j.sessionId === 'term_1'), undefined, 'kein erneuter Auto-Release');
+});
+
+test('enqueue: überschreibt einen RELEASE_FAILED-Job NICHT', async () => {
+  await reportQueue.enqueue(baseJob('term_2', past()));
+  await reportQueue.markJobStatus('term_2', 'RELEASE_FAILED', { error: 'permanent' });
+  const after = await reportQueue.enqueue(baseJob('term_2', past()));
+  assert.equal(after.status, 'RELEASE_FAILED', 'ein permanent fehlgeschlagener Job bleibt terminal, kein automatischer Re-Enqueue');
+});
+
+test('enqueue: normaler (nicht-terminaler) Job wird weiterhin ganz normal (re-)enqueued', async () => {
+  await reportQueue.enqueue(baseJob('non_term_1', past()));
+  const newReleaseAt = future();
+  const after = await reportQueue.enqueue(baseJob('non_term_1', newReleaseAt));
+  assert.equal(after.status, 'SCHEDULED');
+  assert.equal(after.releaseAt, newReleaseAt, 'ein SCHEDULED-Job darf weiterhin normal überschrieben werden');
+});
+
 test('releaseDue: gibt nur fällige Jobs frei', async () => {
   await reportQueue.enqueue(baseJob('d_a', past()));
   await reportQueue.enqueue(baseJob('d_b', future()));

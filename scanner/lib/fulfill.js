@@ -9,7 +9,7 @@
 // jedem invoice.paid (subscription_cycle) des Re-Check-Abos.
 
 import path from 'node:path';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { scanUrl, scanSite } from './scan.js';
@@ -43,6 +43,28 @@ export const PKG_CONFIG = {
   'cookie-basis': { kind: 'cookie', maxPages: 1,  withStatement: false, emailKind: 'cookie' },
   'cookie-profi': { kind: 'cookie', maxPages: 5,  withStatement: false, emailKind: 'cookie' }
 };
+
+// F1: welche Pakete bekommen den priorisierten Umsetzungsplan zusätzlich zur
+// Umsetzungs-Checkliste (Profi + beide Abo-Varianten — der günstige Basis-Report
+// bleibt bei der einfachen Checkliste).
+const PLAN_PACKAGES = new Set(['profi', 'abo', 'abo-jahr']);
+
+// D5: offizielles Logo als data-URI in den Report einbetten (Kunden-PDF trug
+// bisher keinerlei Marken-/Kontaktbezug). Lazy + gecacht, damit das Bild nur
+// einmal pro Prozesslaufzeit von Platte gelesen wird. Fehlt die Datei (anderes
+// Deploy-Layout), liefert renderReport ohne Logo weiter — kein harter Fehler.
+const LOGO_PATH = path.join(__dirname, '..', 'assets', 'logo-fox.png');
+let cachedLogoDataUri;
+async function getLogoDataUri() {
+  if (cachedLogoDataUri !== undefined) return cachedLogoDataUri;
+  try {
+    const buf = await readFile(LOGO_PATH);
+    cachedLogoDataUri = `data:image/png;base64,${buf.toString('base64')}`;
+  } catch {
+    cachedLogoDataUri = null;
+  }
+  return cachedLogoDataUri;
+}
 
 const COOKIE_REPORT_OPTS = {
   reportTitle: 'Cookie- & Consent-Report (§ 25 TDDDG)',
@@ -82,11 +104,10 @@ async function runScan(url, cfg, { lenientTls = false } = {}) {
   // (Default in scan.js greift, falls ein Feld fehlt).
   const { settleMs, perPageTimeout } = cfg;
   if (cfg.kind === 'cookie') {
-    // Cookie-Multi-Page derzeit sequentiell same-origin (Engine erweiterbar);
-    // V1: scannt nur Startseite (klares 1-Tier-Signal). 'cookie-profi' bekommt
-    // Multi-Page erst in v2 — Aufpreis rechtfertigt sich aktuell durch tiefere
-    // manuelle Prüfung im Backend.
-    return await scanCookie(url, { timeout: 45000, lenientTls });
+    // F19: cookie-profi bekommt jetzt echtes same-origin Multi-Page (cfg.maxPages),
+    // cookie-basis bleibt bei 1 Seite — kein Byte-identischer Output mehr zwischen
+    // beiden Paketen.
+    return await scanCookie(url, { timeout: 45000, lenientTls, maxPages: cfg.maxPages });
   }
   if (cfg.maxPages > 1) {
     return await scanSite(url, { maxPages: cfg.maxPages, perPageTimeout: perPageTimeout ?? 45000, lenientTls, settleMs });
@@ -108,8 +129,24 @@ export async function fulfillOrder({ url, company = '', email = '', pkg = 'basis
     throw new Error('Scan lieferte kein verwertbares Ergebnis (Seite blockiert/leer/nicht erreichbar)');
   }
 
+  // PR4: KI-Report-QA — prüft/überarbeitet den Report vor Auslieferung. STRIKT
+  // fail-open (null bei deaktiviert/Fehler/Timeout/Refusal → Report unverändert).
+  // Dormant, solange REPORT_QA_ENABLED nicht gesetzt ist. Nur BFSG-Reports (die
+  // WCAG-Rubrik passt nicht auf den TDDDG-Cookie-Report). PR5 verschiebt den Call
+  // ins Delay-Fenster; hier synchron eingehängt + testbar.
+  // F17: MUSS vor diff()/snapshot() laufen — beide rechnen auf der gefilterten
+  // (False-Positive-bereinigten) Violations-Liste, sonst zeigt der Abo-Report
+  // zwei widersprüchliche Scores im selben PDF (Diff-Karte vs. Hauptscore).
+  let qaOverrides = null;
+  if (cfg.kind === 'bfsg') {
+    qaOverrides = await qaReport({ scan, pkg });
+  }
+  const effectiveScan = qaOverrides?.falsePositiveIds?.length
+    ? { ...scan, violations: scan.violations.filter((v) => !new Set(qaOverrides.falsePositiveIds).has(v.id)) }
+    : scan;
+
   // Diff (für Re-Check-Abo) — first scan, falls prevSnapshot null.
-  const scanDiff = diff(scan, prevSnapshot);
+  const scanDiff = diff(effectiveScan, prevSnapshot);
 
   // Ehrlichkeits-Hinweis: Lief der Scan lenient (Cert-Fehler bewusst ignoriert), prüfen
   // wir das Zertifikat separat und weisen einen realen Mangel als technischen Hinweis aus
@@ -119,42 +156,60 @@ export async function fulfillOrder({ url, company = '', email = '', pkg = 'basis
     const tlsNotice = await tlsCertNotice(url);
     if (tlsNotice) notices.push(tlsNotice);
   }
+  // F3: Crawl-Transparenz. Konnte der Crawler auf einem Multi-Page-Paket keine
+  // weiteren Unterseiten erreichen, UND liefert scanSite Fehler einzelner Seiten,
+  // muss der Kunde das im Report sehen statt einen stillschweigend gekappten
+  // Multi-Page-Scan zu erhalten.
+  if (cfg.kind === 'bfsg') {
+    if (cfg.maxPages > 1 && scan.pagesScanned === 1) {
+      notices.push({
+        title: `Nur 1 von bis zu ${cfg.maxPages} Unterseiten geprüft`,
+        severity: 'moderate',
+        text: 'Der automatisierte Crawler konnte auf der Startseite keine weiteren erreichbaren internen Links finden. Dieser Report deckt daher ausschließlich die Startseite ab.'
+      });
+    }
+    if (Array.isArray(scan.errors) && scan.errors.length) {
+      const shown = scan.errors.slice(0, 8).map((e) => `${e.url} – ${e.error}`).join('; ');
+      const rest = scan.errors.length > 8 ? ` … und ${scan.errors.length - 8} weitere` : '';
+      notices.push({
+        title: `${scan.errors.length} Unterseite(n) nicht prüfbar`,
+        severity: 'minor',
+        text: `${shown}${rest}`
+      });
+    }
+  }
 
   const reportOpts = cfg.kind === 'cookie'
     ? {
         company,
         ...COOKIE_REPORT_OPTS,
+        pagesScanned: scan.pagesScanned,
         // TDDDG-neutrales Verdikt statt BFSG-„konform"-Aussage (keine Konformitätsgarantie).
-        verdictText: scan.violations.length === 0
+        verdictText: effectiveScan.violations.length === 0
           ? 'Keine vor einer Einwilligung feuernden Tracker/Cookies gemessen. Dies ist eine technische Einzelmessung — bitte manuell verifizieren, keine Konformitätsaussage.'
           : 'Vor einer Einwilligung feuernde Tracker/Cookies gemessen — siehe Befunde. Technische Einzelmessung, keine Konformitätsaussage.'
       }
-    : { company, diff: scanDiff, pagesScanned: scan.pagesScanned };
+    : {
+        company,
+        diff: scanDiff,
+        pagesScanned: scan.pagesScanned,
+        pages: scan.pages,
+        plan: PLAN_PACKAGES.has(pkg)
+      };
   reportOpts.notices = notices;
+  if (qaOverrides) reportOpts.qaOverrides = qaOverrides;
+  const logo = await getLogoDataUri();
+  if (logo) reportOpts.logo = logo;
 
-  // PR4: KI-Report-QA — prüft/überarbeitet den Report vor Auslieferung. STRIKT
-  // fail-open (null bei deaktiviert/Fehler/Timeout/Refusal → Report unverändert).
-  // Dormant, solange REPORT_QA_ENABLED nicht gesetzt ist. Nur BFSG-Reports (die
-  // WCAG-Rubrik passt nicht auf den TDDDG-Cookie-Report). PR5 verschiebt den Call
-  // ins Delay-Fenster; hier synchron eingehängt + testbar.
-  let qaOverrides = null;
-  if (cfg.kind === 'bfsg') {
-    qaOverrides = await qaReport({ scan, pkg });
-    if (qaOverrides) reportOpts.qaOverrides = qaOverrides;
-  }
-
-  const html = renderReport(scan, reportOpts);
+  const html = renderReport(effectiveScan, reportOpts);
   const htmlPath = path.join(outDir, `${slug}-report.html`);
   await writeFile(htmlPath, html);
 
   let stmtPath = null;
   if (cfg.withStatement) {
-    // Erklärung auf denselben Stand wie den Report bringen: von der QA als False
-    // Positive markierte Regeln auch hier rausfiltern → Score/Aussage konsistent.
-    const stmtScan = qaOverrides?.falsePositiveIds?.length
-      ? { ...scan, violations: scan.violations.filter((v) => !new Set(qaOverrides.falsePositiveIds).has(v.id)) }
-      : scan;
-    const statement = renderStatement(stmtScan, {
+    // Erklärung auf demselben (QA-gefilterten) Stand wie der Report — Score/Aussage
+    // bleiben konsistent (siehe effectiveScan oben, F17).
+    const statement = renderStatement(effectiveScan, {
       company: company || '[Unternehmen]',
       email: email || '[E-Mail-Adresse]'
     });
@@ -173,16 +228,23 @@ export async function fulfillOrder({ url, company = '', email = '', pkg = 'basis
       path: pdfPath,
       format: 'A4',
       printBackground: true,
-      margin: { top: '12mm', bottom: '12mm', left: '10mm', right: '10mm' }
+      margin: { top: '12mm', bottom: '18mm', left: '10mm', right: '10mm' },
+      // D4: Seitenzahlen — ohne die Anzeige hatte ein mehrseitiges Kunden-PDF
+      // weder Nummerierung noch wiederkehrende Fußzeile.
+      displayHeaderFooter: true,
+      headerTemplate: '<div></div>',
+      footerTemplate: '<div style="width:100%;font-size:8px;color:#94a3b8;text-align:center;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">bfsg-fix.de &middot; Seite <span class="pageNumber"></span> von <span class="totalPages"></span></div>'
     });
   } finally {
     await browser.close();
   }
 
   return {
-    url, pkg, slug, pdfPath, htmlPath, stmtPath, scan,
+    // F17: scan/snapshot spiegeln denselben (QA-gefilterten) Stand wie der
+    // ausgelieferte Report — kein zweiter, abweichender Rohwert mehr nach außen.
+    url, pkg, slug, pdfPath, htmlPath, stmtPath, scan: effectiveScan,
     diff: scanDiff,
-    snapshot: snapshot(scan),
+    snapshot: snapshot(effectiveScan),
     emailKind: cfg.emailKind
   };
 }
