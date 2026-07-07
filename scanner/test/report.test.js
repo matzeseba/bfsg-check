@@ -153,3 +153,88 @@ test('ruleInfo: Fallback für unbekannte Regel bleibt funktional', () => {
   assert.equal(info.title, 'Hilfetext');
   assert.match(info.fix, /axe-core/);
 });
+
+test('computeScore (D2): degressiv statt bodenlos — wenige leichte Befunde bleiben hoch, ein realistischer Multi-Page-Scan mit vielen Regel-Typen fällt nicht auf 0', () => {
+  // Ein einzelner leichter (serious, 1 Node) Befund: Score bleibt hoch (85-95),
+  // nicht linear "bestraft" wie bei der alten 100-penalty-Formel.
+  const light = computeScore([viol('label', 'serious', 1)]);
+  assert.ok(light.score >= 85 && light.score <= 95, `Score ${light.score} außerhalb 85-95`);
+
+  // 13 aggregierte Regel-Typen (typisch bei einem Multi-Page-Scan über viele
+  // Unterseiten) trieben die alte Formel über 100 Punkte Abzug -> 0/100 neben
+  // hunderten bestandenen Prüfungen. Die neue Formel bleibt > 0.
+  const manyRuleTypes = Array.from({ length: 13 }, (_, i) =>
+    viol('rule-' + i, ['critical', 'serious', 'moderate', 'minor'][i % 4], 8)
+  );
+  const heavy = computeScore(manyRuleTypes);
+  assert.ok(heavy.score > 0, `Score darf bei realistischem Multi-Page-Scan nicht auf 0 fallen (war ${heavy.score})`);
+
+  // 0 Befunde bleibt weiterhin 100/100.
+  assert.equal(computeScore([]).score, 100);
+});
+
+test('renderReport (F6/F16): Fundstellen offen sichtbar (kein <details>), mit Seiten-Tag/HTML-Snippet/failureSummary', () => {
+  const v = viol('image-alt', 'critical', 2);
+  v.nodes[0]._page = 'https://beispiel.de/unterseite';
+  v.nodes[0].html = '<img class="banner">';
+  v.nodes[0].failureSummary = 'Fix: alt-Attribut ergänzen.';
+  const html = renderReport(scanStub([v]));
+  assert.doesNotMatch(html, /<details/);
+  assert.match(html, /examples-open/);
+  assert.match(html, /Seite: https:\/\/beispiel\.de\/unterseite/);
+  assert.match(html, /&lt;img class=&quot;banner&quot;&gt;/);
+  assert.match(html, /Fix: alt-Attribut ergänzen\./);
+});
+
+test('renderReport (F15): ab dem 6. Beispiel wandert der Rest in den Anhang "Vollständige Fundstellenliste"', () => {
+  const v = viol('image-alt', 'serious', 7);
+  const html = renderReport(scanStub([v]));
+  assert.match(html, /Anhang: Vollständige Fundstellenliste/);
+  // Alle 7 Selektoren müssen irgendwo im Dokument vorkommen (5 offen + Rest im Anhang).
+  for (let i = 0; i < 7; i++) assert.match(html, new RegExp(`#n${i}`));
+  assert.match(html, /weitere Stelle/);
+});
+
+test('renderReport (F1): plan=true rendert Umsetzungsplan mit Phasen, plan=false/Default nicht', () => {
+  const withPlan = renderReport(scanStub([viol('label', 'serious', 1)]), { plan: true });
+  const withoutPlan = renderReport(scanStub([viol('label', 'serious', 1)]));
+  assert.match(withPlan, /Priorisierter Umsetzungsplan/);
+  assert.match(withPlan, /Phase \d/);
+  assert.doesNotMatch(withoutPlan, /Priorisierter Umsetzungsplan/);
+});
+
+test('renderReport (F2/F7): pages-Option rendert "Befunde je Unterseite"-Tabelle ab 2 Seiten', () => {
+  const pages = [
+    { url: 'https://beispiel.de/', title: 'Start', violationCount: 3 },
+    { url: 'https://beispiel.de/kontakt', title: 'Kontakt', violationCount: 1 }
+  ];
+  const html = renderReport(scanStub([viol('label')]), { pages });
+  assert.match(html, /Befunde je Unterseite/);
+  assert.match(html, /beispiel\.de\/kontakt/);
+  // Bei nur 1 Seite (oder ohne pages) keine Tabelle.
+  const single = renderReport(scanStub([viol('label')]), { pages: [pages[0]] });
+  assert.doesNotMatch(single, /Befunde je Unterseite/);
+});
+
+test('renderReport (F3): "Geprüfte Unterseiten" wird auch bei genau 1 Seite gerendert', () => {
+  const html = renderReport(scanStub([viol('label')]), { pagesScanned: 1 });
+  assert.match(html, /Geprüfte Unterseiten: 1/);
+});
+
+test('renderReport (D5): Fußzeile trägt Marke + Kontakt statt generischem "BFSG-Audit"', () => {
+  const html = renderReport(scanStub([]));
+  assert.match(html, /BFSG-Fuchs/);
+  assert.match(html, /bfsg-fix\.de/);
+  assert.match(html, /info@bfsg-fix\.de/);
+  assert.doesNotMatch(html, /BFSG-Audit &middot; Automatisierte/);
+});
+
+test('renderReport (D6): Badge-Hintergründe erreichen mindestens 4,5:1-Kontrast (dunklere Töne statt der alten zu hellen)', () => {
+  const html = renderReport(scanStub([]));
+  assert.match(html, /--ser:#c2410c/);
+  assert.match(html, /--mod:#854d0e/);
+  assert.match(html, /--min:#155e75/);
+  assert.doesNotMatch(html, /--ser:#ea580c/);
+  assert.doesNotMatch(html, /--mod:#ca8a04/);
+  assert.doesNotMatch(html, /--min:#0891b2/);
+});

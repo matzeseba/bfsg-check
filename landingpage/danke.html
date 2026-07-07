@@ -23,9 +23,10 @@
   <div class="card">
     <div class="check">✅</div>
     <h1>Vielen Dank für Ihre Bestellung!</h1>
-    <p>Ihr vollständiger BFSG-Barrierefreiheits-Report wird gerade automatisch
-    erstellt und in wenigen Minuten an Ihre E-Mail-Adresse gesendet — inklusive
-    Entwurf Ihrer Erklärung zur Barrierefreiheit.</p>
+    <p id="delivery-text">Ihr vollständiger BFSG-Barrierefreiheits-Report wird
+    gerade automatisch erstellt und in der Regel innerhalb von 1–2 Stunden an
+    Ihre E-Mail-Adresse gesendet — jeder Report wird vor dem Versand persönlich
+    geprüft. Inklusive Entwurf Ihrer Erklärung zur Barrierefreiheit.</p>
     <p>Bitte prüfen Sie auch Ihren Spam-Ordner. Bei Fragen antworten Sie einfach
     auf die E-Mail.</p>
     <div class="upsell" data-upsell="cookie">
@@ -48,11 +49,34 @@
     <a href="/">Zurück zur Startseite</a>
   </div>
   <script>
-    // danke.html ist die success_url ALLER Pakete — das soeben gekaufte Produkt
-    // nicht erneut bewerben (pkg kommt whitelist-validiert aus scanner/app.js).
+    // danke.html ist die success_url ALLER Pakete (pkg kommt whitelist-validiert
+    // aus scanner/app.js: basis, profi, cookie-basis, cookie-profi, abo, abo-jahr).
     (function () {
       var pkg = new URLSearchParams(location.search).get("pkg") || "";
-      var hide = pkg.indexOf("cookie") === 0 ? "cookie" : pkg.indexOf("abo") === 0 ? "abo" : null;
+
+      // Produktbeschreibung je Paket-Kategorie — der Standardtext im Markup
+      // (BFSG-Report) gilt fuer basis/profi/unbekannt; Cookie- und Abo-Kaeufer
+      // lesen sonst die falsche Produktbeschreibung (F33).
+      var DELIVERY_TEXT = {
+        cookie: "Ihr Cookie- & Consent-Report (§ 25 TDDDG) wird gerade automatisch " +
+          "erstellt und in der Regel innerhalb von 1–2 Stunden an Ihre " +
+          "E-Mail-Adresse gesendet — jeder Report wird vor dem Versand " +
+          "persönlich geprüft.",
+        abo: "Ihr erster automatisierter Report inklusive Entwurf Ihrer Erklärung " +
+          "zur Barrierefreiheit wird gerade erstellt und in der Regel innerhalb " +
+          "von 1–2 Stunden gesendet — jeder Report wird vor dem Versand " +
+          "persönlich geprüft. Ab jetzt prüfen wir Ihre Website automatisch " +
+          "jeden Monat erneut und liefern Ihnen den aktualisierten Report per " +
+          "E-Mail."
+      };
+      var category = pkg.indexOf("cookie") === 0 ? "cookie" : pkg.indexOf("abo") === 0 ? "abo" : null;
+      if (category) {
+        var textEl = document.getElementById("delivery-text");
+        if (textEl) textEl.textContent = DELIVERY_TEXT[category];
+      }
+
+      // Das soeben gekaufte Produkt nicht erneut bewerben.
+      var hide = category;
       if (!hide) return;
       var el = document.querySelector('[data-upsell="' + hide + '"]');
       if (el) el.remove();

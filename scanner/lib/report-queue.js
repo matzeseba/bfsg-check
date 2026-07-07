@@ -62,8 +62,19 @@ async function write(rec) {
  * @param {object} job
  * @returns {Promise<object>} der persistierte Record
  */
+// Terminal-Status eines bereits abgeschlossenen Jobs — ein erneutes enqueue() für
+// dieselbe sessionId darf ihn NICHT zurück auf SCHEDULED setzen (F21: invoice.paid-
+// Redelivery nach Neustart würde sonst einen bereits versendeten Report ein zweites
+// Mal in die Freigabe-Queue stellen → Doppelversand/Doppelrechnung).
+const TERMINAL_JOB_STATUS = new Set(['RELEASED', 'RELEASE_FAILED', 'RELEASE_IN_DOUBT']);
+
 export async function enqueue(job) {
   await ensureLoaded();
+  const existing = jobs.get(job.sessionId);
+  if (existing && TERMINAL_JOB_STATUS.has(existing.status)) {
+    console.warn(`[report-queue] enqueue für ${job.sessionId} übersprungen — Job bereits terminal (${existing.status})`);
+    return existing;
+  }
   const rec = { ...job, status: 'SCHEDULED', attempts: 0 };
   jobs.set(job.sessionId, rec);
   await write(rec);

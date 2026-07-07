@@ -11,7 +11,15 @@ export function computeScore(violations) {
     const nodes = Math.min(v.nodes.length, 10); // Diminishing returns
     penalty += w * (1 + Math.log2(nodes + 1));
   }
-  const score = Math.max(0, Math.round(100 - penalty));
+  // Degressive Formel (D2) statt linearem Abzug: bei vielen aggregierten Regel-
+  // Typen (typisch bei Multi-Page-Scans, siehe scan.js) türmte 100-penalty die
+  // Strafe schnell über 100 auf → Score 0/100 neben hunderten bestandenen
+  // Prüfungen, obwohl die Seite nicht "komplett kaputt" ist. exp(-penalty/k)
+  // nähert sich 0 nur asymptotisch — 0/100 bleibt echten Katastrophenfällen
+  // vorbehalten. k=80 kalibriert an: 0 Befunde -> 100, ein einzelner leichter
+  // Befund -> ~85-95 (siehe report.test.js), der alte Beispiel-Report-Fall
+  // (4 Befunde, Penalty ~44) bleibt nahe am bisherigen ~56/100.
+  const score = Math.max(0, Math.round(100 * Math.exp(-penalty / 80)));
   let grade, verdict;
   if (score >= 90) {
     grade = 'A';
@@ -54,6 +62,92 @@ function countByImpact(violations) {
   return c;
 }
 
+// F2/F7: Tabelle "Befunde je Unterseite" — nur bei tatsächlichem Multi-Page-Scan
+// (scan.pages von scanSite) sinnvoll; bei 0/1 Seite entfällt sie (redundant zur
+// "Geprüfte Unterseiten"-Zeile im Kopf).
+function renderPagesTable(pages) {
+  if (!Array.isArray(pages) || pages.length < 2) return '';
+  const rows = pages
+    .map((p) => `<tr><td>${esc(p.url)}</td><td>${esc(p.title || '—')}</td><td>${p.violationCount}</td></tr>`)
+    .join('');
+  return `
+  <h2 class="section">Befunde je Unterseite</h2>
+  <table class="pages-table">
+    <thead><tr><th>Seite</th><th>Titel</th><th>Befunde</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+// F15: vollständige Fundstellenliste (kein Kappen mehr auf 3/5 Beispiele) als
+// eigener Anhang — PDF-Länge ist unkritisch, ein stiller Verlust von Fundorten
+// dagegen schon (der Kunde bezahlt für genau diese Liste).
+function renderAppendix(sorted, infoFor) {
+  if (!sorted.length) return '';
+  const rows = sorted
+    .map((v) => {
+      const info = infoFor(v);
+      const items = v.nodes
+        .map((n) => {
+          const pageTag = n._page ? ` <span class="ex-page">(${esc(n._page)})</span>` : '';
+          return `<li><code>${esc(n.target.join(' '))}</code>${pageTag}</li>`;
+        })
+        .join('');
+      return `<div class="appendix-rule"><h4>${esc(info.title)} (${v.nodes.length}&times;)</h4><ul class="appendix-list">${items}</ul></div>`;
+    })
+    .join('');
+  return `
+  <h2 class="section">Anhang: Vollständige Fundstellenliste</h2>
+  <p>Alle automatisiert erkannten Fundstellen je Befund — ohne Kürzung, inkl. Seiten-Zuordnung bei Multi-Page-Scans.</p>
+  ${rows}`;
+}
+
+// F1: Priorisierter Umsetzungsplan (nur Profi/Abo — siehe fulfill.js `plan`-Option).
+// Wirkung = Impact-Gewicht × Fundstellenzahl (gedeckelt), grob in hoch/mittel/gering
+// gebündelt. Ehrlich bleiben: automatisiert erstellte Priorisierung, KEINE Stunden-
+// oder Kostenschätzung.
+function planWirkung(v) {
+  const raw = (IMPACT_WEIGHT[v.impact] ?? 2) * Math.min(v.nodes.length, 10);
+  if (raw >= 30) return 'hoch';
+  if (raw >= 10) return 'mittel';
+  return 'gering';
+}
+
+const PLAN_PHASE_LABEL = {
+  S: 'Phase 1 — Quick-Wins (geringer Aufwand)',
+  M: 'Phase 2 — mittlerer Aufwand',
+  L: 'Phase 3 — größerer Aufwand'
+};
+const PLAN_EFFORT_LABEL = { S: 'gering', M: 'mittel', L: 'hoch' };
+
+function renderPlan(sorted, infoFor) {
+  const phases = { S: [], M: [], L: [] };
+  for (const v of sorted) {
+    const info = infoFor(v);
+    phases[info.effort].push({ v, info, wirkung: planWirkung(v) });
+  }
+  const wirkungOrder = { hoch: 0, mittel: 1, gering: 2 };
+  for (const key of ['S', 'M', 'L']) {
+    phases[key].sort((a, b) => wirkungOrder[a.wirkung] - wirkungOrder[b.wirkung]);
+  }
+  const body = ['S', 'M', 'L']
+    .map((key) => {
+      const items = phases[key];
+      if (!items.length) return '';
+      const rows = items
+        .map(
+          ({ v, info, wirkung }) =>
+            `<li><span class="box">&#9744;</span><span><strong>${esc(info.title)}</strong> &mdash; Aufwand: ${PLAN_EFFORT_LABEL[key]}, Wirkung: ${wirkung} (${v.nodes.length}&times; betroffen)</span></li>`
+        )
+        .join('');
+      return `<h3 class="plan-phase">${esc(PLAN_PHASE_LABEL[key])}</h3><ul class="checklist">${rows}</ul>`;
+    })
+    .join('');
+  return `
+  <h2 class="section">Priorisierter Umsetzungsplan</h2>
+  <p>Automatisiert nach Aufwandsklasse und geschätzter Wirkung sortiert — eine Priorisierungshilfe für Ihre Entwickler, keine Stunden- oder Kostenschätzung.</p>
+  ${body || '<p>Keine automatisiert erkannten Punkte für einen Umsetzungsplan.</p>'}`;
+}
+
 export function renderReport(
   scan,
   {
@@ -66,16 +160,23 @@ export function renderReport(
     legalHtml = '<strong>Wichtiger Hinweis:</strong> Dieser Fix-Plan ist eine automatisierte technische Erstprüfung auf Basis von axe-core (WCAG 2.1), KI-gestützt erstellt und vor Auslieferung menschlich geprüft. Er ist <strong>keine Rechtsberatung</strong> und keine Garantie für BFSG-Konformität. Automatisierte Tests erkennen erfahrungsgemäß rund 30&ndash;50&nbsp;% aller Barrieren; Aspekte wie Tastaturbedienung im Detail, Vorlese-Logik und Verständlichkeit erfordern eine manuelle Ergänzung. Für eine rechtsverbindliche Bewertung ziehen Sie bitte fachkundige Beratung hinzu.',
     diff = null,
     pagesScanned = null,
+    // F2/F7: Pro-Seite-Aufschlüsselung (scan.pages von scanSite) — nur gesetzt bei
+    // Multi-Page-Scans, rendert eine eigene Tabelle "Befunde je Unterseite".
+    pages = null,
     // Score-Beschriftung + Verdikt-Text überschreibbar, damit der Cookie-Report ein
     // TDDDG-neutrales Label/Verdikt nutzen kann statt der BFSG-„konform"-Aussage (SF13).
     scoreLabel = 'Konformitäts-Score',
     verdictText = null,
-    // Zusätzliche technische Hinweise (z. B. fehlerhaftes TLS-Zertifikat), die KEINE
-    // WCAG-Verstöße sind — eigener Abschnitt, fließen NICHT in Score/Erklärung ein.
+    // Zusätzliche technische Hinweise (z. B. fehlerhaftes TLS-Zertifikat, nicht
+    // erreichbare Unterseiten), die KEINE WCAG-Verstöße sind — eigener Abschnitt,
+    // fließen NICHT in Score/Erklärung ein.
     notices = [],
     // PR4: optionale KI-QA-Overrides { falsePositiveIds[], findingOverrides[{id,why,fix}],
     // additionalNotices[{title,text,severity}] }. Default null = unverändertes Verhalten.
-    qaOverrides = null
+    qaOverrides = null,
+    // F1: Profi-/Abo-Pakete bekommen einen priorisierten Umsetzungsplan zusätzlich
+    // zur Checkliste (siehe fulfill.js PLAN_PACKAGES).
+    plan = false
   } = {}
 ) {
   // PR4: KI-QA anwenden — False Positives rausfiltern (Score/Counts/Findings
@@ -88,11 +189,18 @@ export function renderReport(
   const effectiveViolations = fpIds.size
     ? scan.violations.filter((v) => !fpIds.has(v.id))
     : scan.violations;
-  // ruleInfo() plus optionalem Override je Regel-ID (leere Override-Felder = Basis behalten).
+  // ruleInfo() plus optionalem Override je Regel-ID (leere Override-Felder = Basis
+  // behalten) + Aufwandsklasse (F1). effort kommt künftig aus rules-de.js
+  // (ruleInfo().effort); bis dahin/bei unbekannter Regel greift der Fallback 'M'.
   const infoFor = (v) => {
     const base = ruleInfo(v);
     const ov = overrideById.get(v.id);
-    return ov ? { title: base.title, why: ov.why || base.why, fix: ov.fix || base.fix } : base;
+    return {
+      title: base.title,
+      why: (ov && ov.why) || base.why,
+      fix: (ov && ov.fix) || base.fix,
+      effort: ['S', 'M', 'L'].includes(base.effort) ? base.effort : 'M'
+    };
   };
   const extraNotices = Array.isArray(qaOverrides?.additionalNotices) ? qaOverrides.additionalNotices : [];
   const allNotices = extraNotices.length ? [...notices, ...extraNotices] : notices;
@@ -108,10 +216,22 @@ export function renderReport(
   const findings = sorted
     .map((v, idx) => {
       const info = infoFor(v);
-      const examples = v.nodes
-        .slice(0, 3)
-        .map((n) => `<code>${esc(n.target.join(' '))}</code>`)
-        .join('<br>');
+      // F6: nicht mehr in einem zugeklappten <details> verstecken (Chromium
+      // rendert das im PDF geschlossen — die Fundorte waren praktisch unsichtbar).
+      // F15: nur die ersten 5 offen zeigen, der Rest steht vollständig im Anhang.
+      // F16: Code-Kontext (HTML-Snippet + failureSummary) je Beispiel mitgeben.
+      const shown = v.nodes.slice(0, 5);
+      const examples = shown
+        .map((n) => {
+          const pageTag = n._page ? `<div class="ex-page">Seite: ${esc(n._page)}</div>` : '';
+          const htmlSnippet = n.html
+            ? `<code class="ex-html">${esc(String(n.html).slice(0, 200))}</code>`
+            : '';
+          const failure = n.failureSummary ? `<div class="ex-fail">${esc(n.failureSummary)}</div>` : '';
+          return `<div class="example"><code>${esc(n.target.join(' '))}</code>${pageTag}${htmlSnippet}${failure}</div>`;
+        })
+        .join('');
+      const moreCount = v.nodes.length - shown.length;
       return `
       <div class="finding ${v.impact}">
         <div class="finding-head">
@@ -122,7 +242,11 @@ export function renderReport(
         </div>
         <p class="why"><strong>Warum kritisch:</strong> ${esc(info.why)}</p>
         <p class="fix"><strong>Lösung:</strong> ${esc(info.fix)}</p>
-        <details><summary>Betroffene Stellen (Beispiele)</summary>${examples}</details>
+        <div class="examples-open">
+          <div class="examples-label">Betroffene Stellen (Beispiele${moreCount > 0 ? `, ${shown.length} von ${v.nodes.length}` : ''}):</div>
+          ${examples}
+          ${moreCount > 0 ? `<div class="ex-more">… ${moreCount} weitere Stelle${moreCount === 1 ? '' : 'n'} in der vollständigen Fundstellenliste im Anhang.</div>` : ''}
+        </div>
       </div>`;
     })
     .join('\n');
@@ -157,9 +281,16 @@ export function renderReport(
     </div>`;
   }
 
-  const pagesHtml = pagesScanned && pagesScanned > 1
+  // F3: IMMER rendern, sobald der Aufrufer eine Seitenzahl mitgibt (auch bei N=1) —
+  // vorher wurde die Zeile bei genau 1 geprüfter Seite unterdrückt, wodurch ein
+  // gescheiterter Multi-Page-Crawl (Profi-Kauf, aber nur Startseite erreichbar)
+  // für den Kunden unsichtbar blieb.
+  const pagesHtml = pagesScanned != null
     ? `<div class="sub">Geprüfte Unterseiten: ${pagesScanned}</div>`
     : '';
+  const pagesTableHtml = renderPagesTable(pages);
+  const planHtml = plan ? renderPlan(sorted, infoFor) : '';
+  const appendixHtml = renderAppendix(sorted, infoFor);
 
   return `<!doctype html>
 <html lang="de">
@@ -167,7 +298,7 @@ export function renderReport(
 <meta charset="utf-8">
 <title>BFSG-Barrierefreiheits-Report${company ? ' — ' + esc(company) : ''}</title>
 <style>
-  :root{--ink:#0f172a;--mut:#64748b;--line:#e2e8f0;--crit:#dc2626;--ser:#ea580c;--mod:#ca8a04;--min:#0891b2;--ok:#16a34a;--accent:#1d4ed8;}
+  :root{--ink:#0f172a;--mut:#64748b;--line:#e2e8f0;--crit:#dc2626;--ser:#c2410c;--mod:#854d0e;--min:#155e75;--ok:#16a34a;--accent:#f4641e;}
   *{box-sizing:border-box}
   body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--ink);margin:0;line-height:1.55;font-size:15px}
   .wrap{max-width:860px;margin:0 auto;padding:48px 40px}
@@ -185,6 +316,7 @@ export function renderReport(
   .kpi.critical b{color:var(--crit)} .kpi.serious b{color:var(--ser)} .kpi.moderate b{color:var(--mod)} .kpi.minor b{color:var(--min)}
   .kpi span{font-size:12px;color:var(--mut)}
   h2.section{margin:36px 0 14px;font-size:19px;border-left:4px solid var(--accent);padding-left:10px}
+  h3.plan-phase{margin:20px 0 8px;font-size:15px;color:var(--accent)}
   .finding{border:1px solid var(--line);border-left-width:5px;border-radius:10px;padding:16px 18px;margin:12px 0}
   .finding.critical{border-left-color:var(--crit)} .finding.serious{border-left-color:var(--ser)}
   .finding.moderate{border-left-color:var(--mod)} .finding.minor{border-left-color:var(--min)}
@@ -195,7 +327,22 @@ export function renderReport(
   .badge.critical{background:var(--crit)} .badge.serious{background:var(--ser)} .badge.moderate{background:var(--mod)} .badge.minor{background:var(--min)}
   .count{font-size:12px;color:var(--mut)}
   .why,.fix{margin:8px 0 0;font-size:14px} .fix{color:#065f46}
-  details{margin-top:8px;font-size:13px;color:var(--mut)} code{background:#f1f5f9;padding:1px 5px;border-radius:4px;font-size:12px}
+  code{background:#f1f5f9;padding:1px 5px;border-radius:4px;font-size:12px}
+  .examples-open{margin-top:10px;font-size:13px;color:var(--mut)}
+  .examples-label{font-weight:600;color:var(--ink);margin-bottom:4px}
+  .example{margin:0 0 8px;padding-bottom:6px;border-bottom:1px dashed var(--line)}
+  .example:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+  .ex-page{font-size:11px;color:var(--mut);margin-top:2px}
+  .ex-html{display:block;margin-top:3px;white-space:pre-wrap;word-break:break-all}
+  .ex-fail{font-size:12px;color:var(--mut);margin-top:2px}
+  .ex-more{font-size:12px;color:var(--mut);margin-top:4px;font-style:italic}
+  .pages-table{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0 20px}
+  .pages-table th,.pages-table td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left}
+  .pages-table th{color:var(--mut);font-weight:600;font-size:12px}
+  .appendix-rule{margin:14px 0}
+  .appendix-rule h4{margin:0 0 4px;font-size:13px}
+  .appendix-list{margin:0;padding-left:18px;font-size:12px;color:var(--mut)}
+  .appendix-list li{margin-bottom:2px}
   .checklist{list-style:none;padding:0;margin:10px 0}
   .checklist li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
   .checklist .box{font-size:18px;line-height:1.2;color:var(--accent)}
@@ -208,6 +355,9 @@ export function renderReport(
   .diffcol h4{margin:0 0 6px;font-size:14px}
   .diffcol h4.ok{color:var(--ok)} .diffcol h4.bad{color:var(--crit)} .diffcol h4.mut{color:var(--mut)}
   .diffcol ul{margin:0;padding-left:18px;font-size:13px;color:var(--mut)}
+  /* D3: Karten/Zeilen nicht mitten im PDF-Seitenumbruch zerreißen. */
+  .finding,.diffcard,.legalbox,.kpi,.scorecard,.checklist li,.appendix-rule{break-inside:avoid;page-break-inside:avoid}
+  h2.section{break-after:avoid}
   @media print{.wrap{padding:24px}}
 </style>
 </head>
@@ -241,6 +391,8 @@ export function renderReport(
     <div class="kpi"><b>${scan.passes}</b><span>Bestandene Prüfungen</span></div>
   </div>
 
+  ${pagesTableHtml}
+
   <h2 class="section">${esc(introTitle)}</h2>
   ${introHtml}
 
@@ -262,6 +414,8 @@ export function renderReport(
   }
   </ul>
 
+  ${planHtml}
+
   ${allNotices && allNotices.length ? `
   <h2 class="section">Weitere technische Hinweise</h2>
   ${allNotices.map((n) => `
@@ -276,8 +430,10 @@ export function renderReport(
 
   <div class="legalbox">${legalHtml}</div>
 
+  ${appendixHtml}
+
   <footer>
-    BFSG-Audit &middot; Automatisierte Barrierefreiheits-Prüfung &middot;
+    BFSG-Fuchs &middot; bfsg-fix.de &middot; info@bfsg-fix.de &middot; Anbieter: Matthias Seba<br>
     Bestandene Prüfungen: ${scan.passes} &middot; Unklare Punkte (manuell prüfen): ${scan.incomplete}
   </footer>
 </div>

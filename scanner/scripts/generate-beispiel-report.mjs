@@ -13,6 +13,7 @@
 // Nutzung:  node scripts/generate-beispiel-report.mjs
 
 import path from 'node:path';
+import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { renderReport } from '../lib/report.js';
 
@@ -77,8 +78,17 @@ const scan = {
 };
 
 async function main() {
+  // D5: dasselbe Logo wie im echten Kunden-Report (fulfill.js) — das öffentliche
+  // Marketing-Muster soll nicht weniger Branding zeigen als das echte Produkt.
+  let logo = '';
+  try {
+    const buf = await readFile(path.join(__dirname, '..', 'assets', 'logo-fox.png'));
+    logo = `data:image/png;base64,${buf.toString('base64')}`;
+  } catch { /* Logo fehlt (anderes Deploy-Layout) — Report ohne Logo, kein Abbruch. */ }
+
   const html = renderReport(scan, {
-    company: 'Beispielshop (anonymisiertes Muster)'
+    company: 'Beispielshop (anonymisiertes Muster)',
+    logo
   });
 
   const { chromium } = await import('playwright');
@@ -100,7 +110,11 @@ async function main() {
       path: pdfPath,
       format: 'A4',
       printBackground: true,
-      margin: { top: '12mm', bottom: '12mm', left: '10mm', right: '10mm' }
+      margin: { top: '12mm', bottom: '18mm', left: '10mm', right: '10mm' },
+      // D4: Seitenzahlen — konsistent zum echten Report (fulfill.js).
+      displayHeaderFooter: true,
+      headerTemplate: '<div></div>',
+      footerTemplate: '<div style="width:100%;font-size:8px;color:#94a3b8;text-align:center;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">bfsg-fix.de &middot; Seite <span class="pageNumber"></span> von <span class="totalPages"></span></div>'
     });
     console.error(`[Beispiel-Report] PDF erzeugt: ${pdfPath}`);
   } finally {

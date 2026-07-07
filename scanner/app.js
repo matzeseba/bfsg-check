@@ -19,7 +19,7 @@ import { renderTeaser } from './lib/report.js';
 import { fulfillOrder, PKG_CONFIG } from './lib/fulfill.js';
 import {
   sendReportFor, sendAlert, sendCancellationConfirmation, sendDsgvoToken, sendDelayNotice,
-  sendOwnerReview, sendOrderReceived, isTransientMailError,
+  sendOwnerReview, sendOrderReceived, sendKuendigungEingang, sendWiderrufEingang, isTransientMailError,
   mailerStatus, requireMailerOrExit, isStripeLive, isEmail
 } from './lib/mailer.js';
 import * as reportQueue from './lib/report-queue.js';
@@ -117,6 +117,11 @@ async function enqueueForRelease({ sessionId, to, company = '', url = '', pkg = 
       releaseAt
     });
     await markStatus(sessionId, 'RELEASE_SCHEDULED', {
+      // F25: email mitschreiben — für Abo-Re-Check-Zyklen (sessionId=cycleKey) ist dies
+      // der EINZIGE Schreibpfad, der order.email setzt (kein recordPaid für Zyklen). Ohne
+      // sie liefert der dokumentierte Recovery-Befehl /api/resend/<sessionId> mit
+      // "Ungültige Empfängeradresse: undefined" einen 500er.
+      email: to,
       pdfPath: order.pdfPath,
       invoiceNumber: invoice?.invoiceNumber || null,
       releaseAt
@@ -130,6 +135,7 @@ async function enqueueForRelease({ sessionId, to, company = '', url = '', pkg = 
     try {
       await markStatus(sessionId, 'READY_NOT_MAILED', {
         error: `enqueue: ${err.message}`,
+        email: to, // F25: siehe Kommentar oben (RELEASE_SCHEDULED)
         pdfPath: order.pdfPath,
         stmtPath: order.stmtPath || null,
         emailKind,
@@ -245,7 +251,12 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
   // spurlos). Schlägt schon die Persistenz fehl, NICHT quittieren + Claim freigeben →
   // Stripe stellt erneut zu (sonst bliebe das Event dauerhaft „verarbeitet").
   try {
-    if (event.type === 'checkout.session.completed') {
+    // F8: checkout.session.async_payment_succeeded ist das Pendant zu .completed für
+    // asynchrone Zahlarten (SEPA-Lastschrift, „Sofort"-Varianten) — bei denen feuert
+    // .completed zuerst MIT payment_status='unpaid' (prePersistCheckout tut dann noch
+    // nichts), und erst der spätere async_payment_succeeded-Event trägt payment_status
+    // 'paid'. Dieselbe Vor-Persistenz wie beim Sync-Pfad, sonst bleibt die Zahlung spurlos.
+    if (event.type === 'checkout.session.completed' || event.type === 'checkout.session.async_payment_succeeded') {
       await prePersistCheckout(event);
     }
   } catch (err) {
@@ -259,8 +270,10 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
   res.json({ received: true });
 
   try {
-    if (event.type === 'checkout.session.completed') {
+    if (event.type === 'checkout.session.completed' || event.type === 'checkout.session.async_payment_succeeded') {
       await handleCheckoutCompleted(event);
+    } else if (event.type === 'checkout.session.async_payment_failed') {
+      await handleAsyncPaymentFailed(event);
     } else if (event.type === 'invoice.paid') {
       // MF2: NUR invoice.paid verarbeiten. invoice.payment_succeeded ist ein zweites
       // Event (eigene event.id → claimEvent dedupliziert es NICHT) für denselben Zyklus
@@ -286,7 +299,10 @@ async function prePersistCheckout(event) {
   if (s.payment_status && s.payment_status !== 'paid') return; // unbezahlt → nichts zu sichern
   const meta = s.metadata || {};
   const email = s.customer_details?.email || s.customer_email || meta.email;
-  const pkg = PACKAGES[meta.pkg] ? meta.pkg : 'basis';
+  // F24: gegen PKG_CONFIG validieren (immer alle 6 Pakete), NICHT gegen das
+  // ENABLE_ABO-gefilterte PACKAGES — sonst koerziert ein zwischenzeitlich gekipptes
+  // ENABLE_ABO ein bezahltes Abo still auf 'basis'.
+  const pkg = PKG_CONFIG[meta.pkg] ? meta.pkg : 'basis';
   const isSub = s.mode === 'subscription' && !!s.subscription;
   await recordPaid({ eventId: event.id, sessionId: s.id, email, url: meta.url, pkg, amount: s.amount_total, customerId: s.customer || null, customerType: meta.customerType || '', consentTs: meta.consentTs || '' });
   if (isSub) {
@@ -305,7 +321,19 @@ async function handleCheckoutCompleted(event) {
   }
   const meta = s.metadata || {};
   const email = s.customer_details?.email || s.customer_email || meta.email;
-  const pkg = PACKAGES[meta.pkg] ? meta.pkg : 'basis';
+  if (meta.pkg && !PKG_CONFIG[meta.pkg]) {
+    // F24: unbekanntes Paket-Kuerzel NICHT still auf 'basis' koerzieren, ohne es zu
+    // melden (z. B. wenn ENABLE_ABO zwischen Checkout und Webhook-Zustellung kippt).
+    // Fulfillment laeuft trotzdem als 'basis' (Kunde geht nicht leer aus), der Owner
+    // muss die Fehlkonfiguration aber sehen.
+    await sendAlert(
+      `Unbekanntes Paket "${meta.pkg}" bei Session ${s.id} — als Basis erfüllt`,
+      `Session: ${s.id}\nPaket laut Metadata: ${meta.pkg}\nBezahlter Betrag: ${s.amount_total}\n` +
+      `PKG_CONFIG kennt dieses Paket nicht. Fulfillment läuft als 'basis' — bitte prüfen, ob das dem gekauften Leistungsumfang entspricht.`
+    );
+    logger.error({ sessionId: s.id, pkg: meta.pkg }, 'Unbekanntes Paket-Kürzel — als basis erfüllt');
+  }
+  const pkg = PKG_CONFIG[meta.pkg] ? meta.pkg : 'basis';
   const isSub = s.mode === 'subscription' && !!s.subscription;
   // Rechnungsempfaenger-Daten aus dem Stripe-Checkout (billing_address_collection).
   // name/address sind leer, falls Stripe sie (noch) nicht geliefert hat → der Renderer
@@ -349,7 +377,8 @@ async function handleCheckoutCompleted(event) {
     await markStatus(s.id, 'FAILED', { error: err.message });
     await sendAlert(
       `Bezahlt, aber Erfüllung fehlgeschlagen: ${email}`,
-      `Session: ${s.id}\nURL: ${meta.url}\nPaket: ${pkg}\nFehler: ${err.message}\n\nManuell nachliefern: curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" ${PUBLIC_URL}/api/resend/${s.id}`
+      `Session: ${s.id}\nURL: ${meta.url}\nPaket: ${pkg}\nFehler: ${err.message}\n\nManuell nachliefern: curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" ${PUBLIC_URL}/api/resend/${s.id}` +
+      tlsRetryHint(err, s.id)
     );
     // MF5: Den zahlenden Kunden NICHT im Schweigen lassen — Best-Effort-Eingangs-/
     // Verzögerungs-Notiz (kein PDF im FAILED-Fall). Eigener try/catch: ein Mail-Fehler
@@ -438,6 +467,31 @@ async function handleCheckoutCompleted(event) {
   }
 }
 
+// F8: SEPA/„Sofort"-Zahlarten können statt eines Erfolgs mit .async_payment_failed
+// scheitern — der Kunde wurde NICHT belastet, also gibt es nichts zu erfüllen. Nur den
+// Owner informieren (z. B. um bei wiederholten Fehlschlägen die aktivierten Payment-
+// Methods im Stripe-Dashboard zu prüfen).
+async function handleAsyncPaymentFailed(event) {
+  const s = event.data.object;
+  const meta = s.metadata || {};
+  const email = s.customer_details?.email || s.customer_email || meta.email;
+  await sendAlert(
+    `Asynchrone Zahlung fehlgeschlagen: ${email || s.id}`,
+    `Session: ${s.id}\nURL: ${meta.url || '?'}\nPaket: ${meta.pkg || '?'}\n` +
+    `Die Zahlung (z. B. SEPA-Lastschrift) ist fehlgeschlagen — der Kunde wurde nicht belastet, keine Erfüllung nötig.`
+  );
+  logger.warn({ sessionId: s.id }, 'Asynchrone Zahlung fehlgeschlagen');
+}
+
+// F22: TLS-/Zertifikatsfehler im bezahlten Scan-Pfad sind oft per lenientTls-Override
+// im Resend nachlieferbar (Admin-only) — Hinweis im Owner-Alarm ergänzen, statt nur auf
+// das globale SCAN_PAID_LENIENT_TLS-Env zu verweisen.
+function tlsRetryHint(err, resendId) {
+  if (classifyScanError(err.message).reason !== 'tls') return '';
+  return `\n\nHinweis: TLS-/Zertifikatsfehler erkannt — Nachlieferung ggf. mit gelockerter TLS-Prüfung möglich:\n` +
+    `curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" -H "Content-Type: application/json" -d '{"lenientTls":true}' ${PUBLIC_URL}/api/resend/${resendId}`;
+}
+
 // Baut den Rechnungsempfaenger aus der Stripe-Checkout-Session. customer_details.name +
 // .address sind gesetzt, sobald billing_address_collection:'required' im Checkout aktiv
 // ist. Felder, die Stripe nicht liefert, bleiben leer — invoice.js rendert nur die
@@ -506,31 +560,55 @@ async function handleInvoicePaid(event) {
     return;
   }
 
-  const sub = await getSubscription(subId);
+  let sub = await getSubscription(subId);
   if (!sub) {
-    console.warn(`[webhook] invoice.paid für unbekannte Subscription ${subId} — übersprungen.`);
+    // NICHT still verschlucken (F9) — der Kunde wurde abgebucht, bekäme aber keinen Re-Check.
+    await sendAlert(
+      `invoice.paid für unbekannte Subscription: ${subId}`,
+      `Invoice: ${inv.id}\nSubscription: ${subId}\nKeine lokale Subscription gefunden — Re-Check wurde NICHT ausgelöst. Bitte manuell prüfen.`
+    );
+    logger.error({ subscriptionId: subId, invoiceId: inv.id }, 'invoice.paid für unbekannte Subscription');
     return;
   }
   if (sub.status !== 'ACTIVE') {
-    console.warn(`[webhook] invoice.paid für Subscription ${subId} mit Status ${sub.status} — übersprungen.`);
-    return;
+    // F9: invoice.paid ist der Zahlungsbeweis — bei Dunning-Recovery (past_due -> Zahlung
+    // klappt wieder) kann dieses Event VOR customer.subscription.updated(active) eintreffen
+    // (keine garantierte Reihenfolge). Den lokalen Status auf Basis der bezahlten Rechnung
+    // synchronisieren, statt den bezahlten Zyklus gegen einen ggf. veralteten Spiegel-Status
+    // stillschweigend zu verwerfen.
+    sub = (await markSubscriptionStatus(subId, 'active')) || sub;
+    if (sub.status !== 'ACTIVE') {
+      await sendAlert(
+        `invoice.paid trotz nicht aktivierbarer Subscription: ${subId}`,
+        `Invoice: ${inv.id}\nLokaler Status: ${sub.status}\nRe-Check wurde NICHT ausgelöst. Bitte manuell prüfen.`
+      );
+      logger.error({ subscriptionId: subId, status: sub.status }, 'invoice.paid: Subscription bleibt nicht-aktiv nach Sync-Versuch');
+      return;
+    }
   }
 
+  // Queue-Key = Invoice-ID (pro Zyklus eindeutig; Abo-Zyklen liegen nicht in orders.js).
+  const cycleKey = inv.id || `${sub.subscriptionId}-${Date.now()}`;
+  // Zyklus-Rechnung fürs Abo (§ 14 UStG) — Betrag aus der Stripe-Invoice. Läuft NACH
+  // erfolgreichem Scan (wie zuvor: kein Rechnungs-/Nummernverbrauch bei Scan-Fehler).
+  const makeInvoice = () => safeGenerateInvoice({
+    orderId: inv.id || sub.subscriptionId, email: sub.email, company: sub.company || '',
+    pkg: sub.pkg || 'abo', amount: inv.amount_paid ?? inv.total ?? 0
+  });
+
   try {
-    await runSubscriptionRecheck(sub, {
-      // Queue-Key = Invoice-ID (pro Zyklus eindeutig; Abo-Zyklen liegen nicht in orders.js).
-      cycleKey: inv.id || `${sub.subscriptionId}-${Date.now()}`,
-      // Zyklus-Rechnung fürs Abo (§ 14 UStG) — Betrag aus der Stripe-Invoice. Läuft NACH
-      // erfolgreichem Scan (wie zuvor: kein Rechnungs-/Nummernverbrauch bei Scan-Fehler).
-      makeInvoice: () => safeGenerateInvoice({
-        orderId: inv.id || sub.subscriptionId, email: sub.email, company: sub.company || '',
-        pkg: sub.pkg || 'abo', amount: inv.amount_paid ?? inv.total ?? 0
-      })
-    });
+    // F21: event.id durchreichen — runSubscriptionRecheck persistiert ihn VOR dem Scan
+    // durabel (RECHECK_STARTED), damit eine invoice.paid-Redelivery nach einem Neustart
+    // (claimEvent ist nur in-memory dedupliziert) nicht erneut scannt/rechnet/mailt.
+    await runSubscriptionRecheck(sub, { cycleKey, eventId: event.id, makeInvoice });
   } catch (err) {
+    await markStatus(cycleKey, 'RECHECK_FAILED', { error: err.message }).catch(() => {});
+    const isMonthly = sub.pkg !== 'abo-jahr';
     await sendAlert(
       `Re-Check fehlgeschlagen: ${sub.email}`,
-      `Subscription: ${sub.subscriptionId}\nURL: ${sub.url}\nFehler: ${err.message}`
+      `Subscription: ${sub.subscriptionId}\nURL: ${sub.url}\nFehler: ${err.message}` +
+      tlsRetryHint(err, cycleKey) +
+      (isMonthly ? `\n\nAutomatischer Retry in ~${Math.round(MONTHLY_RECHECK_RETRY_MS / 60000)} Min.` : '')
     );
     // MF5: auch beim Abo-Re-Check den zahlenden Kunden nicht im Schweigen lassen.
     try {
@@ -540,6 +618,9 @@ async function handleInvoicePaid(event) {
     }
     sentry.captureException(err, { webhook_event: 'invoice.paid', subscription_id: sub.subscriptionId });
     logger.error({ subscriptionId: sub.subscriptionId, err: err.message }, 'RE-CHECK FEHLGESCHLAGEN');
+    // F27: Monats-Abo hat (anders als 'abo-jahr') keinen eigenen Ticker-Fallback —
+    // GENAU EIN automatischer Retry, danach Owner-Alarm mit funktionierendem Re-Trigger.
+    if (isMonthly) scheduleMonthlyRecheckRetry(sub, { cycleKey, makeInvoice });
   }
 }
 
@@ -547,8 +628,19 @@ async function handleInvoicePaid(event) {
 // Jahres-Abo: die eine Jahresrechnung) und den Jahres-Abo-Ticker (siehe unten).
 // makeInvoice ist optional — der Ticker erzeugt KEINE Rechnung (es gibt keine Zahlung
 // im Zwischenmonat; die Jahresrechnung entsteht beim invoice.paid der Jahreszahlung).
-async function runSubscriptionRecheck(sub, { cycleKey, makeInvoice = null }) {
+async function runSubscriptionRecheck(sub, { cycleKey, makeInvoice = null, eventId = null }) {
   await assertPublicHttpUrl(sub.url);
+  // F20/F26/F21: durable Spur VOR dem (minutenlangen) Scan schreiben. Überlebt ein
+  // Crash/Deploy mitten im Re-Check, bleibt der Order-Record auf RECHECK_STARTED stehen —
+  // der Reconcile-Sweeper (reconcileOnStartup) meldet das beim nächsten Start (nach einer
+  // Karenzzeit). Zusätzlich persistiert eine übergebene event.id (invoice.paid) durabel:
+  // ensureLoaded liest jedes rec.eventId beim Neustart zurück in claimEvent's Dedup-Set,
+  // sodass eine Stripe-Redelivery desselben invoice.paid keinen zweiten Scan/keine zweite
+  // Rechnungsnummer/Mail mehr auslösen kann.
+  await markStatus(cycleKey, 'RECHECK_STARTED', {
+    ...(eventId ? { eventId } : {}),
+    email: sub.email, url: sub.url, pkg: sub.pkg || 'abo', subscriptionId: sub.subscriptionId
+  });
   const order = await paidScanGate(() =>
     services.fulfillOrder({
       url: sub.url, company: sub.company || '', email: sub.email,
@@ -582,7 +674,42 @@ async function runSubscriptionRecheck(sub, { cycleKey, makeInvoice = null }) {
     invoicePdfPath: invoice?.pdfPath || null,
     invoiceNumber: invoice?.invoiceNumber || null
   });
+  await markStatus(cycleKey, 'RECHECK_DONE', { pdfPath: order.pdfPath, invoiceNumber: invoice?.invoiceNumber || null });
   logger.info({ subscriptionId: sub.subscriptionId, invoiceNumber: invoice?.invoiceNumber || null }, 'Re-Check ausgeliefert');
+}
+
+// F27: fürs MONATLICHE Abo (kein eigener Ticker wie 'abo-jahr') GENAU EIN automatischer
+// Retry-Versuch, wenn der Re-Check am Scan scheitert — danach Owner-Alarm mit einem
+// tatsächlich funktionierenden Re-Trigger-Befehl (POST /api/recheck/:subscriptionId).
+// Non-durable (In-Memory-Timer): ein Prozess-Crash in der Zwischenzeit wird trotzdem
+// nicht stumm — der RECHECK_STARTED/RECHECK_FAILED-Trail (s. o.) fängt ihn über den
+// Reconcile-Sweeper beim nächsten Start ab.
+const MONTHLY_RECHECK_RETRY_MS = Math.max(60_000, Number(process.env.MONTHLY_RECHECK_RETRY_MS) || 30 * 60_000);
+const monthlyRetryScheduled = new Set(); // subscriptionId -> verhindert Doppel-Retry pro Ausfall
+
+function scheduleMonthlyRecheckRetry(sub, { cycleKey, makeInvoice }) {
+  if (monthlyRetryScheduled.has(sub.subscriptionId)) return;
+  monthlyRetryScheduled.add(sub.subscriptionId);
+  const handle = setTimeout(async () => {
+    monthlyRetryScheduled.delete(sub.subscriptionId);
+    try {
+      const fresh = await getSubscription(sub.subscriptionId);
+      if (!fresh || fresh.status !== 'ACTIVE') return; // zwischenzeitlich gekündigt/pausiert
+      await runSubscriptionRecheck(fresh, { cycleKey: `${cycleKey}-retry`, makeInvoice });
+      logger.info({ subscriptionId: sub.subscriptionId }, 'Monats-Re-Check-Retry erfolgreich');
+    } catch (err) {
+      await markStatus(`${cycleKey}-retry`, 'RECHECK_FAILED', { error: err.message }).catch(() => {});
+      await sendAlert(
+        `Re-Check endgültig fehlgeschlagen (nach Retry): ${sub.email}`,
+        `Subscription: ${sub.subscriptionId}\nURL: ${sub.url}\nFehler: ${err.message}\n\n` +
+        `Der automatische Retry ist ebenfalls fehlgeschlagen. Manuell erneut anstoßen:\n` +
+        `curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" ${PUBLIC_URL}/api/recheck/${sub.subscriptionId}`
+      );
+      sentry.captureException(err, { stage: 'monthlyRecheckRetry', subscription_id: sub.subscriptionId });
+      logger.error({ subscriptionId: sub.subscriptionId, err: err.message }, 'MONATS-RE-CHECK-RETRY FEHLGESCHLAGEN');
+    }
+  }, MONTHLY_RECHECK_RETRY_MS);
+  handle.unref?.();
 }
 
 // --- Jahres-Abo-Ticker ('abo-jahr') ------------------------------------------------
@@ -621,14 +748,17 @@ export async function annualRecheckTick(now = Date.now()) {
     const lastTry = annualAttemptAt.get(sub.subscriptionId) || 0;
     if (now - lastTry < ANNUAL_RECHECK_RETRY_MS) continue;
     annualAttemptAt.set(sub.subscriptionId, now);
+    // Queue-Key pro Kalendermonat → idempotent gegen Doppel-Ticks nach Neustart.
+    const monthKey = new Date(now).toISOString().slice(0, 7);
+    const cycleKey = `${sub.subscriptionId}-m-${monthKey}`;
     try {
-      // Queue-Key pro Kalendermonat → idempotent gegen Doppel-Ticks nach Neustart.
-      const monthKey = new Date(now).toISOString().slice(0, 7);
-      await runSubscriptionRecheck(sub, { cycleKey: `${sub.subscriptionId}-m-${monthKey}` });
+      await runSubscriptionRecheck(sub, { cycleKey });
     } catch (err) {
+      await markStatus(cycleKey, 'RECHECK_FAILED', { error: err.message }).catch(() => {});
       await sendAlert(
         `Jahres-Abo-Re-Check fehlgeschlagen: ${sub.email}`,
-        `Subscription: ${sub.subscriptionId}\nURL: ${sub.url}\nFehler: ${err.message}\n\nNächster automatischer Versuch in ~20 h.`
+        `Subscription: ${sub.subscriptionId}\nURL: ${sub.url}\nFehler: ${err.message}` +
+        tlsRetryHint(err, cycleKey) + `\n\nNächster automatischer Versuch in ~20 h.`
       );
       sentry.captureException(err, { stage: 'annualRecheck', subscription_id: sub.subscriptionId });
       logger.error({ subscriptionId: sub.subscriptionId, err: err.message }, 'JAHRES-ABO-RE-CHECK FEHLGESCHLAGEN');
@@ -1077,6 +1207,24 @@ app.get('/admin/subscriptions', rateLimit({ windowMs: 60_000, max: 30 }), requir
   }
 });
 
+// F27: manueller Re-Trigger fuer einen fehlgeschlagenen Abo-Re-Check (der bisher in den
+// Owner-Alarmen referenzierte Recovery-Weg existierte fuer Rechecks nicht wirklich).
+// Erzeugt bewusst KEINE neue Rechnung (der Zyklus wurde bereits bezahlt/abgerechnet) —
+// ruft denselben Re-Check-Kern wie der Jahres-Abo-Ticker auf (ohne makeInvoice).
+app.post('/api/recheck/:subscriptionId', rateLimit({ windowMs: 60_000, max: 10 }), requireAdminAuth, async (req, res) => {
+  const { subscriptionId } = req.params;
+  const sub = await getSubscription(subscriptionId);
+  if (!sub) return res.status(404).json({ error: 'Subscription nicht gefunden' });
+  if (sub.status !== 'ACTIVE') return res.status(409).json({ error: `Subscription-Status ${sub.status} — Re-Check nicht ausgeführt` });
+  try {
+    await runSubscriptionRecheck(sub, { cycleKey: `${subscriptionId}-manual-${Date.now()}` });
+    res.json({ ok: true, subscriptionId });
+  } catch (err) {
+    logger.error({ subscriptionId, err: err.message }, 'Manueller Re-Check fehlgeschlagen');
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Resend-Endpoint: bei Fulfillment-/Mail-Fehler Report nochmal ausliefern.
 // SF2: atomarer In-Memory-Lock gegen parallele Doppel-Auslieferung (zwei Resends
 // würden sonst doppelt mailen + zwei GoBD-Rechnungsnummern ziehen).
@@ -1196,8 +1344,13 @@ app.post('/api/resend/:sessionId', rateLimit({ windowMs: 60_000, max: RESEND_RAT
       return res.json({ ok: true, sessionId, email: recipient, status: 'RESENT', mode: 'mail-only' });
     }
 
+    // F22: admin-authentifizierter lenientTls-Override — liefert einen an TLS-Eigenheiten
+    // der Zielseite gescheiterten bezahlten Scan nach, ohne das globale
+    // SCAN_PAID_LENIENT_TLS-Env fuer ALLE bezahlten Scans umschalten zu muessen.
+    // Nur explizites true/false uebersteuert; sonst greift fulfillOrder's eigener Default.
+    const lenientTlsOverride = typeof req.body?.lenientTls === 'boolean' ? req.body.lenientTls : undefined;
     const result = await paidScanGate(() =>
-      services.fulfillOrder({ url: overrideUrl || order.url, company: order.company || '', email: recipient, pkg: order.pkg || 'basis' })
+      services.fulfillOrder({ url: overrideUrl || order.url, company: order.company || '', email: recipient, pkg: order.pkg || 'basis', lenientTls: lenientTlsOverride })
     );
     // Rechnung nachreichen, falls bei der fehlgeschlagenen Erst-Auslieferung noch keine erzeugt wurde.
     const invoice = order.invoiceNumber
@@ -1243,21 +1396,40 @@ app.post('/api/resend/:sessionId', rateLimit({ windowMs: 60_000, max: RESEND_RAT
 app.post('/api/widerruf', rateLimit({ windowMs: 60_000, max: 5 }), async (req, res) => {
   const { name = '', email = '', vertrag = '', datum = '' } = req.body || {};
   if (!name || !email) return res.status(400).json({ error: 'Name und E-Mail erforderlich' });
+  const receivedAt = new Date();
   await sendAlert(
     `Widerruf eingegangen: ${String(name).slice(0, 80)}`,
-    `Name: ${name}\nE-Mail: ${email}\nVertrag/Bestellung: ${vertrag}\nDatum: ${datum}\nEingang: ${new Date().toISOString()}`
+    `Name: ${name}\nE-Mail: ${email}\nVertrag/Bestellung: ${vertrag}\nDatum: ${datum}\nEingang: ${receivedAt.toISOString()}`
   );
+  // F13/F36: § 356 Abs. 1 S. 2 BGB verlangt eine unverzuegliche Zugangsbestaetigung an
+  // den Verbraucher — best-effort (Owner-Alarm oben ist der verlaessliche Kanal; ein
+  // Mailfehler hier darf die Erfolgsantwort an den Antragsteller nicht verhindern).
+  try {
+    if (isEmail(email)) await sendWiderrufEingang({ to: email, name, vertrag, receivedAt });
+  } catch (err) {
+    logger.warn({ err: err.message }, 'Widerrufs-Zugangsbestätigung nicht gesendet');
+  }
   res.json({ ok: true });
 });
 
 // Kündigungs-Funktion (§ 312k BGB) für das Abo.
 app.post('/api/kuendigung', rateLimit({ windowMs: 60_000, max: 5 }), async (req, res) => {
-  const { name = '', email = '', vertrag = '' } = req.body || {};
+  // F31: 'effective' (Sofort vs. Periodenende) wird vom Formular mitgesendet, aber
+  // bisher stillschweigend verworfen — jetzt mit destrukturieren + weitergeben.
+  const { name = '', email = '', vertrag = '', effective = '' } = req.body || {};
   if (!name || !email) return res.status(400).json({ error: 'Name und E-Mail erforderlich' });
+  const receivedAt = new Date();
   await sendAlert(
     `Kündigung eingegangen: ${String(name).slice(0, 80)}`,
-    `Name: ${name}\nE-Mail: ${email}\nVertrag: ${vertrag}\nEingang: ${new Date().toISOString()}`
+    `Name: ${name}\nE-Mail: ${email}\nVertrag: ${vertrag}\nWunschzeitpunkt: ${effective || '(nicht angegeben)'}\nEingang: ${receivedAt.toISOString()}`
   );
+  // F12/F36: § 312k Abs. 2 BGB verlangt eine unverzuegliche Zugangsbestaetigung
+  // (Inhalt + Datum/Uhrzeit) an den Verbraucher — best-effort, siehe /api/widerruf.
+  try {
+    if (isEmail(email)) await sendKuendigungEingang({ to: email, name, vertrag, effective, receivedAt });
+  } catch (err) {
+    logger.warn({ err: err.message }, 'Kündigungs-Eingangsbestätigung nicht gesendet');
+  }
   res.json({ ok: true });
 });
 
@@ -1357,14 +1529,22 @@ async function reconcileOnStartup() {
   try {
     const { listOrders } = await import('./lib/orders.js');
     const all = await listOrders({ limit: 1000 });
-    const TERMINAL = new Set(['MAILED', 'RESENT', 'CANCELLED', 'FAILED', 'RELEASED']);
+    // F20/F26/F27: RECHECK_FAILED ist bereits an den Owner alarmiert worden (bei Scan-
+    // Fehlschlag bzw. nach dem einmaligen Retry) → hier ausgelassen, sonst Alarm-Spam bei
+    // jedem Neustart (gleiches Prinzip wie FAILED).
+    const TERMINAL = new Set(['MAILED', 'RESENT', 'CANCELLED', 'FAILED', 'RELEASED', 'RECHECK_FAILED']);
     // PR5: RELEASE_SCHEDULED mit noch offenem Queue-Job ist ERWARTET (Scheduler-Start-Tick
     // gibt überfällige Jobs sofort frei) → nicht alarmieren. Nur ein RELEASE_SCHEDULED OHNE
     // Queue-Job wäre ein echtes Loch (Job verloren) und bleibt als „hängend" sichtbar.
     const pendingIds = new Set((await reportQueue.listPending()).map((j) => j.sessionId));
+    // F20/F26: ein RECHECK_STARTED ist beim Start eines laufenden (nicht abgestürzten) Scans
+    // ERWARTET — erst wenn er die Karenzzeit überschreitet, ist das Fenster (typische
+    // Scan-Dauer: Minuten) plausibel abgelaufen und der Zyklus vermutlich verloren.
+    const RECHECK_STARTED_GRACE_MS = 2 * 3600_000;
     const stuck = all
       .filter((o) => o.status && !TERMINAL.has(o.status))
       .filter((o) => !(o.status === 'RELEASE_SCHEDULED' && pendingIds.has(o.sessionId)))
+      .filter((o) => !(o.status === 'RECHECK_STARTED' && Date.now() - Date.parse(o.ts || 0) < RECHECK_STARTED_GRACE_MS))
       .map((o) => `${o.sessionId} — ${o.status} (${o.email || '?'}, ${o.url || '?'})`);
     if (stuck.length) {
       await sendAlert(

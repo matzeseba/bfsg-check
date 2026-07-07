@@ -201,6 +201,37 @@ export async function scanSite(startUrl, opts = {}) {
   return result;
 }
 
+// Aggregation auf Regel-Ebene über alle gescannten Unterseiten. Exportiert als
+// reine Funktion (kein Browser nötig) für den Unit-Test (test/scan-aggregate.test.js).
+// F2/F7: jede Node bekommt die Quell-Seiten-URL (n._page) angeheftet, damit der
+// Report Fundstellen einer Unterseite zuordnen kann. F14: Dedupe-Key läuft über
+// Seite+Selektor statt nur Selektor — derselbe kaputte Selektor auf mehreren
+// Seiten (Template-Fehler, der Normalfall) zählt dadurch weiterhin je Seite,
+// statt sich auf 1× zu kollabieren.
+export function aggregatePageResults(pageResults) {
+  const ruleMap = new Map(); // id -> { ...v, nodes: deduped, je Node mit _page }
+  let passes = 0;
+  let incomplete = 0;
+  for (const pr of pageResults) {
+    passes += pr.passes;
+    incomplete += pr.incomplete;
+    for (const v of pr.violations) {
+      const existing = ruleMap.get(v.id);
+      const taggedNodes = (v.nodes || []).map((n) => ({ ...n, _page: pr.url }));
+      if (!existing) {
+        ruleMap.set(v.id, { ...v, nodes: taggedNodes });
+      } else {
+        const seen = new Set(existing.nodes.map((n) => `${n._page || ''}|${(n.target || []).join(' ')}`));
+        for (const n of taggedNodes) {
+          const key = `${n._page || ''}|${(n.target || []).join(' ')}`;
+          if (!seen.has(key)) { existing.nodes.push(n); seen.add(key); }
+        }
+      }
+    }
+  }
+  return { violations: [...ruleMap.values()], passes, incomplete };
+}
+
 async function scanSiteAttempt(startUrl, { maxPages = 5, perPageTimeout = 45000, lenientTls = false, settleMs = 12000, axeTags = AXE_TAGS } = {}) {
   if (!/^https?:\/\//i.test(startUrl)) startUrl = 'https://' + startUrl;
   const origin = new URL(startUrl).origin;
@@ -296,28 +327,8 @@ async function scanSiteAttempt(startUrl, { maxPages = 5, perPageTimeout = 45000,
     await browser?.close().catch(() => {});
   }
 
-  // Aggregation auf Regel-Ebene.
-  const ruleMap = new Map(); // id -> { ...v, nodes: deduped }
-  let passes = 0;
-  let incomplete = 0;
-  for (const pr of pageResults) {
-    passes += pr.passes;
-    incomplete += pr.incomplete;
-    for (const v of pr.violations) {
-      const existing = ruleMap.get(v.id);
-      if (!existing) {
-        ruleMap.set(v.id, { ...v, nodes: [...(v.nodes || [])] });
-      } else {
-        const seen = new Set(existing.nodes.map((n) => (n.target || []).join(' ')));
-        for (const n of v.nodes || []) {
-          const key = (n.target || []).join(' ');
-          if (!seen.has(key)) { existing.nodes.push(n); seen.add(key); }
-        }
-      }
-    }
-  }
+  const { violations, passes, incomplete } = aggregatePageResults(pageResults);
 
-  const violations = [...ruleMap.values()];
   // Erste Seite stellt die Meta (Sprache, Titel etc.) — kompatibel zu scanUrl().
   const firstUrl = pageResults[0]?.url || startUrl;
   return {

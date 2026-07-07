@@ -19,6 +19,7 @@ jobs:
     steps:
       - name: Health-Check
         id: health
+        continue-on-error: true
         run: |
           set +e
           RESPONSE=$(curl -sS --max-time 15 -w "\nHTTP_STATUS=%{http_code}\nTIME_TOTAL=%{time_total}\n" https://bfsg-fix.de/health 2>&1)
@@ -52,8 +53,31 @@ jobs:
 
           echo "✅ Health OK (response_time=${TIME_TOTAL}s)"
 
-      - name: Alert via Brevo bei Fehler
-        if: failure()
+      - name: Health-Check bfsg-fuchs.de
+        id: health_fuchs
+        continue-on-error: true
+        run: |
+          set +e
+          # bfsg-fuchs.de kann auf bfsg-fix.de redirecten (Marken-Domain → Haupt-Domain).
+          # -L folgt Redirects, geprüft wird der finale Status.
+          RESPONSE=$(curl -sS -L --max-time 15 -w "\nHTTP_STATUS=%{http_code}\nTIME_TOTAL=%{time_total}\n" https://bfsg-fuchs.de/ 2>&1)
+          EXIT=$?
+          set -e
+          echo "$RESPONSE"
+
+          HTTP_STATUS=$(echo "$RESPONSE" | grep "^HTTP_STATUS=" | cut -d= -f2)
+          TIME_TOTAL=$(echo "$RESPONSE" | grep "^TIME_TOTAL=" | cut -d= -f2)
+
+          if [ "$EXIT" != "0" ] || [ "$HTTP_STATUS" != "200" ]; then
+            echo "::error::Health-Check bfsg-fuchs.de FAIL: exit=$EXIT http=$HTTP_STATUS"
+            echo "fail_reason=HTTP $HTTP_STATUS, exit $EXIT" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+          echo "✅ bfsg-fuchs.de OK (response_time=${TIME_TOTAL}s)"
+
+      - name: Alert via Brevo bei Fehler (bfsg-fix.de)
+        if: steps.health.outcome == 'failure'
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp-relay.brevo.com
@@ -75,3 +99,31 @@ jobs:
             4. Falls dauerhaft kaputt: GitHub-Actions deploy.yml manuell triggern (Rebuild)
           to: matze.seba@outlook.de
           from: BFSG-Check Uptime <no-reply@bfsg-fix.de>
+
+      - name: Alert via Brevo bei Fehler (bfsg-fuchs.de)
+        if: steps.health_fuchs.outcome == 'failure'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp-relay.brevo.com
+          server_port: 587
+          username: ${{ secrets.SMTP_USER }}
+          password: ${{ secrets.SMTP_PASS }}
+          subject: "[BFSG-ALERT] bfsg-fuchs.de DOWN"
+          body: |
+            Health-Check für https://bfsg-fuchs.de/ (mit Redirect-Folge) fehlgeschlagen.
+
+            Reason: ${{ steps.health_fuchs.outputs.fail_reason }}
+            Workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            Zeit: ${{ github.event.repository.updated_at }}
+
+            Sofortige Schritte:
+            1. DNS/Redirect prüfen: dig bfsg-fuchs.de + curl -I -L https://bfsg-fuchs.de/
+            2. SSH zum Server: docker compose -f /opt/bfsg-check/deployment/docker-compose.yml ps
+            3. Logs: docker compose logs --tail=100 caddy
+            4. Falls dauerhaft kaputt: GitHub-Actions deploy.yml manuell triggern (Rebuild)
+          to: matze.seba@outlook.de
+          from: BFSG-Check Uptime <no-reply@bfsg-fix.de>
+
+      - name: Job-Status setzen
+        if: steps.health.outcome == 'failure' || steps.health_fuchs.outcome == 'failure'
+        run: exit 1

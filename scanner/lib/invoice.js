@@ -21,7 +21,7 @@ const COUNTER_FILE = process.env.INVOICE_COUNTER_FILE || path.join(__dirname, '.
 const INVOICE_DIR = process.env.INVOICE_DIR || path.join(__dirname, '..', 'out', 'invoices');
 
 const FROM = {
-  name: process.env.INVOICE_FROM_NAME || process.env.FROM_NAME || 'BFSG-Check',
+  name: process.env.INVOICE_FROM_NAME || process.env.FROM_NAME || 'BFSG-Fuchs',
   // KEIN Platzhalter-Fallback mehr (MF3): ein Platzhaltertext auf einer echten Kunden-
   // rechnung ist §14-UStG-formfehlerhaft. Fehlt die Anschrift, bleibt die Zeile leer und
   // der Startup-Check (invoiceConfigStatus + app.js) alarmiert im Live-Betrieb.
@@ -275,7 +275,7 @@ function pkgDescription(pkg) {
     abo: 'BFSG Re-Check Abo — monatliche Überprüfung mit Diff-Report',
     'abo-jahr': 'BFSG Re-Check Abo (jährlich) — monatliche Überprüfung mit Diff-Report, jährliche Abrechnung'
   };
-  return map[pkg] || `BFSG-Check Leistung (${pkg})`;
+  return map[pkg] || `BFSG-Fuchs Leistung (${pkg})`;
 }
 
 export { nextInvoiceNumber };

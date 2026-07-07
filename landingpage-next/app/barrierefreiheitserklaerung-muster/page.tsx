@@ -134,12 +134,12 @@ E-Mail: [barrierefreiheit@ihre-domain.de]
 5. SCHLICHTUNGSSTELLE
 
 Bei Beschwerden, die nicht direkt mit uns gelöst werden können, können Sie
-sich an die Schlichtungsstelle nach § 16 BFSGV wenden:
+sich an die Schlichtungsstelle nach § 34 BFSG wenden:
 
-Schlichtungsstelle für barrierefreie Informationstechnik (BFIT-Bund)
-Der Beauftragter der Bundesregierung für die Belange von Menschen mit Behinderungen
+Schlichtungsstelle nach dem Behindertengleichstellungsgesetz (BGG)
+bei dem Beauftragten der Bundesregierung für die Belange von Menschen mit Behinderungen
 Mauerstraße 53, 10117 Berlin
-E-Mail: info@schlichtungsstelle-bfit.de
+E-Mail: info@schlichtungsstelle-bgg.de
 
 6. METHODE DER BEURTEILUNG
 
@@ -190,9 +190,9 @@ export default function BarrierefreiheitserklaerungMusterPage() {
           </h1>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground">
             Eine Barrierefreiheitserklärung ist seit dem 28. Juni 2025 für viele Websites Pflicht. Doch was muss
-            drin stehen — und was passiert bei Fehlern? Dieser Artikel erklärt alle 8 Pflichtangaben nach § 15
-            BFSGV, enthält ein vollständiges Copy-Paste-Muster und zeigt die häufigsten Fehler, die in der Praxis
-            unterlaufen.
+            drin stehen — und was passiert bei Fehlern? Dieser Artikel erklärt alle 8 Pflichtangaben nach § 14
+            BFSG (i. V. m. der BFSGV), enthält ein vollständiges Copy-Paste-Muster und zeigt die häufigsten
+            Fehler, die in der Praxis unterlaufen.
           </p>
           <p className="mt-2 text-xs text-muted-foreground">
             Stand: Juni 2026 · Informationsartikel, keine Rechtsberatung
