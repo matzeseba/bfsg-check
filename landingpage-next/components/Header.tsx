@@ -84,7 +84,7 @@ export function Header() {
           {/* Offizielles Fuchs-Wappen (aus docs/brand/bfsg-fuchs-logo-final.png
               zugeschnitten, Glow eingebrannt + transparenter Rand), dekorativ →
               leeres alt, da die nebenstehende Wortmarke den Namen traegt. Klein
-              (~36px), mit orangem Drop-Shadow. */}
+              (~36px); der eingebrannte Glow reicht, kein CSS-Drop-Shadow. */}
           <Image
             src="/logo-fuchs-wappen.png"
             alt=""
@@ -93,7 +93,7 @@ export function Header() {
             // priority: Markenzeichen im allerersten Paint (Header ist immer
             // above-the-fold); next/image liefert ohnehin nur die ~36px-Variante.
             priority
-            className="h-9 w-auto shrink-0 rounded-md [filter:drop-shadow(0_2px_10px_color-mix(in_oklch,var(--brand-orange),transparent_55%))]"
+            className="h-9 w-auto shrink-0 rounded-md"
           />
           <span className="flex items-baseline gap-0.5">
             <span>BFSG</span>
