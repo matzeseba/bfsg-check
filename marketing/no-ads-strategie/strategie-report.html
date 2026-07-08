@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>No-Ads-Marketingstrategie · BFSG-Fuchs · 90-Tage-Plan</title>
+<style>
+  @page { size: A4; margin: 16mm 14mm; }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: 'Segoe UI', 'Calibri', Arial, sans-serif;
+    color: #241a12;
+    background: #fffaf5;
+    font-size: 10.3pt;
+    line-height: 1.5;
+  }
+  .page {
+    page-break-after: always;
+    padding: 2mm 0;
+    position: relative;
+  }
+  .page:last-child { page-break-after: auto; }
+
+  h1, h2, h3, h4 { font-family: 'Segoe UI', Arial, sans-serif; margin: 0 0 3mm 0; color: #7a2e05; }
+  h1 { font-size: 20pt; }
+  h2 { font-size: 15pt; border-bottom: 2px solid #ff7a1a; padding-bottom: 1.5mm; margin-top: 0; }
+  h3 { font-size: 11.5pt; color: #b8430e; margin-top: 5mm; }
+  h4 { font-size: 10.3pt; color: #b8430e; margin-top: 3mm; }
+  p { margin: 0 0 2.5mm 0; }
+  ul, ol { margin: 0 0 3mm 0; padding-left: 5mm; }
+  li { margin-bottom: 1.3mm; }
+  a { color: #b8430e; }
+  .small { font-size: 8pt; color: #6b5a4a; }
+  .muted { color: #6b5a4a; }
+  .badge {
+    display: inline-block; background: #34d99a; color: #06251a; font-weight: 700;
+    border-radius: 3px; padding: 0.5mm 2mm; font-size: 8pt; margin-right: 1.5mm;
+  }
+  .badge.orange { background: #ff7a1a; color: #2b1206; }
+  .badge.grey { background: #e7ddd2; color: #4a3a2a; }
+
+  table { width: 100%; border-collapse: collapse; margin-bottom: 3mm; font-size: 8.6pt; }
+  th, td { border: 0.5px solid #e2d3c0; padding: 1.6mm 2mm; text-align: left; vertical-align: top; }
+  th { background: #ffe8d5; color: #7a2e05; font-weight: 700; }
+  tr:nth-child(even) td { background: #fffdf9; }
+  td.num, th.num { text-align: right; white-space: nowrap; }
+
+  .box {
+    border: 1.2px solid #ffd2ab; background: #fff3e6; border-radius: 6px;
+    padding: 3mm 4mm; margin: 3mm 0;
+  }
+  .box.mint { border-color: #a9ecd2; background: #eafcf4; }
+  .box.warn { border-color: #f5c2a0; background: #fff0e0; }
+
+  .cover {
+    height: 253mm;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center;
+    background: linear-gradient(160deg, #fff3e6 0%, #fffaf5 55%, #eafcf4 100%);
+    border-radius: 8px;
+  }
+  .cover .kicker { font-size: 11pt; letter-spacing: 0.12em; text-transform: uppercase; color: #b8430e; font-weight: 700; margin-bottom: 6mm; }
+  .cover h1 { font-size: 30pt; margin-bottom: 4mm; max-width: 150mm; }
+  .cover .sub { font-size: 13pt; color: #4a3a2a; max-width: 140mm; margin-bottom: 10mm; }
+  .cover .fox { font-size: 46pt; margin-bottom: 6mm; }
+  .cover .meta { font-size: 9pt; color: #6b5a4a; border-top: 1px solid #e2d3c0; padding-top: 4mm; width: 110mm; }
+  .cover .meta div { margin-bottom: 1mm; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3mm; }
+  .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; }
+
+  .stat {
+    background: #fff; border: 1px solid #e2d3c0; border-radius: 6px; padding: 3mm; text-align: center;
+  }
+  .stat .n { font-size: 15pt; font-weight: 800; color: #ff7a1a; display: block; }
+  .stat .l { font-size: 7.7pt; color: #6b5a4a; }
+
+  .footer {
+    position: absolute; bottom: -8mm; left: 0; right: 0;
+    font-size: 7.5pt; color: #a99a89; display: flex; justify-content: space-between;
+    border-top: 0.5px solid #eee0d2; padding-top: 1.5mm;
+  }
+
+  .pill-row { display: flex; gap: 2mm; flex-wrap: wrap; margin-bottom: 2mm; }
+  .pill { background: #ffe8d5; border-radius: 12px; padding: 1mm 3mm; font-size: 8pt; font-weight: 600; color: #7a2e05; }
+  .pill.b { background: #eafcf4; color: #06251a; }
+  .pill.c { background: #ffe1e0; color: #6b1206; }
+  .pill.d { background: #e6e9ff; color: #1a2470; }
+
+  .legend { display: flex; gap: 4mm; font-size: 8pt; margin-top: 2mm; flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 1.5mm; }
+  .dot { width: 3mm; height: 3mm; border-radius: 50%; display: inline-block; }
+
+  .src-list { font-size: 8pt; color: #4a3a2a; }
+  .src-list li { margin-bottom: 2mm; }
+
+  .kv { display: flex; justify-content: space-between; border-bottom: 0.5px dashed #e2d3c0; padding: 1mm 0; font-size: 9pt; }
+
+  .two-col { columns: 2; column-gap: 6mm; }
+  .two-col li { break-inside: avoid; }
+</style>
+</head>
+<body>
+
+<!-- ============ SEITE 1: DECKBLATT ============ -->
+<div class="page cover">
+  <div class="fox">🦊</div>
+  <div class="kicker">Marketingstrategie · Juli–Oktober 2026</div>
+  <h1>No-Ads-Wachstum für BFSG-Fuchs</h1>
+  <div class="sub">Wie wir ohne Google Ads und ohne Microsoft Ads planbar Leads und Sales aufbauen — über Content-Autorität, KI-Suchmaschinen, Partner und Vertrauens-Signale.</div>
+  <div class="meta">
+    <div><strong>Erstellt:</strong> 08.07.2026</div>
+    <div><strong>Zeitraum:</strong> Woche 1 (08.07.2026) – Woche 13 (06.10.2026)</div>
+    <div><strong>Grundlage:</strong> 6 Perplexity-Recherchen (20 belegte Findings) + 3 Strategie-Entwürfe + Jury-Review + finaler 90-Tage-Plan</div>
+    <div><strong>Rahmen:</strong> Solo-Founder, ~600&nbsp;€/Monat Budget, Google&nbsp;/&nbsp;Microsoft Ads dauerhaft gesperrt</div>
+  </div>
+</div>
+
+<!-- ============ SEITE 2: MANAGEMENT SUMMARY ============ -->
+<div class="page">
+  <h2>Management-Summary — die Strategie in 60 Sekunden</h2>
+
+  <p><strong>Die Ausgangslage:</strong> Google Ads und Microsoft Ads sind dauerhaft gesperrt. Der klassische "Geld rein, Klicks raus"-Hebel fällt komplett weg. Gleichzeitig ist der Markt für Gratis-Scanner inzwischen voll — mindestens 10 Wettbewerber bieten fast denselben Mechanismus. Wir müssen also <strong>ohne Werbebudget</strong> und <strong>trotz Wettbewerbsdruck</strong> planbar Leads erzeugen.</p>
+
+  <p><strong>Die Antwort — zwei Motoren statt einem:</strong> Ein <strong>schneller Motor</strong> (Content, der zur richtigen Zeit von Google <em>und</em> von KI-Suchmaschinen wie ChatGPT/Perplexity zitiert wird) trägt die ersten Wochen. Ein <strong>langsamer, aber stärkerer Motor</strong> (Agenturen und Berater, die BFSG-Prüfungen als Provisions-Partner weiterreichen) übernimmt ab Monat 2 und wächst danach von selbst weiter — ganz ohne, dass wir je eine einzelne Person kalt anschreiben.</p>
+
+  <div class="grid4" style="margin: 4mm 0;">
+    <div class="stat"><span class="n">4</span><span class="l">Wachstums-Säulen: Content&nbsp;/&nbsp;Partner&nbsp;/&nbsp;Directories&nbsp;/&nbsp;Produkt</span></div>
+    <div class="stat"><span class="n">~600&nbsp;€</span><span class="l">Budget pro Monat, größtenteils an Bedingungen geknüpft</span></div>
+    <div class="stat"><span class="n">13</span><span class="l">Wochen bis zum großen Strategie-Review</span></div>
+    <div class="stat"><span class="n">6</span><span class="l">KPI-Gates, alle 2 Wochen, mit klaren Kill-Kriterien</span></div>
+  </div>
+
+  <h3>Die 4 Säulen auf einen Blick</h3>
+  <table>
+    <tr><th style="width:14%">Säule</th><th>Rolle</th><th style="width:20%">Tempo bis Wirkung</th></tr>
+    <tr><td><span class="pill">A — Content, KI-Suche &amp; PR</span></td><td>Schnellstart. Presseartikel, aktualisierte Ratgeberseiten und LinkedIn-Posts nutzen das aktuelle Zeitfenster (aktive Behörden-Kontrollen seit Januar, zweite Abmahnwelle seit Februar 2026) — genau das, was KI-Suchsysteme bevorzugt zitieren.</td><td>Tage bis Wochen</td></tr>
+    <tr><td><span class="pill b">B — Partner &amp; Provision</span></td><td>Agenturen und Berater empfehlen uns gegen Provision weiter — ohne dass wir je kalt anfragen. Wächst von selbst, sobald die ersten Partner aktiv sind.</td><td>Monate, dann selbsttragend</td></tr>
+    <tr><td><span class="pill c">C — Vertrauens-Verzeichnisse</span></td><td>Einträge bei G2, SaaSHub &amp; Co. sind der stärkste einzelne Hebel dafür, dass KI-Systeme uns überhaupt als Marke kennen und empfehlen.</td><td>Wochen</td></tr>
+    <tr><td><span class="pill d">D — Sichtbares Ergebnis</span></td><td>Eine schlichte "Zuletzt geprüft am…"-Zeile, die Kunden freiwillig auf ihrer Website einbinden — Werbefläche, die sich von selbst verbreitet.</td><td>Monate, kleiner Zusatzhebel</td></tr>
+  </table>
+
+  <div class="box mint">
+    <strong>Was in 90 Tagen realistisch ist:</strong> Erste Sales innerhalb von 14 Tagen (2–6 Stück), bis Ende Monat 3 laufend 8–15 Sales/Monat plus ein wachsendes Abo-Fundament. Diese Korridore sind bewusst breit — es fehlt aktuell eine Website-Traffic-Baseline (wird in Woche 1 nachgeholt) und die Zahlen sind aus vergleichbaren Fallstudien abgeleitet, keine Garantie.
+  </div>
+
+  <div class="box warn">
+    <strong>Was wir bewusst NICHT tun:</strong> keine Kaltakquise per E-Mail oder LinkedIn-DM (rechtlich verboten), keine "BFSG-konform"-Werbeversprechen, keine Gütesiegel-Optik beim Produkt-Widget, kein Invest in Chrome-Extension/WordPress-Plugin, bevor echte Nachfrage nachgewiesen ist.
+  </div>
+</div>
+
+<!-- ============ SEITE 3: WARUM DIESE STRATEGIE — RECHERCHE ============ -->
+<div class="page">
+  <h2>Warum diese Strategie — was die Recherche wirklich zeigt</h2>
+
+  <p>Sechs unabhängige Web-Recherchen (20 belegte Kernaussagen, alle mit Quelle und Datum) liegen dieser Strategie zugrunde. Vier Erkenntnisse sind entscheidend für die Kanal-Wahl:</p>
+
+  <div class="grid2">
+    <div class="box">
+      <h4>① KI-Suchtraffic konvertiert außergewöhnlich gut</h4>
+      <p>Traffic aus ChatGPT/Perplexity konvertiert 4–9× besser als klassischer Google-Traffic (16&nbsp;% vs. 1,8&nbsp;% in einer Fallstudie). Wer heute für KI-Zitierfähigkeit statt nur für klassisches Google-Ranking optimiert, gewinnt einen Kanal, den fast kein Wettbewerber gezielt bespielt.</p>
+      <p class="small">Quellen: seerinteractive.com (2025) · pixis.ai (2025)</p>
+    </div>
+    <div class="box">
+      <h4>② Aktualität ist ein direkter Zitier-Vorteil</h4>
+      <p>Inhalte, die innerhalb der letzten 2 Monate aktualisiert wurden, erhalten 28&nbsp;% mehr KI-Zitierungen. Die aktive Behörden-Kontrollphase (MLBF, seit 05.01.2026) und die zweite Abmahnwelle (seit 02/2026) sind exakt der aktuelle, sich entwickelnde Themen-Typ, den KI-Systeme bevorzugen — ein Zeitfenster, das ältere Wettbewerber-Inhalte nicht automatisch haben.</p>
+      <p class="small">Quelle: virayo.com/blog/llm-seo (2025/26)</p>
+    </div>
+    <div class="box">
+      <h4>③ Verzeichnis-Einträge schlagen eigenen Content</h4>
+      <p>41&nbsp;% des Gewichts für KI-Markenempfehlungen entfällt auf Erwähnungen in Verzeichnissen/Listen (G2, Capterra, SaaSHub) — mehr als jeder eigene Blogartikel leisten kann. Marken auf 4+ Plattformen sind 2,8× wahrscheinlicher in ChatGPT-Antworten präsent.</p>
+      <p class="small">Quellen: getfancy.ai · virayo.com (2025/26)</p>
+    </div>
+    <div class="box">
+      <h4>④ Partner kommen über Content, nicht über Ansprache</h4>
+      <p>Agentur-Partnerschaften entstehen laut Marktbeobachtung über Founder-Content und Communities — nie über Cold-Outreach. Das deckt sich exakt mit unseren rechtlichen Grenzen: das 0-Touch-Partnermodell ist 2026 ohnehin Marktstandard, nicht nur unsere Notlösung.</p>
+      <p class="small">Quelle: saaswelt.de/artikel/saas-marketing-ki-aera (2026)</p>
+    </div>
+  </div>
+
+  <h3>Die Wettbewerbslage, ehrlich betrachtet</h3>
+  <p>Der Gratis-Scan selbst ist kein Alleinstellungsmerkmal mehr — mindestens 10 Anbieter bieten ihn an, darunter der Legal-Tech-Platzhirsch eRecht24 (eigener Scanner seit 01.08.2025). AccessiWay besetzt bereits aktiv das Agentur-Partnergeschäft in DACH (eigenes Büro in Hamburg seit August 2025). Unsere Antwort darauf ist <strong>nicht</strong>, denselben Mechanismus lauter zu bewerben, sondern zwei Lücken zu besetzen, die (Stand Recherche) noch niemand im KMU-Segment schließt: <strong>eigene Scan-Datenpunkte</strong> als zitierfähiges Content-Asset und ein <strong>eigenes Partnerprogramm</strong> unterhalb der Enterprise-Preisklasse von AccessiWay.</p>
+
+  <div class="box mint">
+    <strong>Zeit-Test bestanden:</strong> Keiner der Top-Hebel aus der Recherche erfordert Cold-Outreach, Kaltakquise oder bezahlte Anzeigen. Das 0-Touch-Modell ist also nicht nur unsere rechtliche Zwangslösung — es ist 2026 ohnehin die empfohlene Vorgehensweise für Solo-SaaS-Gründer.
+  </div>
+
+  <p class="small muted">Vollständiges Quellenverzeichnis: siehe Anhang, letzte Seite dieses Reports.</p>
+</div>
+
+<!-- ============ SEITE 4: FUNNEL-DIAGRAMM ============ -->
+<div class="page">
+  <h2>Der Funnel — vom Traffic zum wiederkehrenden Umsatz</h2>
+  <p>Der Funnel selbst bleibt unverändert bestehen. Neu ist nur, <strong>woher</strong> der Traffic künftig kommt (vier Säulen statt Anzeigen) und dass ab Monat 2 zusätzlich Partner-Provisionen im Hintergrund mitlaufen.</p>
+
+  <svg viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; margin: 4mm 0;">
+    <!-- Funnel stages as trapezoids -->
+    <!-- Stage 1: Traffic -->
+    <polygon points="20,40 340,40 300,95 60,95" fill="#ff7a1a"/>
+    <text x="180" y="63" text-anchor="middle" font-size="15" fill="#2b1206" font-weight="700">Traffic</text>
+    <text x="180" y="80" text-anchor="middle" font-size="9.5" fill="#2b1206">Content · KI-Suche · PR · Partner · Verzeichnisse</text>
+
+    <!-- Stage 2: Gratis-Scan -->
+    <polygon points="60,105 300,105 268,160 92,160" fill="#f5b13d"/>
+    <text x="180" y="128" text-anchor="middle" font-size="14" fill="#2b1206" font-weight="700">Gratis-Scan</text>
+    <text x="180" y="145" text-anchor="middle" font-size="9.5" fill="#2b1206">URL + E-Mail (Double-Opt-in) → Brevo-Nurture</text>
+
+    <!-- Stage 3: Kauf -->
+    <polygon points="92,170 268,170 240,220 120,220" fill="#7fe8bd"/>
+    <text x="180" y="191" text-anchor="middle" font-size="13" fill="#06251a" font-weight="700">Kauf</text>
+    <text x="180" y="207" text-anchor="middle" font-size="9.5" fill="#06251a">Basis 129 € · Profi 399 € · Cookie-Check 39/69 €</text>
+
+    <!-- Stage 4: Abo -->
+    <polygon points="120,230 240,230 220,270 140,270" fill="#34d99a"/>
+    <text x="180" y="249" text-anchor="middle" font-size="12" fill="#06251a" font-weight="700">Abo</text>
+    <text x="180" y="262" text-anchor="middle" font-size="9" fill="#06251a">Re-Check 24,99 €/Mo · 249 €/Jahr</text>
+
+    <!-- Right-hand annotation: corridors -->
+    <g font-size="9.5" fill="#4a3a2a">
+      <line x1="345" y1="50" x2="345" y2="270" stroke="#e2d3c0" stroke-width="1"/>
+      <text x="360" y="55" font-weight="700" fill="#7a2e05">Zielkorridore bis Ende Woche 12</text>
+      <text x="360" y="75">Sessions/Woche: +40–100 % ggü. Baseline</text>
+      <text x="360" y="95">(Baseline wird in Woche 1 erhoben)</text>
+      <text x="360" y="130">Neue Gratis-Scans/Woche: +35–80</text>
+      <text x="360" y="192">Sales kumuliert: 8–15 pro Monat</text>
+      <text x="360" y="212">(laufend, ab Monat 3)</text>
+      <text x="360" y="250">Abo-MRR: 250–500 €</text>
+      <text x="360" y="285" font-style="italic" fill="#8a7a68">Zusätzlich: 14-Tage-Skill „upsell-trigger"</text>
+      <text x="360" y="298" font-style="italic" fill="#8a7a68">schlägt Käufern automatisch das Abo vor</text>
+    </g>
+  </svg>
+
+  <h3>Warum diese Zahlen Richtwerte sind, keine Prognosen</h3>
+  <p>Es liegt aktuell keine Google-Analytics-/Search-Console-Baseline vor — das ist die erste Aufgabe in Woche 1. Die obigen Korridore sind konservativ aus vergleichbaren Fallstudien abgeleitet und werden ab KPI-Gate&nbsp;3 (Woche 6) mit echten Ist-Daten neu kalibriert, statt stur fortgeschrieben zu werden.</p>
+</div>
+
+<!-- ============ SEITE 5: KANAL-MATRIX ============ -->
+<div class="page">
+  <h2>Die Kanal-Matrix — Tempo gegen Aufwand</h2>
+  <p>Zwölf geprüfte Kanäle, eingeordnet nach Geschwindigkeit bis zur Wirkung (senkrechte Achse) und wöchentlichem Owner-Aufwand (waagerechte Achse). Die Kreisgröße zeigt den ungefähren Cash-Bedarf — die meisten Kreise sind klein, weil die Kanäle fast kostenlos sind.</p>
+
+  <svg viewBox="0 0 760 430" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; margin: 3mm 0;">
+    <!-- axes -->
+    <line x1="90" y1="20" x2="90" y2="370" stroke="#c9b8a4" stroke-width="1.2"/>
+    <line x1="90" y1="370" x2="720" y2="370" stroke="#c9b8a4" stroke-width="1.2"/>
+    <!-- gridlines -->
+    <g stroke="#f0e6d8" stroke-width="1">
+      <line x1="90" y1="95" x2="720" y2="95"/>
+      <line x1="90" y1="195" x2="720" y2="195"/>
+      <line x1="90" y1="295" x2="720" y2="295"/>
+      <line x1="220" y1="20" x2="220" y2="370"/>
+      <line x1="380" y1="20" x2="380" y2="370"/>
+      <line x1="540" y1="20" x2="540" y2="370"/>
+    </g>
+    <text x="20" y="60" font-size="10" fill="#4a3a2a">schnell</text>
+    <text x="20" y="200" font-size="10" fill="#4a3a2a">mittel</text>
+    <text x="10" y="345" font-size="10" fill="#4a3a2a">langsam</text>
+    <text x="405" y="392" font-size="10" fill="#4a3a2a" text-anchor="middle">Owner-Aufwand pro Woche →</text>
+    <text x="30" y="200" font-size="10" fill="#4a3a2a" transform="rotate(-90 30 200)" text-anchor="middle">Tempo bis Wirkung</text>
+
+    <!-- bubbles: säule A orange, B mint, C rot/pink, D blau -->
+    <!-- PR-Portale (A) schnell, aufwand mittel -->
+    <circle cx="270" cy="70" r="16" fill="#ff7a1a" fill-opacity="0.82"/>
+    <text x="270" y="45" font-size="8.6" text-anchor="middle" fill="#4a3a2a">PR-Portale</text>
+
+    <!-- Status-Widget (D) schnell, wenig aufwand -->
+    <circle cx="150" cy="60" r="12" fill="#6f7bff" fill-opacity="0.82"/>
+    <text x="150" y="38" font-size="8.6" text-anchor="middle" fill="#4a3a2a">Status-Widget</text>
+
+    <!-- Newsletter-Sponsoring (A) schnell, wenig aufwand, groß=teuer -->
+    <circle cx="160" cy="100" r="22" fill="#ff7a1a" fill-opacity="0.55"/>
+    <text x="160" y="132" font-size="8.6" text-anchor="middle" fill="#4a3a2a">Newsletter (teuer)</text>
+
+    <!-- AEO-Optimierung (A) mittel, aufwand niedrig-mittel -->
+    <circle cx="230" cy="190" r="16" fill="#ff7a1a" fill-opacity="0.82"/>
+    <text x="230" y="165" font-size="8.6" text-anchor="middle" fill="#4a3a2a">AEO-Refresh</text>
+
+    <!-- Directory/Review (C) mittel, wenig Aufwand -->
+    <circle cx="150" cy="210" r="15" fill="#f5554b" fill-opacity="0.78"/>
+    <text x="150" y="240" font-size="8.6" text-anchor="middle" fill="#4a3a2a">Verzeichnisse</text>
+
+    <!-- LinkedIn (A) mittel, aufwand mittel -->
+    <circle cx="320" cy="195" r="14" fill="#ff7a1a" fill-opacity="0.82"/>
+    <text x="320" y="220" font-size="8.6" text-anchor="middle" fill="#4a3a2a">LinkedIn</text>
+
+    <!-- Podcast (A) mittel, aufwand mittel -->
+    <circle cx="360" cy="205" r="12" fill="#ff7a1a" fill-opacity="0.6"/>
+    <text x="380" y="180" font-size="8.6" text-anchor="middle" fill="#4a3a2a">Podcast</text>
+
+    <!-- Fachmedien-Gastbeiträge (A) mittel-langsam, aufwand hoch -->
+    <circle cx="470" cy="250" r="15" fill="#ff7a1a" fill-opacity="0.7"/>
+    <text x="470" y="275" font-size="8.6" text-anchor="middle" fill="#4a3a2a">Gastbeiträge</text>
+
+    <!-- Programmatic SEO (A) langsam, aufwand hoch, sehr hoher compounding -->
+    <circle cx="480" cy="330" r="20" fill="#ff7a1a" fill-opacity="0.9"/>
+    <text x="480" y="360" font-size="8.6" text-anchor="middle" fill="#4a3a2a">Programmatic-SEO</text>
+
+    <!-- IHK/Verbände (B) langsam, aufwand mittel-hoch -->
+    <circle cx="420" cy="320" r="12" fill="#34d99a" fill-opacity="0.75"/>
+    <text x="420" y="298" font-size="8.6" text-anchor="middle" fill="#4a3a2a">IHK/Verbände</text>
+
+    <!-- Partnerprogramm (B) langsam, aufwand mittel-hoch, sehr hoher compounding -->
+    <circle cx="560" cy="310" r="19" fill="#34d99a" fill-opacity="0.9"/>
+    <text x="560" y="285" font-size="8.6" text-anchor="middle" fill="#4a3a2a">Agentur-Partner</text>
+
+    <!-- WordPress-Plugin (D) langsam, aufwand sehr hoch -->
+    <circle cx="660" cy="335" r="14" fill="#6f7bff" fill-opacity="0.75"/>
+    <text x="660" y="358" font-size="8.6" text-anchor="middle" fill="#4a3a2a">WP-Plugin (trigger)</text>
+
+    <text x="90" y="15" font-size="8.5" fill="#a99a89">senkrecht = Zeit bis erste Wirkung · waagerecht = h/Woche · Größe = Cash-Bedarf</text>
+  </svg>
+
+  <div class="legend">
+    <span><span class="dot" style="background:#ff7a1a"></span> Säule A — Content/AEO/PR</span>
+    <span><span class="dot" style="background:#34d99a"></span> Säule B — Partner &amp; Channel</span>
+    <span><span class="dot" style="background:#f5554b"></span> Säule C — Verzeichnisse</span>
+    <span><span class="dot" style="background:#6f7bff"></span> Säule D — Produkt-Distribution</span>
+  </div>
+
+  <p style="margin-top:3mm">Die vier Sofort-Prioritäten liegen bewusst oben links (schnell, wenig Aufwand): AEO-Refresh, PR-Portale, Verzeichnis-Pflege, LinkedIn-Start. Programmatic-SEO und das Agentur-Partnerprogramm liegen unten rechts — mehr Aufwand, aber der stärkste Compounding-Effekt über die vollen 90 Tage hinweg.</p>
+</div>
+
+<!-- ============ SEITE 6: DIE 4 SÄULEN IM DETAIL ============ -->
+<div class="page">
+  <h2>Die vier Säulen im Detail</h2>
+
+  <h3><span class="pill">Säule A</span> Content-Autorität, KI-Suche &amp; PR</h3>
+  <p>Bestehende 15+ Ratgeberseiten werden auf Frage-Antwort-Struktur, Schema-Markup und ein aktuelles Änderungsdatum umgebaut (das allein bringt laut Recherche bis zu +44&nbsp;% mehr KI-Zitierungen). Dazu kommen 3–5 neue Branchenseiten pro Monat, ein Pillar-Artikel zur "Overlay-funktioniert-nicht"-Debatte (eine bisher unbesetzte Content-Lücke) und ein wöchentlicher LinkedIn-Post des Gründers. Die fertige Pressemitteilung zur MLBF-Kontrollphase wird sofort bei drei kostenlosen Portalen eingereicht.</p>
+
+  <h3><span class="pill b">Säule B</span> Partner &amp; Channel</h3>
+  <p>Ein Agentur-/White-Label-Partnerprogramm mit gestaffelter Provision (20&nbsp;% auf das Basis-Produkt, 25&nbsp;% auf Profi, 20&nbsp;% laufend auf das Abo). Bewusst <strong>kein</strong> Soft-Launch: Das Programm geht erst live, nachdem die tatsächlichen Stückkosten pro Report (Server, Playwright-Laufzeit, PDF-Erstellung, Support) in Woche 3 gegengerechnet wurden. Partner kommen über die neue Partner-Landingpage und Content — nie über Kaltakquise.</p>
+
+  <h3><span class="pill c">Säule C</span> Vertrauens-Verzeichnisse</h3>
+  <p>SaaSHub- und G2-Einträge (Accounts bereits vorhanden) werden vollständig ausgefüllt und laufend mit Bewertungen gepflegt. Das ist laut Recherche der einzelne stärkste Hebel dafür, dass KI-Systeme unsere Marke überhaupt kennen (41&nbsp;% Gewichtung) — und kostet nichts außer Pflegezeit.</p>
+
+  <h3><span class="pill d">Säule D</span> Produkt-Distribution, leicht &amp; redesignt</h3>
+  <p>Statt eines Gütesiegels (rechtliches Risiko, siehe Risiko&nbsp;7) bekommen Kunden eine schlichte "Zuletzt geprüft am [Datum]"-Statuszeile zum Einbinden. WordPress-Plugin und Chrome-Extension bleiben bewusst <strong>außerhalb</strong> des 90-Tage-Kernplans — sie werden erst gebaut, wenn echte Nachfrage in Form von Widget-Adoption und Nutzeranfragen nachgewiesen ist (siehe Kill-/Trigger-Kriterien, Seite 12).</p>
+
+  <div class="box">
+    <strong>Das verbindende Prinzip:</strong> Jede Bau- oder Cash-Entscheidung braucht einen <em>Trigger</em>, kein Kalenderdatum — zum Beispiel "Extension erst bei 2 von 3 Nachfrage-Schwellen". Das verhindert Perfektionismus-Fallen und stellt sicher, dass Geld und Zeit nur dorthin fließen, wo bereits ein Signal aus dem Markt vorliegt.
+  </div>
+</div>
+
+<!-- ============ SEITE 7: 90-TAGE-ZEITSTRAHL ============ -->
+<div class="page">
+  <h2>Der 90-Tage-Zeitstrahl</h2>
+  <p>Drei Monatsblöcke, sechs KPI-Gates alle zwei Wochen. Die Balken zeigen, wann welche Säule anläuft.</p>
+
+  <svg viewBox="0 0 760 340" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto;">
+    <!-- month blocks -->
+    <rect x="60" y="15" width="620" height="18" fill="#ffe8d5" rx="3"/>
+    <text x="150" y="28" font-size="10" text-anchor="middle" fill="#7a2e05" font-weight="700">Monat 1 · Woche 1–4 · Sofort-Start</text>
+    <text x="370" y="28" font-size="10" text-anchor="middle" fill="#7a2e05" font-weight="700">Monat 2 · Woche 5–8 · Ausbau</text>
+    <text x="600" y="28" font-size="10" text-anchor="middle" fill="#7a2e05" font-weight="700">Monat 3 · Woche 9–13 · Laufbetrieb &amp; Review</text>
+
+    <!-- week ticks -->
+    <line x1="60" y1="45" x2="680" y2="45" stroke="#c9b8a4" stroke-width="1"/>
+    <g font-size="8" fill="#6b5a4a">
+      <text x="60" y="58">W1</text><text x="107" y="58">W2</text><text x="154" y="58">W3</text><text x="201" y="58">W4</text>
+      <text x="248" y="58">W5</text><text x="295" y="58">W6</text><text x="342" y="58">W7</text><text x="389" y="58">W8</text>
+      <text x="436" y="58">W9</text><text x="483" y="58">W10</text><text x="530" y="58">W11</text><text x="577" y="58">W12</text><text x="624" y="58">W13</text>
+    </g>
+    <g stroke="#e2d3c0" stroke-width="0.7">
+      <line x1="107" y1="40" x2="107" y2="330"/><line x1="154" y1="40" x2="154" y2="330"/><line x1="201" y1="40" x2="201" y2="330"/>
+      <line x1="248" y1="40" x2="248" y2="330"/><line x1="295" y1="40" x2="295" y2="330"/><line x1="342" y1="40" x2="342" y2="330"/><line x1="389" y1="40" x2="389" y2="330"/>
+      <line x1="436" y1="40" x2="436" y2="330"/><line x1="483" y1="40" x2="483" y2="330"/><line x1="530" y1="40" x2="530" y2="330"/><line x1="577" y1="40" x2="577" y2="330"/><line x1="624" y1="40" x2="624" y2="330"/>
+    </g>
+
+    <!-- Säule A bar -->
+    <rect x="60" y="75" width="620" height="20" fill="#ff7a1a" rx="3"/>
+    <text x="65" y="89" font-size="9" fill="#2b1206" font-weight="700">Säule A — Content / AEO / PR / LinkedIn (durchgängig)</text>
+
+    <!-- Säule B bar, starts week 3 -->
+    <rect x="154" y="105" width="526" height="20" fill="#34d99a" rx="3"/>
+    <text x="159" y="119" font-size="9" fill="#06251a" font-weight="700">Säule B — Partner &amp; Affiliate (ab Stückkosten-Check W3)</text>
+
+    <!-- Säule C bar, W1 durchgängig -->
+    <rect x="60" y="135" width="620" height="20" fill="#f5554b" rx="3" fill-opacity="0.8"/>
+    <text x="65" y="149" font-size="9" fill="#3a0704" font-weight="700">Säule C — Verzeichnisse &amp; Reviews (durchgängig)</text>
+
+    <!-- Säule D bar, W5 to W7 concept+build, ongoing light -->
+    <rect x="248" y="165" width="141" height="20" fill="#6f7bff" rx="3" fill-opacity="0.85"/>
+    <text x="253" y="179" font-size="9" fill="#0d0c3a" font-weight="700">Säule D — Status-Widget Konzept &amp; Bau (W5–W8)</text>
+
+    <!-- KPI gates as diamonds -->
+    <g>
+      <polygon points="107,205 113,215 107,225 101,215" fill="#7a2e05"/>
+      <text x="107" y="245" font-size="8" text-anchor="middle">Gate 1</text>
+      <text x="107" y="256" font-size="7.5" text-anchor="middle" fill="#6b5a4a">0–2 Sales</text>
+
+      <polygon points="201,205 207,215 201,225 195,215" fill="#7a2e05"/>
+      <text x="201" y="245" font-size="8" text-anchor="middle">Gate 2</text>
+      <text x="201" y="256" font-size="7.5" text-anchor="middle" fill="#6b5a4a">2–6 Sales</text>
+
+      <polygon points="295,205 301,215 295,225 289,215" fill="#7a2e05"/>
+      <text x="295" y="245" font-size="8" text-anchor="middle">Gate 3</text>
+      <text x="295" y="256" font-size="7.5" text-anchor="middle" fill="#6b5a4a">3–8 Sales</text>
+
+      <polygon points="389,205 395,215 389,225 383,215" fill="#7a2e05"/>
+      <text x="389" y="245" font-size="8" text-anchor="middle">Gate 4</text>
+      <text x="389" y="256" font-size="7.5" text-anchor="middle" fill="#6b5a4a">5–12 Sales</text>
+      <text x="389" y="267" font-size="7" text-anchor="middle" fill="#b8430e" font-style="italic">Reißleinen-Check</text>
+
+      <polygon points="483,205 489,215 483,225 477,215" fill="#7a2e05"/>
+      <text x="483" y="245" font-size="8" text-anchor="middle">Gate 5</text>
+      <text x="483" y="256" font-size="7.5" text-anchor="middle" fill="#6b5a4a">7–16 Sales</text>
+
+      <polygon points="577,205 583,215 577,225 571,215" fill="#7a2e05"/>
+      <text x="577" y="245" font-size="8" text-anchor="middle">Gate 6</text>
+      <text x="577" y="256" font-size="7.5" text-anchor="middle" fill="#6b5a4a">8–15/Monat</text>
+    </g>
+
+    <line x1="60" y1="200" x2="680" y2="200" stroke="#e2d3c0" stroke-width="0.7"/>
+    <text x="65" y="197" font-size="8" fill="#a99a89">KPI-Gates (alle 2 Wochen), Sales-Korridor kumuliert</text>
+
+    <!-- Puffer week 13 -->
+    <rect x="624" y="75" width="56" height="80" fill="none" stroke="#c9b8a4" stroke-dasharray="3,2"/>
+    <text x="652" y="290" font-size="8" text-anchor="middle" fill="#6b5a4a">Woche 13:</text>
+    <text x="652" y="301" font-size="8" text-anchor="middle" fill="#6b5a4a">Puffer +</text>
+    <text x="652" y="312" font-size="8" text-anchor="middle" fill="#6b5a4a">Gesamt-</text>
+    <text x="652" y="323" font-size="8" text-anchor="middle" fill="#6b5a4a">Review</text>
+  </svg>
+</div>
+
+<!-- ============ SEITE 8: WOCHENPLAN TABELLE (verdichtet) ============ -->
+<div class="page">
+  <h2>Der 90-Tage-Plan — verdichtet nach Phasen</h2>
+
+  <h3>Phase 1 — Sofort-Start (Woche 1–2)</h3>
+  <table>
+    <tr><th style="width:55%">Aufgabe</th><th style="width:15%">Wer</th><th>Deliverable</th></tr>
+    <tr><td>PM „MLBF-Kontrollphase" bei openPR, inar.de, firmenpresse.de einreichen</td><td>🦊 ~2 h</td><td>3 Live-PMs + Backlinks</td></tr>
+    <tr><td>SaaSHub- und G2-Listing live schalten (Texte liegen fertig vor)</td><td>🦊 ~1 h</td><td>2 Live-Verzeichnis-Einträge</td></tr>
+    <tr><td>AEO-Refresh aller bestehenden Ratgeberseiten (Q&amp;A-Struktur, Schema, Freshness-Datum)</td><td>🤖, 🦊 Stichprobe</td><td>15+ überarbeitete Seiten</td></tr>
+    <tr><td>Overlay-Kritik-Pillar-Artikel entwerfen und veröffentlichen</td><td>🤖 Entwurf, 🦊 Freigabe</td><td>1 Live-Artikel</td></tr>
+    <tr><td>LinkedIn-Founder-Content starten (1–2 Posts/Woche)</td><td>🤖 Entwurf, 🦊 postet</td><td>2–3 Live-Posts</td></tr>
+    <tr><td>GA-/Search-Console-Zugriff freigeben (Baseline-Messung)</td><td>🦊 ~15 Min</td><td>Zugriff erteilt</td></tr>
+  </table>
+
+  <h3>Phase 2 — Partner-Aufbau (Woche 3–4)</h3>
+  <table>
+    <tr><th style="width:55%">Aufgabe</th><th style="width:15%">Wer</th><th>Deliverable</th></tr>
+    <tr><td>Stückkosten-Gegenrechnung Partnerprogramm (Server/Playwright/Support pro Report)</td><td>🦊 mit 🤖-Aufbereitung</td><td>Bestätigte Provisionssätze — Kill-Gate vor Säule B</td></tr>
+    <tr><td>Affiliate-Tool auswählen &amp; scharf schalten (FirstPromoter/Rewardful/Reditus)</td><td>🦊 Account, 🤖 Konfiguration</td><td>Live-Partnerprogramm</td></tr>
+    <tr><td>Agentur-Partnerprogramm-Landingpage texten &amp; live schalten</td><td>🤖, 🦊 Freigabe Konditionen</td><td>Live-Seite `/agentur-partner`</td></tr>
+    <tr><td>Programmatic-SEO-Branchenseiten starten (2–3/Woche, laufend)</td><td>🤖, 🦊 Stichprobe</td><td>4–6 Live-Seiten</td></tr>
+    <tr><td><strong>KPI-Gate 1 &amp; 2</strong></td><td>🤖</td><td>Kurzreports Ende W2 / W4</td></tr>
+  </table>
+
+  <h3>Phase 3 — Ausbau (Woche 5–8)</h3>
+  <table>
+    <tr><th style="width:55%">Aufgabe</th><th style="width:15%">Wer</th><th>Deliverable</th></tr>
+    <tr><td>Scan-Dataset-Auswertung + PR-Meldung „1 Jahr BFSG" mit eigenen Datenpunkten</td><td>🤖, 🦊 Freigabe</td><td>Live-PM #2</td></tr>
+    <tr><td>Status-Widget entwerfen, bauen und auf 2–3 echten Kundenseiten testen</td><td>🤖, 🦊 Design/Testing-Freigabe</td><td>Live-Prototyp</td></tr>
+    <tr><td>Review-Ask-Automation scharf schalten (Brevo)</td><td>🤖</td><td>Live-Automation</td></tr>
+    <tr><td>Manuelle AI-Zitier-Stichprobe auswerten → Tool-Entscheidung</td><td>🤖 Auswertung, 🦊 Entscheidung</td><td>Go/No-Go dokumentiert</td></tr>
+    <tr><td>Programmatic-SEO weiter (2–3 Seiten/Woche)</td><td>🤖, 🦊</td><td>8–12 weitere Live-Seiten</td></tr>
+    <tr><td><strong>KPI-Gate 3 &amp; 4</strong> (Gate 4 = wichtigstes Gate, Monat-2-Review)</td><td>🤖</td><td>Ausführlicher Report Ende W6 / W8</td></tr>
+  </table>
+
+  <h3>Phase 4 — Laufbetrieb &amp; Review (Woche 9–13)</h3>
+  <table>
+    <tr><th style="width:55%">Aufgabe</th><th style="width:15%">Wer</th><th>Deliverable</th></tr>
+    <tr><td>Kill-Kriterien-Review für alle Kanäle</td><td>🤖 Auswertung, 🦊 Entscheidung</td><td>Dokumentierte Entscheidungen</td></tr>
+    <tr><td>Trigger-Check WordPress-Plugin/Chrome-Extension (nur Bestandsaufnahme)</td><td>🤖</td><td>Trigger-Report</td></tr>
+    <tr><td>Newsletter-Sponsoring-Test prüfen (nur bei belegtem Sale aus Gratis-Kanal)</td><td>🦊 Entscheidung</td><td>Go/No-Go</td></tr>
+    <tr><td>Quartals-PR-Meldung #3 (Datenupdate)</td><td>🤖 Entwurf, 🦊 Freigabe</td><td>Live-PM</td></tr>
+    <tr><td>Gesamt-90-Tage-Review: welche Kanäle skalieren, welche werden gekillt</td><td>🤖 Auswertung, 🦊 Entscheidung</td><td>Strategie-Update für Monat 4+</td></tr>
+    <tr><td><strong>KPI-Gate 5 &amp; 6</strong> (Gate 6 = Monat-3-Review)</td><td>🤖</td><td>Reports Ende W10 / W12</td></tr>
+  </table>
+
+  <p class="small muted">🦊 = Owner (Matthias) · 🤖 = Claude Code · vollständige Wochenliste inkl. aller Nebenaufgaben in <code>marketing/no-ads-strategie/90-tage-plan.md</code></p>
+</div>
+
+<!-- ============ SEITE 9: WER MACHT WAS + OWNER-ZEIT ============ -->
+<div class="page">
+  <h2>Wer macht was — und reicht die Zeit?</h2>
+
+  <div class="grid2">
+    <div class="box">
+      <h4>🦊 Owner (Matthias) — Freigaben &amp; Vertrauens-Momente</h4>
+      <ul>
+        <li>Accounts anlegen, Formulare final einreichen (PR-Portale, Verzeichnisse, Affiliate-Tool)</li>
+        <li>Rechtliche und inhaltliche Freigabe vor jeder Veröffentlichung</li>
+        <li>LinkedIn-Posts persönlich veröffentlichen (Authentizität)</li>
+        <li>Stückkosten-Rechnung fürs Partnerprogramm (Woche 3)</li>
+        <li>Alle Kill-/Go-Entscheidungen an den KPI-Gates</li>
+        <li>Zahlungsmittel-Freigaben (Affiliate-Tool, ggf. Newsletter-Slot)</li>
+      </ul>
+    </div>
+    <div class="box mint">
+      <h4>🤖 Claude Code — Produktion &amp; Auswertung</h4>
+      <ul>
+        <li>Content-Entwürfe: Artikel, LinkedIn-Posts, PM-Texte, Landingpage-Texte</li>
+        <li>AEO-Umbau bestehender Seiten (Struktur, Schema, Freshness)</li>
+        <li>Programmatic-SEO-Seitenproduktion (mit Owner-Stichprobe)</li>
+        <li>Technischer Aufbau: Status-Widget, Affiliate-Konfiguration, Automationen</li>
+        <li>KPI-Reports alle 2 Wochen, Kill-Kriterien-Auswertung</li>
+        <li>Recherche &amp; Wettbewerbsbeobachtung laufend</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Owner-Zeit-Bedarf über alle vier Säulen summiert</h3>
+  <p>Die Einzel-Entwürfe hatten je Kanal isoliert gerechnet, ohne sie gegeneinander aufzusummieren. Hier die tatsächliche Summe pro Woche im Vergleich zur verfügbaren Kapazität (2–4 h/Tag = 14–28 h/Woche):</p>
+
+  <svg viewBox="0 0 760 190" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto;">
+    <line x1="80" y1="20" x2="80" y2="150" stroke="#c9b8a4"/>
+    <line x1="80" y1="150" x2="700" y2="150" stroke="#c9b8a4"/>
+    <text x="20" y="155" font-size="8" fill="#6b5a4a">0 h</text>
+    <text x="20" y="87" font-size="8" fill="#6b5a4a">7 h</text>
+    <text x="10" y="27" font-size="8" fill="#6b5a4a">14 h</text>
+    <line x1="80" y1="25" x2="700" y2="25" stroke="#f5554b" stroke-dasharray="4,3"/>
+    <text x="690" y="20" font-size="8" fill="#b8430e" text-anchor="end">Untere Kapazitätsgrenze (14 h/Woche)</text>
+
+    <!-- bars: W1-2, W3-4, W5-8, W9-13 -->
+    <rect x="130" y="86" width="90" height="64" fill="#ff7a1a"/>
+    <text x="175" y="168" font-size="9" text-anchor="middle">W1–2</text>
+    <text x="175" y="78" font-size="9" text-anchor="middle" font-weight="700">4–5,5 h</text>
+
+    <rect x="280" y="97" width="90" height="53" fill="#ff9440"/>
+    <text x="325" y="168" font-size="9" text-anchor="middle">W3–4</text>
+    <text x="325" y="89" font-size="9" text-anchor="middle" font-weight="700">3,5–5 h</text>
+
+    <rect x="430" y="72" width="90" height="78" fill="#f5b13d"/>
+    <text x="475" y="168" font-size="9" text-anchor="middle">W5–8</text>
+    <text x="475" y="64" font-size="9" text-anchor="middle" font-weight="700">4–7 h</text>
+
+    <rect x="580" y="99" width="90" height="51" fill="#34d99a"/>
+    <text x="625" y="168" font-size="9" text-anchor="middle">W9–13</text>
+    <text x="625" y="91" font-size="9" text-anchor="middle" font-weight="700">3,5–4,5 h</text>
+  </svg>
+  <p>Auch in der arbeitsintensivsten Phase (Woche 5–8, max. ~7 h/Woche) bleibt deutlich Puffer zur unteren Kapazitätsgrenze. Der Plan ist damit realistisch tragbar — der Puffer dient bewusst als Reserve für Produktbetrieb und Störfälle, nicht für zusätzliche Kanäle.</p>
+</div>
+
+<!-- ============ SEITE 10: BUDGET-DONUT ============ -->
+<div class="page">
+  <h2>Budget — 600 €/Monat, größtenteils an Bedingungen geknüpft</h2>
+  <p>Kein starrer Plan, sondern explizite Freigabe-Regeln: Geld fließt nur, wenn ein Trigger erfüllt ist — sonst bleibt es Reserve.</p>
+
+  <div class="grid2">
+    <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:270px; height:auto;">
+      <!-- Donut: Fix ~49 (8.2%), Trigger-abhängig ~321 (53.5%), Reserve ~230 (38.3%) -->
+      <!-- circle circumference approach using stroke-dasharray on r=90 circle, circumference ~565.5 -->
+      <g transform="translate(150,150)">
+        <circle r="90" fill="none" stroke="#e7ddd2" stroke-width="34"/>
+        <!-- Fix: 8.2% -->
+        <circle r="90" fill="none" stroke="#ff7a1a" stroke-width="34"
+          stroke-dasharray="46.4 519.1" stroke-dashoffset="0" transform="rotate(-90)"/>
+        <!-- Trigger: 53.5% starts after fix -->
+        <circle r="90" fill="none" stroke="#f5b13d" stroke-width="34"
+          stroke-dasharray="302.5 263" stroke-dashoffset="-46.4" transform="rotate(-90)"/>
+        <!-- Reserve: 38.3% -->
+        <circle r="90" fill="none" stroke="#34d99a" stroke-width="34"
+          stroke-dasharray="216.6 348.9" stroke-dashoffset="-348.9" transform="rotate(-90)"/>
+        <text x="0" y="-4" text-anchor="middle" font-size="22" font-weight="800" fill="#7a2e05">600 €</text>
+        <text x="0" y="16" text-anchor="middle" font-size="9" fill="#6b5a4a">pro Monat</text>
+      </g>
+    </svg>
+
+    <div>
+      <div class="kv"><span><span class="dot" style="background:#ff7a1a"></span> Fix ab Woche 4</span><span><strong>~49 €</strong> (8 %)</span></div>
+      <p class="small muted" style="margin-top:-1mm">Affiliate-Tracking-Tool — geringes Risiko, läuft standardmäßig an.</p>
+      <div class="kv"><span><span class="dot" style="background:#f5b13d"></span> Trigger-abhängig</span><span><strong>bis ~321 €</strong> (54 %)</span></div>
+      <p class="small muted" style="margin-top:-1mm">PR-Premium, AI-Zitier-Tracking, Freelance-Korrektorat, Widget-Design, Newsletter-Test — jeweils nur bei erfülltem Trigger.</p>
+      <div class="kv"><span><span class="dot" style="background:#34d99a"></span> Ungebundene Reserve</span><span><strong>≥230 €</strong> (38 %)</span></div>
+      <p class="small muted" style="margin-top:-1mm">Bleibt bewusst frei für kurzfristige Chancen — wird nie automatisch verplant.</p>
+    </div>
+  </div>
+
+  <h3>Die wichtigsten Trigger-Regeln</h3>
+  <table>
+    <tr><th>Posten</th><th class="num">Betrag</th><th>Ausgelöst durch</th><th>Sonst</th></tr>
+    <tr><td>Affiliate-Tool</td><td class="num">~49 €/Mo</td><td>Standard ab Woche 4</td><td>&lt;3 aktive Affiliates bis W8 → kündigen</td></tr>
+    <tr><td>PR-Premium-Distribution</td><td class="num">~100 €</td><td>Nur für Scan-Dataset-Studie, wenn PM #1 ≥1 Backlink brachte</td><td>Kostenlose Basisportale reichen</td></tr>
+    <tr><td>AI-Zitier-Tracking-Tool</td><td class="num">~90 €/Mo</td><td>Erst ab Woche 8, wenn manuelle Stichproben bereits Zitierungen zeigen</td><td>Manuelle Stichprobe bleibt kostenlos</td></tr>
+    <tr><td>Freelance-Korrektorat</td><td class="num">0–180 €/Mo</td><td>Nur wenn Seitenproduktion &gt;5/Monat skaliert</td><td>Owner prüft selbst weiter</td></tr>
+    <tr><td>Newsletter-Sponsoring</td><td class="num">400–600 € einmalig</td><td>Nur Monat 3, nur bei ≥1 belegtem Sale aus Gratis-Kanal</td><td>Entfällt ersatzlos</td></tr>
+  </table>
+
+  <h3>CAC-Rechnung gegen das 177-€-Ziel</h3>
+  <table>
+    <tr><th>Kanal</th><th>CAC-Mechanismus</th><th class="num">Rechnung</th><th class="num">Ziel &lt;177 €</th></tr>
+    <tr><td>Säule A + C (Content/PR/AEO/Directories)</td><td>Cash-CAC ≈ 0 € (nur Zeitkosten)</td><td class="num">≈ 0 €</td><td class="num">✅</td></tr>
+    <tr><td>Säule B — Affiliate, Basis-Produkt (129 €)</td><td>20 % einmalig</td><td class="num">25,80 €</td><td class="num">✅</td></tr>
+    <tr><td>Säule B — Affiliate, Profi-Produkt (399 €)</td><td>25 % einmalig</td><td class="num">99,75 €</td><td class="num">✅</td></tr>
+    <tr><td>Säule B — Abo-Recurring</td><td>20 % recurring</td><td class="num">~5,00 €/Mo</td><td class="num">kein Einmalvergleich sinnvoll</td></tr>
+  </table>
+</div>
+
+<!-- ============ SEITE 11: KPI-GATES ============ -->
+<div class="page">
+  <h2>KPI-Gates — alle 2 Wochen prüfen, nicht täglich</h2>
+  <p>Sechs Gates über 90 Tage. Korridore sind bewusst breit, weil aktuell keine Traffic-Baseline vorliegt — sie werden ab Gate 3 mit echten Ist-Daten neu kalibriert.</p>
+
+  <table>
+    <tr><th>Gate</th><th>Zeitpunkt</th><th>Traffic-Zuwachs</th><th>Neue Leads/Woche</th><th>Sales kumuliert</th><th>Abo-MRR</th></tr>
+    <tr><td>Gate 1</td><td>Ende W2 (21.07.)</td><td class="num">+5–15 %</td><td class="num">+1–5</td><td class="num">0–2</td><td class="num">0–25 €</td></tr>
+    <tr><td>Gate 2</td><td>Ende W4 (04.08.)</td><td class="num">+10–25 %</td><td class="num">+5–15</td><td class="num">2–6</td><td class="num">25–75 €</td></tr>
+    <tr><td>Gate 3</td><td>Ende W6 (18.08.)</td><td class="num">+15–35 %</td><td class="num">+10–25</td><td class="num">3–8</td><td class="num">50–125 €</td></tr>
+    <tr><td><strong>Gate 4</strong></td><td>Ende W8 (01.09.)</td><td class="num">+20–50 %</td><td class="num">+20–40</td><td class="num">5–12</td><td class="num">100–250 €</td></tr>
+    <tr><td>Gate 5</td><td>Ende W10 (15.09.)</td><td class="num">+30–70 %</td><td class="num">+25–55</td><td class="num">7–16</td><td class="num">175–375 €</td></tr>
+    <tr><td>Gate 6</td><td>Ende W12 (29.09.)</td><td class="num">+40–100 %</td><td class="num">+35–80</td><td class="num">8–15/Mo</td><td class="num">250–500 €</td></tr>
+  </table>
+
+  <div class="box warn">
+    <strong>Die Reißleine (wichtigstes Kill-Kriterium):</strong> Weniger als 2 Sales kumuliert bis Gate 4 (Woche 8) — trotz vollständig umgesetzter Aufgaben aus Woche 1–8 — löst einen vollständigen Strategie-Review mit dem Owner aus. Dann wird zuerst die Funnel-Konversion geprüft (Double-Opt-in-Rate, Nurture-Öffnungsraten), bevor weitere Kanäle skaliert werden — die Ursache könnte am Funnel liegen, nicht an den Kanälen.
+  </div>
+
+  <h3>Kill-/Pivot-Kriterien je Kanal (Auswahl)</h3>
+  <table>
+    <tr><th style="width:22%">Kanal</th><th>Kill-Kriterium</th><th>Konsequenz</th></tr>
+    <tr><td>PR (Säule A)</td><td>0 Backlinks aus PM #1+#2 bis Gate 3</td><td>Nur kostenlose Basistarife weiter, keine Premium-Distribution</td></tr>
+    <tr><td>Programmatic-SEO</td><td>&lt;20 Sessions/Monat auf neuen Seiten bis Gate 4</td><td>Produktion pausieren, technisches SEO-Audit zuerst</td></tr>
+    <tr><td>Affiliate-Programm</td><td>&lt;3 aktive Affiliates bis Gate 4</td><td>Tool-Abo kündigen, zurück auf manuelles Tracking</td></tr>
+    <tr><td>Agentur-Partnerprogramm</td><td>0 Inbound-Sign-ups bis Gate 5</td><td>Landingpage bleibt passiv online, kein Nachfassen</td></tr>
+    <tr><td>LinkedIn-Content</td><td>&lt;500 Impressionen/Post über 8 Posts bis Gate 4</td><td>Kadenz auf 1×/2 Wochen senken</td></tr>
+    <tr><td>Status-Widget</td><td>&lt;5 Kunden binden es ein bis Gate 5</td><td>Keine Weiterentwicklung, bestehende Version bleibt online</td></tr>
+    <tr><td>WordPress-Plugin</td><td>Bau erst bei 2 von 3 Trigger-Schwellen erfüllt</td><td>Vor Erreichen: kein Entwicklungsstart</td></tr>
+    <tr><td>Chrome-Extension</td><td>Bau erst bei 2 von 3 Trigger-Schwellen erfüllt</td><td>Vor Erreichen: kein Entwicklungsstart</td></tr>
+  </table>
+</div>
+
+<!-- ============ SEITE 12: RISIKEN ============ -->
+<div class="page">
+  <h2>Risiken — offen benannt, mit Gegenmaßnahme</h2>
+  <table>
+    <tr><th style="width:30%">Risiko</th><th>Gegenmaßnahme</th></tr>
+    <tr><td><strong>Thin-Content-Abwertung</strong> bei Programmatic-SEO ohne echten Mehrwert</td><td>Pflicht-Review-Gate: eigener Risiko-Absatz + eigene FAQ + Datenbezug pro Seite, Owner-Stichprobenfreigabe vor Veröffentlichung</td></tr>
+    <tr><td><strong>UWG-Risiko bei Vergleichsaussagen</strong> (§ 6 UWG)</td><td>Nur objektiv messbare, quellenbelegte Kriterien; jeder Text läuft vor Veröffentlichung durch das <code>legal-copy-grep</code>-Skill</td></tr>
+    <tr><td><strong>Provisions-/CAC-Fehlkalkulation</strong> beim Partnerprogramm</td><td>Partnerprogramm geht erst nach Owner-Stückkosten-Gegenrechnung (Woche 3) live — kein Soft-Launch mit unbestätigten Zahlen</td></tr>
+    <tr><td><strong>Owner-Zeit-Überkommittierung</strong> durch parallel laufende Kanäle</td><td>Konsolidierte Wochenstunden-Tabelle zeigt durchgängig Puffer; Kapazitäts-Realitäts-Check in Woche 13</td></tr>
+    <tr><td><strong>Affiliate-Kennzeichnungspflicht</strong> (UWG/TTDSG) bei Partner-Links</td><td>„Werbung"/„Anzeige"-Kennzeichnung vertraglich in jedem Partnervertrag; Datenschutzerklärung vor Launch ergänzt</td></tr>
+    <tr><td><strong>Status-Widget als verdecktes Gütesiegel</strong> missverstanden (UWG-Irreführung)</td><td>Bewusst kein Ampel-/Haken-/Siegel-Design, reine Datums-Statuszeile; Copy läuft durch <code>legal-copy-grep</code>; nie „barrierefrei" oder „konform" im Widget-Text</td></tr>
+    <tr><td><strong>Wettbewerbsdruck</strong> (eRecht24, AccessGO, AccessiWay besetzen ähnliche Themen)</td><td>Differenzierung über eigene Scan-Datenpunkte und KMU-/Kleinagentur-Preissegment statt Themen-Breite</td></tr>
+    <tr><td><strong>Zeitverzug bis Wirkung</strong> — SEO/AEO/Partner brauchen laut allen Entwürfen 6–12+ Wochen</td><td>Quick-Wins liefern bereits Woche 1 sichtbare Fortschritte; KPI-Gates sind der vereinbarte Bewertungsrhythmus, keine täglichen Ad-hoc-Urteile</td></tr>
+    <tr><td><strong>Fehlende Baseline-Daten</strong> bei Planerstellung</td><td>Woche-1-Aufgabe: Owner gibt GA-/Search-Console-Zugriff frei; Korridore werden ab Gate 3 neu kalibriert</td></tr>
+    <tr><td><strong>Zu geringes Scan-Volumen</strong> für die Scan-Dataset-PR-Studie</td><td>Volumen-Check vor Publikation; bei Bedarf Kombination mit öffentlichen Referenzstudien, klar gekennzeichnet</td></tr>
+    <tr><td><strong>Newsletter-Sponsoring verbrennt Budget</strong> ohne Konversionsnachweis</td><td>Kill-Kriterium: nur bei mind. 1 belegtem Sale aus Gratis-Kanal, sonst entfällt der Test ersatzlos</td></tr>
+  </table>
+
+  <h3>Bewusst nicht übernommen (mit Begründung)</h3>
+  <ul class="two-col">
+    <li><strong>30 % Provision auf Basis-Produkt</strong> → auf 20 % gesenkt (Marge geschont)</li>
+    <li><strong>AI-Zitier-Tracking ab Tag 1</strong> (90 €/Monat) → auf Trigger nach Gate 4 verschoben</li>
+    <li><strong>Score-Badge als Siegel/Ampel</strong> → zu neutraler Statuszeile redesignt</li>
+    <li><strong>WordPress-Plugin/Extension im Kernplan</strong> → bleiben trigger-basiert außerhalb</li>
+    <li><strong>Freelance-Budget fix eingeplant</strong> (180 €/Monat) → nur bei nachgewiesenem Bedarf</li>
+  </ul>
+</div>
+
+<!-- ============ SEITE 13: QUELLENVERZEICHNIS ============ -->
+<div class="page">
+  <h2>Anhang — Quellenverzeichnis</h2>
+  <p class="small muted">Alle Recherche-Quellen aus der Synthese, mit Publikationsdatum. Vollständige Einzel-Recherchen liegen unter <code>marketing/no-ads-strategie/research/</code>.</p>
+
+  <ol class="src-list">
+    <li>Omnius Programmatic-SEO-Case-Study — omnius.so/blog/programmatic-seo-case-study (2025)</li>
+    <li>SEO-Content-Clusters &amp; Topic Authority — digitalapplied.com/blog/seo-content-clusters-2026-topic-authority-guide (2026)</li>
+    <li>KI-Suchtraffic-Konversionsraten — seerinteractive.com/insights/case-study-6-learnings-about-how-traffic-from-chatgpt-converts (2025)</li>
+    <li>AI-Search-Traffic-Konversionsraten — pixis.ai/blog/why-ai-search-traffic-converts-at-4-5x (2025)</li>
+    <li>LLM-SEO-Struktursignale — virayo.com/blog/llm-seo (2025/26)</li>
+    <li>AI-SEO-Statistiken — position.digital/blog/ai-seo-statistics (2026)</li>
+    <li>Off-Site-Autorität für KI-Markenempfehlungen — getfancy.ai/article-platform-google-ai-overviews-gemini (2025/26)</li>
+    <li>Reddit als GEO-Signal, Breaking B2B — youtube.com/watch?v=sOCxXJzlB-A (2025)</li>
+    <li>llms.txt-Wirkungslosigkeit — ahrefs.com/blog/what-is-llms-txt (2026); seeklab.io (2026)</li>
+    <li>Directory-/Review-Benchmarks — reviewflowz.com/blog/capterra-vs-g2 (2025)</li>
+    <li>LinkedIn-Personal-Branding 2026 — orelunited.de/linkedin-fuer-unternehmen-2026 (2026); annamarialanger.com/blog/personal-branding-auf-linkedin (2025)</li>
+    <li>Lead-to-Meeting-Conversion-Benchmarks — revenuehero.io/blog/lead-to-meeting-conversion-benchmarks-for-2025 (2025)</li>
+    <li>HubSpot Website Grader (Gratis-Scan-PLG-Muster) — hubspot.com/blog/bid/5539 (ca. 2008)</li>
+    <li>Trustpilot Trust-Badge-Uplift — business.trustpilot.com/customer-stories (ca. 2022/23)</li>
+    <li>BFSG-Scanner-Marktübersicht — bf-check.de/blog/barrierefreiheit-testen-tools-uebersicht (2026)</li>
+    <li>eRecht24-Scanner-Launch-PM — finanznachrichten.de (01.08.2025)</li>
+    <li>AccessiWay-Partnerprogramm DACH — accessiway.com/de/partnerships (2026); deal-magazin.com (07.08.2025)</li>
+    <li>Overlay-Kritik-Content-Cluster — bf-check.de/blog/overlay-widgets-barrierefreiheit-kritik (2026); xictron.com (27.06.2026)</li>
+    <li>Agentur-Partnerprogramm-Provisionsbenchmarks DACH — kopfundstift.de/affiliate-marketing (2026); greatpartners.net/de/reseller-channel (2026)</li>
+    <li>3-Phasen-Partner-Akquise-Modell — saaswelt.de/artikel/saas-marketing-ki-aera (2026)</li>
+    <li>AccessGO „1-Jahr-BFSG"-PR-Referenz — openpr.de/pressemitteilungen/accessgo-0236495 (30.06.2026)</li>
+    <li>PR-Portale-Vergleich DACH — medienkraft.at/presseportale-im-vergleich (2025)</li>
+    <li>Schema-Markup-Wirkung auf AI-Overviews — schemaapp.com/schema-markup/what-2025-revealed-about-ai-search (2025)</li>
+  </ol>
+
+  <div class="box" style="margin-top:5mm">
+    <strong>Vollständige Dokumente dieser Strategie:</strong>
+    <p class="small" style="margin-top:1mm">
+      <code>marketing/no-ads-strategie/synthese.md</code> — 20 Findings, Kanal-Shortlist, Nicht-Empfehlungen, aufgelöste Widersprüche<br>
+      <code>marketing/no-ads-strategie/90-tage-plan.md</code> — vollständiger Wochenplan W1–W13, alle Nebenaufgaben<br>
+      <code>marketing/no-ads-strategie/research/</code> — sechs Einzel-Recherchen mit allen Primärquellen<br>
+      <code>marketing/no-ads-strategie/entwurf-*.md</code> — die drei ursprünglichen Strategie-Entwürfe vor der Jury-Synthese
+    </p>
+  </div>
+</div>
+
+</body>
+</html>
