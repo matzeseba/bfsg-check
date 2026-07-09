@@ -83,3 +83,21 @@ class FinanceCache(SQLModel, table=True):
     key: str = Field(unique=True, index=True)
     payload_json: str = "{}"
     fetched_at: datetime = Field(default_factory=utcnow)
+
+
+class AuthCredential(SQLModel, table=True):
+    """Vom Betreiber selbst gesetztes Login-Passwort (Einzel-Admin-Dashboard).
+
+    Genau eine Zeile. Solange keine existiert, ist nur der Bootstrap-Token
+    (AOS_ADMIN_TOKEN) gueltig und der erste Login erzwingt das Setzen eines
+    Passworts. Der Token bleibt danach als Notfall-/Recovery-Zugang gueltig.
+    Passwort wird via PBKDF2-HMAC-SHA256 mit Pro-Zeile-Salt gehasht (nie im Klartext).
+    """
+
+    __tablename__ = "auth_credential"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    password_hash: str
+    salt: str
+    iterations: int = 200_000
+    updated_at: datetime = Field(default_factory=utcnow)

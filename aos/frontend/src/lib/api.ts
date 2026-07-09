@@ -282,10 +282,18 @@ export const api = {
 };
 
 // ---- Konkrete, typisierte Endpunkte (Spec §4) ----
+export interface LoginResult {
+  ok: boolean;
+  must_set_password: boolean;
+}
+
 export const auth = {
-  login: (token: string) => api.post<{ ok: boolean }>("/auth/login", { token }),
+  login: (token: string) => api.post<LoginResult>("/auth/login", { token }),
+  setPassword: (newPassword: string) =>
+    api.post<{ ok: boolean }>("/auth/set-password", { new_password: newPassword }),
   logout: () => api.post<{ ok: boolean }>("/auth/logout"),
-  me: () => api.get<{ authenticated: boolean }>("/auth/me"),
+  me: () =>
+    api.get<{ authenticated: boolean; must_set_password: boolean }>("/auth/me"),
 };
 
 export const dashboardApi = {

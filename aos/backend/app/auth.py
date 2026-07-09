@@ -12,6 +12,7 @@ import base64
 import hashlib
 import hmac
 import json
+import os
 import time
 
 from fastapi import Depends, HTTPException, Request
@@ -21,6 +22,29 @@ from .config import INSECURE_SESSION_SECRET, Settings, get_settings
 COOKIE_NAME = "aos_session"
 TTL_DAYS = 7
 _TTL_SECONDS = TTL_DAYS * 24 * 60 * 60
+
+# --- Passwort-Hashing (PBKDF2-HMAC-SHA256, stdlib — keine Extra-Dependency) --- #
+PBKDF2_ITERATIONS = 200_000
+MIN_PASSWORD_LEN = 8
+MAX_PASSWORD_LEN = 200
+
+
+def hash_password(
+    password: str, *, salt: str | None = None, iterations: int = PBKDF2_ITERATIONS
+) -> tuple[str, str, int]:
+    """Gibt (password_hash_hex, salt_hex, iterations) zurueck."""
+    salt = salt or os.urandom(16).hex()
+    dk = hashlib.pbkdf2_hmac(
+        "sha256", password.encode("utf-8"), bytes.fromhex(salt), iterations
+    )
+    return dk.hex(), salt, iterations
+
+
+def verify_password(
+    password: str, password_hash: str, salt: str, iterations: int
+) -> bool:
+    calc, _, _ = hash_password(password, salt=salt, iterations=iterations)
+    return hmac.compare_digest(calc, password_hash)
 
 
 def _b64url_encode(data: bytes) -> str:
