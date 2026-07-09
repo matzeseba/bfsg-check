@@ -117,9 +117,21 @@ aos.bfsg-fuchs.de {
         Referrer-Policy "no-referrer"
         -Server
     }
-    handle /api/* { reverse_proxy aos-backend:8100 }
-    handle /ws/*  { reverse_proxy aos-backend:8100 }
-    handle /healthz { reverse_proxy aos-backend:8100 }
-    handle        { reverse_proxy aos-frontend:3100 }
-    log { output stdout format console level INFO }
+    handle /api/* {
+        reverse_proxy aos-backend:8100
+    }
+    handle /ws/* {
+        reverse_proxy aos-backend:8100
+    }
+    handle /healthz {
+        reverse_proxy aos-backend:8100
+    }
+    handle {
+        reverse_proxy aos-frontend:3100
+    }
+    log {
+        output stdout
+        format console
+        level INFO
+    }
 }
