@@ -102,3 +102,24 @@ preview.bfsg-fix.de {
 #     encode gzip
 #     header Strict-Transport-Security "max-age=31536000; includeSubDomains"
 # }
+
+# === AOS-Dashboard (aos.bfsg-fuchs.de) ===
+# Internes Business-Dashboard (Compose-Projekt "aos"). aos-frontend/aos-backend
+# haengen zusaetzlich im deployment_default-Netz → von bfsg-caddy erreichbar.
+# CSP bewusst weggelassen (Next.js inline-Scripts); Auth (aos_session-Cookie)
+# schuetzt alles. Mikrofon fuer Jarvis-Voice ERLAUBT.
+aos.bfsg-fuchs.de {
+    encode gzip
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        Permissions-Policy "microphone=(self), geolocation=(), camera=()"
+        X-Frame-Options "DENY"
+        Referrer-Policy "no-referrer"
+        -Server
+    }
+    handle /api/* { reverse_proxy aos-backend:8100 }
+    handle /ws/*  { reverse_proxy aos-backend:8100 }
+    handle /healthz { reverse_proxy aos-backend:8100 }
+    handle        { reverse_proxy aos-frontend:3100 }
+    log { output stdout format console level INFO }
+}

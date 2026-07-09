@@ -1,0 +1,17 @@
+# AOS-Dashboard — lokale Build-/Env-Artefakte (nie committen)
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+*.db
+*.sqlite
+*.sqlite3
+/data/
+# Node/Next
+node_modules/
+.next/
+# Secrets & lokale Env (aos.env.example bleibt versioniert)
+.env
+.env.local
+deploy/.env

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 160" role="img" aria-label="BFSG-FUCHS">
+  <title>BFSG-FUCHS Wortmarke</title>
+  <desc>Wortmarke "BFSG-FUCHS": "BFSG-" in Navy, "FUCHS" in Marken-Orange.</desc>
+  <!-- PRODUKTION: vor finalem Einsatz die Schrift in Pfade umwandeln (Illustrator/Inkscape: "In Pfade/Kurven umwandeln" / "Create Outlines"),
+       damit die Wortmarke unabhaengig von installierten Fonts ueberall identisch rendert. Font-Stack hier nur fuer die Vorschau. -->
+  <text x="380" y="112" text-anchor="middle"
+        font-family="Montserrat, 'Arial Black', Inter, system-ui, sans-serif"
+        font-weight="800" font-size="110" letter-spacing="3">
+    <tspan fill="#13294a">BFSG-</tspan><tspan fill="#E8743B">FUCHS</tspan>
+  </text>
+</svg>

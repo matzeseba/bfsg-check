@@ -81,6 +81,17 @@ Beide Records bei INWX unter **`bfsg-fix.de` → DNS** zusätzlich eintragen, da
 | AAAA | `preview` | `2a01:4f8:1c18:d890::1` | 3600 | optional, sobald IPv6 produktiv |
 | AAAA | `admin` | `2a01:4f8:1c18:d890::1` | 3600 | optional, sobald IPv6 produktiv |
 
+### AOS-Dashboard (`aos.bfsg-fuchs.de`)
+
+> **Wichtig:** Diese beiden Records gehören in die **`bfsg-fuchs.de`**-Zone (NICHT `bfsg-fix.de`), da das Dashboard unter `aos.bfsg-fuchs.de` läuft. Eintragen bei INWX unter **`bfsg-fuchs.de` → DNS**.
+
+| Typ | Host / Name | Wert | TTL | Zweck |
+|---|---|---|---|---|
+| A | `aos` | `178.105.83.0` | 3600 | AOS Business-Dashboard |
+| AAAA | `aos` | `2a01:4f8:1c18:d890::1` | 3600 | AOS Business-Dashboard |
+
+Sobald der Record propagiert ist und das Compose-Projekt `aos` läuft, zieht Caddy automatisch ein Let's-Encrypt-Zertifikat für `aos.bfsg-fuchs.de` (Vhost-Block liegt bereits im `deployment/Caddyfile`).
+
 Caddy-Vhosts liegen bereits im `deployment/Caddyfile` (Targets `landing-next:3000` / `admin-next:3001`) — werden aktiv, sobald die Container im `docker-compose.yml` ergänzt sind.
 
 ---
