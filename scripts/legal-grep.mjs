@@ -116,13 +116,25 @@ function walk(dir, extFilter, out) {
   return out;
 }
 
+// Interne Strategie-/Analyse-Dokumente sind KEINE veröffentlichte Marketing-Copy.
+// Sie zitieren die Verbotswörter, um die Regeln zu erklären (z. B. Zeilen wie
+// „verboten: 'BFSG-konform'/'rechtssicher'" oder Recherche über UWG-Claims) und
+// werden nie an Nutzer ausgeliefert. Das Gate schützt publizierbare Copy
+// (landingpage-next/ + Top-Level-marketing/*.md-Entwürfe für Ads/PR/Listings),
+// nicht diese Memos. Merke: publizierbare Entwürfe gehören nach marketing/
+// (Top-Level), Analyse/Strategie nach marketing/no-ads-strategie/.
+const IGNORE_PATH_PREFIXES = ["marketing/no-ads-strategie/"];
+
 const MD_ONLY = new Set([".md", ".mdx"]);
 const files = [
   ...walk(join(REPO_ROOT, "marketing"), MD_ONLY, []),
   ...walk(join(REPO_ROOT, "landingpage-next", "app"), null, []),
   ...walk(join(REPO_ROOT, "landingpage-next", "components"), null, []),
   ...walk(join(REPO_ROOT, "landingpage-next", "lib"), null, []),
-];
+].filter((f) => {
+  const rel = relative(REPO_ROOT, f).replace(/\\/g, "/");
+  return !IGNORE_PATH_PREFIXES.some((p) => rel.startsWith(p));
+});
 
 // ---------------------------------------------------------------------------
 // Scan
