@@ -34,6 +34,22 @@ from fastapi.testclient import TestClient  # noqa: E402
 from app.main import app  # noqa: E402
 
 
+@pytest.fixture(autouse=True)
+def _reset_auth_credential():
+    """Vor jedem Test das selbst gesetzte Passwort leeren — sonst leckt ein in einem
+    Test gesetztes Passwort in andere (geteilte Temp-DB) und macht sie nichtdeterministisch."""
+    from sqlmodel import Session, delete
+
+    from app.db import engine, init_db
+    from app.models import AuthCredential
+
+    init_db()  # idempotent — stellt sicher, dass die Tabelle existiert
+    with Session(engine) as s:
+        s.exec(delete(AuthCredential))
+        s.commit()
+    yield
+
+
 @pytest.fixture()
 def client():
     # Kontextmanager triggert Lifespan (init_db + Seeds).
