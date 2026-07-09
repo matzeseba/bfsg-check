@@ -1,0 +1,197 @@
+# AOS Business-Dashboard — Compose-Projekt "aos" (SSOT: aos/ARCHITECTURE.md §2)
+#
+# Betrieb auf dem Hetzner-Server (3,8 GB RAM, KEIN Swap): striktes mem_limit pro
+# Container, AOS-Gesamtbudget ~1,2 GB. Keine Host-Port-Mappings — Caddy proxyt
+# intern (aos-frontend/aos-backend haengen zusaetzlich im externen
+# deployment_default-Netz, damit bfsg-caddy sie erreicht und das Backend
+# bfsg-app:8080 sehen kann).
+#
+# Start (Server):  docker compose -p aos -f aos/deploy/docker-compose.aos.yml --env-file aos/deploy/.env up -d --build
+# Start (lokal):   docker compose -p aos -f aos/deploy/docker-compose.aos.yml up -d --build
+#                  (+ docker-compose.override.yml aus dem README fuer 127.0.0.1-Ports)
+
+services:
+  aos-frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: aos-frontend
+    restart: unless-stopped
+    expose:
+      - "3100"
+    environment:
+      # middleware.ts verifiziert das Session-Cookie am Edge → braucht dasselbe
+      # HMAC-Secret wie das Backend. Interpolation aus aos/deploy/.env (--env-file).
+      - AOS_SESSION_SECRET=${AOS_SESSION_SECRET}
+      - PORT=3100
+      - HOSTNAME=0.0.0.0
+    mem_limit: 256m
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3100/api/ping').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - aos_internal
+      - deployment_default
+    depends_on:
+      - aos-backend
+
+  aos-backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: aos-backend
+    restart: unless-stopped
+    expose:
+      - "8100"
+    # env_file liefert alle §7-Vars in den Container (ANTHROPIC/PERPLEXITY-Keys,
+    # STRIPE/BREVO, AOS_ADMIN_TOKEN, AOS_SESSION_SECRET, Modelle, MCP-URLs, TZ …).
+    env_file:
+      - .env
+    mem_limit: 512m
+    volumes:
+      - aos_data:/data
+      # KEIN direkter docker.sock-Mount: ':ro' beschraenkt nur den Dateiknoten, NICHT
+      # die Docker-Engine-API (Container-create/exec, Host-Bind-Mounts) → Root-
+      # Eskalation. Die Container-Uebersicht laeuft ueber aos-docker-proxy (read-only,
+      # nur GET /containers/json). Siehe AOS_DOCKER_PROXY_URL.
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8100/healthz',timeout=5).status==200 else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - aos_internal
+      - deployment_default
+    depends_on:
+      - aos-mcp-research
+      - aos-mcp-leadscore
+      - aos-mcp-competitor
+      - aos-mcp-debrief
+      - aos-docker-proxy
+
+  # Read-only Docker-Socket-Proxy (haproxy-basiert). Nur GET-Container-Endpunkte
+  # freigeschaltet (CONTAINERS=1), alle schreibenden/gefaehrlichen Docker-API-Pfade
+  # gesperrt (POST=0 u. a. per Default). NUR im internen aos_internal-Netz erreichbar,
+  # NICHT via Caddy nach aussen. So bekommt das Backend die Container-Liste ohne
+  # vollen Daemon-Zugriff (kein Root-Eskalationspfad).
+  aos-docker-proxy:
+    image: tecnativa/docker-socket-proxy:0.2.0
+    container_name: aos-docker-proxy
+    restart: unless-stopped
+    environment:
+      - CONTAINERS=1
+      - POST=0
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    mem_limit: 64m
+    networks:
+      - aos_internal
+
+  aos-mcp-research:
+    build:
+      context: ../mcp
+      dockerfile: common/Dockerfile
+    container_name: aos-mcp-research
+    restart: unless-stopped
+    expose:
+      - "8101"
+    env_file:
+      - .env
+    environment:
+      - AGENT_MODULE=research_agent.agent:app
+      - AGENT_PORT=8101
+    mem_limit: 128m
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8101/healthz',timeout=5).status==200 else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    networks:
+      - aos_internal
+
+  aos-mcp-leadscore:
+    build:
+      context: ../mcp
+      dockerfile: common/Dockerfile
+    container_name: aos-mcp-leadscore
+    restart: unless-stopped
+    expose:
+      - "8102"
+    env_file:
+      - .env
+    environment:
+      - AGENT_MODULE=leadscore_agent.agent:app
+      - AGENT_PORT=8102
+    mem_limit: 128m
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8102/healthz',timeout=5).status==200 else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    networks:
+      - aos_internal
+
+  aos-mcp-competitor:
+    build:
+      context: ../mcp
+      dockerfile: common/Dockerfile
+    container_name: aos-mcp-competitor
+    restart: unless-stopped
+    expose:
+      - "8103"
+    env_file:
+      - .env
+    environment:
+      - AGENT_MODULE=competitor_agent.agent:app
+      - AGENT_PORT=8103
+    mem_limit: 128m
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8103/healthz',timeout=5).status==200 else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    networks:
+      - aos_internal
+
+  aos-mcp-debrief:
+    build:
+      context: ../mcp
+      dockerfile: common/Dockerfile
+    container_name: aos-mcp-debrief
+    restart: unless-stopped
+    expose:
+      - "8104"
+    env_file:
+      - .env
+    environment:
+      - AGENT_MODULE=debrief_agent.agent:app
+      - AGENT_PORT=8104
+    mem_limit: 128m
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8104/healthz',timeout=5).status==200 else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    networks:
+      - aos_internal
+
+networks:
+  # Internes AOS-Netz (default fuer alle Services).
+  aos_internal:
+    driver: bridge
+  # Bestehendes Netz des Compose-Projekts "deployment" (bfsg-caddy, bfsg-app …).
+  # NUR aos-frontend + aos-backend haengen zusaetzlich hier drin.
+  deployment_default:
+    external: true
+    name: deployment_default
+
+volumes:
+  aos_data:   # /data — aos.db (SQLite)

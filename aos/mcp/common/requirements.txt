@@ -1,0 +1,9 @@
+# AOS MCP-Microservices — gemeinsame Abhängigkeiten (Team Beta-2)
+# Getestet mit Python 3.12 (Ziel-Image) und 3.14 (lokale Verifikation).
+fastapi>=0.115,<1.0
+uvicorn[standard]>=0.30,<1.0
+httpx>=0.27,<1.0
+anthropic>=0.40,<1.0
+feedparser>=6.0,<7.0
+python-dotenv>=1.0,<2.0
+pytest>=8.0

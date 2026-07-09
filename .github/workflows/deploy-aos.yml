@@ -1,0 +1,146 @@
+name: Deploy AOS-Dashboard
+
+# Auto-Deploy des AOS-Business-Dashboards (Compose-Projekt "aos") auf den
+# Hetzner-Server. Eigener Clone unter /opt/aos, getrennt vom Live-SaaS-Stack
+# unter /opt/bfsg-check. Muster analog .github/workflows/deploy.yml.
+#
+# Der Caddyfile-Vhost fuer aos.bfsg-fuchs.de wird vom bestehenden deploy.yml-Flow
+# ausgerollt (deployment/** Pfad) — dieser Workflow kuemmert sich nur um den
+# aos-Container-Stack.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'aos/**'
+      - '.github/workflows/deploy-aos.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-aos
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: SSH Deploy (aos-Stack)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: root
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          port: 22
+          script_stop: true
+          request_pty: true
+          # Hotfix wie in deploy.yml: cloud-init setzt initial chage -d 0 root →
+          # PAM verlangt sonst bei jedem non-TTY-Login einen Passwortwechsel.
+          script: |
+            set -e
+            # Idempotenter Password-Expiry-Reset (Image-Default setzt sonst chage -d 0).
+            chage -d $(date +%Y-%m-%d) root || true
+            chage -M 99999 root || true
+
+            REPO_LIVE=/opt/bfsg-check
+            REPO_AOS=/opt/aos
+            SRC_ENV="$REPO_LIVE/deployment/.env"
+            ENV_DIR="$REPO_AOS/aos/deploy"
+            ENV_FILE="$ENV_DIR/.env"
+
+            echo "=== 1. Repo-Clone /opt/aos ==="
+            if [ ! -d "$REPO_AOS/.git" ]; then
+              ORIGIN=$(git -C "$REPO_LIVE" remote get-url origin)
+              echo "Clone von $ORIGIN nach $REPO_AOS"
+              git clone "$ORIGIN" "$REPO_AOS"
+            fi
+            cd "$REPO_AOS"
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "=== 2. .env-Bootstrap ($ENV_FILE) ==="
+            mkdir -p "$ENV_DIR"
+            touch "$ENV_FILE"
+            chmod 600 "$ENV_FILE"
+
+            # Wert aus einer KEY=VALUE-Datei lesen (erste Fundstelle).
+            getval() { grep -E "^$1=" "$2" 2>/dev/null | head -n1 | cut -d= -f2- ; }
+            # KEY hart auf VALUE setzen (idempotent — ersetzt vorhandene Zeile).
+            upsert() {
+              grep -v "^$1=" "$ENV_FILE" > "$ENV_FILE.tmp" 2>/dev/null || true
+              printf '%s=%s\n' "$1" "$2" >> "$ENV_FILE.tmp"
+              mv "$ENV_FILE.tmp" "$ENV_FILE"
+            }
+            # KEY nur setzen, wenn noch leer/fehlend (manuelle Werte bleiben erhalten).
+            ensure() {
+              if [ -z "$(getval "$1" "$ENV_FILE")" ]; then upsert "$1" "$2"; fi
+            }
+
+            # Secrets aus dem Live-Stack uebernehmen (nur wenn im aos-.env noch leer).
+            # Mapping "ZIEL:QUELLE" — ADMIN_TOKEN der Scan-Engine → SCANNER_ADMIN_TOKEN.
+            for MAP in \
+              "STRIPE_SECRET_KEY:STRIPE_SECRET_KEY" \
+              "BREVO_API_KEY:BREVO_API_KEY" \
+              "ANTHROPIC_API_KEY:ANTHROPIC_API_KEY" \
+              "ADMIN_EMAIL:ADMIN_EMAIL" \
+              "SCANNER_ADMIN_TOKEN:ADMIN_TOKEN"; do
+              DST="${MAP%%:*}"; SRCKEY="${MAP##*:}"
+              if [ -z "$(getval "$DST" "$ENV_FILE")" ]; then
+                VAL="$(getval "$SRCKEY" "$SRC_ENV")"
+                if [ -n "$VAL" ]; then upsert "$DST" "$VAL"; echo "  $DST aus Live-.env uebernommen"; fi
+              fi
+            done
+
+            # Login-/Session-Secrets NUR beim ersten Mal generieren, nie ueberschreiben.
+            if [ -z "$(getval AOS_ADMIN_TOKEN "$ENV_FILE")" ]; then
+              upsert AOS_ADMIN_TOKEN "$(openssl rand -hex 24)"; echo "  AOS_ADMIN_TOKEN generiert"
+            fi
+            if [ -z "$(getval AOS_SESSION_SECRET "$ENV_FILE")" ]; then
+              upsert AOS_SESSION_SECRET "$(openssl rand -hex 24)"; echo "  AOS_SESSION_SECRET generiert"
+            fi
+
+            # Rest-Defaults aus §7 (idempotent, manuelle Overrides bleiben erhalten).
+            ensure SCANNER_BASE_URL "http://app:8080"
+            ensure PUBLIC_HEALTH_URL "https://bfsg-fuchs.de/health"
+            ensure AOS_DOCKER_SOCK "true"
+            ensure AOS_DOCKER_PROXY_URL "http://aos-docker-proxy:2375"
+            ensure AOS_BASE_URL "https://aos.bfsg-fuchs.de"
+            ensure AOS_MODEL_JARVIS "claude-sonnet-4-6"
+            ensure AOS_MODEL_AGENTS "claude-sonnet-4-6"
+            ensure MCP_RESEARCH_URL "http://aos-mcp-research:8101"
+            ensure MCP_LEADSCORE_URL "http://aos-mcp-leadscore:8102"
+            ensure MCP_COMPETITOR_URL "http://aos-mcp-competitor:8103"
+            ensure MCP_DEBRIEF_URL "http://aos-mcp-debrief:8104"
+            ensure TZ "Europe/Berlin"
+            chmod 600 "$ENV_FILE"
+
+            echo "=== 3. Swap-Sicherung (2G, idempotent) ==="
+            if ! swapon --show 2>/dev/null | grep -q '/swapfile'; then
+              if [ ! -f /swapfile ]; then
+                echo "Erzeuge /swapfile (2G)"
+                fallocate -l 2G /swapfile || dd if=/dev/zero of=/swapfile bs=1M count=2048
+                chmod 600 /swapfile
+                mkswap /swapfile
+              fi
+              swapon /swapfile
+            fi
+            sysctl -w vm.swappiness=10 || true
+            grep -q '^/swapfile' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
+            grep -q '^vm.swappiness' /etc/sysctl.conf || echo 'vm.swappiness=10' >> /etc/sysctl.conf
+
+            echo "=== 4. docker compose up -d --build ==="
+            cd "$REPO_AOS"
+            docker compose -p aos -f aos/deploy/docker-compose.aos.yml --env-file aos/deploy/.env up -d --build
+
+            echo "=== 5. Health-Verify (aos-backend /healthz) ==="
+            sleep 12
+            if docker exec aos-backend python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8100/healthz',timeout=5).status==200 else 1)"; then
+              echo "aos-backend /healthz OK"
+            else
+              echo "aos-backend /healthz FEHLGESCHLAGEN — Logs:"
+              docker compose -p aos -f aos/deploy/docker-compose.aos.yml logs --tail=80
+              exit 1
+            fi
+
+            echo "=== 6. Status ==="
+            docker compose -p aos -f aos/deploy/docker-compose.aos.yml ps
