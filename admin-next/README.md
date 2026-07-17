@@ -23,7 +23,7 @@ Bestellungen, Abos, Server-Status und Marketing-Kampagnen.
 | `/orders`         | Bestelltabelle (Stripe Checkout-Sessions)                       |
 | `/subscriptions`  | Abo-Tabelle (Monitoring-MRR, Status, Letzter Scan)              |
 | `/server`         | Health-Card + GitHub-Workflows-Status                           |
-| `/marketing`      | Notion-Sync-Status + laufende Kampagnen                         |
+| `/marketing`      | Laufende Kampagnen + Lead-Generierung                           |
 
 ## Lokal starten
 

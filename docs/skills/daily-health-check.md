@@ -29,9 +29,6 @@ Nutze Brevo MCP `contacts_get_contact_stats` + `email_campaign_management_get_em
 Falls Sentry-DSN konfiguriert: Anzahl Errors + Top-3-Issues per Severity.
 Falls nicht: skip mit Hinweis "Sentry nicht konfiguriert".
 
-## 5. Notion Sales-Pipeline (optional)
-Falls Notion-DB "BFSG Sales Pipeline" existiert: neue Leads + Pipeline-Stages.
-
 ## Output-Format
 ```markdown
 ## 🌅 BFSG-Tagescheck — [Datum]
@@ -40,7 +37,6 @@ Falls Notion-DB "BFSG Sales Pipeline" existiert: neue Leads + Pipeline-Stages.
 💰 **Sales 24h**: X € (Y Käufe)
 📧 **Mails**: Bounce-Rate X% (Z gesendet)
 🔥 **Errors**: X (Top: ...)
-📋 **Pipeline**: X neue Leads
 
 **Aktion heute:** [konkreter Vorschlag basierend auf Findings]
 ```

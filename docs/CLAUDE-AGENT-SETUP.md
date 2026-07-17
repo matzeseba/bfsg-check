@@ -90,7 +90,6 @@ bw status   # sollte "unlocked" zeigen
 |---|---|
 | `BFSG-Claude-ADMIN_TOKEN` | password: `(noch leer, Claude füllt in Block 1.1)` |
 | `BFSG-Claude-Sentry` | custom field `dsn`: `(noch leer, Block 1.2)` |
-| `BFSG-Claude-Notion` | password: `(noch leer, Block 1.5)` |
 | `BFSG-Claude-Hetzner-Storage` | username: `uXXXXX`, password: `(aus Block 1.4)` |
 | `BFSG-Claude-Stripe` | password: dein Stripe Restricted-Key, custom `webhook_secret`: dein Webhook-Secret |
 | `BFSG-Claude-Brevo` | username: `matthiasseba92@gmail.com`, password: dein SMTP-Key |
@@ -273,7 +272,6 @@ Alles unter 5 Minuten.
 | 1.1 | ADMIN_TOKEN generieren + in Bitwarden ablegen | ❌ |
 | 1.2 | Sentry-Account anlegen | 🟡 nur 2FA-Code aus App |
 | 1.4 | Hetzner Storage-Box bestellen | 🟡 nur Zahlung bestätigen |
-| 1.5 | Notion-Workspace einrichten | ❌ |
 | 3.2 | Server-.env aktualisieren | ❌ (via `scripts/bw-inject-env.sh`) |
 | 3.3–3.4 | GPG-Pubkey + rclone | ❌ |
 | 4.1 | GitHub-Secrets setzen | ❌ (via `gh secret set`) |

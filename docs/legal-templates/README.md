@@ -19,7 +19,7 @@
 | `dpa-checkliste.md` | DPA-Sammlung-Checkliste (Brevo/Stripe/Sentry) | docs/dpa/ Ordner |
 | `rechnungs-template.md` | § 19 UStG Rechnungs-Pflichtangaben | scanner/lib/invoice.js |
 | `wortwahl-rdg-safe.md` | Sprach-Regeln gegen RDG-Risiko | überall (Marketing, Reports) |
-| `trigger-kalender.md` | Schwellen für VSH/Anwalt | Notion-Dashboard |
+| `trigger-kalender.md` | Schwellen für VSH/Anwalt | Kalender-Erinnerungen (Google/Outlook) |
 
 ---
 
@@ -35,6 +35,6 @@
 | 6 | Tag 3, 30 Min | `dpa-checkliste.md` abarbeiten (Brevo/Stripe/Sentry DPA download) | 30 Min |
 | 7 | Tag 3, 30 Min | `rechnungs-template.md` lexoffice-Account + Pflichtangaben | 30 Min |
 | 8 | Tag 4 (optional) | `widerrufsbutton-356a.md` — Deadline 19.06.2026 | später |
-| 9 | Tag 5 (sofort fertig) | `trigger-kalender.md` in Notion einrichten | 10 Min |
+| 9 | Tag 5 (sofort fertig) | `trigger-kalender.md` als Kalender-Erinnerungen einrichten | 10 Min |
 
 **Total: ~4h Founder-Zeit + 25 €/Monat Fixkosten (AGB-Service 15€ + Buchhaltung 10€)**

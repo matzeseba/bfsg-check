@@ -13,9 +13,8 @@ description: Erstellt personalisierte LinkedIn-DM-Drafts für N warme Kontakte m
 
 ### 1. Warme Liste finden
 Quellen (in dieser Priorität):
-1. `marketing/partner-targets.md` (vorab gepflegte Liste)
-2. Notion-DB „BFSG Sales Pipeline" → Stage „Warm-Lead-Identified"
-3. Falls nichts: User-Frage nach Profil-URLs
+1. `marketing/_obsolete/partner-targets.md` (vorab gepflegte Liste)
+2. Falls nichts: User-Frage nach Profil-URLs
 
 **STOP wenn:** Keine warmen Kontakte → Vorschlag User soll erst LinkedIn-1.-Grad-Filtern.
 
@@ -29,7 +28,7 @@ Extrahiere:
 - Top-3 Findings (Severity descending)
 
 ### 3. DM-Draft erstellen
-Nutze Vorlage aus `marketing/partner-warm-dms.md` (Vorlage 1-5 je nach Persona).
+Nutze Vorlage aus `marketing/_obsolete/partner-warm-dms.md` (Vorlage 1-5 je nach Persona).
 Personalisiere:
 - Vorname
 - 1 persönliches Detail (aus letztem LinkedIn-Post oder gemeinsamem Kontakt)
@@ -50,8 +49,7 @@ Personalisiere:
 User kopiert dann Draft für Draft in LinkedIn → klickt Senden manuell (UWG-Sicherheit).
 
 ### 5. Tracking
-Append zu Notion-DB „BFSG Sales Pipeline" (falls existiert):
-- Name, Profile-URL, Domain, Score, Status: „DM-Draft-Bereit"
+Status je Kontakt in der Markdown-Ausgabe vermerken (z.B. „DM-Draft-Bereit"); Pflege der Liste in `marketing/`.
 
 ## Ausgaben-Regel
 **NIEMALS automatisch senden.** Du erstellst nur Drafts. User klickt selbst.

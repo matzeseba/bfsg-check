@@ -12,13 +12,6 @@ export const metadata = {
   title: "Marketing · BFSG-Check Admin",
 };
 
-const notionSync = {
-  lastSyncAt: "2026-06-16T06:00:00Z",
-  status: "ok" as const,
-  pagesSynced: 18,
-  workspaceId: "bfsg-check-marketing",
-};
-
 const campaigns = [
   {
     name: "LinkedIn-Outreach KMU",
@@ -54,30 +47,12 @@ export default function MarketingPage() {
       <header>
         <h1 className="text-2xl font-semibold tracking-tight">Marketing</h1>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          Notion-Sync, laufende Kampagnen und Lead-Generierung. Werte werden in
-          Welle 5 aus Notion + Stripe verknüpft.
+          Laufende Kampagnen und Lead-Generierung. Werte werden in Welle 5 aus
+          Stripe verknüpft.
         </p>
       </header>
 
-      <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <Card>
-          <CardHeader>
-            <CardDescription>Notion-Sync</CardDescription>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Badge className="bg-emerald-600 hover:bg-emerald-600">OK</Badge>
-              <span className="text-sm font-normal text-zinc-500">
-                {notionSync.pagesSynced} Seiten
-              </span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-sm text-zinc-600 dark:text-zinc-400">
-            Workspace <code>{notionSync.workspaceId}</code>
-            <br />
-            Letzte Synchronisation:{" "}
-            {new Date(notionSync.lastSyncAt).toLocaleString("de-DE")}
-          </CardContent>
-        </Card>
-
+      <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardDescription>Lead-Quellen (heute)</CardDescription>
