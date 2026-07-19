@@ -61,21 +61,20 @@ Das AOS-Business-Dashboard (`aos.bfsg-fuchs.de`) wird von Demo-Daten auf drei ec
 
 > Alles hier Aufgefuehrte kann die Session sonst blockieren oder das Live-Ergebnis unsichtbar lassen. Reihenfolge egal, aber alle vor dem finalen Merge/Live-Test erledigen. Die Session selbst braucht KEINE dieser Aktionen zum Bauen/Testen (alles faellt sauber auf Demo zurueck) — sie sind fuer den Live-Betrieb.
 
-### 3.1 INWX — dediziertes Kopie-Postfach fuer E-Mail-Inbound (Feature 1)
-1. Einloggen unter `kundenlogin.inwx.de` (Achtung: `.de`-Account ≠ `.com`-Account).
-2. Domain `bfsg-fix.de` → Menue **E-Mail** → **„E-Mail-Konto/Postfach anlegen"** (NICHT nur Weiterleitung). Empfohlene Adresse: `crm@bfsg-fix.de`, starkes Passwort setzen.
-   - HINWEIS: „Mail Easy" kann nur Weiterleitung. Erscheint kein „Konto anlegen", im selben Menue auf ein Paket mit echten Postfaechern upgraden (INWX Mailspace/Hosting, wenige Euro/Monat).
-3. In den Postfach-/Programm-Einstellungen den **exakten IMAP-Server-Namen + Port (SSL 993)** notieren.
-4. Bestehende Weiterleitung `info@bfsg-fix.de → matze.seba@outlook.de` um einen **ZWEITEN Empfaenger** `crm@bfsg-fix.de` ergaenzen (Outlook-Ziel NICHT entfernen). **MX-Records NICHT anfassen.**
-5. Test-Mail an `info@bfsg-fix.de` senden und pruefen, dass sie SOWOHL im Outlook-Postfach ALS AUCH im neuen `crm@`-Postfach ankommt.
+### 3.1 IONOS — dediziertes Kopie-Postfach fuer E-Mail-Inbound (Feature 1)
+> ENTSCHEIDUNG GEAENDERT (19.07., Owner): Das urspruenglich geplante INWX-/Froxlor-Postfach `crm@bfsg-fix.de` erfordert einen Bezahlplan („Mail Easy" = nur Weiterleitungen, „Konto"-Spalte bleibt ❌). Stattdessen: **ungenutztes IONOS-Postfach** des Owners als exklusives Kopie-Postfach. IMAP `imap.ionos.de:993` (SSL) ist verifiziert erreichbar; Login = vollstaendige E-Mail-Adresse, normales Passwort (kein OAuth). Der Poller filtert ohnehin nicht auf die Postfach-Adresse, sondern zeigt die Original-Empfaenger/Absender der weitergeleiteten Mails — die konkrete IONOS-Adresse ist daher NUR in den Secrets relevant, nirgends im Code.
+1. IONOS: `login.ionos.de` → Menue **E-Mail** → ungenutztes Postfach waehlen (oder kostenlos inkludiertes „Mail Basic" neu anlegen) → **Passwort setzen/aendern**, vollstaendige Adresse notieren.
+2. **Postfach leeren + exklusiv nutzen:** Posteingang unter `mail.ionos.de` komplett leeren (das Dashboard importiert, was im INBOX liegt) und das Postfach ab jetzt fuer nichts anderes verwenden.
+3. Froxlor (`prod0.webspace.bz` → E-Mail → Adressen): Bei `info@bfsg-fix.de` die Weiterleitung `crm@bfsg-fix.de` **entfernen** und die IONOS-Adresse als Ziel **hinzufuegen** (`matze.seba@outlook.de` bleibt!). Die verwaiste Adresse `crm@bfsg-fix.de` loeschen. **MX-Records NICHT anfassen.**
+4. Test-Mail an `info@bfsg-fix.de` senden und pruefen, dass sie SOWOHL im Outlook-Postfach ALS AUCH im IONOS-Webmail ankommt.
 
 ### 3.2 GitHub — 3 neue Repository-Secrets (Feature 1)
 `Repo matzeseba/bfsg-check → Settings → Secrets and variables → Actions → „New repository secret"`, exakte Namen:
 | Secret-Name | Wert |
 |---|---|
-| `AOS_IMAP_HOST` | der notierte INWX-IMAP-Server (z. B. `imap.ispgateway.de` — realen Wert aus 3.1.3 einsetzen) |
-| `AOS_IMAP_USER` | `crm@bfsg-fix.de` |
-| `AOS_IMAP_PASSWORD` | das Postfach-Passwort aus 3.1.2 |
+| `AOS_IMAP_HOST` | `imap.ionos.de` |
+| `AOS_IMAP_USER` | die vollstaendige IONOS-Postfach-Adresse aus 3.1.1 |
+| `AOS_IMAP_PASSWORD` | das Postfach-Passwort aus 3.1.1 |
 
 Diese greifen erst NACH dem Merge beim naechsten `aos`-Deploy (upsert in Server-`.env`).
 
@@ -164,7 +163,7 @@ Muster: Adapter-`is_live()` + Demo-Fallback; nutzt intern `session_scope()`.
   - `external_id = (msg.get("Message-ID") or "").strip()`; leer → `f"nomid:{sha1(from+subject+date)}"` (verhindert Endlos-Reimport).
   - `subject`: `email.header.make_header(decode_header(...))`, max 300 Zeichen.
   - Body: erster `text/plain`-Part (nicht-Attachment), `get_content_charset()` mit utf-8-Fallback, `errors="replace"`; nur HTML → Tags grob strippen; auf **20.000** Zeichen kappen.
-  - Attachments v1 = ignorieren + Hinweiszeile: `Content-Disposition: attachment`-Parts zaehlen; `> 0` → ans Body-Ende: `"\n\n[Hinweis: <n> Anhang/Anhaenge in der Original-Mail — im Dashboard nicht dargestellt. Original im Postfach crm@bfsg-fix.de.]"`.
+  - Attachments v1 = ignorieren + Hinweiszeile: `Content-Disposition: attachment`-Parts zaehlen; `> 0` → ans Body-Ende: `"\n\n[Hinweis: <n> Anhang/Anhaenge in der Original-Mail — im Dashboard nicht dargestellt. Original im CRM-Kopie-Postfach (IONOS).]"`.
   - `preview`: erste 140 Zeichen, Zeilenumbrueche → Leerzeichen.
 - `_ingest_message(session, settings, msg) -> InboxItem | None` (Test-Hook, kapselt Schritte 5–9 ohne IMAP).
 - `_MAX_PER_POLL = 50` als Modulkonstante.
@@ -251,7 +250,7 @@ def reply_inbox(item_id: int, body: ReplyBody,
     return out
 ```
 `_re_subject(s)`: `s` wenn schon (case-insensitiv) mit `re:` beginnend, sonst `"Re: " + s`.
-**From/Reply-To:** Von = `no-reply@bfsg-fuchs.de` (DKIM-verifiziert). Reply-To = `info@bfsg-fix.de` → Kundenantworten laufen wieder in den info@-Kanal → Outlook + crm@-Kopie → erneut als neuer `InboxItem` (geschlossener Kreis).
+**From/Reply-To:** Von = `no-reply@bfsg-fuchs.de` (DKIM-verifiziert). Reply-To = `info@bfsg-fix.de` → Kundenantworten laufen wieder in den info@-Kanal → Outlook + IONOS-Kopie → erneut als neuer `InboxItem` (geschlossener Kreis).
 **Fehlerfaelle:** kein `BREVO_API_KEY` → `sent=false, source="demo"`, HTTP 200, Status UNVERAENDERT. Brevo-HTTP-Fehler → `sent=false, source="live"`, `detail` sichtbar, Status unveraendert. Item nicht gefunden → 404. Kein Text/Entwurf → 422. Keine Adresse → 422.
 **Detail-Response:** in `get_inbox()` und `patch_inbox()` je `data["reply_to"] = item.reply_to` ergaenzen. `_item_summary` (Liste) **NICHT** anfassen (haelt `_SUMMARY_KEYS`/`test_list_inbox_seeded` stabil; Demo-Seeds haben `reply_to=None`).
 
@@ -273,9 +272,9 @@ Nach `self.admin_email` ergaenzen:
 `aos/deploy/aos.env.example` (Owner-Doku, Content-Anker: Ende der Datei) neuer Block:
 ```
 # --- Eingehende Mail (IMAP-Poll der info@bfsg-fix.de-Kopie) ---
-AOS_IMAP_HOST=            # INWX-IMAP-Server, leer = Demo
+AOS_IMAP_HOST=            # imap.ionos.de (IONOS-Kopie-Postfach), leer = Demo
 AOS_IMAP_PORT=993
-AOS_IMAP_USER=            # z.B. crm@bfsg-fix.de
+AOS_IMAP_USER=            # vollstaendige IONOS-Postfach-Adresse
 AOS_IMAP_PASSWORD=        # Postfach-Passwort (GitHub-Secret)
 AOS_IMAP_MAILBOX=INBOX
 AOS_IMAP_POLL_MINUTES=5
