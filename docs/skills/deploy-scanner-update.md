@@ -48,7 +48,6 @@ git revert HEAD --no-edit && git push origin main
 
 ### 6. Bei Erfolg: Audit
 - GitHub-Issue „Deploy YYYY-MM-DD" mit Diff-Summary
-- Notion-DB „Deploys" eintrag (falls existiert)
 
 ## Output
 ```markdown

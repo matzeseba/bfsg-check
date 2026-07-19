@@ -104,7 +104,7 @@ Text fertig in `marketing/press-release-launch.md`:
 ### Tag 7 (So) — Review
 - Google Search Console öffnen → Sitemap submitten, erste Klicks anschauen
 - Google Ads: erste Daten? CPC, CTR
-- Notion-DB „BFSG Sales Pipeline" updaten
+- Orders/Sales im Admin-Dashboard (`admin-next`) prüfen
 
 ---
 

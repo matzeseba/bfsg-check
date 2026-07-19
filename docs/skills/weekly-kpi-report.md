@@ -25,19 +25,14 @@ description: Wöchentlicher KPI-Snapshot mit allen Channels. Trigger "Wochenrepo
 - Error-Anzahl + Top-3-Issues
 - Performance-Metriken (durchschnittliche Scan-Dauer)
 
-### 4. Pipeline (Notion MCP)
-- Neue Leads
-- Pipeline-Stages-Bewegung
-- Top-3 hottest Leads (mit nächster Aktion)
-
-### 5. Output
-Erstelle Notion-Page mit Titel „Wochenreport KW [X] / [Jahr]" in DB „BFSG KPIs" mit:
+### 4. Output
+Gib den Report als Markdown im Chat aus (optional als Datei ins Repo unter `docs/kpi-reports/`) mit:
 - KPI-Tabelle (Wochen-Vergleich)
 - Highlights (besser Vorwoche)
 - Lowlights (schlechter Vorwoche)
 - 3 Action-Items für nächste Woche
 
-### 6. Bonus: Gamma-Deck (optional)
+### 5. Bonus: Gamma-Deck (optional)
 Frage User ob Slide-Deck erwünscht. Falls ja:
 Gamma MCP `generate`: 5-Slide-Deck mit KPIs als Charts.
 
@@ -58,6 +53,4 @@ Gamma MCP `generate`: 5-Slide-Deck mit KPIs als Charts.
 1. ...
 2. ...
 3. ...
-
-Notion-Page: [Link]
 ```

@@ -95,11 +95,11 @@ process.on('unhandledRejection', (e) => {
 
 ## Dashboard-Vorbereitung (für Welle 4)
 
-Diese Logger-Outputs sind die Datenquellen für das geplante Notion+n8n Dashboard:
+Diese Logger-Outputs sind die Datenquellen für das Admin-Dashboard (`admin-next/`):
 - `logger.info` mit Tag `order.paid` → MRR-Tracker
 - `logger.info` mit Tag `order.mailed` → Fulfillment-Rate
 - `logger.error` mit Tag `webhook` → Failure-Rate-Trend
-- `/admin/orders` API (aus PR #6) → Notion-DB-Sync alle 15 Min
+- `/admin/orders` API (aus PR #6) → Datenquelle des Admin-Dashboards (`admin-next/`)
 
 ## Sanity-Test nach Setup
 

@@ -21,7 +21,7 @@ cp docs/skills/*.md ~/.claude/skills/
 | `daily-health-check.md` | „Tagescheck" | Server + Sales + Bounces + Errors |
 | `process-refund.md` | „Erstatte Order #..." | Stripe-Refund + Mail + Audit |
 | `outreach-warm-batch.md` | „5 Partner anschreiben" | Personalisierte DM-Drafts |
-| `weekly-kpi-report.md` | „Wochenreport" | MRR + Funnel + Pipeline → Notion |
+| `weekly-kpi-report.md` | „Wochenreport" | MRR + Funnel + KPI-Report |
 | `publish-blog-post.md` | „Neuer Blog-Artikel über X" | SEO-Draft + PR + Newsletter-Draft |
 | `incident-response.md` | „Site ist down" | Logs → Diagnose → Rollback bereit |
 | `deploy-scanner-update.md` | „Deploy" | Tests → PR → Smoke-Test |
