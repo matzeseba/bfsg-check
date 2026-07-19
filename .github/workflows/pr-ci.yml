@@ -1,7 +1,7 @@
 name: PR-CI
 
 # PR-Gate vor Merge auf main (Merge = Live-Deploy!):
-# 3 parallele Jobs — Scanner-Tests, Landingpage-Lint+Build, Legal-Grep.
+# 4 parallele Jobs — Scanner-Tests, Landingpage-Lint+Build, Legal-Grep, Caddy-Validate.
 # Bewusst OHNE Secrets: läuft auch für Fork-PRs sicher.
 
 on:
@@ -68,3 +68,19 @@ jobs:
           node-version: 22
       - name: Verbotene Marketing-Claims prüfen
         run: node scripts/legal-grep.mjs
+
+  # Lehre aus dem P0-Ausfall 09.07. (PR #142/#143): eine syntaktisch ungültige
+  # Caddyfile crash-loopte den gemeinsamen bfsg-caddy-Ingress → gesamte Live-Site
+  # down. caddy validate fängt genau das VOR dem Merge (Merge = Auto-Deploy!).
+  # Gleiches Image wie in deployment/docker-compose.yml (caddy:2-alpine).
+  caddy-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Caddyfile-Syntax validieren
+        run: >
+          docker run --rm
+          -v "$PWD/deployment/Caddyfile:/etc/caddy/Caddyfile:ro"
+          caddy:2-alpine
+          caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
