@@ -1,6 +1,6 @@
 # Organic Social Pack (ready to post)
 
-Drei sofort postbare Texte. Link jeweils: https://bfsg-fix.de (UTM-Parameter anhängen).
+Drei sofort postbare Texte. Link jeweils: https://bfsg-fuchs.de (UTM-Parameter anhängen).
 Pflicht-Sprache eingehalten; jeweils klare Founder-Disclosure.
 
 ---
@@ -11,17 +11,17 @@ Vor einem Jahr, am 28. Juni 2025, ist das Barrierefreiheitsstärkungsgesetz (BFS
 
 Und ehrlich? Ein Jahr später reden immer noch die wenigsten Website-Betreiber darüber. Nicht aus Ignoranz, sondern weil die Materie sperrig ist: WCAG 2.1 AA, Kontrastwerte, Fokus-Reihenfolge, Alt-Texte, Tastatur-Bedienbarkeit. Wer soll das als Solo-Händler oder kleines Team nebenbei durchdringen?
 
-Genau das hat mich beschäftigt — und deshalb habe ich BFSG-Check gebaut.
+Genau das hat mich beschäftigt — und deshalb habe ich BFSG-Fuchs gebaut.
 
 Was es macht: eine automatisierte technische Analyse deiner Website gegen die WCAG-2.1-AA-Kriterien. Du bekommst einen verständlichen Report, welche technischen Punkte auffällig sind und wo du ansetzen kannst.
 
 Was es ausdrücklich NICHT macht: dir eine juristische Sicherheit versprechen. Ein automatisierter Scan findet einen relevanten Teil der technischen Probleme, aber keine Software ersetzt eine vollständige manuelle Prüfung oder Rechtsberatung. Das sage ich lieber offen, als dir etwas zu versprechen, das kein Tool halten kann.
 
-Der erste Check ist kostenlos — du siehst sofort, wo deine Seite technisch steht: https://bfsg-fix.de
+Der erste Check ist kostenlos — du siehst sofort, wo deine Seite technisch steht: https://bfsg-fuchs.de
 
 Zum ersten BFSG-Geburtstag die ehrliche Frage an alle mit eigener Website: Habt ihr das Thema angepackt — oder liegt es noch auf dem Stapel „mach ich bald"?
 
-Offenlegung: Ich bin der Gründer von BFSG-Check. Das hier ist mein Produkt.
+Offenlegung: Ich bin der Gründer von BFSG-Fuchs. Das hier ist mein Produkt.
 
 #BFSG #Barrierefreiheit #WCAG #Accessibility #KMU
 
@@ -47,7 +47,7 @@ Was ihr in 15 Minuten selbst kostenlos checken könnt, ohne Tool:
 
 Das findet natürlich nicht alles, und eine automatisierte Prüfung ersetzt keine manuelle Kontrolle oder Rechtsberatung. Aber es ist ein ehrlicher Startpunkt, und die meisten sind überrascht, wie viele einfache Dinge auffallen.
 
-Falls jemand einen automatisierten WCAG-2.1-AA-Scan der kompletten Seite auf einen Schlag will statt manuell durchzugehen: Ich hab dafür ein kostenloses Auto-Scan-Tool gebaut (bfsg-fix.de). Ist mein eigenes Projekt, deshalb die Disclosure oben — verlinke es nur, weil es hier direkt reinpasst. Wenn Selbstpromo hier unerwünscht ist, sagt Bescheid, dann editier ich den Link raus, der Rest vom Post steht auch so.
+Falls jemand einen automatisierten WCAG-2.1-AA-Scan der kompletten Seite auf einen Schlag will statt manuell durchzugehen: Ich hab dafür ein kostenloses Auto-Scan-Tool gebaut (bfsg-fuchs.de). Ist mein eigenes Projekt, deshalb die Disclosure oben — verlinke es nur, weil es hier direkt reinpasst. Wenn Selbstpromo hier unerwünscht ist, sagt Bescheid, dann editier ich den Link raus, der Rest vom Post steht auch so.
 
 Wie handhabt ihr das Thema? Ignoriert, erledigt, oder „muss ich mich mal ransetzen"?
 
@@ -61,7 +61,7 @@ Ein Jahr BFSG (seit 28.06.2025) — und die meisten kleinen Websites haben Barri
 
 Schneller Selbsttest: Klick deine Seite mal nur mit der Tab-Taste durch. Kommst du überall hin? Siehst du immer, wo der Fokus ist? Das ist oft schon die halbe Miete.
 
-Wer den kompletten WCAG-2.1-AA-Scan automatisiert will: hab dazu ein kostenloses Tool gebaut (mein eigenes Projekt) 👉 https://bfsg-fix.de
+Wer den kompletten WCAG-2.1-AA-Scan automatisiert will: hab dazu ein kostenloses Tool gebaut (mein eigenes Projekt) 👉 https://bfsg-fuchs.de
 
 Kein Ersatz für manuelle Prüfung oder Rechtsberatung — aber ein ehrlicher Startpunkt.
 

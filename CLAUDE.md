@@ -30,8 +30,8 @@ Die vollständigen Karpathy-Coding-Guidelines (**Think Before Coding · Simplici
 
 ## 🏗️ Projekt-Kontext
 
-- **Produkt:** BFSG-Check — automatisierter Compliance-Scanner für deutsche Websites (BFSG/WCAG/TDDDG)
-- **Domain:** bfsg-fix.de (Server bei Hetzner Cloud CPX22, Nürnberg, Ubuntu 24.04)
+- **Produkt/Marke:** BFSG-Fuchs — automatisierter Compliance-Scanner für deutsche Websites (BFSG/WCAG/TDDDG); Maskottchen „Filo"
+- **Primär-Domain:** bfsg-fuchs.de (SSOT: `landingpage-next/lib/config.ts`; Cutover 29.06.2026). bfsg-fix.de läuft parallel weiter (canonical → bfsg-fuchs.de, E-Mail info@bfsg-fix.de, Stripe-/Webhook-URLs). Server bei Hetzner Cloud CPX22, Nürnberg, Ubuntu 24.04. **Alle Außen-Texte (PMs, Listings, Social) IMMER auf Marke BFSG-Fuchs + bfsg-fuchs.de!**
 - **Owner:** Matthias Seba, Lange Straße 20, 27449 Kutenholz, info@matthias-seba.de
 - **Steuer:** § 19 UStG Kleinunternehmer
 - **Status:** Live (`/health` = `ok:true, stripe:true, live:true, mailer aktiv`)
@@ -41,6 +41,7 @@ Die vollständigen Karpathy-Coding-Guidelines (**Think Before Coding · Simplici
 scanner/          Node.js Backend (Express + Playwright + axe-core + Stripe)
 landingpage-next/ Next.js Landing (Tailwind v4 + shadcn, base-nova style)
 admin-next/       Admin-Dashboard (Next.js)
+aos/              Agent Operating System — Business-Dashboard (Next.js + FastAPI + Jarvis-Voice), eigener Docker-Stack, live auf aos.bfsg-fuchs.de
 landingpage/      Legacy HTML-Fallback (Volume-Mount)
 deployment/       Docker Compose + Caddy + cloud-init
 docs/             Pläne, Audits, Runbooks, Skills, Legal-Templates
@@ -69,6 +70,7 @@ scripts/          PDF-Generator + Helper-Scripts
 - `.github/workflows/deploy.yml` — Auto-Deploy auf main-Push
 - `.github/workflows/diagnose.yml` — Manueller SSH-Diagnose-Trigger
 - `.github/workflows/uptime-watch.yml` — 5-min /health-Check + Brevo-Alert
+- `.github/workflows/deploy-aos.yml` — Auto-Deploy des AOS-Stacks (aos/)
 
 ---
 
@@ -107,22 +109,25 @@ scripts/          PDF-Generator + Helper-Scripts
 
 ---
 
-## 🎯 Aktuelle Strategie (Stand 20.06.2026)
+## 🎯 Aktuelle Strategie (Stand 19.07.2026 — No-Ads)
 
-### Marketing (0-Touch, kein LinkedIn, kein persönliches Netzwerk)
-- **Säule 1:** Google Ads (13 €/Tag) + Bing Ads (4 €/Tag) → siehe `marketing/google-ads-rsa-headlines.md`
-- **Säule 2:** SEO + Programmatic (8-10 Pillar-Pages) → siehe `marketing/seo-content-plan.md`
-- **Säule 3:** Distribution-as-Product (Chrome Extension Tag 7-14, WordPress-Plugin Tag 30, BFSG-Score-Badge)
-- **Säule 4:** Listings (SaaSHub dofollow! + G2 + Capterra + OMR) + PRs (kostenlos + 28.06.2026 1-Jahr-BFSG-Hook)
+### ⚠️ Paid Ads sind TOT — nicht reaktivieren!
+- **Bing/Microsoft Ads:** Konto endgültig gesperrt (Einspruch abgelehnt 08.07.; Re-Appeal frühestens ~01/2027, KEIN neues Konto anlegen!)
+- **Google Ads:** nicht weiterverfolgt (Owner-Entscheidung 08.07.)
+- **Konsequenz:** 0-€-/No-Ads-Track ist DER Weg — keine Session darf Ads-Budgets einplanen oder Ad-Konten anfassen
+
+### Marketing (4-Säulen-No-Ads-Plan, siehe `marketing/no-ads-strategie/`)
+- **Säule A:** Content/AEO/PR (Ratgeberseiten mit FAQ-Schema, /mlbf-pruefstrategie live)
+- **Säule B:** Partner & Channel
+- **Säule C:** Directories/Listings (SaaSHub dofollow, G2, Capterra, OMR)
+- **Säule D:** Widget-Kern (Distribution-as-Product)
+- **Lead-Blitz:** priorisierte 80-Kanal-Liste + 4 ready-to-launch Assets → `marketing/no-ads-strategie/2026-07-19-lead-blitz-strategie.md` + `marketing/ready-to-launch/`
+- **Bindend:** Kaltakquise-Scan+Mail = NO-GO (UWG § 7 II Nr. 2, Netto-EV negativ — nicht erneut prüfen)
 
 ### Budget
-- 20 €/Tag Ads (600 €/Monat)
-- 25 €/Mo Tools (AGB-Generator IT-Recht-Kanzlei 15€ + lexoffice/sevdesk 10€)
+- 0 €/Tag Ads · 25 €/Mo Tools (AGB-Generator IT-Recht-Kanzlei 15€ + lexoffice/sevdesk 10€)
 - Trigger-Kalender für VSH/Anwalt: siehe `docs/LEGAL-REALITY-CHECK-2026.md`
-
-### Realistisches Ziel
-- 14 Tage: 2-6 Sales (400-1.500 €)
-- Monat 3: 8-15 Sales (350-700 € MRR)
+- 90-Tage-Plan mit KPI-Gates + Kill-Kriterien: `marketing/no-ads-strategie/`
 
 ---
 

@@ -1,6 +1,8 @@
 # 🗺️ BLUEPRINT — Nächste Session (Report-Glaubwürdigkeit, Value-Mail, KI-QA, Mail-Härtung)
 
-> **Lies das nach `CLAUDE.md` als ZWEITES.** Diese Datei ist die vollständige, self-contained Übergabe für die Rest-Umsetzung des „Masterplans Report-Glaubwürdigkeit". Du kannst **ohne Rückfragen durchstarten** — jeder Schritt hat Datei-, Env- und Agenten-Anweisungen. Reihenfolge strikt einhalten: **PR2 → PR3 → PR4 → PR5 → WS7**.
+> ⚠️ **ARCHIV-STATUS (seit 07.07.2026): Diese Datei ist abgeschlossen und NUR noch Meilenstein-Archiv.** PR2 (#102), PR3 (#103), PR4 (#104), PR5 (#108) und WS7 sind seit 01.–02.07. gemergt und live (siehe Memory `pr2-pr4-report-glaubwuerdigkeit`). **Nicht mehr als Anleitung für neue Sessions verwenden** — aktueller Stand kommt aus dem Auto-Memory (MEMORY.md-Index) + `git log origin/main`. Hinweis: Die hier beschriebene sendLeadTeaser-Backend-Mail wurde am 07.07. durch PR #132 wieder entfernt (Doppelmail-Fix, siehe Memory `merge-forensik-0719`).
+
+> **Ursprünglicher Kopf (historisch):** Lies das nach `CLAUDE.md` als ZWEITES. Diese Datei ist die vollständige, self-contained Übergabe für die Rest-Umsetzung des „Masterplans Report-Glaubwürdigkeit". Reihenfolge strikt einhalten: **PR2 → PR3 → PR4 → PR5 → WS7**.
 >
 > **Stand:** 01.07.2026 · **PR1 ist fertig + gemergt** (Frontend-Politur + Maskottchen). Live nach Merge auf `main`.
 

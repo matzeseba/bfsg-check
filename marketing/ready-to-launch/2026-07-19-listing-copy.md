@@ -25,15 +25,15 @@ Alle Texte einsatzbereit. Pflicht-Sprache eingehalten („automatisierte technis
 
 ## 3) Langbeschreibung (150–250 Wörter)
 
-BFSG-Check ist ein automatisierter technischer Scanner für die Barrierefreiheit deutscher Websites und Online-Shops. Das Tool führt einen WCAG-2.1-AA-Audit durch und prüft Ihre Seite auf über 90 technische Kriterien — von Farbkontrasten über Alternativtexte und Tastatur-Bedienbarkeit bis zu ARIA-Strukturen und Formular-Beschriftungen.
+BFSG-Fuchs ist ein automatisierter technischer Scanner für die Barrierefreiheit deutscher Websites und Online-Shops. Das Tool führt einen WCAG-2.1-AA-Audit durch und prüft Ihre Seite auf über 90 technische Kriterien — von Farbkontrasten über Alternativtexte und Tastatur-Bedienbarkeit bis zu ARIA-Strukturen und Formular-Beschriftungen.
 
 Der Ablauf ist bewusst einfach: Sie geben Ihre URL ein und erhalten in wenigen Minuten das Ergebnis eines automatisierten Scans (auf Basis der Engine axe-core). Der kostenlose Erst-Check zeigt Ihren aktuellen Status. Für den vollständigen PDF-Report mit priorisierter Fehlerliste, verständlichen Erklärungen und konkreten Umsetzungshinweisen gibt es einmalige Pakete ab 129 €.
 
-BFSG-Check richtet sich an Betreiber kleiner und mittlerer Websites, Shopbetreiber (Shopware, Shopify, JTL, WooCommerce) und Agenturen, die den technischen Ist-Zustand ihrer Barrierefreiheit schnell und nachvollziehbar dokumentieren wollen. Das Profi-Paket deckt mehrere Seiten ab und liefert einen konkreten Umsetzungsplan; ein optionales Re-Check-Abo überwacht Änderungen im Zeitverlauf. Zusätzlich gibt es einen separaten Cookie-/TDDDG-Check.
+BFSG-Fuchs richtet sich an Betreiber kleiner und mittlerer Websites, Shopbetreiber (Shopware, Shopify, JTL, WooCommerce) und Agenturen, die den technischen Ist-Zustand ihrer Barrierefreiheit schnell und nachvollziehbar dokumentieren wollen. Das Profi-Paket deckt mehrere Seiten ab und liefert einen konkreten Umsetzungsplan; ein optionales Re-Check-Abo überwacht Änderungen im Zeitverlauf. Zusätzlich gibt es einen separaten Cookie-/TDDDG-Check.
 
-**Wichtig:** BFSG-Check liefert eine automatisierte technische Analyse und ersetzt keine Rechtsberatung. Automatisierte Tests decken einen relevanten, aber nicht vollständigen Teil aller Barrierefreiheits-Anforderungen ab — manuelle Prüfschritte bleiben sinnvoll.
+**Wichtig:** BFSG-Fuchs liefert eine automatisierte technische Analyse und ersetzt keine Rechtsberatung. Automatisierte Tests decken einen relevanten, aber nicht vollständigen Teil aller Barrierefreiheits-Anforderungen ab — manuelle Prüfschritte bleiben sinnvoll.
 
-*Transparenz-Hinweis: Ich bin der Gründer von BFSG-Check.*
+*Transparenz-Hinweis: Ich bin der Gründer von BFSG-Fuchs.*
 
 *(ca. 205 Wörter)*
 

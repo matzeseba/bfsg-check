@@ -12,7 +12,7 @@ Show HN: Free WCAG 2.1 AA scanner for German websites (BFSG deadline)
 
 **Body:**
 
-I'm the founder of BFSG-Check (https://bfsg-fix.de). Full disclosure up front: this is my product and there's a paid tier, but the scan I'm asking you to try is free and needs no signup to see results.
+I'm the founder of BFSG-Fuchs (https://bfsg-fuchs.de). Full disclosure up front: this is my product and there's a paid tier, but the scan I'm asking you to try is free and needs no signup to see results.
 
 Some background on why it exists. Since 28 June 2025, Germany's Barrierefreiheitsstärkungsgesetz (BFSG — the national implementation of the European Accessibility Act) requires many commercial websites and online shops to be accessible, roughly to WCAG 2.1 AA. A lot of small German shop owners (Shopware, JTL, WooCommerce, Shopify) I talked to had heard the acronym, gotten a scary email from someone, and had no idea whether their own site was anywhere close. The existing answers were either a €2,000 manual audit or a wall of raw axe-core JSON they couldn't read.
 
@@ -36,7 +36,7 @@ Free WCAG 2.1 AA scan for German websites
 
 **Description:**
 
-BFSG-Check runs an automated technical analysis of any website against WCAG 2.1 AA — the standard behind Germany's new BFSG accessibility law (in force since June 2025). Paste a URL, get a prioritized list of the accessibility issues a machine can detect: contrast, alt text, form labels, heading and landmark structure, focus order, plus cookie-banner/TDDDG checks specific to the German market.
+BFSG-Fuchs runs an automated technical analysis of any website against WCAG 2.1 AA — the standard behind Germany's new BFSG accessibility law (in force since June 2025). Paste a URL, get a prioritized list of the accessibility issues a machine can detect: contrast, alt text, form labels, heading and landmark structure, focus order, plus cookie-banner/TDDDG checks specific to the German market.
 
 It's built on Playwright + axe-core, and the free scan needs no signup to show you results. Paid tiers add a full PDF report and a step-by-step fix plan, but the point of launching here is the free check.
 
