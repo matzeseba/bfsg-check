@@ -1,7 +1,7 @@
 # Handover — Marken-Vollumbau auf „BFSG-Fuchs" (Option B) · Roll-out-Plan
 
 > **Stand:** 29.06.2026 · **ERSETZT** die frühere Empfehlung „Architektur B = Fuchs nur als Layer auf barrierefrei-pruefen.de". Owner-Entscheid ist jetzt **Option B**: die Figur IST die Marke.
-> **Lies zuerst** `CLAUDE.md` + `docs/HANDOVER-NEXT-SESSION.md`, dann diese Datei.
+> **Lies zuerst** `CLAUDE.md` + `docs/archive/HANDOVER-NEXT-SESSION.md`, dann diese Datei.
 
 ---
 

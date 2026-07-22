@@ -15,10 +15,10 @@ description: Monatlicher Check auf BFSG/DSGVO/UWG-Updates die Code/Texte betreff
 - BFSG-Verordnungen (BFSGV) — Auslegungshinweise
 - EU AI Act Artikel die ab 02.08.2026 gelten
 
-Quellen-Liste in `docs/RECHTSSICHERHEITS-AUDIT.md` Sektion "Quellen".
+Quellen-Liste in `docs/archive/RECHTSSICHERHEITS-AUDIT.md` Sektion "Quellen".
 
 ### 2. Vergleich zum letzten Stand
-Letztes Audit-Datum in `docs/RECHTSSICHERHEITS-AUDIT.md` lesen.
+Letztes Audit-Datum in `docs/archive/RECHTSSICHERHEITS-AUDIT.md` lesen.
 Diff der relevanten Paragrafen seit dann.
 
 ### 3. Bewertung

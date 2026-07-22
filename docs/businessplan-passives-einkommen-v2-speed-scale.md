@@ -4,7 +4,7 @@
 **Auftrag:** schnellstmöglich + maximal viel · faceless · kein/minimaler Kontakt · KI >90 % · Ziel **3.000 €+/Monat**
 **Methode:** 2. Spezialisten-Agenten-Team (6 Agenten, lückenlos): Speed-Ranking · Blue-Ocean-Scanner · Paid-Traffic · Micro-SaaS/MRR · High-Ceiling-Modelle · Reality-/Scam-Filter.
 
-> Dieser Plan ergänzt `businessplan-passives-einkommen-2026.md` (v1 = passiv & langsam). v2 = **Tempo & Skalierung**.
+> Dieser Plan ergänzt `archive/businessplan-passives-einkommen-2026.md` (v1 = passiv & langsam). v2 = **Tempo & Skalierung**.
 
 ---
 
