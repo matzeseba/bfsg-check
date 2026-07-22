@@ -5,6 +5,12 @@ import { buildPrompt } from './prompt.js';
 
 const POLL_MS = 5_000;
 
+// Runner-Recovery: ein 'running'-Job, dessen letzter Timestamp älter als 30 Minuten
+// ist, kann nur aus einer abgebrochenen Session stammen (Runner ist sequentiell,
+// max. 1 Job gleichzeitig) und wird beim Engine-Start auf 'failed' gesetzt.
+const STALE_RUNNING_MS = 30 * 60_000;
+const RECOVERY_ERROR = 'Runner-Recovery: Job hing über Session-Abbruch';
+
 export function createRunner(cfg, store, deps) {
   const executor = deps.executor;
   const gate = deps.gate;
@@ -61,6 +67,25 @@ export function createRunner(cfg, store, deps) {
     }
   }
 
+  /**
+   * Runner-Recovery beim Engine-Start: hängengebliebene 'running'-Jobs
+   * (Timestamp älter als 30 Minuten) werden auf 'failed' gesetzt.
+   * @returns {Promise<string[]>} IDs der bereinigten Jobs
+   */
+  async function recoverStale(now = new Date()) {
+    const jobs = await store.readJobs();
+    const recovered = [];
+    for (const job of jobs) {
+      if (job.status !== 'running') continue;
+      const ts = new Date(job.updatedAt || job.createdAt || 0).getTime();
+      if (!Number.isFinite(ts) || now.getTime() - ts <= STALE_RUNNING_MS) continue;
+      await store.updateJob(job.id, { status: 'failed', error: RECOVERY_ERROR });
+      recovered.push(job.id);
+      if (log) await log.event(`Runner-Recovery: Job ${job.id} auf failed gesetzt (${RECOVERY_ERROR})`);
+    }
+    return recovered;
+  }
+
   function start() {
     if (timer) return;
     timer = setInterval(() => {
@@ -76,5 +101,5 @@ export function createRunner(cfg, store, deps) {
     timer = null;
   }
 
-  return { processNext, start, stop };
+  return { processNext, start, stop, recoverStale };
 }

@@ -39,13 +39,22 @@ export async function main(overrides = {}) {
   });
   const port = server.address().port;
 
+  // Runner-Recovery: hängengebliebene 'running'-Jobs aus abgebrochenen
+  // Sessions werden vor dem ersten Tick bereinigt (läuft immer, auch ohne autoStart).
+  const recovered = await runner.recoverStale();
+  if (recovered.length > 0) {
+    // eslint-disable-next-line no-console
+    console.log(`[MOS] Runner-Recovery: ${recovered.length} hängende(r) Job(s) -> failed (${recovered.join(', ')})`);
+  }
+
   if (autoStart) {
-    scheduler.start();
+    // Scheduler-Pause (Owner-Beschluss 23.07.2026): tickt nur bei MOS_SCHEDULER_ENABLED=true.
+    if (cfg.schedulerEnabled) scheduler.start();
     runner.start();
   }
 
   // eslint-disable-next-line no-console
-  console.log(`[MOS] Engine läuft auf http://127.0.0.1:${port} (dryRun=${cfg.dryRun}, autoStart=${autoStart})`);
+  console.log(`[MOS] Engine läuft auf http://127.0.0.1:${port} (dryRun=${cfg.dryRun}, autoStart=${autoStart}, scheduler=${cfg.schedulerEnabled ? 'an' : 'pausiert'})`);
 
   async function stop() {
     scheduler.stop();

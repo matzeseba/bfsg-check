@@ -33,6 +33,10 @@ export function createConfig(overrides = {}) {
     dashboardDist: overrides.dashboardDist || path.join(mosRoot, 'dashboard', 'dist'),
     dryRun: overrides.dryRun ?? (process.env.MOS_DRY_RUN === '1'),
     port: overrides.port ?? (process.env.MOS_PORT ? Number(process.env.MOS_PORT) : 4870),
+    // Scheduler-Pause (Owner-Beschluss 23.07.2026): der Scheduler bleibt bis zur
+    // Executor-Reparatur aus und tickt nur bei explizitem MOS_SCHEDULER_ENABLED=true.
+    schedulerEnabled:
+      overrides.schedulerEnabled ?? (process.env.MOS_SCHEDULER_ENABLED === 'true'),
     // Produkt-Fakten für Prompt-Platzhalter
     product: overrides.product || 'BFSG-Fuchs',
     domain: overrides.domain || 'bfsg-fix.de',
