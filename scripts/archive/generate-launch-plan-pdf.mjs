@@ -52,7 +52,7 @@ const blocks = [
         why: 'Wenn der Server crasht, kriegst du eine Mail.',
         steps: [
           'Browser: <code>https://sentry.io/signup/</code>',
-          '„Sign up with Email" → <code>matze.seba@outlook.de</code>',
+          '„Sign up with Email" → <code>admin@example.com</code>',
           'Organisation: „BFSG-Check"',
           'Plattform: <strong>Node.js</strong>',
           'Den DSN-String (beginnt mit https://) kopieren',
@@ -187,7 +187,7 @@ const blocks = [
         steps: [
           'SSH einloggen, dann: <code>nano /opt/bfsg-check/deployment/.env</code>',
           'Ans Ende der Datei diese Zeilen einfügen (mit deinen Werten):',
-          '<pre>ADMIN_TOKEN=DEIN_TOKEN_AUS_1.1\nSENTRY_DSN=https://...\nVAT_MODE=kleinunternehmer\nINVOICE_FROM_NAME=Matthias Seba\nINVOICE_FROM_ADDRESS=Lange Straße 20, 27449 Kutenholz\nBACKUP_GPG_RECIPIENT=backup@bfsg-fix.de\nBACKUP_TARGET=hetzner-storage:bfsg-backups</pre>',
+          '<pre>ADMIN_TOKEN=DEIN_TOKEN_AUS_1.1\nSENTRY_DSN=https://...\nVAT_MODE=kleinunternehmer\nINVOICE_FROM_NAME=MUSTERFIRMA\nINVOICE_FROM_ADDRESS=Musterstraße 1, 12345 Musterstadt\nBACKUP_GPG_RECIPIENT=backup@bfsg-fix.de\nBACKUP_TARGET=hetzner-storage:bfsg-backups</pre>',
           'Speichern: Ctrl+O → Enter → Ctrl+X',
           'Neustart: <code>cd /opt/bfsg-check/deployment && docker compose restart app</code>',
           'Test: <code>curl -fSs https://bfsg-fix.de/health</code>',
@@ -245,7 +245,7 @@ const blocks = [
           'Browser: <code>https://github.com/matzeseba/bfsg-check/settings/secrets/actions</code>',
           'Pro Secret: „New repository secret" → Name + Wert → „Add secret"',
           'Diese 5 Secrets anlegen:',
-          '<ul><li><code>SMTP_USER</code> = matthiasseba92@gmail.com</li><li><code>SMTP_PASS</code> = Brevo SMTP-Key</li><li><code>ADMIN_TOKEN</code> = Token aus 1.1</li><li><code>SENTRY_DSN</code> = DSN aus 1.2</li><li><code>NOTION_TOKEN</code> = Token aus 1.5</li></ul>'
+          '<ul><li><code>SMTP_USER</code> = DEINE-SMTP-EMAIL@example.com</li><li><code>SMTP_PASS</code> = Brevo SMTP-Key</li><li><code>ADMIN_TOKEN</code> = Token aus 1.1</li><li><code>SENTRY_DSN</code> = DSN aus 1.2</li><li><code>NOTION_TOKEN</code> = Token aus 1.5</li></ul>'
         ],
         done: 'Alle 5 Secrets in GitHub sichtbar.'
       }
@@ -661,8 +661,8 @@ function renderHtml() {
   </div>
   <div class="cover-foot">
     <div>
-      <strong>Für:</strong> Matthias Seba<br>
-      Lange Straße 20, 27449 Kutenholz
+      <strong>Für:</strong> MUSTERFIRMA<br>
+      Musterstraße 1, 12345 Musterstadt
     </div>
     <div class="cover-foot-right">
       <strong>Stand:</strong> 18.06.2026<br>
