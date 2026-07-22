@@ -1,7 +1,8 @@
 name: PR-CI
 
 # PR-Gate vor Merge auf main (Merge = Live-Deploy!):
-# 4 parallele Jobs — Scanner-Tests, Landingpage-Lint+Build, Legal-Grep, Caddy-Validate.
+# 5 parallele Jobs — Scanner-Tests, Landingpage-Lint+Build, Legal-Grep,
+# Preis-Sync (Scanner ↔ Landingpage), Caddy-Validate.
 # Bewusst OHNE Secrets: läuft auch für Fork-PRs sicher.
 
 on:
@@ -25,14 +26,13 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          # scanner/ hat kein package-lock.json (per scanner/.gitignore
-          # ausgeschlossen) → package.json als Cache-Key.
-          cache-dependency-path: scanner/package.json
+          # scanner/package-lock.json ist versioniert → reproduzierbarer Cache-Key.
+          cache-dependency-path: scanner/package-lock.json
       - name: Dependencies installieren (ohne Chromium-Download)
-        # npm install statt npm ci, weil kein Lockfile versioniert ist.
-        # --ignore-scripts überspringt den postinstall-Chromium-Download —
+        # npm ci gegen das versionierte Lockfile (bit-gleiche Dependency-Versionen
+        # wie lokal). --ignore-scripts überspringt den postinstall-Chromium-Download —
         # die Tests (node --test) starten keinen Browser.
-        run: npm install --ignore-scripts
+        run: npm ci --ignore-scripts
         working-directory: scanner
       - name: Tests ausführen
         run: npm test
@@ -68,6 +68,20 @@ jobs:
           node-version: 22
       - name: Verbotene Marketing-Claims prüfen
         run: node scripts/legal-grep.mjs
+
+  # Preis-Sync: Paket-IDs, Cent-Beträge und available-Flags zwischen
+  # scanner/app.js (PACKAGES) und landingpage-next/lib/config.ts müssen deckungsgleich
+  # bleiben — sonst zeigt die Landingpage andere Preise als der Checkout berechnet.
+  price-sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Paket-/Preis-Konfiguration vergleichen
+        run: node scripts/check-price-sync.mjs
 
   # Lehre aus dem P0-Ausfall 09.07. (PR #142/#143): eine syntaktisch ungültige
   # Caddyfile crash-loopte den gemeinsamen bfsg-caddy-Ingress → gesamte Live-Site

@@ -9,8 +9,9 @@ FROM mcr.microsoft.com/playwright:v1.55.1-jammy
 
 WORKDIR /app
 
-COPY package.json ./
-RUN npm install --omit=dev --ignore-scripts
+# Lockfile ist versioniert (Build-Reproduzierbarkeit) → npm ci statt npm install.
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev --ignore-scripts
 
 COPY . .
 
