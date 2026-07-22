@@ -1,225 +1,137 @@
 # CLAUDE.md — Arbeits-Regeln für dieses Projekt
 
-> Diese Datei wird von Claude Code automatisch beim Session-Start gelesen.
-> **Lies sie ZUERST. Der aktuelle Projekt-Stand kommt aus dem Auto-Memory (MEMORY.md-Index, wird automatisch geladen) + `git log origin/main` — NICHT aus `docs/HANDOVER-NEXT-SESSION.md` (nur Meilenstein-Archiv, kann veraltet sein).**
+> Wird automatisch beim Session-Start geladen. **Aktueller Projekt-Stand = Auto-Memory (MEMORY.md-Index, auto-geladen) + `git log origin/main`** — NICHT `docs/HANDOVER-NEXT-SESSION.md` (nur Meilenstein-Archiv, kann veraltet sein).
 
 ---
 
 ## 🚀 Express-Modus (FESTE REGEL)
 
-**Immer den schnellsten Weg gehen. Maximal viel selbst erledigen.**
+**Schnellster Weg, maximal viel selbst erledigen:**
+- Keine Klick-Anleitungen, wenn es per API/CLI selbst geht; aktiv nach Credentials fragen, sofort handeln (danach aus Repo raushalten, Rotation empfehlen)
+- Knappe Status-Updates statt Tutorials; parallele Tool-Calls wo möglich
+- Bei Hindernissen eigenständig Plan B/C — Rückfrage nur bei echten Owner-Entscheidungen
 
-Konkret:
-- **Keine Klick-Anleitungen** für den User, wenn ich es per API/CLI selbst machen kann
-- **Aktiv nach Zugängen fragen** (API-Tokens, Credentials), statt User durch UIs zu schicken
-- **Sofort handeln** nach Erhalt der Credentials — nicht erst lange erklären
-- **Knappe Status-Updates** statt langer Tutorials
-- **Parallele Tool-Calls** wo immer möglich (Bash + Read + Write gleichzeitig)
-- **Self-cleanup**: Credentials nach Nutzung `shred`-en, aus Repo raushalten, User zur Rotation auffordern
-- **Bei Hindernissen**: Eigenständig Plan B/C wählen, nicht mit klärenden Fragen blockieren (außer Entscheidungen sind echt nur vom User zu treffen)
+## 🧭 Coding-Guidelines (Karpathy — FESTE REGEL)
 
----
-
-## 🧭 Coding-Guidelines (Karpathy-inspiriert — FESTE REGEL)
-
-Die vollständigen Karpathy-Coding-Guidelines (**Think Before Coding · Simplicity First · Surgical Changes · Goal-Driven Execution**) gelten **global** für alle Projekte — Quelle: `~/.claude/rules/karpathy-coding-guidelines.md` (von der Harness bei jedem Session-Start automatisch geladen, hier nicht dupliziert).
-
-> **Verhältnis zum Express-Modus:** Der Express-Modus regelt das **WIE** der Umsetzung (Tempo, selbst erledigen, keine Klick-Tutorials, parallele Tool-Calls). Die Guidelines regeln das **WAS/OB** (vorher denken, minimal + chirurgisch ändern, verifizieren). Bei echter Mehrdeutigkeit oder Nur-vom-User-Entscheidungen gilt Guideline 1 (kurz benennen/fragen) — deckt sich mit der Express-Modus-Ausnahme „außer Entscheidungen sind echt nur vom User zu treffen". Bei trivialen Aufgaben: Urteilsvermögen nutzen, nicht formalisieren.
+**Think Before Coding · Simplicity First · Surgical Changes · Goal-Driven Execution** — gelten global, Quelle `~/.claude/rules/karpathy-coding-guidelines.md` (auto-geladen). Express-Modus regelt das WIE (Tempo, selbst erledigen), die Guidelines das WAS/OB (vorher denken, minimal ändern, verifizieren).
 
 ---
 
 ## 🏗️ Projekt-Kontext
 
 - **Produkt/Marke:** BFSG-Fuchs — automatisierter Compliance-Scanner für deutsche Websites (BFSG/WCAG/TDDDG); Maskottchen „Filo"
-- **Primär-Domain:** bfsg-fuchs.de (SSOT: `landingpage-next/lib/config.ts`; Cutover 29.06.2026). bfsg-fix.de läuft parallel weiter (canonical → bfsg-fuchs.de, E-Mail info@bfsg-fix.de, Stripe-/Webhook-URLs). Server bei Hetzner Cloud CPX22, Nürnberg, Ubuntu 24.04. **Alle Außen-Texte (PMs, Listings, Social) IMMER auf Marke BFSG-Fuchs + bfsg-fuchs.de!**
-- **Owner:** Matthias Seba, Lange Straße 20, 27449 Kutenholz, info@matthias-seba.de
-- **Steuer:** § 19 UStG Kleinunternehmer
+- **Primär-Domain:** bfsg-fuchs.de (SSOT: `landingpage-next/lib/config.ts`; Cutover 29.06.2026). bfsg-fix.de läuft parallel (canonical → bfsg-fuchs.de, E-Mail info@bfsg-fix.de, Stripe-/Webhook-URLs). Server: Hetzner CPX22, Nürnberg, Ubuntu 24.04. **Alle Außen-Texte (PMs, Listings, Social) IMMER auf Marke BFSG-Fuchs + bfsg-fuchs.de!**
+- **Owner:** Matthias Seba, Lange Straße 20, 27449 Kutenholz, info@matthias-seba.de · § 19 UStG Kleinunternehmer
 - **Status:** Live (`/health` = `ok:true, stripe:true, live:true, mailer aktiv`)
 
 ### Repo-Layout
 ```
 scanner/          Node.js Backend (Express + Playwright + axe-core + Stripe)
-landingpage-next/ Next.js Landing (Tailwind v4 + shadcn, base-nova style)
+landingpage-next/ Next.js Landing (Tailwind v4 + shadcn)
 admin-next/       Admin-Dashboard (Next.js)
-aos/              Agent Operating System — Business-Dashboard (Next.js + FastAPI + Jarvis-Voice), eigener Docker-Stack, live auf aos.bfsg-fuchs.de
+aos/              Agent Operating System — Business-Dashboard, eigener Docker-Stack, live auf aos.bfsg-fuchs.de
 landingpage/      Legacy HTML-Fallback (Volume-Mount)
 deployment/       Docker Compose + Caddy + cloud-init
-docs/             Pläne, Audits, Runbooks, Skills, Legal-Templates
-marketing/        Strategy, Ad-Headlines, Listings-Templates, PRs
-scripts/          PDF-Generator + Helper-Scripts
-.claude/          Claude Code Settings (settings.local.json)
+docs/ · marketing/ · scripts/ · plans/   Doku, Strategie, Helper, Pläne
+.claude/          Settings + lokale Agenten/Skills (gitignored)
 ```
 
 ### Pakete (alle live, Stripe Live-Mode)
-- **Basis** 129 € (einmalig, Auto-Scan + PDF-Report)
-- **Profi** 399 € (einmalig, Multi-Page + Umsetzungsplan + 30 Tage Support)
-- **Cookie-Basis** 39 € · **Cookie-Profi** 69 €
-- **Re-Check-Abo** 24,99 €/Monat oder 249 €/Jahr (`ENABLE_ABO=true`; Jahresoption = Backend-Paket `abo-jahr`)
+Basis 129 € · Profi 399 € · Cookie-Basis 39 € · Cookie-Profi 69 € · Re-Check-Abo 24,99 €/Mo oder 249 €/Jahr (`ENABLE_ABO=true`; Jahresoption = Backend-Paket `abo-jahr`)
 
 ---
 
 ## 🛠️ Deploy & Operations
 
-- **Deploy:** GitHub Actions auf `main`-Push → SSH zu Hetzner → `git pull && docker compose up -d --build`
-- **Health-Endpoint:** `https://bfsg-fix.de/health`
-- **Stripe-Webhook:** `https://bfsg-fix.de/webhook` (Signatur-validated)
-- **SSL:** Let's Encrypt via Caddy (auto-renewal)
-- **Backups:** noch nicht voll automatisiert (siehe `docs/BACKUP.md`)
+- **Deploy:** GitHub Actions auf `main`-Push → SSH zu Hetzner → `git pull && docker compose up -d --build`. **Merge = Live-Deploy** → nur via PR.
+- **Health:** `https://bfsg-fix.de/health` · **Stripe-Webhook:** `https://bfsg-fix.de/webhook` · SSL via Caddy/Let's Encrypt
+- **Workflows:** `deploy.yml` (Auto-Deploy) · `deploy-aos.yml` (AOS-Stack) · `pr-ci.yml` (Scanner-Tests + LP-Build + Legal-Grep + Caddy-Validate) · `diagnose.yml` · `uptime-watch.yml` (5-min Health + Brevo-Alert)
+- Backups: noch nicht voll automatisiert (`docs/BACKUP.md`)
 
-### Wichtigste Workflows
-- `.github/workflows/deploy.yml` — Auto-Deploy auf main-Push
-- `.github/workflows/diagnose.yml` — Manueller SSH-Diagnose-Trigger
-- `.github/workflows/uptime-watch.yml` — 5-min /health-Check + Brevo-Alert
-- `.github/workflows/deploy-aos.yml` — Auto-Deploy des AOS-Stacks (aos/)
+## 🔐 Sensible Daten
 
----
-
-## 🔐 Sensible Daten — Hygiene
-
-- **Niemals** Live-Keys ins Repo (`.env` ist gitignored, `.env.example` als Template)
-- **Niemals** Live-Keys in Chat — falls passiert: User aktiv zur Rotation auffordern
-- **Secrets-Quellen:**
-  - GitHub Secrets (für CI): `HETZNER_SSH_KEY`, `STRIPE_*`, `SMTP_*`, `ADMIN_TOKEN`, etc.
-  - Server `.env` auf bfsg-fix.de unter `/opt/bfsg-check/deployment/.env`
-- **Stripe-Key-Prefix:** `rk_live_*` (Restricted, nicht `sk_live_*`) — Live-Flag-Check in `scanner/lib/mailer.js:43`
+- **Niemals** Live-Keys ins Repo oder in den Chat (falls passiert: Owner zur Rotation auffordern). `.env` gitignored, `.env.example` als Template.
+- Secrets-Quellen: GitHub Secrets (CI) + Server-`.env` unter `/opt/bfsg-check/deployment/.env`
+- Stripe-Key-Prefix: `rk_live_*` (Restricted) — Live-Flag-Check in `scanner/lib/mailer.js:43`
 
 ---
 
 ## ⚖️ Recht & Compliance
 
-### Was wir DÜRFEN (Stand 20.06.2026, siehe `docs/LEGAL-REALITY-CHECK-2026.md`)
-- ✅ B2B-positionierter SaaS-Verkauf ohne Anwalts-Endabnahme (Solo, <30k€/Jahr, mit Disclaimer + AGB-Cap)
-- ✅ Google Ads + Bing Ads + Listings + freie PMs (openPR/inar/firmenpresse)
-- ✅ HARO/Recherchescout/Featured-Answers
-- ✅ Show HN + Awesome-List-PRs (mit klarer Disclosure „I'm the founder")
-- ✅ § 6 UWG vergleichende Werbung (objektiv messbare WCAG-Scores, nicht herabsetzend)
+**DÜRFEN** (Stand 20.06.2026, Details `docs/LEGAL-REALITY-CHECK-2026.md`): B2B-SaaS-Verkauf ohne Anwalts-Endabnahme (Solo, <30k€/Jahr, Disclaimer + AGB-Cap) · Listings + freie PMs (openPR/inar/firmenpresse) · HARO/Featured-Answers · Show HN + Awesome-Lists (mit Founder-Disclosure) · § 6 UWG vergleichende Werbung (objektiv messbare WCAG-Scores).
 
-### Was wir NICHT dürfen
-- ❌ Cold-Mails an Einzelpersonen (UWG §7 II Nr.2 — 270-800€ Abmahnung pro Mail)
-- ❌ LinkedIn-DMs / Xing-DMs an Fremde (OLG Hamm 18 U 154/22 — selbst 1:1 personalisiert)
-- ❌ „BFSG-konform"-Garantien in Marketing (UWG §5 Irreführung)
-- ❌ TÜV/DEKRA-Siegel ohne echte Zertifizierung
-- ❌ Schleichwerbung in Foren (UWG §5a IV + §22 MStV — bis 500.000€ Strafrahmen)
-- ❌ Cookie-Banner ohne 2-Button-Gleichgewicht („Ablehnen" muss gleich sichtbar)
+**NICHT dürfen:** ❌ Cold-Mails (UWG §7 II Nr.2, 270–800 € Abmahnung/Mail) · ❌ LinkedIn-/Xing-DMs an Fremde (OLG Hamm 18 U 154/22) · ❌ „BFSG-konform"-Garantien (UWG §5) · ❌ TÜV/DEKRA-Siegel ohne Zertifizierung · ❌ Schleichwerbung in Foren (UWG §5a IV, §22 MStV) · ❌ Cookie-Banner ohne 2-Button-Gleichgewicht.
 
-### Pflicht-Sprache
-- ✅ „automatisierte technische Analyse" / „WCAG-2.1-AA-Audit"
-- ❌ „BFSG-konform" / „rechtssicher" / „garantiert"
-- Disclaimer-Wortlaut: siehe `docs/legal-templates/disclaimer-footer.md`
+**Pflicht-Sprache:** ✅ „automatisierte technische Analyse" / „WCAG-2.1-AA-Audit" — ❌ „BFSG-konform" / „rechtssicher" / „garantiert". Disclaimer: `docs/legal-templates/disclaimer-footer.md`.
 
 ---
 
-## 🎯 Aktuelle Strategie (Stand 19.07.2026 — No-Ads)
+## 🎯 Strategie (Stand 19.07.2026 — No-Ads)
 
-### ⚠️ Paid Ads sind TOT — nicht reaktivieren!
-- **Bing/Microsoft Ads:** Konto endgültig gesperrt (Einspruch abgelehnt 08.07.; Re-Appeal frühestens ~01/2027, KEIN neues Konto anlegen!)
-- **Google Ads:** nicht weiterverfolgt (Owner-Entscheidung 08.07.)
-- **Konsequenz:** 0-€-/No-Ads-Track ist DER Weg — keine Session darf Ads-Budgets einplanen oder Ad-Konten anfassen
-
-### Marketing (4-Säulen-No-Ads-Plan, siehe `marketing/no-ads-strategie/`)
-- **Säule A:** Content/AEO/PR (Ratgeberseiten mit FAQ-Schema, /mlbf-pruefstrategie live)
-- **Säule B:** Partner & Channel
-- **Säule C:** Directories/Listings (SaaSHub dofollow, G2, Capterra, OMR)
-- **Säule D:** Widget-Kern (Distribution-as-Product)
-- **Lead-Blitz:** priorisierte 80-Kanal-Liste + 4 ready-to-launch Assets → `marketing/no-ads-strategie/2026-07-19-lead-blitz-strategie.md` + `marketing/ready-to-launch/`
-- **Bindend:** Kaltakquise-Scan+Mail = NO-GO (UWG § 7 II Nr. 2, Netto-EV negativ — nicht erneut prüfen)
-
-### Budget
-- 0 €/Tag Ads · 25 €/Mo Tools (AGB-Generator IT-Recht-Kanzlei 15€ + lexoffice/sevdesk 10€)
-- Trigger-Kalender für VSH/Anwalt: siehe `docs/LEGAL-REALITY-CHECK-2026.md`
-- 90-Tage-Plan mit KPI-Gates + Kill-Kriterien: `marketing/no-ads-strategie/`
+- **⚠️ Paid Ads sind TOT:** Bing-Konto endgültig gesperrt (Re-Appeal frühestens ~01/2027, KEIN neues Konto!), Google Ads verworfen (Owner 08.07.). Keine Session plant Ads-Budgets oder fasst Ad-Konten an.
+- **4-Säulen-No-Ads-Plan** (`marketing/no-ads-strategie/`, inkl. 90-Tage-Plan + KPI-Gates): A Content/AEO/PR · B Partner/Channel · C Directories/Listings · D Widget-Kern
+- **Lead-Blitz:** 80-Kanal-Liste + ready-to-launch Assets → `marketing/no-ads-strategie/2026-07-19-lead-blitz-strategie.md` + `marketing/ready-to-launch/`
+- **Bindend:** Kaltakquise-Scan+Mail = NO-GO (UWG § 7 II Nr. 2 — nicht erneut prüfen)
+- Budget: 0 €/Tag Ads · 25 €/Mo Tools · Anwalts-Trigger: `docs/LEGAL-REALITY-CHECK-2026.md`
 
 ---
 
-## 🧠 Wenn du eine neue Aufgabe bekommst
+## 🧠 Arbeitsregeln bei neuen Aufgaben
 
-1. **Aktueller Stand = Auto-Memory + Git.** Der MEMORY.md-Index wird bei jedem Session-Start automatisch geladen — relevante Memory-Dateien bei Bedarf lesen. `docs/HANDOVER-NEXT-SESSION.md` ist nur Meilenstein-Archiv (Datum im Kopf prüfen, kann veraltet sein)
-2. Prüfe `git log origin/main --oneline -10` für letzte Änderungen (Session-Branches/Disk-Docs hängen oft hinter origin/main)
-3. Bei Marketing-Tasks: `marketing/` + `docs/SALES-DAY-1-V2.md`
-4. Bei Code-Änderungen: TypeScript-Strikt-Mode, ESLint-No-ASCII-Umlaute-Rule (echte ä/ö/ü/ß!)
-5. Bei Deploy: nur via PR-Merge auf main (Auto-Deploy via GitHub Actions)
-6. Multi-Agent-Sprints: nutze die **Agency-Agents** (siehe unten) + Explore + Plan parallel
-7. **Computer Use ist aktiviert** (seit 20.06.2026) — Claude Code kann Browser nativ steuern
-8. **Memory sofort pflegen (FESTE REGEL):** Nach jedem abgeschlossenen Meilenstein (PR offen/gemergt, Entscheidung gefallen, Blocker entdeckt) SOFORT ins Auto-Memory schreiben (neue/aktualisierte Memory-Datei + MEMORY.md-Indexzeile) — NICHT erst „am Session-Ende": ein Session-Ende (/clear, Fenster zu) kündigt sich nicht an. So ist das Memory jederzeit übergabefähig, egal wann die Session endet. Wichtig: in der YAML-`description` kein ` #` verwenden (YAML-Kommentar, schneidet den Text ab)
+1. **Stand = Auto-Memory + `git log origin/main --oneline -10`** (Branches/Disk-Docs hängen oft hinterher)
+2. **Memory SOFORT pflegen (FESTE REGEL):** Nach jedem Meilenstein (PR offen/gemergt, Entscheidung, Blocker) sofort Memory-Datei + MEMORY.md-Indexzeile schreiben — nicht erst am Session-Ende. Kein ` #` in YAML-`description` (schneidet Text ab).
+3. Code: TypeScript-Strikt-Mode, echte Umlaute (ä/ö/ü/ß — ESLint-Rule)
+4. Deploy nur via PR-Merge auf main; Marketing-Tasks: `marketing/` + `docs/SALES-DAY-1-V2.md`
+5. Computer Use ist aktiviert (Browser nativ steuerbar)
 
 ---
 
-## 🤖 Agency-Agents (FESTE REGEL — dauerhaft installiert seit 21.06.2026)
+## 🤖 Agency-Agents (FESTE REGEL)
 
-**Wir nutzen das Agency-Agents-Set (`msitarzewski/agency-agents`, MIT, 114k★) als Standard-Werkzeug für jede Spezial-Aufgabe.**
+**217 spezialisierte Agenten** (`msitarzewski/agency-agents`, MIT) lokal unter `.claude/agents/agency/` — 16 Divisionen (engineering, security, design, marketing, sales, testing, support, …). Gitignored; Update: `git -C /tmp/agency-agents pull` + Re-Copy. Als native `subagent_type` ab nächstem Session-Start verfügbar.
 
-- **Installiert unter:** `.claude/agents/agency/` — **217 spezialisierte Agenten** in 16 Divisionen (engineering, security, design, marketing, sales, product, testing, support, paid-media, project-management, finance, academic, gis, game-development, spatial-computing, specialized). Hinweis: `.claude/` ist gitignored → die Agenten leben lokal auf Disk (nicht im Repo), Regel + Audits sind aber versioniert.
-- **Quelle/Update:** kanonisches Original `msitarzewski/agency-agents` (native Claude-Code-`.md`+YAML-Agenten, kein fremder Hook-Code). Update via `git -C /tmp/agency-agents pull` + Re-Copy der 16 Divisionen.
-- **Registrierung:** Agenten stehen ab dem **nächsten Session-Start** als native `subagent_type` zur Verfügung. In der Install-Session: Persona-Datei lesen und in einen `general-purpose`/`Explore`/`Plan`-Agenten injizieren.
+**Regel:** Bei jeder substanziellen Spezial-Aufgabe zuerst passenden Agency-Agenten wählen statt generisch arbeiten; unabhängige Agenten parallel in EINER Nachricht starten. Beispiele: Code-Review → `engineering-code-reviewer` · Security → `security-appsec-engineer` · Conversion/UX → `design-ux-architect`, `marketing-growth-hacker` · A11y-Dogfood → `testing-accessibility-auditor` · Reliability → `engineering-sre`. Falls Kontext-Overhead zu groß: irrelevante Divisionen (academic, gis, game-development, spatial-computing) löschen.
 
-**Wann welche Division (Auswahl für unser Business):**
-| Aufgabe | Agenten (Beispiele) |
+## 💰 Cost-Aware Model-Routing (FESTE REGEL, seit 22.07.2026)
+
+**Jeder Sub-Agent bekommt beim Start EXPLIZIT das günstigste Modell zugewiesen, das die Aufgabe sicher schafft** — nie stillschweigend das Haupt-Session-Modell erben lassen. Mechanik je Startweg: `model`-Parameter im Agent-Tool · `opts.model` + `opts.effort` im Workflow-Tool · `model`-Frontmatter in `.claude/agents/*.md` · `--model`-Flag bei `claude`-CLI-Aufrufen.
+
+| Tier | Einsatz |
 |---|---|
-| Code-Review / Architektur | `engineering-code-reviewer`, `engineering-software-architect`, `engineering-senior-developer`, `engineering-minimal-change-engineer` |
-| Sicherheit / Pentest | `security-appsec-engineer`, `security-penetration-tester`, `security-architect`, `security-compliance-auditor` |
-| Landingpage / UX / Conversion | `design-ux-architect`, `design-ux-researcher`, `marketing-growth-hacker` |
-| Accessibility (eigenes Dogfood) | `testing-accessibility-auditor`, `testing-reality-checker` |
-| Marketing / SEO / Ads | Division `marketing` + `paid-media` |
-| Reliability / Deploy | `engineering-sre`, `engineering-devops-automator` |
+| `haiku` | Mechanik/Volumen: Grep-/Datei-Sweeps, Extraktion, Format-/Checklisten-Prüfungen, simple Zusammenfassungen (+ `effort: low`) |
+| `sonnet` | **Default für ALLE Subagenten** (Owner-Vorgabe): Code, Review, Recherche, Forensik, Content |
+| `opus` | Nur einzeln begründet: schwerste Architektur-/Judge-/Verify-Stages |
+| Fable/Mythos | **NIE für Subagenten** — nur Haupt-Loop |
 
-**Regel:** Bei jeder substanziellen Spezial-Aufgabe zuerst prüfen, ob ein Agency-Agent fachlich passt, und ihn nutzen — statt generisch zu arbeiten. Mehrere Agenten parallel starten, wenn die Teilaufgaben unabhängig sind.
+Im Zweifel `sonnet`. Zusatzregel: Subagenten-Prompts verbieten SSH-/Prod-Zugriff explizit (Memory `subagent-model-policy`).
 
-**Erster Einsatz (21.06.2026):** 6 parallele Teams haben einen Pre-Launch-Audit gefahren → `docs/agency-audits/2026-06-21-MASTER-SUMMARY.md` (Security/Code/A11y/Legal/Conversion/SRE).
+## ⚡ Cache-Prompting (FESTE REGEL)
 
-**Hinweis Kontext:** 217 Agenten erhöhen den Agent-Typen-Listing-Overhead pro Session. Falls zu schwer → unrelevante Divisionen (academic, gis, game-development, spatial-computing) aus `.claude/agents/agency/` entfernen.
-
----
-
-## ⚡ Cache-Prompting (FESTE REGEL — gilt für die festen Agenten)
-
-> **Warum:** Die 217 Agency-Agenten + diese CLAUDE.md sind ein großer, stabiler Prompt-Prefix. Claude Code cached den automatisch (System- + Projekt-Kontext-Layer). Cache-Read kostet ~0,1×, ein Cache-Miss zahlt den vollen Prefix neu. Cache-bewusst arbeiten = schneller + günstiger. Details: `docs/CACHE-PROMPTING-AGENTS.md`.
-
-**Wie Caching hier wirkt (Stand 21.06.2026, doc-belegt):**
-- **Automatisch + an by default.** Der feste Agenten-Prefix + CLAUDE.md laden 1× beim Session-Start und liegen im Cache. Nichts manuell zu setzen.
-- **Subagents:** jeder Agency-Agent baut seinen **eigenen** Cache (kalt → warm über seine Turns), **immer 5-Min-TTL** (auch bei Abo). Die 1h-TTL gilt nur fürs Haupt-Gespräch.
-
-**Regeln, um den warmen Prefix NICHT zu zerstören:**
-1. **Kein Modellwechsel mitten in der Session** (Opus↔Sonnet, `/fast`-Toggle, Effort-Änderung) — jedes davon = voller Re-Read des gesamten Prefix.
-2. **CLAUDE.md / `.claude/agents/` nicht mitten im Task ändern.** Edits greifen ohnehin erst nächste Session und der Mid-Session-Edit ist zwar cache-sicher, aber Struktur-Churn vermeiden. Agenten-/Regel-Änderungen an Session-Grenzen.
-3. **MCP-Server / Plugins nicht unnötig mitten in der Session an-/abschalten** (kann Prefix invalidieren, wenn Tools in den Prefix laden).
-4. **Agency-Sprints batchen:** unabhängige Agenten in EINER Nachricht parallel starten; iterative Arbeit innerhalb des 5-Min-Fensters halten. Bei langen Pausen `/loop`-Kadenz < 5 Min oder die 1h-Haupt-Cache (s. u.).
-5. **Warmen Agenten weiternutzen** via `SendMessage` (Kontext + Cache bleiben warm) statt neuem `Agent`-Call, wenn die Arbeit zusammenhängt.
-6. **Subagent-Prompts self-contained** geben (Persona-Datei-Pfad + voller Task vorne), da jeder Subagent kalt startet und nur über eigene Turns warm wird — Nachfüttern in Tröpfchen ist teuer.
-
-**Optionaler 1h-Haupt-Cache (manuell, vom User zu setzen — NICHT eigenmächtig):**
-- `ENABLE_PROMPT_CACHING_1H=1` in `.claude/settings.json` (`env`-Block) hält den **Haupt-Gespräch**-Cache 1h warm (gut für lange Sprints mit Weg-Pausen). Trade-off: Cache-Writes 2× statt 1,25×; greift nur bei API-Key-Auth (bei Abo ist 1h ohnehin automatisch). Zurück: Zeile entfernen oder `FORCE_PROMPT_CACHING_5M=1`. Komplett aus: `DISABLE_PROMPT_CACHING=1`.
-
----
+Fester Prefix (CLAUDE.md + Agenten) wird automatisch gecacht — warm halten (Details: `docs/CACHE-PROMPTING-AGENTS.md`):
+1. Kein Modellwechsel des HAUPT-Gesprächs mitten in der Session (`/fast`, Opus↔Sonnet, Effort) — Subagenten-Routing (s. o.) ist davon unberührt
+2. CLAUDE.md / `.claude/agents/` nur an Session-Grenzen ändern
+3. MCP-Server nicht unnötig mid-Session togglen
+4. Agenten-Sprints batchen (eine Nachricht); warmen Agenten via `SendMessage` weiternutzen statt neu spawnen; Subagent-Prompts self-contained
+5. Optionaler 1h-Haupt-Cache: `ENABLE_PROMPT_CACHING_1H=1` — nur vom Owner zu setzen
 
 ## 🪨 Caveman-Modus (Token-Sparen — FESTE REGEL, seit 22.07.2026)
 
-Der Skill `caveman` (github.com/JuliusBrussee/caveman, MIT) ist projektlokal unter `.claude/skills/caveman/` installiert (gitignored — bei frischem Checkout aus dem Quell-Repo neu kopieren: `skills/caveman/SKILL.md`).
+Skill `caveman` (github.com/JuliusBrussee/caveman, MIT) lokal unter `.claude/skills/caveman/` (gitignored; bei frischem Checkout `skills/caveman/SKILL.md` aus dem Quell-Repo re-kopieren).
 
-**Standard-Anweisung:** Invoke zu Session-Beginn den Skill `caveman` (Level `full`) und behalte ihn für ALLE Chat-Antworten der gesamten Session bei — knappe Fragmente statt Füllsätze, keine Tool-Call-Narration, keine dekorativen Tabellen/Emojis. Technische Substanz bleibt vollständig: Code, CLI-Befehle, Dateipfade, API-Namen und Fehlermeldungen byte-genau; Antworten weiterhin auf Deutsch (der Skill komprimiert den Stil, nicht die Sprache).
+**Standard:** Zu Session-Beginn Skill `caveman` invoken (Level `full`) und für ALLE Chat-Antworten halten — Fragmente statt Füllsätze, keine Tool-Call-Narration, keine Deko-Tabellen/Emojis. Substanz vollständig: Code, Befehle, Pfade, Fehlermeldungen byte-genau; Sprache bleibt Deutsch.
 
-**Ausnahmen — IMMER normale, vollständige Sprache:**
-- Alle **Deliverables/Außen-Texte** (Marketing-Copy, E-Mail-Texte, PMs, Listings, Landingpage-Texte, Doku in `docs/`, README, PR-Beschreibungen, Commit-Messages) — Brand-Voice geht vor Token-Ersparnis
-- Sicherheitswarnungen, Bestätigungen irreversibler Aktionen (Live-Deploy, Löschungen), mehrstufige Owner-Runbooks (Auto-Clarity-Regel des Skills)
-- Memory-Dateien (müssen für künftige Sessions selbsterklärend sein)
-
-**Steuerung:** `/caveman lite|full|ultra` wechselt das Level · „normal mode" / „stop caveman" deaktiviert für den Rest der Session.
+**Ausnahmen (IMMER normale Sprache):** Deliverables/Außen-Texte (Marketing, Mails, PMs, Listings, LP-Texte, `docs/`, README, PR-/Commit-Texte — Brand-Voice vor Ersparnis) · Sicherheitswarnungen + irreversible Aktionen · Owner-Runbooks · Memory-Dateien. Steuerung: `/caveman lite|full|ultra` · aus: „normal mode".
 
 ---
 
 ## 📞 Bei Fragen / Blockern
 
-- **User-E-Mail:** matze.seba@outlook.de (für Account-Erstellungen, etc.)
-- **Anwalts-Liste** (Trigger-basiert, NICHT vorbeugend): siehe `docs/LEGAL-REALITY-CHECK-2026.md` Sektion „Anwalts-Kontakte"
-- **Server-SSH:** via SSH-Config-Alias `bfsg` (nur vom User-Mac, nicht aus Claude Code Web/Sandbox)
-- **MCPs in der Session:** dynamisch — checke mit `claude mcp list`
-
----
+- **User-E-Mail:** matze.seba@outlook.de (Account-Erstellungen etc.)
+- Anwalts-Liste (Trigger-basiert): `docs/LEGAL-REALITY-CHECK-2026.md` · Server-SSH: Alias `bfsg` (nur User-Mac) · MCPs: `claude mcp list`
 
 ## 🚫 Was du NICHT tust
 
-- Keine Force-Pushes auf main
-- Keine `git reset --hard` ohne explizite User-OK
-- Keine Live-Aktionen (Stripe-Refunds, Hetzner-Server-Löschung, Google-Ads-Aktivierung) ohne User-Bestätigung
-- Keine destruktiven `rm -rf` ohne Backup
-- Keine eigenmächtigen Permission-Erweiterungen in `.claude/settings.local.json` (Auto-Mode-Classifier blockt das ohnehin)
-- Keine Cold-Mails, keine LinkedIn-DMs, keine `outreach.js`-Sperre umgehen
+- Keine Force-Pushes auf main · kein `git reset --hard` ohne User-OK · keine destruktiven `rm -rf` ohne Backup
+- Keine Live-Aktionen (Stripe-Refunds, Server-Löschung, Ads-Aktivierung) ohne User-Bestätigung
+- Keine eigenmächtigen Permission-Erweiterungen in `.claude/settings.local.json`
+- Keine Cold-Mails, keine LinkedIn-DMs, keine Umgehung der `outreach.js`-Sperre
