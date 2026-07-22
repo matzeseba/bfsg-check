@@ -13,8 +13,35 @@ Docker-Volume `bfsg_data` auf dem Server: enthält **alle business-kritischen Da
 | Skript | Wann | Was |
 |---|---|---|
 | `deployment/backup.sh` | täglich 03:00 UTC via Cron (in cloud-init) | tar→gpg→rclone, GPG-asymmetrisch, Off-Site-Upload |
+| `/usr/local/bin/bfsg-backup-run.sh` | Wrapper, vom Cron aufgerufen (per cloud-init `write_files` angelegt) | sourced `/opt/bfsg-check/deployment/.env` (`set -a; . .env; set +a`), dann `exec backup.sh` |
 | `deployment/restore.sh` | manuell bei Bedarf | gpg→tar→target-Dir, dann manuelles rsync zurück |
 | `.github/workflows/backup-restore-test.yml` | monatlich 1. d. Monats 04:00 UTC | Synthetic round-trip + Brevo-Mail-Alert bei Fehler |
+
+**Env-Sourcing:** Cron startet ohne Server-Umgebung — `BACKUP_GPG_RECIPIENT` und
+`BACKUP_TARGET` aus der `.env` kommen nicht von allein an. Deshalb sourced der
+Wrapper die `.env`, und `backup.sh` sourced sie zusätzlich **selbst als Fallback**
+(wenn eine der beiden Variablen fehlt und `/opt/bfsg-check/deployment/.env`
+existiert). Der Fallback greift damit auch auf Bestandsservern mit altem,
+manuell angelegtem Wrapper — ein Deploy genügt, kein manueller Server-Eingriff nötig.
+
+## ⚠️ Ist-Zustand (Stand: 23.07.2026, per SSH verifiziert) — RISIKO
+
+Auf dem Produktiv-Server läuft das Backup **nur lokal**:
+
+- Cron `/etc/cron.d/bfsg-backup` → `/usr/local/bin/bfsg-backup-run.sh` läuft
+  täglich 03:00 und erzeugt GPG-Archive in `/var/backups/bfsg/` — **aber** das
+  Log meldet `BACKUP_TARGET nicht gesetzt — Backup nur lokal`.
+- `/opt/bfsg-check/backups/` ist leer, es gibt **kein Offsite-Backup**.
+- Lokale Retention: **14 Tage** (`find -mtime +14 -delete`).
+
+**Konsequenz:** Bei Server-Ausfall / Volume-Verlust sind **alle
+business-kritischen Daten weg** (Bestell-Historie, GoBD-pflichtige
+Rechnungs-PDFs, Abo-Snapshots, DSGVO-Tokens) — die lokalen Archive liegen auf
+derselben Maschine wie die Produktivdaten.
+
+**Bis zur Behebung unbedingt die Owner-Schritte unten (Setup 3. + 4.) ausführen.**
+Der Env-Sourcing-Fix (dieser Stand der Skripte) sorgt nur dafür, dass gesetzte
+Werte auch beim Cron-Lauf ankommen — **die Werte selbst muss der Owner setzen.**
 
 ## Setup (einmalig auf Server)
 
@@ -52,14 +79,19 @@ echo "$(gpg --list-keys --with-colons backup@bfsg-fix.de | awk -F: '/fpr/{print 
 rm /tmp/backup-pubkey.asc
 ```
 
-### 3. `.env` ergänzen
+### 3. `.env` ergänzen (Owner-Pflicht für Offsite-Backup)
 ```bash
 echo "BACKUP_GPG_RECIPIENT=backup@bfsg-fix.de" >> /opt/bfsg-check/deployment/.env
-# Optional (wenn Off-Site-Storage gewählt):
+# Pflicht für Off-Site (rclone-Remote aus Schritt 4):
 echo "BACKUP_TARGET=hetzner-storage:bfsg-backups" >> /opt/bfsg-check/deployment/.env
 ```
 
-### 4. Off-Site-Storage einrichten
+Beide Variablen werden ab dem nächsten Cron-Lauf automatisch gesourced
+(Wrapper + Fallback in `backup.sh`) — **kein** manueller Export und kein
+Cron-Neustart nötig. Ohne `BACKUP_TARGET` bleibt das Backup lokal (siehe
+Risiko-Hinweis oben).
+
+### 4. Off-Site-Storage einrichten (rclone-Remote, einmalig)
 
 #### Option A: Hetzner Storage-Box (Empfehlung)
 
@@ -104,11 +136,18 @@ rclone config
 ### 5. Backup testen
 
 ```bash
-# Trockenlauf
-sudo BACKUP_GPG_RECIPIENT=backup@bfsg-fix.de /opt/bfsg-check/deployment/backup.sh
+# Manueller Lauf über den Wrapper (sourced die .env wie der Cron):
+sudo /usr/local/bin/bfsg-backup-run.sh
 
-# Sollte ohne Fehler durchlaufen + Datei in /var/backups/bfsg/ (oder am BACKUP_TARGET) erstellen.
+# Alternativ direkt (backup.sh sourced die .env selbst als Fallback):
+sudo /opt/bfsg-check/deployment/backup.sh
+
+# Sollte ohne Fehler durchlaufen + Datei in /var/backups/bfsg/ (lokal)
+# UND am BACKUP_TARGET (rclone-Remote) erstellen. Im Log prüfen:
+#   "[OK] Uploaded to <BACKUP_TARGET>/..."  → Offsite läuft
+#   "[WARN] BACKUP_TARGET nicht gesetzt"    → weiterhin nur lokal (Risiko!)
 ls -la /var/backups/bfsg/
+tail -20 /var/log/bfsg-backup.log
 ```
 
 ### 6. Restore-Test (DRINGEND empfohlen vor Go-Live)
@@ -157,7 +196,8 @@ cat /tmp/restore-test/orders.jsonl | head -3
 - [ ] GPG-Keypair generieren + Private-Key in Passwort-Safe
 - [ ] Public-Key auf Server importieren + trusten
 - [ ] Storage-Ziel wählen (Hetzner Storage-Box vs Backblaze B2)
-- [ ] `BACKUP_GPG_RECIPIENT` + `BACKUP_TARGET` in `.env` setzen
-- [ ] `rclone config` ausführen + `rclone.conf` validieren
-- [ ] Restore-Test mind. 1× **vor Live-Schaltung** durchführen
+- [ ] **`rclone config` ausführen + rclone-Remote einmalig einrichten** (`/root/.config/rclone/rclone.conf`) — ohne Remote kein Offsite-Upload
+- [ ] **`BACKUP_GPG_RECIPIENT` + `BACKUP_TARGET` (rclone-Remote) in Server-`.env` setzen** — wird ab nächstem Cron-Lauf automatisch gesourced
+- [ ] Nach dem Setzen: manuellen Lauf (Schritt 5) + Log auf `[OK] Uploaded to ...` prüfen
+- [ ] Restore-Test mind. 1× durchführen (überfällig — System ist bereits live!)
 - [ ] Quartalsweise: Restore-Test in ephemeral Container wiederholen
