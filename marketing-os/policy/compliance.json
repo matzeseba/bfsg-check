@@ -1,7 +1,7 @@
 {
   "version": "1.1.0",
-  "updatedAt": "2026-07-08",
-  "source": "CLAUDE.md + docs/LEGAL-REALITY-CHECK-2026.md + legal-copy-grep + Team-A-Paid-Ads-Erweiterung (siehe forbiddenChannels-Hinweis unten)",
+  "updatedAt": "2026-07-23",
+  "source": "CLAUDE.md + docs/LEGAL-REALITY-CHECK-2026.md + legal-copy-grep + Team-A-Paid-Ads-Erweiterung + Owner-Review 23.07.2026 (siehe forbiddenChannels-Hinweis unten)",
   "language": {
     "required": ["automatisierte technische Analyse", "WCAG"],
     "disclaimerHint": "Automatisierte technische Analyse — ersetzt keine Rechtsberatung.",
@@ -30,7 +30,7 @@
     { "channel": "linkedin_dm", "reason": "OLG Hamm 18 U 154/22 — auch 1:1 personalisiert unzulässig" },
     { "channel": "xing_dm", "reason": "wie linkedin_dm" },
     { "channel": "forum_seeding", "reason": "UWG §5a IV + §22 MStV — Schleichwerbung, bis 500.000 € Strafrahmen" },
-    { "channel": "paid_ads", "reason": "HINWEIS 08.07.2026: der generische v1-Nicht-Ziel-Eintrag ist mit dem Bau der Paid-Ads-Domäne (paid_ads_google/paid_ads_bing, jetzt in allowedChannels) überholt — Owner/Chef-Architekt-Review nötig, ob ARCHITECTURE.md §2 formell angepasst wird. Bis dahin bleibt dieser Eintrag als Altlast stehen; er wird von gate.js nicht ausgewertet (nur allowedChannels ist bindend)." }
+    { "channel": "paid_ads", "reason": "REVIEW-VERMERK 23.07.2026: Paid Ads tot — Bing gesperrt, Google verworfen. Das paid_ads-Modul bleibt archiviert und ruht dauerhaft (enabled:false); es werden keine Paid-Ads-Kanäle mehr bespielt. Die Kanäle paid_ads_google/paid_ads_bing stehen zwar noch in allowedChannels, sind aber faktisch stillgelegt (Owner-Beschluss 23.07.2026; ersetzt den Hinweis vom 08.07.2026 zur geplanten Paid-Ads-Domäne). Dieser Eintrag bleibt als dokumentierte Altlast stehen; er wird von gate.js nicht ausgewertet (nur allowedChannels ist bindend)." }
   ],
   "publishing": {
     "autoPublish": false,

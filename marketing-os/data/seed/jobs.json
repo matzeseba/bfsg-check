@@ -8,7 +8,7 @@
     "status": "published",
     "createdAt": "2026-07-03T06:00:12.000Z",
     "updatedAt": "2026-07-05T14:22:41.000Z",
-    "outputFile": "data/outbox/job_20260703_0001.md",
+    "outputFile": null,
     "gate": {
       "checked": true,
       "passed": true,
@@ -29,7 +29,7 @@
     "status": "approved",
     "createdAt": "2026-07-06T06:00:09.000Z",
     "updatedAt": "2026-07-07T08:11:03.000Z",
-    "outputFile": "data/outbox/job_20260706_0002.md",
+    "outputFile": null,
     "gate": {
       "checked": true,
       "passed": true,
@@ -50,7 +50,7 @@
     "status": "review",
     "createdAt": "2026-07-07T07:00:05.000Z",
     "updatedAt": "2026-07-07T07:04:58.000Z",
-    "outputFile": "data/outbox/job_20260707_0003.md",
+    "outputFile": null,
     "gate": {
       "checked": true,
       "passed": true,
@@ -71,7 +71,7 @@
     "status": "review",
     "createdAt": "2026-07-07T09:00:11.000Z",
     "updatedAt": "2026-07-07T09:06:22.000Z",
-    "outputFile": "data/outbox/job_20260707_0004.md",
+    "outputFile": null,
     "gate": {
       "checked": true,
       "passed": false,
@@ -102,9 +102,9 @@
     "agent": "haro-responder",
     "title": "HARO-Entwurf: Sind Accessibility-Overlays wirksam?",
     "channel": "haro_recherchescout",
-    "status": "running",
+    "status": "failed",
     "createdAt": "2026-07-07T08:00:03.000Z",
-    "updatedAt": "2026-07-07T08:00:47.000Z",
+    "updatedAt": "2026-07-23T00:00:00.000Z",
     "outputFile": null,
     "gate": {
       "checked": false,
@@ -115,7 +115,7 @@
       "type": "manual-browser",
       "instructions": "Nur Entwurf — Owner passt an eine echte, journalisten-initiierte Anfrage an und sendet selbst."
     },
-    "error": null
+    "error": "Runner-Recovery: Job hing über Session-Abbruch (bereinigt 23.07.2026)"
   },
   {
     "id": "job_20260707_0006",

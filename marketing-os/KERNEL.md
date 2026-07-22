@@ -99,4 +99,21 @@ technischen Badge-Text).
 
 ---
 
+## 6. Betriebsstatus (Owner-Beschluss 23.07.2026)
+
+- **Scheduler pausiert:** Der Scheduler der Engine (`engine/src/scheduler.js`) startet
+  standardmäßig **pausiert** und erzeugt keine neuen Jobs aus Playbooks. Er tickt nur bei
+  explizitem Opt-in über die Umgebungsvariable `MOS_SCHEDULER_ENABLED=true`. Grund: er bleibt
+  bis zur **Executor-Reparatur** aus. Der Runner verarbeitet weiterhin manuell angelegte
+  `queued`-Jobs; `once`-/Kadenz-Logik (`isDue`, `nextRun`) bleibt unverändert testbar.
+- **Runner-Recovery:** Beim Engine-Start werden Jobs mit Status `running`, deren Timestamp
+  älter als 30 Minuten ist, auf `failed` gesetzt
+  (Fehler: `Runner-Recovery: Job hing über Session-Abbruch`) — Überreste abgebrochener
+  Sessions werden so automatisch bereinigt.
+- **Paid Ads tot:** Bing gesperrt, Google verworfen. Das `paid_ads`-Modul bleibt archiviert
+  und ruht (`enabled: false`); siehe Review-Vermerk in `policy/compliance.json`
+  (`forbiddenChannels`) und das ruhende Dashboard-Modul.
+
+---
+
 *Änderungen an Kernel, Registry oder Policy erfolgen an Session-Grenzen, nicht mitten im Lauf.*

@@ -82,6 +82,50 @@ test('runner: processNext gibt null zurück ohne queued-Job', async () => {
   }
 });
 
+test('runner-recovery: hängender running-Job (>30 Min) -> failed mit Recovery-Fehler', async () => {
+  const dir = await mkTmp();
+  try {
+    const cfg = createConfig({ dataDir: dir });
+    const store = createStore(cfg);
+    await store.bootstrap();
+    const runner = createRunner(cfg, store, { executor: fakeExecutor('x'), gate: createGate(cfg) });
+
+    const job = await store.createJob({ agent: 'a', title: 'T', channel: 'seo_pillar' });
+    await store.updateJob(job.id, { status: 'running' });
+    // Timestamp künstlich altern (60 Min zurück) — updateJob setzt updatedAt sonst auf jetzt
+    const jobs = await store.readJobs();
+    jobs[0].updatedAt = new Date(Date.now() - 60 * 60_000).toISOString();
+    await store.writeJobs(jobs);
+
+    const recovered = await runner.recoverStale();
+    assert.deepEqual(recovered, [job.id]);
+    const done = await store.getJob(job.id);
+    assert.equal(done.status, 'failed');
+    assert.equal(done.error, 'Runner-Recovery: Job hing über Session-Abbruch');
+  } finally {
+    await rmTmp(dir);
+  }
+});
+
+test('runner-recovery: frischer running-Job (<30 Min) bleibt unangetastet', async () => {
+  const dir = await mkTmp();
+  try {
+    const cfg = createConfig({ dataDir: dir });
+    const store = createStore(cfg);
+    await store.bootstrap();
+    const runner = createRunner(cfg, store, { executor: fakeExecutor('x'), gate: createGate(cfg) });
+
+    const job = await store.createJob({ agent: 'a', title: 'T', channel: 'seo_pillar' });
+    await store.updateJob(job.id, { status: 'running' });
+
+    const recovered = await runner.recoverStale();
+    assert.deepEqual(recovered, []);
+    assert.equal((await store.getJob(job.id)).status, 'running');
+  } finally {
+    await rmTmp(dir);
+  }
+});
+
 test('claude-exec: DRY_RUN liefert deterministischen Dummy ohne Spawn', async () => {
   const cfg = createConfig({ dryRun: true });
   const job = { id: 'job_x', title: 'Titel', agent: 'a', channel: 'seo_pillar' };

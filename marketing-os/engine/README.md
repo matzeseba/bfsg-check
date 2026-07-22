@@ -35,11 +35,12 @@ auf einem Ephemeral-Port und wird per `fetch` geprüft. Nichts spawnt die Claude
 
 ## Umgebungsvariablen
 
-| Variable        | Default        | Zweck                                                                 |
-|-----------------|----------------|-----------------------------------------------------------------------|
-| `MOS_PORT`      | `4870`         | API-Port (bind 127.0.0.1)                                             |
-| `MOS_DRY_RUN`   | _(aus)_        | `1` => Runner erzeugt deterministischen Dummy-Markdown, kein CLI-Spawn |
-| `MOS_DATA_DIR`  | `../data`      | Laufzeit-State-Verzeichnis (für isolierte Setups/Tests)             |
+| Variable               | Default        | Zweck                                                                 |
+|------------------------|----------------|-----------------------------------------------------------------------|
+| `MOS_PORT`             | `4870`         | API-Port (bind 127.0.0.1)                                             |
+| `MOS_DRY_RUN`          | _(aus)_        | `1` => Runner erzeugt deterministischen Dummy-Markdown, kein CLI-Spawn |
+| `MOS_DATA_DIR`         | `../data`      | Laufzeit-State-Verzeichnis (für isolierte Setups/Tests)             |
+| `MOS_SCHEDULER_ENABLED`| `false`        | `true` => Scheduler-Tick an. **Default: pausiert** (Owner-Beschluss 23.07.2026 — bleibt bis Executor-Reparatur aus) |
 
 Beispiel (PowerShell):
 
@@ -55,7 +56,18 @@ MOS_DRY_RUN=1 npm start
 
 ## Wie ein Job durch die Engine läuft
 
-1. **Scheduler** (Tick alle 60 s): fällige Playbooks (`daily|weekly|interval|once`) erzeugen
+> **Betriebsstatus (Owner-Beschluss 23.07.2026):** Der **Scheduler ist standardmäßig
+> pausiert** und erzeugt keine neuen Jobs — er tickt nur bei explizitem
+> `MOS_SCHEDULER_ENABLED=true`. Grund: er bleibt bis zur Executor-Reparatur aus.
+> Der Runner läuft weiterhin und verarbeitet manuell angelegte `queued`-Jobs.
+>
+> **Runner-Recovery:** Beim Engine-Start werden Jobs mit Status `running`, deren
+> Timestamp älter als 30 Minuten ist, automatisch auf `failed` gesetzt
+> (Fehler: `Runner-Recovery: Job hing über Session-Abbruch`). Solche Jobs stammen
+> aus abgebrochenen Sessions — der Runner arbeitet sequentiell, ein echter Lauf
+> kann nicht 30 Minuten ohne Update stehen bleiben.
+
+1. **Scheduler** (Tick alle 60 s, **nur wenn aktiviert**): fällige Playbooks (`daily|weekly|interval|once`) erzeugen
    `queued`-Jobs; `data/state.json` hält `lastRun` je Playbook fest.
 2. **Runner** (sequentiell, max. 1): baut den Prompt = Persona (`../agents/<agent>.md`) +
    Policy-Kurzfassung + `promptTemplate`, ruft den Executor, schreibt das Ergebnis nach
@@ -91,8 +103,9 @@ schtasks /Delete /TN "MarketingOS-Engine" /F
 ```
 
 Für echten Dauerbetrieb (Auto-Restart) empfiehlt sich ein Prozess-Manager wie `pm2`
-(`pm2 start src/server.js --name marketing-os`). Der Scheduler selbst tickt intern jede Minute,
-solange der Prozess läuft.
+(`pm2 start src/server.js --name marketing-os`). Der Scheduler tickt intern jede Minute,
+solange der Prozess läuft — aber **nur bei `MOS_SCHEDULER_ENABLED=true`** (siehe oben:
+Scheduler-Pause bis Executor-Reparatur).
 
 ## Modul-Landkarte (`src/`)
 
@@ -102,7 +115,7 @@ solange der Prozess läuft.
 | `store.js`       | atomare JSON-Reads/Writes (temp+rename), Bootstrap, Job-Helfer |
 | `jobs.js`        | Job-Factory + fortlaufende ID (`job_YYYYMMDD_NNNN`)          |
 | `scheduler.js`   | Kadenz-Logik + 60-s-Tick                                     |
-| `runner.js`      | sequentielle Job-Verarbeitung, Prompt -> Executor -> Gate     |
+| `runner.js`      | sequentielle Job-Verarbeitung, Prompt -> Executor -> Gate, Runner-Recovery |
 | `claude-exec.js` | Default-Executor (CLI-Spawn / DRY_RUN-Dummy)                 |
 | `prompt.js`      | Prompt-Bau (Persona + Policy-Kurzfassung + Aufgabe)          |
 | `gate.js`        | Compliance-Gate (Regex, Kanal, Disclaimer)                  |
