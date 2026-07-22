@@ -3,6 +3,12 @@
 
 import { ruleInfo, IMPACT_WEIGHT, IMPACT_DE, CATEGORY_ORDER } from './rules-de.js';
 
+// Domain-SSOT: Marke/Domain auf Cover und Footer des Kunden-Reports.
+// Default = Marken-Primär bfsg-fuchs.de (Kontakt-E-Mail bleibt info@bfsg-fix.de,
+// das Postfach @bfsg-fuchs.de existiert noch nicht).
+const PUBLIC_HOST = (process.env.PUBLIC_URL || 'https://bfsg-fuchs.de')
+  .replace(/^https?:\/\//, '').replace(/\/+$/, '');
+
 export function computeScore(violations) {
   // Punktabzug nach Impact und Anzahl betroffener Stellen, gedeckelt.
   let penalty = 0;
@@ -625,7 +631,7 @@ export function renderReport(
       <div class="cover-kpi min"><b>${counts.minor}</b><span>Gering</span></div>
       <div class="cover-kpi ok"><b>${scan.passes}</b><span>Bestandene Prüfungen</span></div>
     </div>
-    <p class="cover-foot">bfsg-fix.de &middot; automatisierte technische Analyse, keine Rechtsberatung</p>
+    <p class="cover-foot">${PUBLIC_HOST} &middot; automatisierte technische Analyse, keine Rechtsberatung</p>
   </div>
   </div>
 
@@ -676,7 +682,7 @@ export function renderReport(
   <div class="legalbox" id="rechtliches">${legalHtml}</div>
 
   <footer>
-    BFSG-Fuchs &middot; bfsg-fix.de &middot; info@bfsg-fix.de &middot; Anbieter: Matthias Seba<br>
+    BFSG-Fuchs &middot; ${PUBLIC_HOST} &middot; info@bfsg-fix.de &middot; Anbieter: Matthias Seba<br>
     Bestandene Prüfungen: ${scan.passes} &middot; Unklare Punkte (manuell prüfen): ${scan.incomplete}
   </footer>
 </div>
