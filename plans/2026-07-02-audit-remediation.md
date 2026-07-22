@@ -3,6 +3,12 @@
 > Quelle: 10-Agenten-Vollaudit (Technik + Business) vom 02.07.2026.
 > Status: **Plan — wartet auf Owner-Freigabe.** Nichts davon ist umgesetzt.
 > Drei offene Owner-Entscheidungen siehe unten (§ „Offene Entscheidungen").
+>
+> ---
+> ⚠️ **Status-Korrektur (22.07.2026):** Die Status-Zeile oben ist historisch. Inzwischen längst gemergt:
+> **S2/PR3** (`SCAN_PAID_LENIENT_TLS` / LENIENT_TLS), **S4** (nodemailer 9.0.3) und **PR4** (anthropic-sdk).
+> Der aktuelle Fortschritt lebt in `docs/BLUEPRINT-NEXT-SESSION.md` — der Inhalt unten bleibt als
+> historischer Plan unverändert.
 
 ---
 

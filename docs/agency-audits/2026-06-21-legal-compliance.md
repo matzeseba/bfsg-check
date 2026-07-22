@@ -51,7 +51,7 @@ Der aktuell ausgecheckte Branch **`docs/handover-final-2026-06-21`** enthält di
 - **Severity:** 🟠 High
 - **Location:** `landingpage-next/lib/config.ts:31` (`title`), `:57` (`headlineEmph: "BFSG-konform?"`), gerendert in `components/Hero.tsx:76`
 - **Offending text:** `title: "BFSG-Check — Ist Ihre Website BFSG-konform? | Kostenlose Sofort-Prüfung"` und H1-Emphasis-Zeile `BFSG-konform?`
-- **Bewertung:** Als **Frage** formuliert — die projekteigene `docs/RECHTSSICHERHEITS-AUDIT.md` §A wertet „Frage statt Versprechen" ausdrücklich als zulässig. Daher nicht Critical. ABER: CLAUDE.md listet „BFSG-konform" als verbotene Marketing-Sprache; der Begriff ist als dominantes H1 + SEO-Title das wahrscheinlichste UWG-Ziel bei Wettbewerber-/Kanzlei-Aufmerksamkeit.
+- **Bewertung:** Als **Frage** formuliert — die projekteigene `docs/archive/RECHTSSICHERHEITS-AUDIT.md` §A wertet „Frage statt Versprechen" ausdrücklich als zulässig. Daher nicht Critical. ABER: CLAUDE.md listet „BFSG-konform" als verbotene Marketing-Sprache; der Begriff ist als dominantes H1 + SEO-Title das wahrscheinlichste UWG-Ziel bei Wettbewerber-/Kanzlei-Aufmerksamkeit.
 - **Concrete Fix:** H1-Emphasis → `WCAG-2.1-AA-geprüft?` oder `BFSG-fit?`; Title → `BFSG-Check — Website auf Barrierefreiheit prüfen | Kostenlose Sofort-Analyse`. Mindestens den werblichen Anspruch durch „automatisierte technische Analyse" stützen.
 - **Already-fixed?** N (unverändert auf origin/main)
 
@@ -88,7 +88,7 @@ Der aktuell ausgecheckte Branch **`docs/handover-final-2026-06-21`** enthält di
 - **Location:** `app/widerrufsbelehrung/page.tsx:18-63`
 - **Offending element:** Eigene Formulierung der Belehrung. Inhaltlich vollständig (Widerrufsrecht, Frist ab Vertragsschluss, Folgen, vorzeitiges Erlöschen bei digitalen Inhalten, B2B-Ausschluss, Muster-Formular), aber **nicht wortgleich** mit Anlage 1 zu Art. 246a §1 Abs.2 S.2 EGBGB.
 - **Bewertung:** Nur die wörtliche Übernahme der amtlichen Musterbelehrung garantiert die gesetzliche Privilegierungswirkung (Schutz vor Belehrungs-Fehler-Abmahnung). Inhaltlich korrekt → niedriges Praxis-Risiko, aber formal angreifbar.
-- **Concrete Fix:** Amtlichen Wortlaut Anlage 1 EGBGB übernehmen (Gestaltungshinweise für Dienstleistung/digitale Inhalte einsetzen). 1× anwaltliche 5-Min-Sichtung (steht als offener Punkt in `LEGAL-REVIEW-CHECKLIST.md` Frage 1).
+- **Concrete Fix:** Amtlichen Wortlaut Anlage 1 EGBGB übernehmen (Gestaltungshinweise für Dienstleistung/digitale Inhalte einsetzen). 1× anwaltliche 5-Min-Sichtung (steht als offener Punkt in `docs/archive/LEGAL-REVIEW-CHECKLIST.md` Frage 1).
 - **Already-fixed?** N
 
 ### F-06 — Newsletter-Anmeldung im Footer ist UI-only (kein Double-Opt-in)

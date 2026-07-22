@@ -70,12 +70,12 @@ Alles andere ist code-fertig und in PRs bereit. Realistischer Live-Termin: **23.
 ### 🔴 BLOCKER für Live-Schaltung (in dieser Reihenfolge)
 
 1. **Anwalts-Termin** für Rechtstexte
-   - Datei: `docs/LEGAL-REVIEW-CHECKLIST.md` (12 Fragen + Datei-Liste)
+   - Datei: `docs/archive/LEGAL-REVIEW-CHECKLIST.md` (12 Fragen + Datei-Liste)
    - Aufwand: 1–2 h Anwalt-Zeit (Wettbewerbs-/IT-Recht)
    - **Ohne diese Freigabe: kein Live-Verkauf möglich (UWG/DSGVO-Abmahnrisiko)**
 
 2. **Rechtstext-Platzhalter füllen**
-   - Datei: `docs/LEGAL-PLACEHOLDERS.md` (20 Stellen)
+   - Datei: `docs/archive/LEGAL-PLACEHOLDERS.md` (20 Stellen)
    - Pflicht: vollständiger Name, ladungsfähige Anschrift (Postfach reicht NICHT, § 5 DDG), evtl. USt-IdNr.
    - Aufwand: 10 min nachdem Anwalt OK gegeben hat
 

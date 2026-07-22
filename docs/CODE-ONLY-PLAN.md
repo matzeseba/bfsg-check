@@ -107,7 +107,7 @@ Anbei in `docs/skills/` als Markdown-Files — du kopierst sie in `~/.claude/ski
 ## ✅ Was ich JETZT für dich gemacht habe
 
 - [x] `docs/CODE-ONLY-PLAN.md` (diese Datei)
-- [x] `docs/SALES-DAY-1.md` (Morgen-Sprint, 5-Jährige-tauglich)
+- [x] `docs/archive/SALES-DAY-1.md` (Morgen-Sprint, 5-Jährige-tauglich)
 - [x] `marketing/linkedin-launch-posts.md` (3 fertige Posts)
 - [x] `marketing/partner-warm-dms.md` (5 personalisierbare DM-Vorlagen)
 - [x] `docs/skills/*.md` (8 Skill-Files bereit zum Kopieren)
@@ -118,7 +118,7 @@ Anbei in `docs/skills/` als Markdown-Files — du kopierst sie in `~/.claude/ski
 
 ## 📋 Was DU jetzt machst (siehe SALES-DAY-1.md)
 
-Kurz-Liste — Details in `docs/SALES-DAY-1.md`:
+Kurz-Liste — Details in `docs/archive/SALES-DAY-1.md`:
 
 **Heute Abend (30 Min):**
 1. Live-Test mit eigener Karte

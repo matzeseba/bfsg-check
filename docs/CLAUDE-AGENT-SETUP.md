@@ -1,6 +1,6 @@
 # 🤖 Claude-Agent Setup — Windows-PC Edition
 
-> Damit Claude den Rest des Launch-Plans (siehe `docs/LAUNCH-PLAN.md`) für dich erledigt.
+> Damit Claude den Rest des Launch-Plans (siehe `docs/archive/LAUNCH-PLAN.md`) für dich erledigt.
 > **Mensch bleibt:** Anwalt, Versicherung, Live-Test-Kauf mit eigener Karte. Sonst nichts.
 
 **Setup-Aufwand:** ~45 Minuten · einmalig.
@@ -265,7 +265,7 @@ Alles unter 5 Minuten.
 
 ## 📚 Was Claude danach automatisch erledigt
 
-(Ausschnitt — komplette Liste in `docs/LAUNCH-PLAN.md`)
+(Ausschnitt — komplette Liste in `docs/archive/LAUNCH-PLAN.md`)
 
 | Block | Aktion | Mensch nötig? |
 |---|---|---|

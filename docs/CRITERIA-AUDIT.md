@@ -119,7 +119,7 @@ Lifecycle vollständig abgedeckt:
 - ✅ **Keine falschen Garantie-Versprechen**: Grep nach "garantieren wir / garantiert konform / 100% konform" → keine Treffer. Der Report nennt ehrlich die ~30–50 %-Erkennungsrate automatisierter Tests.
 - ✅ **Widerruf/Verbraucherschutz**: `/api/widerruf` (§ 356e BGB), Verbraucher-Consent-Pflicht im Checkout (§ 356 IV/V BGB — Sofort-Erfüllung nur mit ausdrücklicher Zustimmung, `app.js#/api/checkout`).
 
-**👤 Mensch-Pflicht:** finale rechtliche Prüfung der Texte (Anwalt) — siehe `docs/LEGAL-REVIEW-CHECKLIST.md`. Code stellt die Disclaimer technisch sicher.
+**👤 Mensch-Pflicht:** finale rechtliche Prüfung der Texte (Anwalt) — siehe `docs/archive/LEGAL-REVIEW-CHECKLIST.md`. Code stellt die Disclaimer technisch sicher.
 
 ---
 
@@ -171,5 +171,5 @@ Lifecycle vollständig abgedeckt:
 2. Abo aktivieren: Stripe-Webhook-Events abonnieren + Zustelltest + ggf. Customer Portal, dann `ENABLE_ABO=true`.
 3. Observability voll nutzen: `npm install pino pino-http pino-pretty @sentry/node` + `SENTRY_DSN`; GH-Secrets für Uptime-Watch.
 4. Backup von `out/*.jsonl` + `out/invoices/` (Kundenverwaltung + GoBD 10 Jahre).
-5. Rechtliche Endabnahme der Texte (Anwalt) — `docs/LEGAL-REVIEW-CHECKLIST.md`.
+5. Rechtliche Endabnahme der Texte (Anwalt) — `docs/archive/LEGAL-REVIEW-CHECKLIST.md`.
 6. Mehr-Instanz-Betrieb: externer Lock für Rechnungsnummern (aktuell Single-Instance → ok).

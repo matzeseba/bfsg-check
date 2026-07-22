@@ -111,7 +111,7 @@ Live-Testkauf (Paket **basis**, URL `https://matthias-seba.de/`, Session `cs_liv
 - **info@bfsg-fix.de** angelegt: INWX-Paket **„Mail Easy" (0,29 €/mo)** vom Owner gekauft, **Weiterleitung info@ → matze.seba@outlook.de** in Froxlor, MX `smtp-in0/in1.prod0.webspace.bz` gesetzt (SPF/DKIM intakt) ✓
 
 ### 📍 Danach: Plan Punkt D
-Sobald Scan/Report-Bug gefixt + Order recovered → weiter in `docs/LAUNCH-PLAN-EINFACH.md` bei **D** (Google-Ads-Kampagne als **pausierter Entwurf** per Computer Use bauen, sobald Owner in ads.google.com eingeloggt), dann **E** (Bing-Ads).
+Sobald Scan/Report-Bug gefixt + Order recovered → weiter in `docs/archive/LAUNCH-PLAN-EINFACH.md` bei **D** (Google-Ads-Kampagne als **pausierter Entwurf** per Computer Use bauen, sobald Owner in ads.google.com eingeloggt), dann **E** (Bing-Ads).
 
 ### 🔑 Zugänge / Fakten
 - Server-SSH von diesem Win-PC: `ssh root@178.105.83.0` (Operator-Key liegt drauf). Server-`.env`: `/opt/bfsg-check/deployment/.env`. Deploy = PR-Merge auf `main` (Auto-Deploy via GitHub Actions, ~20–40 s).
@@ -125,7 +125,7 @@ Sobald Scan/Report-Bug gefixt + Order recovered → weiter in `docs/LAUNCH-PLAN-
 
 ---
 
-> ▶️ **Nächster Schritt diese Session:** **`docs/LAUNCH-PLAN-EINFACH.md`** (+ `.pdf`) abarbeiten — kompletter kinderleichter Owner-Plan **A–H für Windows** (Rechnungs-`.env`, `SCAN_TEASER_LENIENT_TLS=true`, Stripe-Live-Testkauf, Ads, Listings, Newsletter). Wer-macht-was: **`docs/LAUNCH-3-SPALTEN-PLAN.md`** (Computer-Use / Owner / Code). Code-PRs **#66–#70 gemergt + live** (SSRF-IP-Pin, C3-Fix, Mail-Retry, Beispiel-Report-PDF, A11y-Icon). Server-Zugang: **Windows-PowerShell `ssh root@178.105.83.0`** (KEIN Mac) — der „Terminal auf dem Mac"-Block direkt unten ist im neuen Plan als **Schritt B** Windows-korrigiert enthalten.
+> ▶️ **Nächster Schritt diese Session:** **`docs/archive/LAUNCH-PLAN-EINFACH.md`** (+ `.pdf`) abarbeiten — kompletter kinderleichter Owner-Plan **A–H für Windows** (Rechnungs-`.env`, `SCAN_TEASER_LENIENT_TLS=true`, Stripe-Live-Testkauf, Ads, Listings, Newsletter). Wer-macht-was: **`docs/LAUNCH-3-SPALTEN-PLAN.md`** (Computer-Use / Owner / Code). Code-PRs **#66–#70 gemergt + live** (SSRF-IP-Pin, C3-Fix, Mail-Retry, Beispiel-Report-PDF, A11y-Icon). Server-Zugang: **Windows-PowerShell `ssh root@178.105.83.0`** (KEIN Mac) — der „Terminal auf dem Mac"-Block direkt unten ist im neuen Plan als **Schritt B** Windows-korrigiert enthalten.
 
 ---
 
