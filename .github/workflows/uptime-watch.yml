@@ -97,7 +97,7 @@ jobs:
             2. Logs: docker compose logs --tail=100 app caddy
             3. Restart: docker compose restart app
             4. Falls dauerhaft kaputt: GitHub-Actions deploy.yml manuell triggern (Rebuild)
-          to: matze.seba@outlook.de
+          to: ${{ secrets.ALERT_EMAIL }}
           from: BFSG-Check Uptime <no-reply@bfsg-fix.de>
 
       - name: Alert via Brevo bei Fehler (bfsg-fuchs.de)
@@ -121,7 +121,7 @@ jobs:
             2. SSH zum Server: docker compose -f /opt/bfsg-check/deployment/docker-compose.yml ps
             3. Logs: docker compose logs --tail=100 caddy
             4. Falls dauerhaft kaputt: GitHub-Actions deploy.yml manuell triggern (Rebuild)
-          to: matze.seba@outlook.de
+          to: ${{ secrets.ALERT_EMAIL }}
           from: BFSG-Check Uptime <no-reply@bfsg-fix.de>
 
       - name: Job-Status setzen

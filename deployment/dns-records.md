@@ -16,7 +16,7 @@
 | AAAA | `@` | `2a01:4f8:1c18:d890::1` | 3600 |
 | AAAA | `www` | `2a01:4f8:1c18:d890::1` | 3600 |
 | TXT | `@` | `v=spf1 include:spf.brevo.com ~all` | 3600 |
-| TXT | `_dmarc` | `v=DMARC1; p=none; rua=mailto:matthiasseba92@gmail.com` | 3600 |
+| TXT | `_dmarc` | `v=DMARC1; p=none; rua=mailto:postmaster@example.com` | 3600 |
 | CNAME | `brevo1._domainkey` | `b1.bfsg-fix-de.dkim.brevo.com` | 3600 |
 | CNAME | `brevo2._domainkey` | `b2.bfsg-fix-de.dkim.brevo.com` | 3600 |
 
@@ -106,7 +106,7 @@ DMARC wird stufenweise schärfer geschaltet. Vorher mindestens 30 Tage Reports e
 
 | Typ | Host | Wert | TTL |
 |---|---|---|---|
-| TXT | `_dmarc` | `v=DMARC1; p=none; rua=mailto:matthiasseba92@gmail.com` | 3600 |
+| TXT | `_dmarc` | `v=DMARC1; p=none; rua=mailto:postmaster@example.com` | 3600 |
 
 Wirkung: Reports kommen, **nichts wird blockiert**.
 
@@ -114,7 +114,7 @@ Wirkung: Reports kommen, **nichts wird blockiert**.
 
 | Typ | Host | Wert | TTL |
 |---|---|---|---|
-| TXT | `_dmarc` | `v=DMARC1; p=quarantine; pct=10; rua=mailto:matthiasseba92@gmail.com` | 3600 |
+| TXT | `_dmarc` | `v=DMARC1; p=quarantine; pct=10; rua=mailto:postmaster@example.com` | 3600 |
 
 Wirkung: 10 % der nicht-konformen Mails landen im Spam.
 
@@ -122,7 +122,7 @@ Wirkung: 10 % der nicht-konformen Mails landen im Spam.
 
 | Typ | Host | Wert | TTL |
 |---|---|---|---|
-| TXT | `_dmarc` | `v=DMARC1; p=quarantine; pct=100; rua=mailto:matthiasseba92@gmail.com` | 3600 |
+| TXT | `_dmarc` | `v=DMARC1; p=quarantine; pct=100; rua=mailto:postmaster@example.com` | 3600 |
 
 Wirkung: Alle nicht-konformen Mails → Spam.
 
@@ -130,7 +130,7 @@ Wirkung: Alle nicht-konformen Mails → Spam.
 
 | Typ | Host | Wert | TTL |
 |---|---|---|---|
-| TXT | `_dmarc` | `v=DMARC1; p=reject; rua=mailto:matthiasseba92@gmail.com` | 3600 |
+| TXT | `_dmarc` | `v=DMARC1; p=reject; rua=mailto:postmaster@example.com` | 3600 |
 
 Wirkung: Nicht-konforme Mails werden **abgelehnt** (kein Spam, sondern Bounce beim Versender).
 

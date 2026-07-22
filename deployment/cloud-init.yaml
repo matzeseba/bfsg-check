@@ -9,7 +9,7 @@ hostname: bfsg-fix
 users:
   - name: root
     ssh_authorized_keys:
-      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINWLfkNJJv0x1V/bKfIvJv3fg+J5OwSCDcT/tRTF5fdx claude-bfsg-deploy@bfsg-fix.de
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINWLfkNJJv0x1V/bKfIvJv3fg+J5OwSCDcT/tRTF5fdx operator-deploy-key
 
 write_files:
   - path: /opt/bfsg-bootstrap.sh
@@ -46,12 +46,14 @@ write_files:
       MAX_CONCURRENT_SCANS=2
       SMTP_HOST=smtp-relay.brevo.com
       SMTP_PORT=587
-      SMTP_USER=matthiasseba92@gmail.com
+      # SMTP_USER / REPLY_TO / ADMIN_EMAIL: vor Server-Create durch die echte
+      # Betreiber-/SMTP-E-Mail ersetzen (PII, gehoert NICHT ins Repo).
+      SMTP_USER=DEINE-SMTP-EMAIL@example.com
       SMTP_PASS=PLACEHOLDER_BREVO_KEY
       FROM_EMAIL=no-reply@bfsg-fix.de
       FROM_NAME=BFSG-Check
-      REPLY_TO=matthiasseba92@gmail.com
-      ADMIN_EMAIL=matthiasseba92@gmail.com
+      REPLY_TO=DEINE-SMTP-EMAIL@example.com
+      ADMIN_EMAIL=DEINE-SMTP-EMAIL@example.com
       ENV
 
       # --- Phase-1-Override: Caddyfile.phase1 statt Caddyfile, nur Port 80 ---
