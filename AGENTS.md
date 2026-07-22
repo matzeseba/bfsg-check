@@ -91,22 +91,34 @@ _migration/claude-memory/   Migriertes Claude-Code-Auto-Memory (54 Dateien, Stan
 
 ---
 
-## 🔧 Offene Baustellen (Stand 22.07.2026, aus Vollanalyse)
+## 📋 Owner-Beschlüsse 23.07.2026 (Instandsetzung)
 
-**Technisch (Priorität):**
-1. **Backup-Bug** `deployment/backup.sh`: Cron lädt `.env` nicht → Pflicht-Vars fehlen → Backup schlägt fehl. Fix: Env im Skript sourcen.
-2. **Domain-Chaos:** `.env.example` nennt `bfsg-check.de`; Code-Defaults/Hardcodings zeigen auf `bfsg-fix.de` (u. a. hartcodierter Kündigungs-Link `scanner/lib/mailer.js:218`, `invoice.js:30`, `fulfill.js:241`, `report.js:628,679`); `landingpage-next/lib/config.ts:56` E-Mail noch info@bfsg-fix.de.
-3. **Kein Lockfile:** `scanner/.gitignore` ignoriert `package-lock.json` → nicht-reproduzierbare Builds eines Payment-Systems. Committen + `npm ci` in CI/Docker.
-4. **Marketing-OS bruch:** `marketing-os/engine/src/claude-exec.js` ruft `claude.cmd` → alle Jobs failed seit 08.07., Zombie-Job `job_20260707_0005`, Scheduler produziert täglich neue Failed-Jobs. Executor portieren oder Scheduler pausieren.
-5. **admin-next ohne Auth** — Container-Port 3001 offen, sobald exposed. Welle-5-Auth (next-auth Allowlist) vor öffentlichem Vhost.
+1. **Merge-Modus:** Hygiene-PRs (Docs, Lockfile, .gitignore) darf die KI bei grüner CI selbst mergen; produktiv wirksame PRs nur nach ausdrücklicher Owner-Freigabe („merge #N").
+2. **SSH:** Lesender Server-Zugriff (Logs/Verifikation) ist erlaubt; schreibend nie ohne Freigabe.
+3. **Domain:** bfsg-fuchs.de = einzige Wahrheit; **Stripe-Webhook zieht auf bfsg-fuchs.de um** (Runbook: `docs/WEBHOOK-CUTOVER-FUCHS.md`, Caddy routet bereits — nur Stripe-Dashboard + neues Secret nötig). Absender bleibt vorerst info@bfsg-fix.de (leitet an matze.seba@outlook.de + info@matthias-seba.de weiter; Postfach @bfsg-fuchs.de existiert noch nicht).
+4. **Dashboard:** Zentrales Business-Dashboard kommt — aber **erst nach der vom Owner geplanten Business-Umstrukturierung** (eigene Session). Basis wird dann `aos/`; bis dahin am Dashboard nichts bauen.
+5. **LLM-Provider:** Abstraktion statt fester Anthropic-Kopplung (Key/Modell per Env).
+6. **cockpit/.env:** gelöscht; **Stripe-/GitHub-/Google-Ads-Keys waren vermutlich live → Rotation durch Owner empfohlen.**
+7. Worktrees: alle 16 entfernt · Docs: nach `docs/archive/` · vault/: quarantäne-verschoben nach `C:\Users\Administrator\vault-quarantine-20260723` (finale Löschung durch Owner) · PII: ersetzt · Marketing-OS-Scheduler: pausiert (Default aus, `MOS_SCHEDULER_ENABLED`).
 
-**Mittelfristig:**
-6. `scanner/app.js` (1.606 Z.) + `mailer.js` (905 Z.) in Module zerlegen; Preis/Paket-Config an 3 Stellen (app.js, fulfill.js, config.ts) konsolidieren + CI-Sync-Check.
-7. **PII im Repo:** private Owner-E-Mail in `.env.example`, `uptime-watch.yml`, `cloud-init.yaml`, `dns-records.md`; Adresse in `scripts/generate-launch-plan-pdf.mjs` → Platzhalter/Secrets.
-8. **Anthropic-API-Abhängigkeiten** (Geschäftslogik, nicht Dev-Tooling): Report-QA (`scanner/lib/anthropic-client.js`, dormant via `REPORT_QA_ENABLED`) + AOS (4 Stellen, Modell `claude-sonnet-4-6` hardcodiert) → ADR: beibehalten oder Provider-Abstraktion.
-9. **Docs-Hygiene:** ~40 % der MDs veraltet → `docs/archive/`; `plans/2026-07-02-audit-remediation.md` zeigt fälschlich „nichts umgesetzt"; 4 überlappende Legal-Docs → SSOT = `legal/disclaimer.md` + `LEGAL-REALITY-CHECK-2026.md` + `legal-templates/`.
-10. **Cockpit entscheiden:** Source nur auf `handover/skills-update`; doppelt sichern/taggen oder löschen; `cockpit/.env` (befüllt, Stripe-/GitHub-/Ads-Keys!) aus Repo-Verzeichnis entfernen, ggf. Keys rotieren. Anzeige-Dashboard konsolidieren (admin-next = Ziel).
-11. **16 verwaiste Git-Worktrees** in `.claude/worktrees/` prüfen/entfernen.
-12. **Vault:** `vault/` vs. `vault-template/` redundant, Dead Links, seit 21.06. ungenutzt → konsolidieren oder entfernen.
+---
 
-**Owner-ToDos (Mensch nötig):** openPR-Konto + PM einreichen · SaaSHub/G2-Listings · Reddit/UGC starten · GitHub-Secrets `AOS_IMAP_*` · Stripe-Scopes · Wortlaut-Freigabe AOS-Blueprint §5 · Disclaimer-Einsatzorte verifizieren.
+## 🔧 Offene Baustellen (Stand 23.07.2026, nach Instandsetzungs-Welle 1)
+
+**Erledigt (PRs #152–#156 gemergt):** Lockfile + npm ci + Preis-Sync-CI-Gate (#153) · Docs-Archivierung + plans-Statusfix (#154) · PII-Entfernung + Skript-Archivierung (#155) · Marketing-OS Runner-Recovery + Scheduler-Pause + Seed-Integrität (#156) · CLAUDE.md-Straffung (#152) · 16 Worktrees entfernt · cockpit/.env gelöscht.
+
+**Wartet auf Owner-Freigabe (produktiv wirksam):**
+- **#157** Domain-SSOT bfsg-fuchs.de (Mail-/PDF-Links, Legacy-LP-Bereinigung, Webhook-Runbook)
+- **#158** Backup-Env-Sourcing (Voraussetzung für Offsite-Backup)
+- **#159** Scanner-LLM-Provider-Abstraktion (dormant, REPORT_QA_ENABLED=false)
+- **#160** AOS-LLM-Provider-Abstraktion
+
+**Technisch (offen):**
+1. **Backup-Offsite:** Nach #158-Merge + Owner-Schritten (BACKUP_GPG_RECIPIENT + BACKUP_TARGET + rclone-Remote in Server-.env, Testlauf, Restore-Test) — Details `docs/BACKUP.md`.
+2. **admin-next ohne Auth** — Container-Port 3001 offen, sobald exposed. Welle-5-Auth vor öffentlichem Vhost. (Langfristig: wird vom künftigen Zentral-Dashboard auf aos-Basis abgelöst — Beschluss 4.)
+3. `scanner/app.js` (1.606 Z.) + `mailer.js` (905 Z.) in Module zerlegen (Wartbarkeit, kein akutes Risiko).
+4. **Cockpit-Reste:** Source nur auf Branch `handover/skills-update` (Commit 1574a0e) — archivieren/taggen oder Branch löschen; Entscheidung beim Dashboard-Projekt (Beschluss 4).
+5. **Follow-ups aus Welle 1:** `backup-restore-test.yml` enthält noch private Alert-E-Mail → auf `secrets.ALERT_EMAIL` umstellen, sobald Secret existiert · neue LLM-Env-Vars in `scanner/.env.example` dokumentieren · Legacy-Doku-Verweise auf alte `landingpage/*.html`-Pfade (in `docs/archive/`, unkritisch) · `docs/MENSCH-PFLICHTEN-START.md` enthält historischen Branch-Link (bewusst belassen).
+6. **Marketing-OS-Executor:** `claude-exec.js` ruft `claude.cmd` (bruch seit 08.07.) — Reparatur erst relevant, wenn das Marketing-OS reaktiviert wird (hängt an Beschluss 4).
+
+**Owner-ToDos (Mensch nötig):** 🔑 **Key-Rotation: Stripe (Restricted Key), GitHub-Token, Google-Ads-Keys** (cockpit/.env war befüllt) · GitHub-Secret `ALERT_EMAIL` anlegen (sonst Uptime-Alerts tot) · Stripe-Webhook-Umzug nach `docs/WEBHOOK-CUTOVER-FUCHS.md` · Backup-Offsite (s. o.) · openPR-Konto + PM einreichen · SaaSHub/G2-Listings · Reddit/UGC starten · GitHub-Secrets `AOS_IMAP_*` · Stripe-Scopes · Wortlaut-Freigabe AOS-Blueprint §5 · Disclaimer-Einsatzorte verifizieren · Postfach @bfsg-fuchs.de einrichten (danach 3 kommentierte E-Mail-Stellen umziehen).
