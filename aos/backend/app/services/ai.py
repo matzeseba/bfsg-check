@@ -1,7 +1,8 @@
-"""KI-Dienst (Anthropic) — Antwortentwuerfe + Inbox-Priorisierung.
+"""KI-Dienst — Antwortentwuerfe + Inbox-Priorisierung.
 
+Provider-Abstraktion ueber ``llm_provider`` (AOS_LLM_PROVIDER, Default Anthropic).
 Modell: AOS_MODEL_AGENTS. System-Prompts verbieten UWG-kritische Begriffe.
-Ohne ANTHROPIC_API_KEY: deterministischer Heuristik-Fallback (model="heuristik").
+Ohne LLM-Key: deterministischer Heuristik-Fallback (model="heuristik").
 """
 
 from __future__ import annotations
@@ -9,6 +10,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..config import Settings
+from . import llm_provider
 
 # UWG-kritische Begriffe, die in generierten Texten NIE vorkommen duerfen.
 FORBIDDEN_TERMS = ("bfsg-konform", "konform", "rechtssicher", "garantiert", "garantie", "tüv", "tuev", "dekra")
@@ -32,14 +34,6 @@ _HIGH_PRIORITY_KW = (
 )
 _MED_PRIORITY_KW = ("angebot", "preis", "profi", "upgrade", "kaufen", "bestellung", "demo")
 _LOW_PRIORITY_KW = ("newsletter", "info", "frage", "hallo", "danke")
-
-
-def _anthropic_client(settings: Settings):
-    try:
-        import anthropic
-    except ImportError:  # pragma: no cover - Anthropic ist Pflicht-Dep
-        return None
-    return anthropic.Anthropic(api_key=settings.anthropic_api_key)
 
 
 def _sanitize(text: str) -> str:
@@ -72,7 +66,7 @@ def _contains_forbidden(text: str) -> bool:
 # --------------------------------------------------------------------------- #
 def draft_reply(settings: Settings, item: dict[str, Any]) -> tuple[str, str]:
     """Erzeugt (Entwurfstext, Modellname) fuer eine Inbox-Anfrage."""
-    if settings.anthropic_api_key:
+    if llm_provider.llm_enabled(settings):
         drafted = _draft_reply_live(settings, item)
         if drafted is not None:
             sanitized = _sanitize(drafted)
@@ -85,9 +79,6 @@ def draft_reply(settings: Settings, item: dict[str, Any]) -> tuple[str, str]:
 
 
 def _draft_reply_live(settings: Settings, item: dict[str, Any]) -> str | None:
-    client = _anthropic_client(settings)
-    if client is None:
-        return None
     user = (
         f"Betreff: {item.get('subject','')}\n"
         f"Absender: {item.get('sender','')}\n"
@@ -95,18 +86,9 @@ def _draft_reply_live(settings: Settings, item: dict[str, Any]) -> str | None:
         f"Nachricht:\n{item.get('body','')}\n\n"
         "Formuliere den Antwortentwurf."
     )
-    try:
-        resp = client.messages.create(
-            model=settings.model_agents,
-            max_tokens=800,
-            system=_REPLY_SYSTEM,
-            messages=[{"role": "user", "content": user}],
-        )
-        parts = [b.text for b in resp.content if getattr(b, "type", "") == "text"]
-        text = "\n".join(parts).strip()
-        return text or None
-    except Exception:  # noqa: BLE001 - jede API-Stoerung faellt auf Heuristik zurueck
-        return None
+    return llm_provider.chat_complete(
+        settings, _REPLY_SYSTEM, user, max_tokens=800
+    )
 
 
 def _draft_reply_heuristic(item: dict[str, Any]) -> str:
@@ -148,7 +130,7 @@ def _draft_reply_heuristic(item: dict[str, Any]) -> str:
 # --------------------------------------------------------------------------- #
 def priorisiere_inbox(settings: Settings, item: dict[str, Any]) -> tuple[int, str]:
     """Liefert (priority 1-5, Begruendung). 1 = hoechste Dringlichkeit."""
-    if settings.anthropic_api_key:
+    if llm_provider.llm_enabled(settings):
         live = _priorisiere_live(settings, item)
         if live is not None:
             return live
@@ -156,9 +138,6 @@ def priorisiere_inbox(settings: Settings, item: dict[str, Any]) -> tuple[int, st
 
 
 def _priorisiere_live(settings: Settings, item: dict[str, Any]) -> tuple[int, str] | None:
-    client = _anthropic_client(settings)
-    if client is None:
-        return None
     system = (
         "Du priorisierst Support-/Vertriebsanfragen fuer BFSG-Fuchs. Antworte NUR im "
         "Format 'PRIORITAET: <1-5> | GRUND: <kurze deutsche Begruendung>'. "
@@ -166,17 +145,8 @@ def _priorisiere_live(settings: Settings, item: dict[str, Any]) -> tuple[int, st
         "5 = niedrig (allgemeine Info)."
     )
     user = f"Betreff: {item.get('subject','')}\nNachricht: {item.get('body','')}"
-    try:
-        resp = client.messages.create(
-            model=settings.model_agents,
-            max_tokens=120,
-            system=system,
-            messages=[{"role": "user", "content": user}],
-        )
-        text = "".join(
-            b.text for b in resp.content if getattr(b, "type", "") == "text"
-        )
-    except Exception:  # noqa: BLE001
+    text = llm_provider.chat_complete(settings, system, user, max_tokens=120)
+    if text is None:
         return None
     return _parse_priority(text)
 

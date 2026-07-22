@@ -43,8 +43,13 @@ class Settings:
                 "Cookie-Auth wird fail-closed abgelehnt. Ein zufaelliges Secret setzen!"
             )
 
-        # --- KI ---
+        # --- KI (Provider-Abstraktion: services/llm_provider.py) ---
+        self.llm_provider: str = os.getenv("AOS_LLM_PROVIDER", "anthropic")
+        self.llm_base_url: str = os.getenv("AOS_LLM_BASE_URL", "")
+        # AOS_LLM_API_KEY hat Vorrang; ANTHROPIC_API_KEY bleibt als Fallback
+        # (Bestands-Deployments setzen nur diesen).
         self.anthropic_api_key: str = os.getenv("ANTHROPIC_API_KEY", "")
+        self.llm_api_key: str = os.getenv("AOS_LLM_API_KEY", "") or self.anthropic_api_key
         self.model_jarvis: str = os.getenv("AOS_MODEL_JARVIS", "claude-sonnet-4-6")
         self.model_agents: str = os.getenv("AOS_MODEL_AGENTS", "claude-sonnet-4-6")
         self.perplexity_api_key: str = os.getenv("PERPLEXITY_API_KEY", "")
