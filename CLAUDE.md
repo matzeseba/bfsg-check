@@ -191,6 +191,21 @@ scripts/          PDF-Generator + Helper-Scripts
 
 ---
 
+## 🪨 Caveman-Modus (Token-Sparen — FESTE REGEL, seit 22.07.2026)
+
+Der Skill `caveman` (github.com/JuliusBrussee/caveman, MIT) ist projektlokal unter `.claude/skills/caveman/` installiert (gitignored — bei frischem Checkout aus dem Quell-Repo neu kopieren: `skills/caveman/SKILL.md`).
+
+**Standard-Anweisung:** Invoke zu Session-Beginn den Skill `caveman` (Level `full`) und behalte ihn für ALLE Chat-Antworten der gesamten Session bei — knappe Fragmente statt Füllsätze, keine Tool-Call-Narration, keine dekorativen Tabellen/Emojis. Technische Substanz bleibt vollständig: Code, CLI-Befehle, Dateipfade, API-Namen und Fehlermeldungen byte-genau; Antworten weiterhin auf Deutsch (der Skill komprimiert den Stil, nicht die Sprache).
+
+**Ausnahmen — IMMER normale, vollständige Sprache:**
+- Alle **Deliverables/Außen-Texte** (Marketing-Copy, E-Mail-Texte, PMs, Listings, Landingpage-Texte, Doku in `docs/`, README, PR-Beschreibungen, Commit-Messages) — Brand-Voice geht vor Token-Ersparnis
+- Sicherheitswarnungen, Bestätigungen irreversibler Aktionen (Live-Deploy, Löschungen), mehrstufige Owner-Runbooks (Auto-Clarity-Regel des Skills)
+- Memory-Dateien (müssen für künftige Sessions selbsterklärend sein)
+
+**Steuerung:** `/caveman lite|full|ultra` wechselt das Level · „normal mode" / „stop caveman" deaktiviert für den Rest der Session.
+
+---
+
 ## 📞 Bei Fragen / Blockern
 
 - **User-E-Mail:** matze.seba@outlook.de (für Account-Erstellungen, etc.)
