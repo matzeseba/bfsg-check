@@ -20,8 +20,8 @@ export default function WiderrufPage() {
         Als Verbraucherin oder Verbraucher haben Sie das Recht, den Vertrag
         binnen 14 Tagen ohne Angabe von Gründen zu widerrufen. Bitte füllen Sie
         das folgende Formular aus — oder senden Sie eine formlose Erklärung an{" "}
-        <a href="mailto:info@bfsg-fix.de" className="underline">
-          info@bfsg-fix.de
+        <a href="mailto:info@bfsg-fuchs.de" className="underline">
+          info@bfsg-fuchs.de
         </a>
         .
       </p>

@@ -39,5 +39,5 @@ Wichtig: BFSG-Fuchs liefert eine automatisierte technische Analyse mit menschlic
 ## Kontakt
 
 - Anbieter: Matthias Seba, Lange Straße 20, 27449 Kutenholz, Deutschland
-- E-Mail: info@bfsg-fix.de
+- E-Mail: info@bfsg-fuchs.de
 - Hosting: Deutschland (Hetzner, Nürnberg)

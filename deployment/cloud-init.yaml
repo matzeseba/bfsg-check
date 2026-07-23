@@ -68,7 +68,7 @@ write_files:
       # Betreiber-/SMTP-E-Mail ersetzen (PII, gehoert NICHT ins Repo).
       SMTP_USER=DEINE-SMTP-EMAIL@example.com
       SMTP_PASS=PLACEHOLDER_BREVO_KEY
-      FROM_EMAIL=no-reply@bfsg-fix.de
+      FROM_EMAIL=no-reply@bfsg-fuchs.de
       FROM_NAME=BFSG-Check
       REPLY_TO=DEINE-SMTP-EMAIL@example.com
       ADMIN_EMAIL=DEINE-SMTP-EMAIL@example.com

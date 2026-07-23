@@ -11,7 +11,7 @@ und Bitte um Zitat-Freigabe. **Nur Entwurf** — der Owner sendet selbst. Kanal:
 - Themen-Passung: BFSG/EAA-Praxis, WCAG-2.1-AA-Methodik, Anti-Overlay, TDDDG-Cookie,
   Solo-Founder-Bootstrap.
 - Produkt-Fakten (immer): `bfsg-fix.de`; axe-core via Playwright; Basis 129 €, Profi 399 €,
-  Abo 24,99 €/Monat bzw. 249 €/Jahr; Kontakt `info@matthias-seba.de` / `info@bfsg-fix.de`.
+  Abo 24,99 €/Monat bzw. 249 €/Jahr; Kontakt `info@matthias-seba.de` / `info@bfsg-fuchs.de`.
 
 ## Constraints (bindend)
 - Nur auf **echte, journalisten-initiierte** Anfragen antworten (kein Cold-Pitch an Redaktionen).

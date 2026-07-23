@@ -227,10 +227,10 @@ test('renderReport (F3): "Geprüfte Unterseiten" wird auch bei genau 1 Seite ger
 test('renderReport (D5): Fußzeile trägt Marke + Kontakt statt generischem "BFSG-Audit"', () => {
   const html = renderReport(scanStub([]));
   assert.match(html, /BFSG-Fuchs/);
-  // Domain-SSOT: Default ist die Marken-Primär bfsg-fuchs.de; die Kontakt-E-Mail
-  // bleibt bewusst info@bfsg-fix.de (Postfach @bfsg-fuchs.de existiert noch nicht).
+  // Domain-SSOT: Default ist die Marken-Primär bfsg-fuchs.de; Kontakt-E-Mail
+  // info@bfsg-fuchs.de (Postfach seit 23.07.2026 eingerichtet).
   assert.match(html, /bfsg-fuchs\.de/);
-  assert.match(html, /info@bfsg-fix\.de/);
+  assert.match(html, /info@bfsg-fuchs\.de/);
   assert.doesNotMatch(html, /bfsg-fix\.de &middot; automatisierte/);
   assert.doesNotMatch(html, /BFSG-Audit &middot; Automatisierte/);
 });

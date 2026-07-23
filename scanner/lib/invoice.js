@@ -27,7 +27,7 @@ const FROM = {
   // der Startup-Check (invoiceConfigStatus + app.js) alarmiert im Live-Betrieb.
   address: process.env.INVOICE_FROM_ADDRESS || '',
   // Kontaktadresse fuer Rueckfragen (NICHT die no-reply-Sendeadresse). Default info@.
-  email: process.env.INVOICE_CONTACT_EMAIL || 'info@bfsg-fix.de',
+  email: process.env.INVOICE_CONTACT_EMAIL || 'info@bfsg-fuchs.de',
   ustId: process.env.INVOICE_USTID || '',
   taxNumber: process.env.INVOICE_TAX_NUMBER || '',
   iban: process.env.INVOICE_IBAN || ''

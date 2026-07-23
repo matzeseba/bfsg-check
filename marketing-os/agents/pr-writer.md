@@ -38,5 +38,5 @@ Reines Markdown auf **stdout**:
 2. Ort/Datum-Zeile + Lead-Absatz (5-W-Fragen sachlich).
 3. Body (3–5 Absätze) mit belegten Aufhängern und Quellenverweis + Datum.
 4. Ein wörtliches Gründer-Zitat (Matthias Seba), sachlich.
-5. Boilerplate „Über BFSG-Fuchs" + Kontakt (`info@bfsg-fix.de`, `bfsg-fix.de`).
+5. Boilerplate „Über BFSG-Fuchs" + Kontakt (`info@bfsg-fuchs.de`, `bfsg-fix.de`).
 6. Abschluss-Disclaimer: „Automatisierte technische Analyse — ersetzt keine Rechtsberatung."

@@ -4,8 +4,8 @@
 import { ruleInfo, IMPACT_WEIGHT, IMPACT_DE, CATEGORY_ORDER } from './rules-de.js';
 
 // Domain-SSOT: Marke/Domain auf Cover und Footer des Kunden-Reports.
-// Default = Marken-Primär bfsg-fuchs.de (Kontakt-E-Mail bleibt info@bfsg-fix.de,
-// das Postfach @bfsg-fuchs.de existiert noch nicht).
+// Default = Marken-Primär bfsg-fuchs.de; Kontakt-E-Mail info@bfsg-fuchs.de
+// (Postfach seit 23.07.2026 eingerichtet, info@bfsg-fix.de gelöscht).
 const PUBLIC_HOST = (process.env.PUBLIC_URL || 'https://bfsg-fuchs.de')
   .replace(/^https?:\/\//, '').replace(/\/+$/, '');
 
@@ -682,7 +682,7 @@ export function renderReport(
   <div class="legalbox" id="rechtliches">${legalHtml}</div>
 
   <footer>
-    BFSG-Fuchs &middot; ${PUBLIC_HOST} &middot; info@bfsg-fix.de &middot; Anbieter: Matthias Seba<br>
+    BFSG-Fuchs &middot; ${PUBLIC_HOST} &middot; info@bfsg-fuchs.de &middot; Anbieter: Matthias Seba<br>
     Bestandene Prüfungen: ${scan.passes} &middot; Unklare Punkte (manuell prüfen): ${scan.incomplete}
   </footer>
 </div>

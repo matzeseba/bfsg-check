@@ -95,7 +95,7 @@ test('(a) SMTP 535 + API 201 → zugestellt via Brevo-API, fetch 1× mit korrekt
         { filename: 'BFSG-Report.pdf', content: Buffer.from('%PDF-1.4 report-inhalt') },
         { filename: 'Rechnung-RE-2026-0001.pdf', path: invoicePdf } // path-Variante (sendOwnerReview)
       ],
-      headers: { 'List-Unsubscribe': '<mailto:info@bfsg-fix.de?subject=unsubscribe>' },
+      headers: { 'List-Unsubscribe': '<mailto:info@bfsg-fuchs.de?subject=unsubscribe>' },
       backoffBaseMs: 0
     });
     assert.equal(smtpCalls, 1, 'permanenter Fehler → kein SMTP-Retry');
@@ -106,18 +106,18 @@ test('(a) SMTP 535 + API 201 → zugestellt via Brevo-API, fetch 1× mit korrekt
     assert.equal(calls[0].opts.method, 'POST');
     assert.equal(calls[0].opts.headers['api-key'], 'test-key');
     const payload = JSON.parse(calls[0].opts.body);
-    assert.deepEqual(payload.sender, { name: 'BFSG-Fuchs', email: 'no-reply@bfsg-fix.de' });
+    assert.deepEqual(payload.sender, { name: 'BFSG-Fuchs', email: 'no-reply@bfsg-fuchs.de' });
     assert.deepEqual(payload.to, [{ email: 'kunde@beispiel.de' }]);
     assert.equal(payload.subject, 'Ihr BFSG-Report');
     assert.equal(payload.textContent, 'Hallo, Ihr Report haengt an.');
     assert.equal(payload.htmlContent, undefined, 'kein HTML uebergeben → Feld fehlt');
-    assert.deepEqual(payload.replyTo, { email: 'info@bfsg-fix.de' });
+    assert.deepEqual(payload.replyTo, { email: 'info@bfsg-fuchs.de' });
     assert.equal(payload.attachment.length, 2);
     assert.equal(payload.attachment[0].name, 'BFSG-Report.pdf');
     assert.equal(payload.attachment[0].content, Buffer.from('%PDF-1.4 report-inhalt').toString('base64'));
     assert.equal(payload.attachment[1].name, 'Rechnung-RE-2026-0001.pdf');
     assert.equal(payload.attachment[1].content, Buffer.from('%PDF-1.4 rechnung-inhalt').toString('base64'));
-    assert.equal(payload.headers['List-Unsubscribe'], '<mailto:info@bfsg-fix.de?subject=unsubscribe>');
+    assert.equal(payload.headers['List-Unsubscribe'], '<mailto:info@bfsg-fuchs.de?subject=unsubscribe>');
   });
 });
 

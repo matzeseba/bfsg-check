@@ -22,7 +22,7 @@ services:
       - FROM_EMAIL=${FROM_EMAIL}
       - FROM_NAME=${FROM_NAME}
       - REPLY_TO=${REPLY_TO}
-      - INVOICE_CONTACT_EMAIL=${INVOICE_CONTACT_EMAIL:-info@bfsg-fix.de}
+      - INVOICE_CONTACT_EMAIL=${INVOICE_CONTACT_EMAIL:-info@bfsg-fuchs.de}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       # --- Brevo REST-API (Newsletter + Scan-Lead-Capture via Double-Opt-in). Ohne
       #     explizite Auflistung erreichen die .env-Werte den Container NICHT (kein

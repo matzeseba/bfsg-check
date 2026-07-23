@@ -194,7 +194,7 @@ Made in Germany, Hosting in Nürnberg.
 Matthias Seba
 BFSG-Fuchs · bfsg-fuchs.de
 Lange Straße 20, 27449 Kutenholz
-E-Mail: info@bfsg-fix.de
+E-Mail: info@bfsg-fuchs.de
 ```
 
 **Quellen-Anhang für Redaktionen (mit in die PM oder als Fußnoten):**

@@ -13,7 +13,7 @@
 
 **Maskottchen + Logo:** Fuchs-Wappen-Logo (Header/Footer/RiskBand/AnnouncementBar/CookieBanner) + Polo-Fuchs-Maskottchen (Hero rechts über der Report-Card + Final-CTA), via `next/image` mit korrekter Aspect-Ratio (kein CLS). PNGs optimiert: Logo **1,9 MB → 64 KB**, Maskottchen **1,7 MB → 103 KB**; Favicon `app/icon.png`.
 
-**Marken-Copy (Fox-Voice):** `lib/config.ts` (Single Source of Truth) + alle 16 Legal-/SEO-Seiten + JSON-LD + OG-Karte auf „BFSG-Fuchs". „BFSG" als **Gesetz/Keyword** überall erhalten; „BFSG-**Checkliste**" (Content) bewusst NICHT umbenannt. E-Mail = `info@bfsg-fix.de` (funktional; ersetzt eine zuvor tote `hallo@`-Adresse).
+**Marken-Copy (Fox-Voice):** `lib/config.ts` (Single Source of Truth) + alle 16 Legal-/SEO-Seiten + JSON-LD + OG-Karte auf „BFSG-Fuchs". „BFSG" als **Gesetz/Keyword** überall erhalten; „BFSG-**Checkliste**" (Content) bewusst NICHT umbenannt. E-Mail = `info@bfsg-fuchs.de` (seit 23.07.2026; ersetzt das gelöschte `info@bfsg-fix.de`).
 
 **Alle 11 Sektionen re-skinned + visuell verifiziert (Desktop dark + light + Mobile 375px):** Announcement, Header, Hero (Scan + Maskottchen + Live-Report-Card mit Scan-Animation), Trust-Strip, Rule-Ticker, Risk-Band + Live-Countdown, How-it-works, Why-us + Code-Snippet, Direktvergleich (qualitativ, UWG-sauber), Pricing (Plan-Finder + 3 Karten), Cookie (2 Karten, zentriert), FAQ, Final-CTA, Footer. Mobile-Sticky-CTA erscheint jetzt consent-unabhängig (Conversion-Leck behoben).
 
@@ -52,7 +52,7 @@
 
 ### 3. Brevo / Mail-Domain
 - [ ] Sender-Domain `bfsg-fuchs.de` in Brevo + DKIM/SPF/DMARC. Server-`.env` `FROM_*`/`INVOICE_CONTACT_EMAIL`/`PUBLIC_URL` → bfsg-fuchs.de.
-- [ ] Catch-all + `info@bfsg-fuchs.de` anlegen (LP zeigt bis dahin bewusst `info@bfsg-fix.de`).
+- [x] `info@bfsg-fuchs.de` angelegt + Weiterleitungen übernommen (erledigt 23.07.2026, LP zeigt `info@bfsg-fuchs.de`).
 
 ### 4. Scanner-Backend-Rebrand (eigene, reviewte Folge-PR — NICHT in dieser PR)
 - `scanner/lib/invoice.js` · `mailer.js` · `dsgvo.js` (+ `.env.example`, `scripts/stripe-trigger.sh`) tragen „BFSG-Check" in LIVE-Mails/Rechnungen. Bewusst getrennt (kundensichtbar, an Domain/Brevo-Cutover gekoppelt). Tests grün halten (vorher `npm i nodemailer --ignore-scripts`).

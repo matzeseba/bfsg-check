@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   },
 };
 
-const KONTAKT_MAIL = "info@bfsg-fix.de";
+const KONTAKT_MAIL = "info@bfsg-fuchs.de";
 const MAILTO = `mailto:${KONTAKT_MAIL}?subject=Partnerprogramm%20BFSG-Fuchs&body=Hallo%2C%0A%0Awir%20m%C3%B6chten%20Partner%20werden.%0A%0AAgentur%2FFirma%3A%20%0AWebsite%3A%20%0AAnzahl%20Kunden-Websites%20(ca.)%3A%20%0A%0AViele%20Gr%C3%BC%C3%9Fe`;
 
 const FAQ = [

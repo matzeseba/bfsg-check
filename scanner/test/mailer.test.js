@@ -95,7 +95,7 @@ test('buildDelayNotice: Owner-freigegebener Betreff + Kernaussagen im Text', () 
   assert.match(text, /kein Grund zur Sorge/);
   assert.match(text, /ein Mensch aus unserem Team/);
   assert.match(text, /Sie müssen dafür nichts tun/);
-  assert.match(text, /info@bfsg-fix\.de/);
+  assert.match(text, /info@bfsg-fuchs\.de/);
   assert.match(text, /Danke für Ihre Geduld/);
   assert.match(text, /Filo & das Team von/);
   // Pflicht-Footer (Anbieterkennzeichnung + Disclaimer) hängt wie bei allen Mails an.
@@ -112,7 +112,7 @@ test('buildDelayNotice: HTML-Variante vorhanden — Ruhe-Box + mailto, aber KEIN
   const { html } = buildDelayNotice({ company: 'ACME GmbH' });
   assert.ok(html && html.includes('<!doctype html>'));
   // Kontakt als klickbarer mailto-Link.
-  assert.match(html, /href="mailto:info@bfsg-fix\.de"/);
+  assert.match(html, /href="mailto:info@bfsg-fuchs\.de"/);
   // Was-jetzt-passiert-Block + Footer.
   assert.match(html, /Was jetzt passiert/);
   assert.match(html, /Keine Rechtsberatung/);
