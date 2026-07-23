@@ -95,7 +95,8 @@ export default function MlbfPruefstrategiePage() {
       "Risikobasierte Prüfstrategie der Marktüberwachungsstelle der Länder: Ablauf, automatisierte Checks, Beschwerdeverfahren und Bußgeldrahmen.",
     url: "https://bfsg-fuchs.de/mlbf-pruefstrategie",
     publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fuchs.de" },
-    dateModified: "2026-07-08",
+    datePublished: "2026-07-08",
+    dateModified: "2026-07-23",
   };
 
   return (
@@ -111,14 +112,19 @@ export default function MlbfPruefstrategiePage() {
           <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
             MLBF-Prüfstrategie 2026: Wird meine Website kontrolliert?
           </h1>
-          <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-            Seit dem 5. Januar 2026 kontrolliert die Marktüberwachungsstelle der Länder (MLBF) aktiv, und seit
-            Juni 2026 hat sie ihre Prüfstrategie öffentlich gemacht. Dieser Artikel erklärt risikobasiert,
-            wie die Behörde auswählt, was sie automatisiert prüft, was bei einer Beschwerde passiert — und wie
-            Sie vorher selbst den eigenen Stand prüfen.
+          {/* AEO-Direktantwort (agent-05 ASSET 2): Hauptfrage in ≤60 Wörtern direkt beantworten */}
+          <p className="mt-4 text-base font-medium leading-relaxed">
+            Ja, möglich — aber nicht automatisch jede Website. Die MLBF kontrolliert seit dem 5. Januar 2026
+            aktiv und risikobasiert: Vorrang haben Meldungen von Verbrauchern und anerkannten Verbänden,
+            danach folgen systematische Kontrollen entlang der veröffentlichten Marktüberwachungsstrategien
+            (seit Juni 2026 öffentlich). Automatisierte Software-Checks sortieren Auffälligkeiten vor.
+          </p>
+          <p className="mt-3 text-base leading-relaxed text-muted-foreground">
+            Dieser Artikel erklärt, wie die Behörde auswählt, was sie automatisiert prüft, was bei einer
+            Beschwerde passiert — und wie Sie vorher selbst den eigenen Stand prüfen.
           </p>
           <p className="mt-2 text-xs text-muted-foreground">
-            Stand: Juli 2026 · Automatisierte technische Analyse, keine Rechtsberatung
+            Zuletzt aktualisiert: 23. Juli 2026 · Automatisierte technische Analyse, keine Rechtsberatung
           </p>
         </header>
 
@@ -135,7 +141,7 @@ export default function MlbfPruefstrategiePage() {
         </section>
 
         <section className="mt-14">
-          <h2 className="text-2xl font-semibold">Die Kontrollphase im Zeitverlauf</h2>
+          <h2 className="text-2xl font-semibold">Wie lief die Kontrollphase bisher ab?</h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
             Von der Errichtung bis zur veröffentlichten Prüfstrategie hat sich einiges getan — die wichtigsten
             Stationen im Überblick:
@@ -163,7 +169,7 @@ export default function MlbfPruefstrategiePage() {
         </section>
 
         <section className="mt-14">
-          <h2 className="text-2xl font-semibold">Risikobasiert: reaktiv vor aktiv</h2>
+          <h2 className="text-2xl font-semibold">Wie wählt die MLBF ihre Prüffälle aus?</h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
             Die MLBF beschreibt ihr Vorgehen als risikobasiert und unterscheidet zwei Wege — mit einer
             bemerkenswerten Reihenfolge:
@@ -192,7 +198,7 @@ export default function MlbfPruefstrategiePage() {
         </section>
 
         <section className="mt-14">
-          <h2 className="text-2xl font-semibold">Was automatisiert geprüft wird</h2>
+          <h2 className="text-2xl font-semibold">Was prüft die MLBF automatisiert?</h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
             Die Prüfung selbst gliedert sich in zwei Aspekte: die <strong>formale</strong> Kontrolle — liegt eine
             Barrierefreiheitserklärung vor, sind die Pflichtangaben vollständig — und die{" "}
@@ -205,7 +211,7 @@ export default function MlbfPruefstrategiePage() {
         </section>
 
         <section className="mt-14">
-          <h2 className="text-2xl font-semibold">Was bei einer Beschwerde passiert</h2>
+          <h2 className="text-2xl font-semibold">Was passiert bei einer Beschwerde?</h2>
           <ol className="mt-4 list-decimal space-y-3 pl-5 text-sm text-muted-foreground">
             <li>
               Ein Verbraucher oder ein anerkannter Verband reicht eine Meldung über das Kontaktformular auf
@@ -233,7 +239,7 @@ export default function MlbfPruefstrategiePage() {
         </section>
 
         <section className="mt-14">
-          <h2 className="text-2xl font-semibold">Bußgeldrahmen nach § 37 BFSG</h2>
+          <h2 className="text-2xl font-semibold">Wie hoch sind die Bußgelder nach § 37 BFSG?</h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
             Einzelne Pflichtverstöße — etwa eine fehlende Barrierefreiheitserklärung — können mit einem
             Bußgeld bis 10.000 € geahndet werden. Bei schwereren Verstößen gegen die
@@ -244,7 +250,7 @@ export default function MlbfPruefstrategiePage() {
         </section>
 
         <section className="mt-14">
-          <h2 className="text-2xl font-semibold">Zusätzlicher Druck von zwei Seiten</h2>
+          <h2 className="text-2xl font-semibold">Woher kommt der zusätzliche Druck von zwei Seiten?</h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
             Neben der behördlichen Kontrolle sind zwei weitere Entwicklungen sachlich belegt: Seit Februar 2026
             läuft eine zweite private Abmahnwelle mit Forderungen um 2.700 € — zusätzlich zur ersten Welle aus
