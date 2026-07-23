@@ -22,6 +22,10 @@ import { qaReport } from './report-qa.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+// Domain-SSOT: Marke/Domain im PDF-Footer. Default = Marken-Primär bfsg-fuchs.de.
+const PUBLIC_HOST = (process.env.PUBLIC_URL || 'https://bfsg-fuchs.de')
+  .replace(/^https?:\/\//, '').replace(/\/+$/, '');
+
 // Pro Paket: welche Engine, wie viele Seiten, welche Report-Optionen, welches
 // Anschreiben (siehe mailer.js#sendReportFor). Single Source of Truth, damit
 // app.js und subscriptions.js dieselbe Konfiguration nutzen.
@@ -238,7 +242,7 @@ export async function fulfillOrder({ url, company = '', email = '', pkg = 'basis
       // weder Nummerierung noch wiederkehrende Fußzeile.
       displayHeaderFooter: true,
       headerTemplate: '<div></div>',
-      footerTemplate: '<div style="width:100%;font-size:8px;color:#94a3b8;text-align:center;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">bfsg-fix.de &middot; Seite <span class="pageNumber"></span> von <span class="totalPages"></span></div>'
+      footerTemplate: `<div style="width:100%;font-size:8px;color:#94a3b8;text-align:center;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">${PUBLIC_HOST} &middot; Seite <span class="pageNumber"></span> von <span class="totalPages"></span></div>`
     });
   } finally {
     await browser.close();

@@ -28,10 +28,13 @@ const REPLY_TO_ADDR = REPLY_TO || INVOICE_CONTACT_EMAIL;
 // Disclaimer-Kurzform). Anschrift aus Env, damit sie nicht hartkodiert ist. ---
 const INVOICE_FROM_NAME = process.env.INVOICE_FROM_NAME || FROM_NAME;
 const INVOICE_FROM_ADDRESS = process.env.INVOICE_FROM_ADDRESS || '';
-const PUBLIC_HOST = (process.env.PUBLIC_URL || 'https://bfsg-fix.de')
+// Domain-SSOT: Default ist die Marken-Primär bfsg-fuchs.de (Cutover 2026).
+// Die Absender-/Kontakt-Postfächer bleiben bewusst @bfsg-fix.de (Owner-Beschluss:
+// Postfach @bfsg-fuchs.de existiert noch nicht).
+const PUBLIC_HOST = (process.env.PUBLIC_URL || 'https://bfsg-fuchs.de')
   .replace(/^https?:\/\//, '').replace(/\/+$/, '');
 // Voll-URL (mit Schema) fuer Links in HTML-Mails; CTA der Value-Mail (PR2).
-const PUBLIC_URL = (process.env.PUBLIC_URL || 'https://bfsg-fix.de').replace(/\/+$/, '');
+const PUBLIC_URL = (process.env.PUBLIC_URL || 'https://bfsg-fuchs.de').replace(/\/+$/, '');
 const LEAD_TEASER_CTA_URL = process.env.LEAD_TEASER_CTA_URL || `${PUBLIC_URL}/#pakete`;
 
 // Exportiert fuer Unit-Tests (reine Funktion, keine Seiteneffekte).
@@ -215,7 +218,7 @@ ${diffText || 'Keine Veränderungen erkannt.'}
 Im Anhang finden Sie:
 1. Den vollständigen Re-Check-Report (PDF) mit allen aktuellen Befunden und Lösungshinweisen.${stmtPath ? '\n2. Ihre auf den aktuellen Stand gebrachte Erklärung zur Barrierefreiheit (Vorlage).' : ''}${invoicePdfPath ? `\n${stmtPath ? '3' : '2'}. Ihre Rechnung (PDF).` : ''}
 
-Sie können Ihr Abo jederzeit über https://bfsg-fix.de/kuendigen beenden.
+Sie können Ihr Abo jederzeit über ${PUBLIC_URL}/kuendigen beenden.
 ${widerrufHinweis({ customerType, consentTs })}
 Mit freundlichen Grüßen
 ${FROM_NAME}
