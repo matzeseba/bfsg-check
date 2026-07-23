@@ -2,7 +2,7 @@ name: Backup Restore Test
 
 # Monatlicher Synthetic-Round-Trip-Test: verifiziert dass backup.sh + restore.sh
 # syntaktisch sauber sind und ein GPG-Verschlüsselungs-Roundtrip funktioniert.
-# Bei Fehler: E-Mail-Alert via Brevo SMTP an matze.seba@outlook.de.
+# Bei Fehler: E-Mail-Alert via Brevo SMTP an secrets.ALERT_EMAIL.
 
 on:
   schedule:
@@ -72,5 +72,5 @@ jobs:
             1. deployment/backup.sh + restore.sh Syntax
             2. docs/BACKUP.md Setup-Schritte
             3. Live-Server: läuft cron @ /etc/cron.d/bfsg-backup?
-          to: matze.seba@outlook.de
+          to: ${{ secrets.ALERT_EMAIL }}
           from: BFSG-Check Monitoring <no-reply@bfsg-fix.de>
