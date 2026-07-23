@@ -271,6 +271,11 @@ export default function AxeLighthouseWaveVergleichPage() {
                 Was kostet eine BFSG-Prüfung? Marktpreise 2026
               </Link>
             </li>
+            <li>
+              <Link href="/wcag-scanner-vs-audit" className="text-primary underline underline-offset-2">
+                WCAG-Scanner vs. manuelles Audit: Was findet was?
+              </Link>
+            </li>
           </ul>
         </section>
 

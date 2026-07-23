@@ -254,6 +254,11 @@ export default function BfsgFristPage() {
                 Website-Barrierefreiheit testen: kostenlose Wege im Überblick
               </Link>
             </li>
+            <li>
+              <Link href="/bfsg-ausnahmen" className="text-primary underline underline-offset-2">
+                Bin ich vom BFSG ausgenommen? Der ehrliche Selbst-Check
+              </Link>
+            </li>
           </ul>
         </section>
 
