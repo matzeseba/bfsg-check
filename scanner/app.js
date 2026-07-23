@@ -910,13 +910,22 @@ app.post('/api/checkout', rateLimit({ windowMs: 60_000, max: 10 }), async (req, 
 
   try {
     const recurring = p.mode === 'subscription' ? { recurring: { interval: p.interval } } : {};
+    // Betroffenheits-Check (CheckoutModal Schritt 0, Asset D1 aus
+    // marketing/swarm-2026-07-23/agent-02-funnel-website.md): Ergebnis nur als
+    // Kontext zur Bestellung (ehrliche Verkaufsdoku / Nicht-Betroffenen-Analyse)
+    // — KEIN Gate, keine Kauf-Validierung. Whitelist statt Freitext; fehlende
+    // oder unbekannte Werte werden verworfen (ältere Clients bleiben kompatibel).
+    const eligibility = ['affected', 'unaffected_override', 'unsure'].includes(req.body?.eligibility)
+      ? req.body.eligibility
+      : undefined;
     const baseMeta = {
       url: safe.url,
       pkg,
       company: String(company).slice(0, 120),
       customerType,
       consent: consent ? 'ja' : 'nein',
-      consentTs: new Date().toISOString()
+      consentTs: new Date().toISOString(),
+      ...(eligibility ? { eligibility } : {})
     };
     // Subscription-Metadata: damit invoice.paid die Bestellung wiederfindet.
     const subscription_data = p.mode === 'subscription'
