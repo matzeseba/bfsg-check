@@ -2,7 +2,7 @@
 
 > BFSG-Fuchs (bfsg-fuchs.de, auch erreichbar über bfsg-fix.de) ist ein automatisierter Barrierefreiheits-Scan für deutsche Websites und Online-Shops. Der Dienst prüft Seiten gegen über 80 Regeln nach WCAG 2.1 AA / EN 301 549 (axe-core-basiert, mit menschlicher Sichtung vor Auslieferung) und liefert priorisierte PDF-Reports mit konkreten Fix-Hinweisen sowie einem Entwurf der Barrierefreiheitserklärung gemäß § 14 BFSG (i. V. m. der BFSGV). Hintergrund: Das Barrierefreiheitsstärkungsgesetz (BFSG) gilt in Deutschland seit dem 28.06.2025.
 
-Wichtig: BFSG-Fuchs liefert eine automatisierte technische Analyse mit menschlicher Sichtung — keine Rechtsberatung und keine Zusicherung rechtlicher Anforderungserfüllung. Zielgruppe sind deutsche KMU, Online-Shops und Webagenturen.
+Wichtig: BFSG-Fuchs liefert eine automatisierte technische Analyse mit menschlicher Sichtung — keine Rechtsberatung und keine Zusicherung rechtlicher Anforderungserfüllung. Automatisierte Prüfverfahren erkennen erfahrungsgemäß etwa 30–50 % der WCAG-Kriterien zuverlässig; dies kommuniziert BFSG-Fuchs offen. Zielgruppe sind deutsche KMU, Online-Shops und Webagenturen.
 
 ## Leistungen und Preise
 
@@ -16,8 +16,12 @@ Wichtig: BFSG-Fuchs liefert eine automatisierte technische Analyse mit menschlic
 ## Ratgeber (SEO-/Fach-Seiten)
 
 - [BFSG-Frist: Was seit dem 28.06.2025 gilt](https://bfsg-fuchs.de/bfsg-frist): Zeitleiste, Marktüberwachung (MLBF), Ausnahmen für Kleinstunternehmen.
+- [Bin ich vom BFSG ausgenommen?](https://bfsg-fuchs.de/bfsg-ausnahmen): Kleinstunternehmen-Ausnahme (<10 Mitarbeitende UND <2 Mio. € Umsatz), Dienstleistung vs. Produkt, Übergangsfrist 28.06.2028 — mit ehrlichem Selbst-Check.
+- [Was kostet eine BFSG-Abmahnung?](https://bfsg-fuchs.de/bfsg-abmahnung-kosten): Dokumentierte Forderungen (595 € bis 2.706,18 €), Bußgeldrahmen § 37 BFSG, offene Rechtslage § 3a UWG — sachlich eingeordnet.
+- [MLBF-Prüfstrategie 2026](https://bfsg-fuchs.de/mlbf-pruefstrategie): Wie die Marktüberwachungsstelle der Länder seit 01/2026 kontrolliert — risikobasiert, Beschwerden zuerst.
 - [BFSG-Checkliste für Online-Shops](https://bfsg-fuchs.de/bfsg-checkliste-online-shop): 25 Prüfpunkte mit WCAG-Referenz und Priorität.
 - [Was kostet eine BFSG-Prüfung?](https://bfsg-fuchs.de/bfsg-pruefung-kosten): Marktpreise 2026 — Gratis-Tools, Auto-Reports, manuelle Audits.
+- [WCAG-Scanner vs. manuelles Audit](https://bfsg-fuchs.de/wcag-scanner-vs-audit): Was Scanner zuverlässig finden (30–50 %), was nur Menschen prüfen können, Kosten und Entscheidungshilfe.
 - [Website-Barrierefreiheit testen](https://bfsg-fuchs.de/barrierefreiheit-testen): Fünf Selbsttests und Gratis-Tools im Überblick.
 - [Barrierefreiheitserklärung: Muster](https://bfsg-fuchs.de/barrierefreiheitserklaerung-muster): Pflicht-Inhalte nach § 14 BFSG mit Vorlage.
 - [BFSG für Webagenturen](https://bfsg-fuchs.de/bfsg-fuer-webagenturen): Verantwortlichkeiten, typische Mängel, Agentur-Workflow.

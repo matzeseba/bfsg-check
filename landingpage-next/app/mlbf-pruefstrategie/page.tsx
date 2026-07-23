@@ -316,6 +316,11 @@ export default function MlbfPruefstrategiePage() {
                 Was kostet eine BFSG-Prüfung? Marktpreise 2026
               </Link>
             </li>
+            <li>
+              <Link href="/bfsg-abmahnung-kosten" className="text-primary underline underline-offset-2">
+                Was kostet eine BFSG-Abmahnung? Forderungen und Rechtslage 2026
+              </Link>
+            </li>
           </ul>
         </section>
 
