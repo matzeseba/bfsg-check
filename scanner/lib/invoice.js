@@ -273,7 +273,15 @@ function pkgDescription(pkg) {
     'cookie-basis': 'Cookie-Check Basis — Tracker-Audit gemäß § 25 TDDDG',
     'cookie-profi': 'Cookie-Check Profi — Tracker-Audit + manuelle CMP-Sichtung',
     abo: 'BFSG Re-Check Abo — monatliche Überprüfung mit Diff-Report',
-    'abo-jahr': 'BFSG Re-Check Abo (jährlich) — monatliche Überprüfung mit Diff-Report, jährliche Abrechnung'
+    'abo-jahr': 'BFSG Re-Check Abo (jährlich) — monatliche Überprüfung mit Diff-Report, jährliche Abrechnung',
+    // Abo-Tiers (agent-01): bewusst OHNE Intervall-Angabe — die beworbenen Rhythmen
+    // (2-wöchentlich/wöchentlich) werden erst nach Scheduler-Umstellung (d10.3) wahr.
+    'abo-pro': 'Fuchs Re-Check Pro — wiederkehrende Überprüfung mit Diff-Report',
+    'abo-pro-jahr': 'Fuchs Re-Check Pro (jährlich) — wiederkehrende Überprüfung mit Diff-Report, jährliche Abrechnung',
+    'abo-business': 'Fuchs Re-Check Business — wiederkehrende Überprüfung mit Diff-Report',
+    'abo-business-jahr': 'Fuchs Re-Check Business (jährlich) — wiederkehrende Überprüfung mit Diff-Report, jährliche Abrechnung',
+    'startpaket-basis': 'Startpaket: BFSG-Report Basis + 1. Re-Check-Monat inklusive',
+    'startpaket-profi': 'Startpaket: BFSG-Report Profi + 1. Re-Check-Monat inklusive'
   };
   return map[pkg] || `BFSG-Fuchs Leistung (${pkg})`;
 }

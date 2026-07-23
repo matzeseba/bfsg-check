@@ -34,7 +34,7 @@ import { diffSummaryText } from './lib/diff.js';
 import { generateInvoicePdf, invoiceConfigStatus } from './lib/invoice.js';
 import { assertPublicHttpUrl } from './lib/url-guard.js';
 import { rateLimit, concurrencyGate } from './lib/limits.js';
-import { claimEvent, releaseEvent, recordPaid, markStatus } from './lib/orders.js';
+import { claimEvent, releaseEvent, recordPaid, markStatus, hasPaidReportFor } from './lib/orders.js';
 import {
   recordSubscription, saveSnapshot, getSubscription, markCancelled, markSubscriptionStatus,
   listSubscriptions
@@ -46,6 +46,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 8080;
 const PUBLIC_URL = process.env.PUBLIC_URL || `http://localhost:${PORT}`;
 const ENABLE_ABO = process.env.ENABLE_ABO === 'true'; // Abo standardmäßig AUS, bis Webhook-Endpoint aktiv getestet.
+// Abo-Tier-Modell „Fuchs Re-Check" (ENTWURF, marketing/swarm-2026-07-23/agent-01-pricing-offer.md):
+// Starter/Pro/Business + Report-Gate + Startpaket. Default AUS — ohne dieses Flag
+// ändert sich am Live-Verhalten NICHTS: 'abo'/'abo-jahr' bleiben frei buchbar
+// (kein Gate), und die neuen Paket-IDs existieren im Checkout gar nicht.
+const ABO_TIERS_ENABLED = process.env.ABO_TIERS_ENABLED === 'true';
 
 // PR5 Owner-Release-Gate: fertige Reports werden vor Auslieferung dem Owner zur
 // Freigabe gemailt (1-Klick-Link) und bei Ablauf des Fensters automatisch versendet.
@@ -202,8 +207,62 @@ const PACKAGES = {
         // nur jährliche Abrechnung. inline price_data → keine Stripe-Dashboard-Aktion nötig.
         'abo-jahr': { name: 'BFSG Re-Check Abo (jährlich)', amount: 24900, mode: 'subscription', interval: 'year' }
       }
+    : {}),
+  // --- Fuchs-Re-Check-Tiers Pro/Business + Startpakete (agent-01, d2/d7) ---------
+  // EINFÜHRUNGSPREISE bis 30.09.2026 (Starter 24,99 € = 'abo' oben, unverändert —
+  // Grandfathering d8: Bestands-Subscriptions in Stripe bleiben unangetastet).
+  // Reguläre Preise ab 01.10.2026 (Starter 29/290 €, Pro 79/790 €, Business
+  // 149/1.490 €) kommen in einem separaten Preis-Umstellungs-PR (bindende Frist,
+  // Owner-Kalender 25.09.2026) — die Preis-Sync-CI erzwingt die config.ts-Spiegelung.
+  ...(ENABLE_ABO && ABO_TIERS_ENABLED
+    ? {
+        'abo-pro':           { name: 'Fuchs Re-Check Pro',                    amount:  6900, mode: 'subscription', interval: 'month' },
+        'abo-pro-jahr':      { name: 'Fuchs Re-Check Pro (jährlich)',         amount: 69000, mode: 'subscription', interval: 'year' },
+        'abo-business':      { name: 'Fuchs Re-Check Business',               amount: 12900, mode: 'subscription', interval: 'month' },
+        'abo-business-jahr': { name: 'Fuchs Re-Check Business (jährlich)',    amount: 129000, mode: 'subscription', interval: 'year' },
+        // Startpaket (agent-01, d1 Szenario E + d10.2): Erst-Report + 1. Re-Check-
+        // Monat inklusive. amount = REPORT-Preis (einmalig, heute fällig); das
+        // Tier-Abo startet mit 30 Tagen Trial (= 1. Monat inklusive) und läuft ab
+        // Monat 2 zum Tier-Preis. reportName = Produktname der Einmalposition.
+        'startpaket-basis':  { name: 'Startpaket: BFSG-Report Basis + 1. Re-Check-Monat', reportName: 'BFSG-Report Basis', amount: 12900, mode: 'subscription', interval: 'month', startpaket: true },
+        'startpaket-profi':  { name: 'Startpaket: BFSG-Report Profi + 1. Re-Check-Monat', reportName: 'BFSG-Report Profi', amount: 39900, mode: 'subscription', interval: 'month', startpaket: true }
+      }
     : {})
 };
+
+// Optionale Stripe-Preis-IDs für die neuen Tier-/Startpaket-Pakete (ENTWURF).
+// Standard: inline price_data aus PACKAGES (wie bei 'abo' — KEINE Stripe-Dashboard-
+// Vorarbeit nötig; Preis-SSOT bleibt diese Datei ↔ landingpage-next/lib/config.ts,
+// die Preis-Sync-CI wacht über die Spiegelung).
+// TODO: Owner legt Stripe-Produkte/-Preise an (Tabelle im PR) und trägt die IDs in
+// der Server-.env ein — eine gesetzte ID ersetzt dann die inline price_data beim
+// Checkout (Vorbereitung für Portal-Tier-Wechsel Starter→Pro→Business, d4-FAQ).
+const STRIPE_PRICE = {
+  'abo-pro':           process.env.STRIPE_PRICE_ABO_PRO_MONTH      || null, // TODO: Owner legt Stripe-Produkt an
+  'abo-pro-jahr':      process.env.STRIPE_PRICE_ABO_PRO_YEAR       || null, // TODO: Owner legt Stripe-Produkt an
+  'abo-business':      process.env.STRIPE_PRICE_ABO_BUSINESS_MONTH || null, // TODO: Owner legt Stripe-Produkt an
+  'abo-business-jahr': process.env.STRIPE_PRICE_ABO_BUSINESS_YEAR  || null, // TODO: Owner legt Stripe-Produkt an
+  // Einmalpositionen der Startpaket-Reports (die Tier-Subscriptions nutzen die IDs oben).
+  'startpaket-basis':  process.env.STRIPE_PRICE_STARTPAKET_BASIS   || null, // TODO: Owner legt Stripe-Produkt an
+  'startpaket-profi':  process.env.STRIPE_PRICE_STARTPAKET_PROFI   || null  // TODO: Owner legt Stripe-Produkt an
+};
+
+// Report-Gate (agent-01, d10.1): diese Pakete setzen einen bezahlten Erst-Report
+// (basis/profi, ggf. via Startpaket) auf derselben E-Mail voraus — alle Re-Check-
+// Abo-Varianten inkl. 'abo'/'abo-jahr' (= Starter). NICHT enthalten: die
+// Startpakete selbst (sie sind der Einstieg OHNE Report — der Report ist inklusive).
+const REPORT_GATE_PACKAGES = new Set(['abo', 'abo-jahr', 'abo-pro', 'abo-pro-jahr', 'abo-business', 'abo-business-jahr']);
+// Wählbare Tiers beim Startpaket (Body-Feld/metadata.tier; Default Starter 'abo').
+const STARTPAKET_TIERS = new Set(['abo', 'abo-pro', 'abo-business']);
+
+// Baut das Stripe-Line-Item für ein Paket: eine gesetzte Stripe-Preis-ID
+// (STRIPE_PRICE oben) schlägt die inline price_data; Default ist inline (wie 'abo').
+function lineItemFor(pkgKey) {
+  const p = PACKAGES[pkgKey];
+  if (STRIPE_PRICE[pkgKey]) return { price: STRIPE_PRICE[pkgKey], quantity: 1 };
+  const recurring = p.mode === 'subscription' ? { recurring: { interval: p.interval } } : {};
+  return { price_data: { currency: 'eur', product_data: { name: p.name }, unit_amount: p.amount, ...recurring }, quantity: 1 };
+}
 
 // max. 2 gleichzeitige Headless-Browser server-weit (verhindert OOM).
 // Gratis-Teaser-Gate: begrenzte Concurrency + Warteschlangen-Cap. Bei vollem Stau
@@ -306,9 +365,17 @@ async function prePersistCheckout(event) {
   const isSub = s.mode === 'subscription' && !!s.subscription;
   await recordPaid({ eventId: event.id, sessionId: s.id, email, url: meta.url, pkg, amount: s.amount_total, customerId: s.customer || null, customerType: meta.customerType || '', consentTs: meta.consentTs || '' });
   if (isSub) {
+    // Startpaket (Abo-Tiers): die Subscription läuft auf dem GEWÄHLTEN TIER
+    // (session-metadata.tier), nicht auf dem Startpaket-Kürzel — der lokale
+    // Subscription-Datensatz steuert Scan-Tiefe (PKG_CONFIG) und Rechnungstext
+    // aller Re-Check-Zyklen ab Monat 2. Der Order-Record (recordPaid oben) bleibt
+    // beim Verkaufskürzel 'startpaket-*' (buchhalterische Wahrheit: Report-Verkauf).
+    const subPkg = meta.pkg && meta.pkg.startsWith('startpaket')
+      ? (STARTPAKET_TIERS.has(meta.tier) ? meta.tier : 'abo')
+      : pkg;
     await recordSubscription({
       subscriptionId: s.subscription, customerId: s.customer || null,
-      email, url: meta.url, company: meta.company || '', pkg
+      email, url: meta.url, company: meta.company || '', pkg: subPkg
     });
   }
 }
@@ -603,7 +670,9 @@ async function handleInvoicePaid(event) {
     await runSubscriptionRecheck(sub, { cycleKey, eventId: event.id, makeInvoice });
   } catch (err) {
     await markStatus(cycleKey, 'RECHECK_FAILED', { error: err.message }).catch(() => {});
-    const isMonthly = sub.pkg !== 'abo-jahr';
+    // Alle Monats-Varianten haben den Retry-Pfad; Jahres-Pakete ('*-jahr', jetzt
+    // auch abo-pro-jahr/abo-business-jahr) laufen über den Ticker-Fallback.
+    const isMonthly = !String(sub.pkg || '').endsWith('-jahr');
     await sendAlert(
       `Re-Check fehlgeschlagen: ${sub.email}`,
       `Subscription: ${sub.subscriptionId}\nURL: ${sub.url}\nFehler: ${err.message}` +
@@ -726,8 +795,11 @@ const ANNUAL_RECHECK_RETRY_MS = 20 * 3600_000;
 const annualAttemptAt = new Map(); // subscriptionId -> letzter Versuch (in-flight-Guard + Retry-Bremse)
 
 // Pure Fälligkeits-Logik, exportiert für den Unit-Test (test/config.test.js).
+// Gilt für ALLE Jahres-Varianten ('abo-jahr', 'abo-pro-jahr', 'abo-business-jahr'):
+// Stripe stellt bei interval:'year' nur 1 Rechnung/Jahr, der monatliche Takt kommt
+// vom Ticker.
 export function annualRecheckDue(sub, now = Date.now()) {
-  if (!sub || sub.status !== 'ACTIVE' || sub.pkg !== 'abo-jahr') return false;
+  if (!sub || sub.status !== 'ACTIVE' || !String(sub.pkg || '').endsWith('-jahr')) return false;
   const last = Date.parse(sub.lastScanAt || sub.createdAt || '');
   if (Number.isNaN(last)) return true; // kein Zeitstempel → lieber prüfen als still auslassen
   return now - last >= ANNUAL_RECHECK_DUE_MS;
@@ -901,6 +973,28 @@ app.post('/api/checkout', rateLimit({ windowMs: 60_000, max: 10 }), async (req, 
   // bezahlte Produkt unzustellbar machen.
   if (cleanEmail && !isEmail(cleanEmail))
     return res.status(400).json({ error: 'Bitte eine gültige E-Mail-Adresse angeben' });
+
+  // Report-Gate (agent-01, d1 Szenario E + d10.1; hinter ABO_TIERS_ENABLED):
+  // Re-Check-Abos setzen einen BEZAHLTEN Erst-Report (basis/profi, ggf. via
+  // Startpaket) auf derselben E-Mail voraus — der Re-Check ist ein Delta-Dienst
+  // auf dieser Baseline. Schließt das Kündigungs-Loophole (24,99 € kauften sonst
+  // sofort einen ~399-€-Vollreport, Kündigung zum Monatsende reichte).
+  // Flag AUS = bisheriges Verhalten ('abo'/'abo-jahr' frei buchbar) — unverändert.
+  if (ABO_TIERS_ENABLED && REPORT_GATE_PACKAGES.has(pkg)) {
+    if (!cleanEmail) {
+      return res.status(400).json({
+        error: 'Bitte E-Mail-Adresse angeben — das Re-Check-Abo wird Ihrem Erst-Report zugeordnet.'
+      });
+    }
+    const hasReport = await hasPaidReportFor(cleanEmail);
+    if (!hasReport) {
+      return res.status(409).json({
+        error: 'Für den Fuchs Re-Check brauchen Sie zuerst einen Erst-Report (Basis oder Profi): Er legt die Baseline, der Re-Check dokumentiert die Entwicklung. Noch kein Report? Das Startpaket kombiniert Ihren Erst-Report mit dem ersten Re-Check-Monat — der erste Monat ist inklusive.',
+        reason: 'report_required'
+      });
+    }
+  }
+
   let safe;
   try {
     safe = await assertPublicHttpUrl(/^https?:\/\//i.test(url) ? url : 'https://' + url);
@@ -909,7 +1003,17 @@ app.post('/api/checkout', rateLimit({ windowMs: 60_000, max: 10 }), async (req, 
   }
 
   try {
-    const recurring = p.mode === 'subscription' ? { recurring: { interval: p.interval } } : {};
+    // Startpaket (agent-01, d10.2): Report-Einmalposition (heute fällig) +
+    // Tier-Subscription mit trial_period_days=30 (= „1. Re-Check-Monat inklusive";
+    // erste Abbuchung des Tier-Preises ab Monat 2, dann monatlich kündbar).
+    // tier = gewähltes Re-Check-Tier aus dem Checkout (Default: Starter 'abo').
+    let tier = null;
+    if (p.startpaket) {
+      tier = STARTPAKET_TIERS.has(req.body?.tier) ? req.body.tier : 'abo';
+      if (!PACKAGES[tier]) {
+        return res.status(400).json({ error: 'Gewähltes Re-Check-Tier ist derzeit nicht buchbar' });
+      }
+    }
     // Betroffenheits-Check (CheckoutModal Schritt 0, Asset D1 aus
     // marketing/swarm-2026-07-23/agent-02-funnel-website.md): Ergebnis nur als
     // Kontext zur Bestellung (ehrliche Verkaufsdoku / Nicht-Betroffenen-Analyse)
@@ -925,17 +1029,32 @@ app.post('/api/checkout', rateLimit({ windowMs: 60_000, max: 10 }), async (req, 
       customerType,
       consent: consent ? 'ja' : 'nein',
       consentTs: new Date().toISOString(),
+      ...(tier ? { tier } : {}),
       ...(eligibility ? { eligibility } : {})
     };
+    // Line-Items: Startpaket = [Report EINMALIG (kein recurring!), Tier recurring];
+    // alle anderen Pakete = 1 Item. STRIPE_PRICE-ID (falls vom Owner gesetzt)
+    // schlägt die inline price_data (siehe lineItemFor oben).
+    const line_items = p.startpaket
+      ? [
+          STRIPE_PRICE[pkg]
+            ? { price: STRIPE_PRICE[pkg], quantity: 1 }
+            : { price_data: { currency: 'eur', product_data: { name: p.reportName }, unit_amount: p.amount }, quantity: 1 },
+          lineItemFor(tier)
+        ]
+      : [lineItemFor(pkg)];
     // Subscription-Metadata: damit invoice.paid die Bestellung wiederfindet.
+    // Beim Startpaket trägt die Subscription das TIER als pkg (Re-Check-Zyklen
+    // scannen mit Tier-Tiefe) — das Verkaufskürzel bleibt in metadata.pkg.
     const subscription_data = p.mode === 'subscription'
-      ? { metadata: { url: safe.url, pkg, company: baseMeta.company, email: cleanEmail || '' } }
+      ? {
+          metadata: { url: safe.url, pkg: tier || pkg, company: baseMeta.company, email: cleanEmail || '' },
+          ...(p.startpaket ? { trial_period_days: 30 } : {})
+        }
       : undefined;
     const session = await services.createCheckoutSession({
       mode: p.mode,
-      line_items: [
-        { price_data: { currency: 'eur', product_data: { name: p.name }, unit_amount: p.amount, ...recurring }, quantity: 1 }
-      ],
+      line_items,
       customer_email: cleanEmail || undefined,
       // Name + Rechnungsanschrift erheben → landet in session.customer_details.{name,address}
       // (§ 14 UStG: Profi 399 € > 250 € erfordert Empfänger-Name+Anschrift). 'required'
@@ -1604,8 +1723,8 @@ if (isMain) {
       startScheduler(releaseDeps('auto'));
       logger.info({ delayMin: RELEASE_DELAY_MIN, tokenReady: releaseTokenConfigured() }, 'Owner-Release-Gate aktiv');
     }
-    // Jahres-Abo ('abo-jahr'): monatlicher Re-Check unabhängig vom jährlichen
-    // Stripe-Billing-Zyklus (siehe startAnnualRecheckTicker).
+    // Jahres-Abos (alle '*-jahr'-Varianten): monatlicher Re-Check unabhängig vom
+    // jährlichen Stripe-Billing-Zyklus (siehe startAnnualRecheckTicker).
     if (ENABLE_ABO) {
       startAnnualRecheckTicker();
       logger.info({ tickMs: ANNUAL_RECHECK_TICK_MS }, 'Jahres-Abo-Re-Check-Ticker aktiv');

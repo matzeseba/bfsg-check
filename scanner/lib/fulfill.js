@@ -45,13 +45,36 @@ export const PKG_CONFIG = {
   // den falschen Report.
   'abo-jahr':   { kind: 'bfsg',   maxPages: 25, withStatement: true,  emailKind: 'recheck', settleMs: 12000, perPageTimeout: 45000 },
   'cookie-basis': { kind: 'cookie', maxPages: 1,  withStatement: false, emailKind: 'cookie' },
-  'cookie-profi': { kind: 'cookie', maxPages: 5,  withStatement: false, emailKind: 'cookie' }
+  'cookie-profi': { kind: 'cookie', maxPages: 5,  withStatement: false, emailKind: 'cookie' },
+  // --- Fuchs-Re-Check-Tiers Pro/Business (agent-01 23.07.2026, d10.4) -------------
+  // 'abo'/'abo-jahr' oben bleiben UNVERÄNDERT = Starter (IDs unverändert →
+  // Bestands-Subscriptions in Stripe unberührt, Grandfathering d8). Pro/Business =
+  // dieselbe Leistungsart (Re-Check + Diff + frische Erklärung), tiefere Crawls;
+  // scanSite cappt hart auf 50 als Sicherheitsnetz. Paket-IDs existieren im
+  // Checkout nur bei ABO_TIERS_ENABLED=true (scanner/app.js PACKAGES).
+  'abo-pro':           { kind: 'bfsg', maxPages: 40, withStatement: true, emailKind: 'recheck', settleMs: 12000, perPageTimeout: 45000 },
+  'abo-pro-jahr':      { kind: 'bfsg', maxPages: 40, withStatement: true, emailKind: 'recheck', settleMs: 12000, perPageTimeout: 45000 },
+  'abo-business':      { kind: 'bfsg', maxPages: 50, withStatement: true, emailKind: 'recheck', settleMs: 12000, perPageTimeout: 45000 },
+  'abo-business-jahr': { kind: 'bfsg', maxPages: 50, withStatement: true, emailKind: 'recheck', settleMs: 12000, perPageTimeout: 45000 },
+  // Startpaket (agent-01, d1 Szenario E): das Fulfillment liefert den ERST-REPORT
+  // auf Basis-/Profi-Niveau (inkl. Erklärung; Profi mit Umsetzungsplan via
+  // PLAN_PACKAGES). Der Scan wird als Baseline-Snapshot der Tier-Subscription
+  // gespeichert (app.js handleCheckoutCompleted) — der erste bezahlte Zyklus nach
+  // dem Trial-Monat (invoice.paid) scannt dann mit Tier-Tiefe (sub.pkg = Tier).
+  'startpaket-basis':  { kind: 'bfsg', maxPages: 8,  withStatement: true, emailKind: 'bfsg', settleMs: 12000, perPageTimeout: 45000 },
+  'startpaket-profi':  { kind: 'bfsg', maxPages: 40, withStatement: true, emailKind: 'bfsg', settleMs: 12000, perPageTimeout: 45000 }
 };
 
 // F1: welche Pakete bekommen den priorisierten Umsetzungsplan zusätzlich zur
-// Umsetzungs-Checkliste (Profi + beide Abo-Varianten — der günstige Basis-Report
-// bleibt bei der einfachen Checkliste).
-const PLAN_PACKAGES = new Set(['profi', 'abo', 'abo-jahr']);
+// Umsetzungs-Checkliste (Profi + alle Abo-Varianten — der günstige Basis-Report
+// bleibt bei der einfachen Checkliste; Abo-Tiers agent-01: alle Tiers liefern
+// den Plan, d2 „Priorisierter Maßnahmenplan ✓"; startpaket-profi = Profi-Report
+// → Plan, startpaket-basis = Basis-Report → Checkliste).
+const PLAN_PACKAGES = new Set([
+  'profi', 'abo', 'abo-jahr',
+  'abo-pro', 'abo-pro-jahr', 'abo-business', 'abo-business-jahr',
+  'startpaket-profi'
+]);
 
 // D5: offizielles Logo (Wappen-Ausschnitt des BFSG-Fuchs-Markenzeichens) als
 // data-URI in den Report einbetten (Kunden-PDF trug bisher keinerlei Marken-/

@@ -19,6 +19,11 @@ import {
   PACKAGES,
   COOKIE_PACKAGES,
   ABO_ANNUAL,
+  ABO_BUSINESS_ANNUAL,
+  ABO_PRO_ANNUAL,
+  RECHECK_PACKAGES,
+  RECHECK_TIERS_VISIBLE,
+  STARTPAKET_PACKAGES,
   type PackageId,
 } from "@/lib/config";
 import {
@@ -43,7 +48,26 @@ const ELIGIBILITY_STATUS: Record<EligibilityResult, string> = {
 // Reihenfolge im Selector: Hauptangebot zuerst, dann Abo (Monat + Jahr), dann Cookie.
 // ABO_ANNUAL macht 'abo-jahr' hier auflösbar (packageFor) UND direkt im Modal wählbar
 // — z.B. wenn der Jahres-Toggle der Pricing-Karten den Checkout mit 'abo-jahr' öffnet.
-const ALL_PACKAGES = [...PACKAGES, ABO_ANNUAL, ...COOKIE_PACKAGES];
+// Tier-/Startpaket-Pakete (agent-01) kommen NUR dazu, wenn die Tier-Sektion live ist
+// (RECHECK_TIERS_VISIBLE) — vor dem Launch erscheinen sie nicht einmal deaktiviert.
+const ALL_PACKAGES = [
+  ...PACKAGES,
+  ...(RECHECK_TIERS_VISIBLE ? RECHECK_PACKAGES : []),
+  ABO_ANNUAL,
+  ...(RECHECK_TIERS_VISIBLE ? [ABO_PRO_ANNUAL, ABO_BUSINESS_ANNUAL] : []),
+  ...(RECHECK_TIERS_VISIBLE ? STARTPAKET_PACKAGES : []),
+  ...COOKIE_PACKAGES,
+];
+
+// Wählbare Re-Check-Tiers beim Startpaket (Backend-Feld `tier`, Default Starter
+// 'abo' — scanner/app.js STARTPAKET_TIERS). Quelle = RECHECK_PACKAGES (SSOT).
+const STARTPAKET_TIER_OPTIONS = RECHECK_PACKAGES.filter((p) =>
+  ["abo", "abo-pro", "abo-business"].includes(p.id),
+);
+
+function isStartpaket(id: PackageId | null | undefined) {
+  return id === "startpaket-basis" || id === "startpaket-profi";
+}
 
 function packageFor(id: PackageId | null) {
   return ALL_PACKAGES.find((p) => p.id === id) ?? null;
@@ -77,6 +101,9 @@ export function CheckoutModal() {
   const [consent, setConsent] = React.useState(false);
   const [company, setCompany] = React.useState("");
   const [submitting, setSubmitting] = React.useState(false);
+  // Re-Check-Tier beim Startpaket (agent-01, d4: „Tier Ihrer Wahl"). Default
+  // Starter — das Backend validiert gegen STARTPAKET_TIERS.
+  const [selectedTier, setSelectedTier] = React.useState<PackageId>("abo");
 
   const [lastOpen, setLastOpen] = React.useState(state.open);
   if (state.open !== lastOpen) {
@@ -90,6 +117,7 @@ export function CheckoutModal() {
       setCustomerType(null);
       setConsent(false);
       setCompany("");
+      setSelectedTier("abo");
     }
   }
 
@@ -137,6 +165,9 @@ export function CheckoutModal() {
           customerType,
           consent,
           company: customerType === "business" ? company.trim() : "",
+          // Startpaket (agent-01, d10.2): gewähltes Re-Check-Tier mitschicken —
+          // das Backend baut daraus die Tier-Subscription (30 Tage Trial).
+          ...(isStartpaket(pkg.id) ? { tier: selectedTier } : {}),
           // Betroffenheits-Check (Schritt 0): nur Kontext zur Bestellung,
           // kein Gate. Backend whitelistet die Werte (scanner/app.js).
           eligibility,
@@ -275,6 +306,52 @@ export function CheckoutModal() {
               })}
             </RadioGroup>
           </fieldset>
+
+          {/* Tier-Auswahl beim Startpaket (agent-01, d4): „1. Re-Check-Monat
+              inklusive (Tier Ihrer Wahl; danach zum jeweiligen Monatspreis)".
+              Nur sichtbar, wenn ein Startpaket gewählt ist. */}
+          {isStartpaket(selectedPkgId) && (
+            <fieldset className="grid gap-2 rounded-md border border-border p-3">
+              <legend className="px-1 text-xs text-muted-foreground">
+                Ihr Re-Check-Tier (1. Monat inklusive, danach monatlich)
+              </legend>
+              <RadioGroup
+                value={selectedTier}
+                onValueChange={(value) => setSelectedTier(value as PackageId)}
+                className="grid gap-2"
+              >
+                {STARTPAKET_TIER_OPTIONS.map((tier) => (
+                  <Label
+                    key={tier.id}
+                    htmlFor={`tier-${tier.id}`}
+                    className={cn(
+                      "flex cursor-pointer items-center justify-between gap-3 rounded-lg border p-3 transition-colors",
+                      tier.id === selectedTier
+                        ? "border-brand-orange/60 bg-brand-orange/10"
+                        : "border-border hover:border-brand-orange/30 hover:bg-muted/40",
+                    )}
+                  >
+                    <span className="flex items-center gap-3">
+                      <RadioGroupItem id={`tier-${tier.id}`} value={tier.id} />
+                      <span className="text-sm font-medium leading-tight">
+                        {tier.name}
+                      </span>
+                    </span>
+                    <span className="shrink-0 font-mono text-sm font-semibold tabular-nums">
+                      {tier.price}
+                      <span className="text-xs font-normal text-muted-foreground">
+                        {tier.priceSuffix ?? "/Monat"}
+                      </span>
+                    </span>
+                  </Label>
+                ))}
+              </RadioGroup>
+              <p className="text-xs text-muted-foreground">
+                Ab Monat 2 zum jeweiligen Monatspreis, jederzeit zum Monatsende
+                kündbar.
+              </p>
+            </fieldset>
+          )}
 
           <div className="grid gap-1.5">
             <Label htmlFor="co-url">Zu prüfende Website-Adresse</Label>

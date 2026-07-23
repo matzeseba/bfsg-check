@@ -7,7 +7,13 @@ export type PackageId =
   | "cookie-basis"
   | "cookie-profi"
   | "abo"
-  | "abo-jahr";
+  | "abo-jahr"
+  | "abo-pro"
+  | "abo-pro-jahr"
+  | "abo-business"
+  | "abo-business-jahr"
+  | "startpaket-basis"
+  | "startpaket-profi";
 
 export type PackageConfig = {
   id: PackageId;
@@ -21,6 +27,11 @@ export type PackageConfig = {
   mode: "payment" | "subscription";
   amountCents: number;
   moneyBack?: string;
+  // Optionaler CTA-Label-Override (Default in PricingCard: "Abo starten"/"Paket kaufen").
+  cta?: string;
+  // Hinweiszeile unter dem Preis (z. B. Einführungspreis-Frist, d4/d7).
+  // Rein deklarativ — KEINE Streichpreise (§ 11 PAngV: kein echter Referenzpreis).
+  priceNote?: string;
   // false = Paket beworben, aber noch nicht kaufbar (Backend-Gate, z.B. ENABLE_ABO=false).
   // CTA zeigt dann "Bald verfügbar" statt einen 400-Checkout auszulösen.
   available?: boolean;
@@ -33,6 +44,7 @@ export type PackageConfig = {
   annualId?: PackageId;
   annualAmountCents?: number;
   annualPrice?: string;
+  annualPriceNote?: string;
   annualMoneyBack?: string;
   // Feature-Liste der Jahres-Ansicht (ersetzt z.B. "Jederzeit kündbar", das beim
   // Jahres-Abo mit 12 Monaten Erstlaufzeit irreführend wäre).
@@ -255,6 +267,20 @@ export const LOGO_CLOUD = {
   ],
 } as const;
 
+// ============================================================================
+// Fuchs Re-Check — Abo-Tier-Modell (ENTWURF, marketing/swarm-2026-07-23/
+// agent-01-pricing-offer.md, Assets d2/d4/d7/d8). Launch-Schalter:
+// ============================================================================
+// Sichtbarkeit der Re-Check-Tier-Sektion — spiegelt das Server-Flag
+// ABO_TIERS_ENABLED (Default AUS). false = die Tier-Sektion rendert NICHT und
+// 'abo' bleibt die bisherige einzelne Abo-Karte in PACKAGES → der Merge ändert
+// am Live-Auftritt NICHTS (kein Stripe-/Server-Vorlauf nötig).
+// Launch-PR (nach Owner-Freigabe G1/G2): hier auf true setzen + available-Flags
+// der neuen Pakete (abo-pro*, abo-business*, startpaket-*) auf true +
+// Server-Env ABO_TIERS_ENABLED=true. Preis-Sync-CI (scripts/check-price-sync.mjs)
+// prüft die Spiegelung zu scanner/app.js.
+export const RECHECK_TIERS_VISIBLE = false;
+
 export const PACKAGES: PackageConfig[] = [
   {
     id: "basis",
@@ -290,37 +316,45 @@ export const PACKAGES: PackageConfig[] = [
       "30 Tage E-Mail-Support bei Rückfragen",
     ],
   },
-  {
-    id: "abo",
-    name: "Fuchs Re-Check Abo",
-    tag: "Abo",
-    price: "24,99 €",
-    priceSuffix: "/Monat",
-    description: "Dauerhafte Überwachung",
-    mode: "subscription",
-    amountCents: 2499,
-    available: true, // Abo live (Server ENABLE_ABO=true). Bei Backend-Deaktivierung wieder false setzen.
-    moneyBack: "Jederzeit zum Monatsende kündbar",
-    // Jahresoption 249 €/Jahr (Backend-Paket 'abo-jahr', Exp. 4): gleiche Leistung,
-    // jährliche Zahlung. 12 × 24,99 € = 299,88 € → Ersparnis 50,88 € (Anzeige wird in
-    // PricingCards aus den beiden Cent-Werten de-DE-formatiert, nie frei erfunden).
-    annualId: "abo-jahr",
-    annualAmountCents: 24900,
-    annualPrice: "249 €",
-    annualMoneyBack: "Erstlaufzeit 12 Monate, danach mit Frist von 1 Monat kündbar",
-    annualFeatures: [
-      "Monatlicher Re-Check",
-      "Alarm bei neuen Mängeln",
-      "Aktualisierte Erklärung",
-      "Nach 12 Monaten Erstlaufzeit monatlich kündbar",
-    ],
-    features: [
-      "Monatlicher Re-Check",
-      "Alarm bei neuen Mängeln",
-      "Aktualisierte Erklärung",
-      "Jederzeit kündbar",
-    ],
-  },
+  // Bisherige Abo-Karte (Grandfathering, d8): Preis/Leistung/Backend-ID bleiben
+  // unverändert. Sobald die Tier-Sektion sichtbar ist (RECHECK_TIERS_VISIBLE),
+  // übernimmt die Starter-Karte in RECHECK_PACKAGES dieselbe Backend-ID 'abo' —
+  // diese Legacy-Karte entfällt dann, damit 'abo' nicht doppelt auf der Seite steht.
+  ...(RECHECK_TIERS_VISIBLE
+    ? []
+    : [
+        {
+          id: "abo",
+          name: "Fuchs Re-Check Abo",
+          tag: "Abo",
+          price: "24,99 €",
+          priceSuffix: "/Monat",
+          description: "Dauerhafte Überwachung",
+          mode: "subscription",
+          amountCents: 2499,
+          available: true, // Abo live (Server ENABLE_ABO=true). Bei Backend-Deaktivierung wieder false setzen.
+          moneyBack: "Jederzeit zum Monatsende kündbar",
+          // Jahresoption 249 €/Jahr (Backend-Paket 'abo-jahr', Exp. 4): gleiche Leistung,
+          // jährliche Zahlung. 12 × 24,99 € = 299,88 € → Ersparnis 50,88 € (Anzeige wird in
+          // PricingCards aus den beiden Cent-Werten de-DE-formatiert, nie frei erfunden).
+          annualId: "abo-jahr",
+          annualAmountCents: 24900,
+          annualPrice: "249 €",
+          annualMoneyBack: "Erstlaufzeit 12 Monate, danach mit Frist von 1 Monat kündbar",
+          annualFeatures: [
+            "Monatlicher Re-Check",
+            "Alarm bei neuen Mängeln",
+            "Aktualisierte Erklärung",
+            "Nach 12 Monaten Erstlaufzeit monatlich kündbar",
+          ],
+          features: [
+            "Monatlicher Re-Check",
+            "Alarm bei neuen Mängeln",
+            "Aktualisierte Erklärung",
+            "Jederzeit kündbar",
+          ],
+        } satisfies PackageConfig,
+      ]),
 ];
 
 // Jahres-Abo als eigenständig auflösbares Checkout-Paket (pkg='abo-jahr' im Backend).
@@ -344,6 +378,228 @@ export const ABO_ANNUAL: PackageConfig = {
     "Nach 12 Monaten Erstlaufzeit monatlich kündbar",
   ],
 };
+
+// ─── Fuchs Re-Check Abo-Tiers (d2/d4) ───────────────────────────────────────
+// Sektions-Copy und Startpaket-Karte exakt nach marketing/swarm-2026-07-23/
+// agent-01-pricing-offer.md d4 (Claim-geprüfte Entwurfs-Copy). Kein Cross-out
+// der regulären Preise (§ 11 PAngV, Claim-Check #7) — das Ankündigungs-Banner
+// nennt Frist und Preise stattdessen ausgeschrieben.
+export const RECHECK_SECTION = {
+  kicker: "Dauerhaft dranbleiben",
+  title: "Fuchs Re-Check — Ihre Website ändert sich. Wir sehen es.",
+  titleAccent: "Wir sehen es",
+  subline:
+    "Jede Aktualisierung Ihrer Website kann neue Barrieren schaffen — ein neues Plugin, ein Relaunch, frische Inhalte. Der Fuchs Re-Check prüft in Ihrem Rhythmus automatisiert nach und zeigt im Delta-Report, was sich verändert hat. Automatisierte technische Analyse nach WCAG 2.1 AA — keine Rechtsberatung.",
+} as const;
+
+export const RECHECK_BANNER = {
+  text: "Einführungspreise bis 30.09.2026: Starter 24,99 €, Pro 69 €, Business 129 € pro Monat. Ab 01.10.2026 gelten die regulären Preise 29 € / 79 € / 149 €. Wir arbeiten ohne Streichpreise — diese Ankündigung gilt.",
+} as const;
+
+// Report-Gate (d2): in allen Tier-Cards und beim Startpaket sichtbar.
+export const RECHECK_GATE_NOTE = {
+  text: "Voraussetzung für den Re-Check ist ein Erst-Report (Basis oder Profi): Er legt die Baseline fest, ab der der Re-Check Veränderungen erkennt. Im Startpaket ist der erste Monat inklusive.",
+} as const;
+
+// Tier-Karten. Einführungspreise sind im Code verdrahtet; die Umstellung auf
+// die regulären Preise ab 01.10.2026 erfolgt in einem eigenen Preis-PR.
+// Bestandskunden mit aktivem Abo behalten dauerhaft ihren Abschlusspreis,
+// solange das Abo ununterbrochen läuft (Grandfathering, d8).
+export const RECHECK_PACKAGES: PackageConfig[] = [
+  {
+    // id "abo" bleibt das Legacy-Paket (24,99 €/Monat) — Grandfathering (d8).
+    // Stripe-Preis via STRIPE_PRICE_ABO_MONTH / STRIPE_PRICE_ABO_YEAR,
+    // sonst Inline-Fallback (wie bisher).
+    id: "abo",
+    name: "Re-Check Starter",
+    tag: "Starter",
+    price: "24,99 €",
+    priceSuffix: "/Monat",
+    priceNote: "Einführungspreis bis 30.09.2026, danach 29 €/Monat",
+    description: "Für Websites mit ruhigem Änderungstempo.",
+    mode: "subscription",
+    amountCents: 2499,
+    available: true,
+    cta: "Starter aktivieren",
+    moneyBack: "Monatlich zum Monatsende kündbar",
+    annualId: "abo-jahr",
+    annualAmountCents: 24900,
+    annualPrice: "249 €",
+    annualPriceNote: "Einführungspreis bis 30.09.2026, danach 290 €/Jahr",
+    annualMoneyBack:
+      "Erstlaufzeit 12 Monate, danach mit Frist von 1 Monat kündbar",
+    features: [
+      "Vollständiger Re-Check alle 4 Wochen (bis 25 Unterseiten)",
+      "Delta-Report: was ist neu, was ist behoben",
+      "Aktualisierte Barrierefreiheitserklärung bei jedem Re-Check",
+      "Priorisierter Maßnahmenplan",
+      "Menschliche Sichtung vor jedem Versand",
+      "E-Mail-Support, Antwort in der Regel innerhalb von 5 Werktagen",
+      "Monatlich zum Monatsende kündbar",
+    ],
+    annualFeatures: [
+      "Vollständiger Re-Check alle 4 Wochen (bis 25 Unterseiten)",
+      "Delta-Report: was ist neu, was ist behoben",
+      "Aktualisierte Barrierefreiheitserklärung bei jedem Re-Check",
+      "Priorisierter Maßnahmenplan",
+      "Menschliche Sichtung vor jedem Versand",
+      "10 Monatsbeiträge jährlich — Erstlaufzeit 12 Monate, danach monatlich kündbar",
+    ],
+  },
+  {
+    // Stripe: STRIPE_PRICE_ABO_PRO_MONTH / STRIPE_PRICE_ABO_PRO_YEAR,
+    // sonst Inline-Fallback.
+    id: "abo-pro",
+    name: "Re-Check Pro",
+    tag: "Pro",
+    price: "69 €",
+    priceSuffix: "/Monat",
+    priceNote: "Einführungspreis bis 30.09.2026, danach 79 €/Monat",
+    description: "Für Shops und Websites, die sich ständig ändern.",
+    mode: "subscription",
+    amountCents: 6900,
+    featured: true,
+    available: false,
+    cta: "Pro aktivieren",
+    moneyBack: "Monatlich zum Monatsende kündbar",
+    annualId: "abo-pro-jahr",
+    annualAmountCents: 69000,
+    annualPrice: "690 €",
+    annualPriceNote: "Einführungspreis bis 30.09.2026, danach 790 €/Jahr",
+    annualMoneyBack:
+      "Erstlaufzeit 12 Monate, danach mit Frist von 1 Monat kündbar",
+    features: [
+      "Re-Check alle 2 Wochen (bis 40 Unterseiten)",
+      "Heartbeat: wöchentlicher automatisierter Zwischen-Scan — E-Mail-Alarm, sobald neue kritische Befunde auftauchen",
+      "Alles aus Starter",
+      "Quartals-Fortschritts-Report (90-Tage-Delta als eigenes PDF — ideal für Geschäftsführung oder Agentur)",
+      "Cookie-Quick-Check (§ 25 TDDDG) einmal pro Quartal inklusive",
+      "E-Mail-Support, Antwort in der Regel innerhalb von 3 Werktagen",
+    ],
+  },
+  {
+    // Stripe: STRIPE_PRICE_ABO_BUSINESS_MONTH / STRIPE_PRICE_ABO_BUSINESS_YEAR,
+    // sonst Inline-Fallback.
+    id: "abo-business",
+    name: "Re-Check Business",
+    tag: "Business",
+    price: "129 €",
+    priceSuffix: "/Monat",
+    priceNote: "Einführungspreis bis 30.09.2026, danach 149 €/Monat",
+    description: "Für Teams mit mehreren Domains und Release-Betrieb.",
+    mode: "subscription",
+    amountCents: 12900,
+    available: false,
+    cta: "Business aktivieren",
+    moneyBack: "Monatlich zum Monatsende kündbar",
+    annualId: "abo-business-jahr",
+    annualAmountCents: 129000,
+    annualPrice: "1.290 €",
+    annualPriceNote: "Einführungspreis bis 30.09.2026, danach 1.490 €/Jahr",
+    annualMoneyBack:
+      "Erstlaufzeit 12 Monate, danach mit Frist von 1 Monat kündbar",
+    features: [
+      "Re-Check jede Woche (bis 50 Unterseiten je Domain)",
+      "Heartbeat alle 3 Tage mit kritischem Alarm",
+      "Bis zu 3 Domains (gleiche Inhaberin/derselbe Inhaber)",
+      "Alles aus Pro",
+      "Pre-Release-Scan: Staging oder Relaunch vor dem Go-Live prüfen — 1× pro Monat auf Anfrage",
+      "Befundliste als CSV-Export (Jira-/Backlog-tauglich)",
+      "Prioritäts-Sichtung + E-Mail-Support, Antwort in der Regel am nächsten Werktag",
+      "Kein White-Label — Reports erscheinen im Fuchs-Format",
+    ],
+  },
+];
+
+// Modal-only Jahreskarten für Pro und Business (Muster wie ABO_ANNUAL).
+export const ABO_PRO_ANNUAL: PackageConfig = {
+  id: "abo-pro-jahr",
+  name: "Re-Check Pro (Jahr)",
+  tag: "Pro · Jahr",
+  price: "690 €",
+  priceSuffix: "/Jahr",
+  description: "Für Shops und Websites, die sich ständig ändern.",
+  mode: "subscription",
+  amountCents: 69000,
+  available: false,
+  cta: "Jetzt Re-Check Pro sichern",
+  moneyBack: "Erstlaufzeit 12 Monate, danach mit Frist von 1 Monat kündbar",
+  features: RECHECK_PACKAGES[1].features,
+};
+
+export const ABO_BUSINESS_ANNUAL: PackageConfig = {
+  id: "abo-business-jahr",
+  name: "Re-Check Business (Jahr)",
+  tag: "Business · Jahr",
+  price: "1.290 €",
+  priceSuffix: "/Jahr",
+  description: "Für Teams mit mehreren Domains und Release-Betrieb.",
+  mode: "subscription",
+  amountCents: 129000,
+  available: false,
+  cta: "Jetzt Re-Check Business sichern",
+  moneyBack: "Erstlaufzeit 12 Monate, danach mit Frist von 1 Monat kündbar",
+  features: RECHECK_PACKAGES[2].features,
+};
+
+// Startpaket (d2): Erst-Report + 1. Re-Check-Monat inklusive.
+// Frontend-Perspektive: einmalige Zahlung (mode "payment"). Backend-Perspektive:
+// der Scanner legt die Report-Einmalposition PLUS die Tier-Subscription mit
+// 30 Tagen Trial an — der erste Re-Check-Monat ist dadurch im Startpaket
+// enthalten (metadata.tier steuert die Tier-Tiefe des Folge-Abo-Zyklus).
+// Stripe: STRIPE_PRICE_STARTPAKET_BASIS / STRIPE_PRICE_STARTPAKET_PROFI für
+// die Einmalposition, sonst Inline-Fallback.
+export const STARTPAKET_PACKAGES: PackageConfig[] = [
+  {
+    id: "startpaket-basis",
+    name: "Startpaket (Report Basis)",
+    tag: "Startpaket",
+    price: "129 €",
+    priceSuffix: " einmalig",
+    description: "Erst-Report Basis inklusive erstem Re-Check-Monat.",
+    mode: "payment",
+    amountCents: 12900,
+    available: false,
+    cta: "Startpaket wählen",
+    moneyBack: "Sichere Zahlung über Stripe · Rechnung sofort per E-Mail",
+    features: [
+      "BFSG-Report Basis (bis 5 Unterseiten) mit Entwurf der Barrierefreiheitserklärung",
+      "1. Re-Check-Monat inklusive (Tier Ihrer Wahl; danach zum jeweiligen Monatspreis, jederzeit zum Monatsende kündbar)",
+      "Menschliche Sichtung vor jedem Versand",
+    ],
+  },
+  {
+    id: "startpaket-profi",
+    name: "Startpaket (Report Profi)",
+    tag: "Startpaket",
+    price: "399 €",
+    priceSuffix: " einmalig",
+    description: "Erst-Report Profi inklusive erstem Re-Check-Monat.",
+    mode: "payment",
+    amountCents: 39900,
+    available: false,
+    cta: "Startpaket wählen",
+    moneyBack: "Sichere Zahlung über Stripe · Rechnung sofort per E-Mail",
+    features: [
+      "BFSG-Report Profi (bis 25 Unterseiten) mit Umsetzungsplan und 30 Tage E-Mail-Support",
+      "1. Re-Check-Monat inklusive (Tier Ihrer Wahl; danach zum jeweiligen Monatspreis, jederzeit zum Monatsende kündbar)",
+      "Menschliche Sichtung vor jedem Versand",
+    ],
+  },
+];
+
+// Startpaket-Info-Card in der Re-Check-Sektion (Copy aus d4).
+export const RECHECK_STARTPAKET_CARD = {
+  name: "Startpaket",
+  tagline: "Erst wissen, wo Sie stehen — dann dranbleiben.",
+  priceLine: "einmalig 129 € (Basis) oder 399 € (Profi)",
+  features: [
+    "Erst-Report nach Wahl (Basis bis 5 Unterseiten oder Profi bis 25 Unterseiten) — legt die Baseline für alle Re-Checks fest",
+    "1. Re-Check-Monat inklusive — danach läuft das gewählte Tier zum Monatspreis weiter, jederzeit zum Monatsende kündbar",
+    "Menschliche Sichtung vor jedem Versand",
+  ],
+  cta: "Startpaket wählen",
+} as const;
 
 export const COOKIE_PACKAGES: PackageConfig[] = [
   {
@@ -526,6 +782,22 @@ export const FAQ_ITEMS = [
     q: "Was passiert mit meinen Daten?",
     a: "Wir speichern nur die zur Vertragsabwicklung nötigen Daten (E-Mail, Rechnungsadresse, gescannte URL). Scan-Ergebnisse enthalten keine personenbezogenen Daten Ihrer Website-Besucher. Details in der Datenschutzerklärung; Auskunft und Löschung über /datenschutz/anfrage.",
   },
+  // Re-Check-FAQs aus d4, soweit sie nicht bereits im Bestand stehen:
+  // „Wie kündige ich?" ist oben bereits beantwortet; „Kann ich das Tier
+  // wechseln?" folgt, sobald der Wechsel im System verdrahtet ist
+  // (Claim-Check #9).
+  ...(RECHECK_TIERS_VISIBLE
+    ? [
+        {
+          q: "Warum brauche ich vor dem Re-Check-Abo einen Erst-Report?",
+          a: "Der Re-Check ist ein Delta-Dienst: Er zeigt, was sich seit der Baseline verändert hat. Ohne Erst-Report gibt es keine Baseline. Deshalb startet jedes Re-Check-Abo mit einem bezahlten Erst-Report — im Startpaket ist der erste Re-Check-Monat inklusive.",
+        },
+        {
+          q: "Bleibt mein Preis stabil?",
+          a: "Solange Ihr Abo ununterbrochen aktiv läuft, behalten Sie Ihren Beitrag — auch wenn sich unsere Listenpreise später ändern. Nach einer Kündigung gilt bei Neuabschluss der dann aktuelle Preis.",
+        },
+      ]
+    : []),
 ];
 
 export const LEGAL_NOTE =

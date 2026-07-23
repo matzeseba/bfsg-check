@@ -62,6 +62,16 @@ type PricingCardsProps = {
   embedded?: boolean;
   // Optischer Marken-Akzent der Featured-Karte (siehe AccentTone). Default Orange.
   accent?: AccentTone;
+  // Hinweis-Banner zwischen Header und Karten (z. B. Einführungspreis-Frist der
+  // Re-Check-Tiers, d4/d7). String wird als Fließtext gerendert.
+  banner?: string;
+  // Plan-Finder-/Preis-Anker-Schalter (Default: wie bisher nur bei NICHT
+  // eingebetteten Sektionen). Die Re-Check-Tier-Sektion nutzt beides nicht —
+  // der Slider empfiehlt Report-Pakete und passt fachlich nicht zu Abo-Tiers.
+  showPlanFinder?: boolean;
+  showAnchor?: boolean;
+  // Zusatz-Inhalt NACH dem Karten-Grid (Re-Check: Gate-Hinweis + Startpaket-Karte).
+  children?: React.ReactNode;
 };
 
 export function PricingCards({
@@ -80,9 +90,17 @@ export function PricingCards({
   showAnnualToggle = true,
   embedded = false,
   accent = "orange",
+  banner,
+  showPlanFinder,
+  showAnchor,
+  children,
 }: PricingCardsProps) {
   const { openCheckout } = useCheckout();
   const [annual, setAnnual] = React.useState(false);
+  // Defaults bewahren das bisherige Verhalten: Plan-Finder + Preis-Anker nur bei
+  // eigenständigen (nicht eingebetteten) Sektionen — Cookie bleibt ohne beides.
+  const planFinderVisible = showPlanFinder ?? !embedded;
+  const anchorVisible = showAnchor ?? !embedded;
 
   // Headline am Akzentwort splitten (erstes Vorkommen) → genau ein Italic-Wort.
   const accentIdx = titleAccent ? title.indexOf(titleAccent) : -1;
@@ -170,10 +188,19 @@ export function PricingCards({
           )}
         </motion.div>
 
+        {/* Hinweis-Banner (z. B. Einführungspreis-Frist der Re-Check-Tiers,
+            d4/d7): faktische Ankündigung mit Datum — bewusst KEIN Countdown-
+            Timer (Fake-Dringlichkeit) und KEINE Streichpreise. */}
+        {banner && (
+          <div className="mx-auto mt-8 max-w-3xl rounded-2xl border border-brand-orange/25 bg-brand-orange/[0.07] px-5 py-4 text-center">
+            <p className="text-sm text-foreground/85">{banner}</p>
+          </div>
+        )}
+
         {/* „Welches Paket passt?"-Slider (nur Hauptpakete, nicht eingebettet bei
             Cookie). Reine Kaufhilfe — die echte Auswahl/der Kauf laeuft ueber den
             Checkout (openCheckout), nichts wird umgangen. */}
-        {!embedded && <PlanFinder packages={packages} />}
+        {planFinderVisible && <PlanFinder packages={packages} />}
 
         {/* Spaltenzahl folgt der Paketanzahl: 2 Pakete (Cookie) → zentriertes 2er-
             Grid (statt linksbuendig im 3er-Raster), 3 Pakete → volles 3er-Grid. */}
@@ -225,8 +252,12 @@ export function PricingCards({
           ))}
         </div>
 
+        {/* Zusatz-Inhalt nach dem Grid (Re-Check-Tiers: Gate-Hinweis +
+            Startpaket-Karte, d4). */}
+        {children}
+
         {/* Preis-Anker: faktisch + hedged („meist") — keine Garantie/Drohung. */}
-        {!embedded && (
+        {anchorVisible && (
           <div className="mx-auto mt-12 flex max-w-3xl items-center gap-4 rounded-2xl border border-brand-amber/20 bg-brand-amber/[0.06] px-5 py-4">
             <ScaleIcon
               aria-hidden
@@ -421,6 +452,14 @@ function PricingCard({
     showAnnual && pkg.annualAmountCents != null
       ? formatEur(pkg.amountCents * 12 - pkg.annualAmountCents)
       : null;
+  // Hinweiszeile unter dem Preis (z. B. Einführungspreis-Frist, d4/d7) —
+  // Jahres-Ansicht zeigt die Jahres-Fassung, falls konfiguriert.
+  const priceNote = showAnnual
+    ? (pkg.annualPriceNote ?? pkg.priceNote)
+    : pkg.priceNote;
+  // CTA-Label: Paket-Override (d4: "Starter/Pro/Business aktivieren",
+  // "Startpaket wählen") schlägt den Default vor.
+  const ctaLabel = pkg.cta ?? (isSub ? "Abo starten" : "Paket kaufen");
 
   // Marken-Akzent-Klassen pro Tone (rein optisch). Orange = Haupt-Pricing,
   // Amber = Cookie. Die Kartenflaeche ist jetzt einheitlich die .glow-card
@@ -552,6 +591,9 @@ function PricingCard({
             Sie sparen {annualSavings} im Vergleich zur Monatszahlung
           </p>
         )}
+        {priceNote && (
+          <p className="mt-1 text-xs text-muted-foreground">{priceNote}</p>
+        )}
         {!isSub && (
           <p className="mt-1 text-xs text-muted-foreground">
             einmalig · keine USt (§ 19 UStG)
@@ -604,7 +646,7 @@ function PricingCard({
             onClick={onSelect}
             className="btn-cta h-11 w-full text-sm"
           >
-            {isSub ? "Abo starten" : "Paket kaufen"}
+            {ctaLabel}
             <ArrowRightIcon className="size-4" />
           </button>
         ) : (
@@ -616,7 +658,7 @@ function PricingCard({
             size="lg"
             className="h-11 w-full gap-1.5 rounded-xl border border-foreground/15 bg-foreground/[0.06] text-sm font-semibold text-foreground transition-transform hover:-translate-y-px hover:bg-foreground/10 focus-visible:ring-offset-2 focus-visible:ring-offset-card"
           >
-            {isSub ? "Abo starten" : "Paket kaufen"}
+            {ctaLabel}
             <ArrowRightIcon className="size-4" />
           </Button>
         )}
