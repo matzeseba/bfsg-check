@@ -1,8 +1,13 @@
 """Jarvis-Brain (ARCHITECTURE.md Paragraph 5).
 
-Anthropic Messages-Streaming mit Tool-Use-Loop. Modell `AOS_MODEL_JARVIS`,
-max_tokens 1024, deutscher System-Prompt. Ohne ANTHROPIC_API_KEY: regelbasierter
-Fallback (Keyword-Routing).
+Provider-Abstraktion ueber ``services/llm_provider`` (AOS_LLM_PROVIDER):
+- ``anthropic`` (Default): Messages-Streaming mit Tool-Use-Loop, Modell
+  `AOS_MODEL_JARVIS`, max_tokens 1024, deutscher System-Prompt.
+- ``openai-compatible``: einfache Chat-Completion via httpx — OHNE Tool-Use
+  und OHNE Streaming (EINSCHRAENKUNG: das Anthropic-Tool-Use-Format laesst
+  sich nicht verlustfrei auf das OpenAI-Format abbilden; dieser Pfad
+  beantwortet nur Fragen, keine navigate-/run_agent-Aktionen).
+Ohne LLM-Key: regelbasierter Fallback (Keyword-Routing).
 
 Frames (an den Client, via `emit`-Callback):
     {"type":"assistant_delta","text":"..."}
@@ -19,6 +24,7 @@ import re
 from typing import Any, Awaitable, Callable, Optional
 
 from ..config import Settings
+from ..services import llm_provider
 from . import tools
 
 log = logging.getLogger("aos.jarvis.brain")
@@ -62,7 +68,7 @@ _MODULE_ROUTES: tuple[tuple[re.Pattern[str], str, str], ...] = (
     (re.compile(r"dashboard|übersicht|ubersicht|start|home", re.IGNORECASE), "/", "Dashboard"),
 )
 
-_NO_KEY_HINT = "KI-Modus inaktiv — ANTHROPIC_API_KEY fehlt."
+_NO_KEY_HINT = "KI-Modus inaktiv — AOS_LLM_API_KEY/ANTHROPIC_API_KEY fehlt."
 
 
 def rule_based_reply(text: str) -> tuple[str, Optional[dict[str, Any]]]:
@@ -103,7 +109,7 @@ async def _fallback_turn(user_text: str, emit: EmitFn) -> str:
 
 
 # --------------------------------------------------------------------------- #
-# LLM-Turn (Anthropic-Streaming + Tool-Use-Loop)
+# LLM-Turn (Anthropic-Streaming + Tool-Use-Loop, alternativ OpenAI-kompatibel)
 # --------------------------------------------------------------------------- #
 def _blocks_to_dicts(content: Any) -> list[dict[str, Any]]:
     """Serialisiert Anthropic-Content-Bloecke fuer den erneuten Versand."""
@@ -127,9 +133,53 @@ def _blocks_to_dicts(content: Any) -> list[dict[str, Any]]:
 async def _llm_turn(
     settings: Settings, messages: list[dict[str, Any]], emit: EmitFn
 ) -> str:
+    if llm_provider.provider_name(settings) == llm_provider.PROVIDER_OPENAI_COMPATIBLE:
+        return await _llm_turn_openai_compatible(settings, messages, emit)
+    return await _llm_turn_anthropic(settings, messages, emit)
+
+
+async def _llm_turn_openai_compatible(
+    settings: Settings, messages: list[dict[str, Any]], emit: EmitFn
+) -> str:
+    """OpenAI-kompatibler Pfad: einfache Chat-Completion OHNE Tool-Use.
+
+    EINSCHRAENKUNG (bewusst): Das Anthropic-Tool-Use-Protokoll (tool_use/
+    tool_result-Bloecke) laesst sich nicht verlustfrei auf OpenAI-Tool-Calls
+    abbilden. Daher laeuft dieser Provider rein als Chat: die letzte
+    Nutzer-Nachricht wird beantwortet, navigate-/run_agent-Aktionen stehen
+    hier NICHT zur Verfuegung (dafuer Anthropic-Provider oder Regel-Fallback).
+    Kein Streaming — die Antwort wird als ein Delta emittiert.
+    """
+    # Letzte Nutzer-Nachricht als Prompt (Historie liegt in `messages`;
+    # der OpenAI-Pfad haelt sie bewusst flach, um Format-Fallstricke
+    # mit tool_use/tool_result-Bloecken zu vermeiden).
+    user_text = ""
+    for msg in reversed(messages):
+        if msg.get("role") == "user":
+            content = msg.get("content")
+            if isinstance(content, str):
+                user_text = content
+                break
+    text = await llm_provider.a_chat_complete_openai(
+        settings.llm_base_url,
+        settings.llm_api_key,
+        SYSTEM_PROMPT,
+        user_text,
+        max_tokens=1024,
+        model=settings.model_jarvis,
+    )
+    if text is None:
+        raise RuntimeError("OpenAI-kompatibler LLM-Call fehlgeschlagen")
+    await emit({"type": "assistant_delta", "text": text})
+    return text
+
+
+async def _llm_turn_anthropic(
+    settings: Settings, messages: list[dict[str, Any]], emit: EmitFn
+) -> str:
     from anthropic import AsyncAnthropic
 
-    client = AsyncAnthropic(api_key=settings.anthropic_api_key)
+    client = AsyncAnthropic(api_key=settings.llm_api_key)
     full_parts: list[str] = []
 
     for _ in range(MAX_TOOL_ITERATIONS):
@@ -183,10 +233,10 @@ async def run_turn(
     """Fuehrt einen Gespraechs-Turn aus und liefert den vollstaendigen Antworttext.
 
     `messages` enthaelt bereits die aktuelle Nutzer-Nachricht (mit eingebettetem
-    Kontext). Ohne API-Key wird der regelbasierte Fallback genutzt; dabei bleibt
+    Kontext). Ohne LLM-Key wird der regelbasierte Fallback genutzt; dabei bleibt
     `messages` unveraendert (der WS-Handler haelt die Historie schlank).
     """
-    if not settings.anthropic_api_key:
+    if not llm_provider.llm_enabled(settings):
         return await _fallback_turn(user_text, emit)
     try:
         return await _llm_turn(settings, messages, emit)

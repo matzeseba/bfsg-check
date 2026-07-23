@@ -133,8 +133,8 @@ Server→Client: {"type":"assistant_delta","text":"..."}          # Streaming-Te
                {"type":"error","detail":"..."}
 ```
 
-- **brain.py:** Anthropic Messages-API-Streaming, Modell `AOS_MODEL_JARVIS` (Default `claude-sonnet-4-6`), max_tokens 1024, System-Prompt deutsch („Du bist Jarvis, das Betriebssystem des BFSG-Fuchs-Dashboards…", kennt Modul-Routen, MUSS UWG-No-Gos beachten). Tools (Anthropic tool use): `navigate(route)`, `get_dashboard_summary()`, `get_health()`, `get_finance_summary()`, `search_library(q)`, `run_agent(key)`, `draft_inbox_reply(inbox_id)`. Tool-Ausführung serverseitig gegen interne Services (direkte Funktionsaufrufe, kein HTTP-Loopback), Ergebnis zurück in den Modell-Loop; `navigate`/`run_agent` zusätzlich als `ui_action` an den Client.
-- **Ohne ANTHROPIC_API_KEY:** Regelbasierter Fallback (Keyword-Routing „öffne/zeige X" → navigate, „debriefing" → run_agent) + Hinweis-Text „KI-Modus inaktiv (kein API-Key)".
+- **brain.py:** LLM-Provider-Abstraktion über `services/llm_provider.py` (`AOS_LLM_PROVIDER`, Default `anthropic`). Anthropic-Pfad: Messages-API-Streaming, Modell `AOS_MODEL_JARVIS` (Default `claude-sonnet-4-6`), max_tokens 1024, System-Prompt deutsch („Du bist Jarvis, das Betriebssystem des BFSG-Fuchs-Dashboards…", kennt Modul-Routen, MUSS UWG-No-Gos beachten). Tools (Anthropic tool use): `navigate(route)`, `get_dashboard_summary()`, `get_health()`, `get_finance_summary()`, `search_library(q)`, `run_agent(key)`, `draft_inbox_reply(inbox_id)`. Tool-Ausführung serverseitig gegen interne Services (direkte Funktionsaufrufe, kein HTTP-Loopback), Ergebnis zurück in den Modell-Loop; `navigate`/`run_agent` zusätzlich als `ui_action` an den Client. OpenAI-kompatibler Pfad (`openai-compatible`): einfache Chat-Completion via httpx auf `/chat/completions` — **ohne Tool-Use und ohne Streaming** (Einschränkung, siehe brain.py-Docstring).
+- **Ohne LLM-Key (`AOS_LLM_API_KEY`/`ANTHROPIC_API_KEY`):** Regelbasierter Fallback (Keyword-Routing „öffne/zeige X" → navigate, „debriefing" → run_agent) + Hinweis-Text „KI-Modus inaktiv (kein API-Key)". Bei Provider-Fehlern fällt Jarvis ebenfalls auf diesen Fallback zurück (bewusstes Design).
 - **Frontend-Voice:** Web Speech API — `SpeechRecognition` (lang `de-DE`, continuous=false, interimResults=true) + `speechSynthesis` (deutsche Stimme, Antworten ≤ 2 Sätze vorlesen wenn Voice-Modus aktiv). Feature-Detection: ohne Support → Text-Only + Hinweis. Overlay: Floating-Action-Button (Fuchs-Avatar, gelber Puls bei Listening) + `Strg+K`. Context-aware: JarvisProvider sammelt route + je Seite registrierte `screen_summary`.
 
 ## 6. DB-Schema (SQLModel, SQLite `/data/aos.db`)
@@ -151,6 +151,9 @@ Server→Client: {"type":"assistant_delta","text":"..."}          # Streaming-Te
 ```
 AOS_ADMIN_TOKEN=            # Login-Token (Server: wird beim Erst-Deploy generiert)
 AOS_SESSION_SECRET=         # HMAC-Secret für Session-Cookies (generiert)
+AOS_LLM_PROVIDER=anthropic  # 'anthropic' (Default) oder 'openai-compatible'
+AOS_LLM_BASE_URL=           # Pflicht bei openai-compatible, z. B. https://api.openai.com/v1
+AOS_LLM_API_KEY=            # leer = Fallback auf ANTHROPIC_API_KEY
 ANTHROPIC_API_KEY=          # aus Server-.env vorhanden
 AOS_MODEL_JARVIS=claude-sonnet-4-6
 AOS_MODEL_AGENTS=claude-sonnet-4-6
