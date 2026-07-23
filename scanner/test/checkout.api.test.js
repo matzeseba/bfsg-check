@@ -85,6 +85,23 @@ test('unbekanntes Paket → 400, kein Stripe-Call', async () => {
   assert.equal(captured, null, 'Stripe darf bei ungültigem Paket nicht aufgerufen werden');
 });
 
+// --- Betroffenheits-Check (D1): eligibility nur als whitelist-validierter Kontext ---
+test("eligibility: gültiger Wert aus dem Vor-Check landet in metadata", async () => {
+  const res = await postCheckout({ pkg: 'basis', eligibility: 'unaffected_override' });
+  assert.equal(res.status, 200, JSON.stringify(res.body));
+  assert.equal(captured.metadata.eligibility, 'unaffected_override');
+});
+
+test('eligibility: Freitext/unbekannte Werte und fehlendes Feld werden verworfen', async () => {
+  const res = await postCheckout({ pkg: 'basis', eligibility: 'freitext-<b>kein-gate</b>' });
+  assert.equal(res.status, 200, JSON.stringify(res.body));
+  assert.equal(captured.metadata.eligibility, undefined, 'kein Freitext in Stripe-metadata');
+
+  const res2 = await postCheckout({ pkg: 'basis' });
+  assert.equal(res2.status, 200, JSON.stringify(res2.body));
+  assert.equal(captured.metadata.eligibility, undefined, 'ältere Clients ohne Feld bleiben kompatibel');
+});
+
 // --- Jahres-Abo-Ticker: Fälligkeits-Logik (pure Funktion) --------------------------
 test('annualRecheckDue: nur AKTIVE abo-jahr-Subscriptions, ≥ 30 Tage seit letztem Scan', () => {
   const now = Date.parse('2026-07-03T12:00:00Z');

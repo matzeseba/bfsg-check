@@ -37,7 +37,7 @@ const FAQ = [
   },
   {
     q: "Gibt es Fördermittel für BFSG-Audits?",
-    a: "Förderprogramme für Barrierefreiheits-Maßnahmen existieren in einigen Bundesländern (z. B. im Rahmen von Digitalisierungsförderungen). Eine allgemeine BFSG-Audit-Förderung auf Bundesebene ist uns zum Stand Juni 2026 nicht bekannt. Prüfen Sie die Förderdatenbank des BMBF oder Ihre zuständige IHK für aktuelle Programme.",
+    a: "Förderprogramme für Barrierefreiheits-Maßnahmen existieren in einigen Bundesländern (z. B. im Rahmen von Digitalisierungsförderungen). Eine allgemeine BFSG-Audit-Förderung auf Bundesebene ist uns zum Stand Juli 2026 nicht bekannt. Prüfen Sie die Förderdatenbank des BMBF oder Ihre zuständige IHK für aktuelle Programme.",
   },
 ];
 
@@ -59,7 +59,8 @@ export default function BfsgPruefungKostenPage() {
     description: "Überblick über BFSG-Audit-Kosten: Gratis-Tools, automatisierte Reports und manuelle Audits.",
     url: "https://bfsg-fuchs.de/bfsg-pruefung-kosten",
     publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fuchs.de" },
-    dateModified: "2026-06-21",
+    datePublished: "2026-06-21",
+    dateModified: "2026-07-23",
   };
 
   return (
@@ -75,20 +76,25 @@ export default function BfsgPruefungKostenPage() {
           <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
             Was kostet eine BFSG-Prüfung? Marktpreise 2026 ehrlich verglichen
           </h1>
-          <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-            Die Spanne reicht von kostenlos bis mehreren Tausend Euro. Was steckt dahinter — und welcher Ansatz
-            lohnt sich für welchen Betrieb? Dieser Artikel schlüsselt die drei Wege auf, zeigt versteckte Kosten
-            und erklärt, warum ein automatisierter Report mit menschlicher Sichtung für viele Shops das
-            realistischste Preis-Leistungs-Verhältnis bietet.
+          {/* AEO-Direktantwort (agent-05 ASSET 2): Preisfrage in ≤60 Wörtern mit Marktspannen beantworten */}
+          <p className="mt-4 text-base font-medium leading-relaxed">
+            Eine BFSG-Prüfung kostet je nach Tiefe zwischen 0 € und mehreren tausend Euro: Gratis-Tools sind
+            kostenlos, finden aber nur ca. 30–40 % der Mängel. Automatisierte Reports mit Fix-Plan liegen bei
+            129–399 €, manuelle Accessibility-Audits bei 1.500–5.000 € (Marktschätzungen, Stand Juli 2026).
+          </p>
+          <p className="mt-3 text-base leading-relaxed text-muted-foreground">
+            Dieser Artikel schlüsselt die drei Wege auf, zeigt versteckte Kosten und erklärt, warum ein
+            automatisierter Report mit menschlicher Sichtung für viele Shops das realistischste
+            Preis-Leistungs-Verhältnis bietet.
           </p>
           <p className="mt-2 text-xs text-muted-foreground">
-            Stand: Juni 2026 · Preisangaben ohne Gewähr, keine Rechtsberatung
+            Zuletzt aktualisiert: 23. Juli 2026 · Preisangaben ohne Gewähr, keine Rechtsberatung
           </p>
         </header>
 
         {/* Drei Wege */}
         <section className="mt-12">
-          <h2 className="text-2xl font-semibold">Drei Wege zur BFSG-Prüfung</h2>
+          <h2 className="text-2xl font-semibold">Welche drei Wege gibt es zur BFSG-Prüfung?</h2>
 
           <h3 className="mt-8 text-xl font-semibold">Weg 1: Gratis-Tools (Browser-Extensions, Online-Checker)</h3>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
@@ -169,7 +175,7 @@ export default function BfsgPruefungKostenPage() {
 
         {/* Versteckte Kosten */}
         <section className="mt-14">
-          <h2 className="text-2xl font-semibold">Versteckte Kosten: Was oft vergessen wird</h2>
+          <h2 className="text-2xl font-semibold">Welche versteckten Kosten werden oft vergessen?</h2>
           <ul className="mt-4 list-disc space-y-3 pl-5 text-sm text-muted-foreground">
             <li>
               <strong>Re-Tests nach Behebung:</strong> Viele Agenturen berechnen Re-Tests separat. Nach der

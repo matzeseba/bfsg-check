@@ -56,7 +56,7 @@ const FAQ = [
   },
   {
     q: "Was droht bei Verstößen gegen das BFSG?",
-    a: "Das Gesetz sieht in § 37 BFSG einen Bußgeldrahmen bis 100.000 € vor (bei minderschweren Verstößen bis 10.000 €). Öffentlich belegte Einzel-Bußgelder der Marktüberwachung sind uns zum Stand Juni 2026 nicht bekannt. Daneben können Verbände und Mitbewerber Verstöße verfolgen — private Abmahnwellen laufen seit Herbst 2025.",
+    a: "Das Gesetz sieht in § 37 BFSG einen Bußgeldrahmen bis 100.000 € vor (bei minderschweren Verstößen bis 10.000 €). Öffentlich belegte Einzel-Bußgelder der Marktüberwachung sind uns zum Stand Juli 2026 nicht bekannt. Daneben können Verbände und Mitbewerber Verstöße verfolgen — private Abmahnwellen laufen seit Herbst 2025.",
   },
   {
     q: "Welchen technischen Standard muss ich zur Frist erfüllen?",
@@ -86,7 +86,8 @@ export default function BfsgFristPage() {
     description: "Zeitleiste zum BFSG: Geltungsbeginn, Marktüberwachung, Abmahnwellen und nächste Schritte.",
     url: "https://bfsg-fuchs.de/bfsg-frist",
     publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fuchs.de" },
-    dateModified: "2026-07-02",
+    datePublished: "2026-07-02",
+    dateModified: "2026-07-23",
   };
 
   return (
@@ -102,19 +103,25 @@ export default function BfsgFristPage() {
           <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
             BFSG-Frist: Was seit dem 28.06.2025 gilt — und was jetzt zu tun ist
           </h1>
-          <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-            Viele suchen noch nach der „BFSG-Frist“ — dabei ist sie bereits abgelaufen: Das
-            Barrierefreiheitsstärkungsgesetz gilt seit dem 28. Juni 2025. Dieser Artikel zeigt die Zeitleiste
-            der Ereignisse seit dem Geltungsbeginn, erklärt, wer betroffen ist, und gibt eine sachliche
-            Einordnung, was Website-Betreiber jetzt priorisieren sollten.
+          {/* AEO-Direktantwort (agent-05 ASSET 2): Frist-Status in ≤60 Wörtern direkt beantworten */}
+          <p className="mt-4 text-base font-medium leading-relaxed">
+            Die BFSG-Frist ist am 28. Juni 2025 abgelaufen — eine allgemeine Schonfrist für Websites und
+            Online-Shops gibt es nicht. Seitdem gelten die Anforderungen der EN 301 549 (im Kern WCAG 2.1 AA)
+            plus Barrierefreiheitserklärung nach § 14 BFSG. Ausnahmen für Kleinstunternehmen sind möglich,
+            aber nachweispflichtig.
+          </p>
+          <p className="mt-3 text-base leading-relaxed text-muted-foreground">
+            Dieser Artikel zeigt die Zeitleiste der Ereignisse seit dem Geltungsbeginn, erklärt, wer
+            betroffen ist, und gibt eine sachliche Einordnung, was Website-Betreiber jetzt priorisieren
+            sollten.
           </p>
           <p className="mt-2 text-xs text-muted-foreground">
-            Stand: Juli 2026 · Automatisierte technische Analyse, keine Rechtsberatung
+            Zuletzt aktualisiert: 23. Juli 2026 · Automatisierte technische Analyse, keine Rechtsberatung
           </p>
         </header>
 
         <section className="mt-12">
-          <h2 className="text-2xl font-semibold">Die BFSG-Zeitleiste seit dem Geltungsbeginn</h2>
+          <h2 className="text-2xl font-semibold">Was ist seit dem Geltungsbeginn passiert?</h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
             Das BFSG setzt den European Accessibility Act in deutsches Recht um. Seit dem Stichtag hat sich
             einiges getan — hier die wichtigsten Stationen im Überblick:
@@ -153,7 +160,7 @@ export default function BfsgFristPage() {
             die Verbrauchern Waren oder digitale Leistungen anbieten — vom Bestellprozess über
             Produktinformationen bis zum Kundenkonto.
           </p>
-          <h3 className="mt-8 text-xl font-semibold">Ausnahme: Kleinstunternehmen</h3>
+          <h3 className="mt-8 text-xl font-semibold">Sind Kleinstunternehmen ausgenommen?</h3>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
             Kleinstunternehmen mit weniger als 10 Beschäftigten und weniger als 2 Millionen Euro Jahresumsatz
             können eine Ausnahme dokumentieren, wenn die Anforderungen eine unverhältnismäßige Belastung
@@ -171,7 +178,7 @@ export default function BfsgFristPage() {
         </section>
 
         <section className="mt-14">
-          <h2 className="text-2xl font-semibold">Frist verpasst: Drei Schritte für eine bessere Ausgangsposition</h2>
+          <h2 className="text-2xl font-semibold">Was tun, wenn die Frist verpasst ist?</h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
             Wer die Anforderungen noch nicht erfüllt, ist damit nicht allein — sollte aber nachweisbar ins
             Handeln kommen. Eine dokumentierte, laufende Verbesserung ist in jeder Hinsicht besser als

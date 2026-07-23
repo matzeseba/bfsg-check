@@ -97,7 +97,8 @@ export default function BfsgEinJahrBilanzPage() {
       "Bilanz nach einem Jahr Barrierefreiheitsstärkungsgesetz: Marktstand, Marktüberwachung MLBF, Abmahnrisiko und nächste Schritte für Website-Betreiber.",
     url: "https://bfsg-fuchs.de/bfsg-1-jahr-bilanz",
     publisher: { "@type": "Organization", name: "BFSG-Fuchs", url: "https://bfsg-fuchs.de" },
-    dateModified: "2026-07-03",
+    datePublished: "2026-07-03",
+    dateModified: "2026-07-23",
   };
 
   return (
@@ -113,19 +114,25 @@ export default function BfsgEinJahrBilanzPage() {
           <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
             1 Jahr BFSG: Die Bilanz 2026 — was sich getan hat und was jetzt zählt
           </h1>
-          <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-            Seit dem 28. Juni 2025 gilt das Barrierefreiheitsstärkungsgesetz — jetzt liegt das erste Jahr
-            hinter uns. Zeit für eine sachliche Bilanz: Wo steht der Markt wirklich? Was macht die
-            Marktüberwachung? Wie ernst ist das Abmahnrisiko 2026? Und was sollten Website-Betreiber jetzt
-            prüfen? Alle Zahlen in diesem Artikel sind mit Quelle und Stand gekennzeichnet.
+          {/* AEO-Direktantwort (agent-05 ASSET 2): Bilanz-Kern in ≤60 Wörtern, Zahlen mit Quelle */}
+          <p className="mt-4 text-base font-medium leading-relaxed">
+            Die Bilanz ist gemischt: Die Umsetzung hinkt — laut itiko.de (Stand 30.06.2026) erfüllen
+            Unternehmen im Schnitt nur rund 49 % der Kriterien. Gleichzeitig ist der Druck real: Die MLBF ist
+            seit September 2025 arbeitsfähig, und die zweite Abmahnwelle stützt sich auf formale Prüfberichte
+            mit dokumentierten Forderungen um 2.700 € (KBM Legal, Stand 23.02.2026).
+          </p>
+          <p className="mt-3 text-base leading-relaxed text-muted-foreground">
+            Zeit für eine sachliche Bilanz: Wo steht der Markt wirklich? Was macht die Marktüberwachung? Wie
+            ernst ist das Abmahnrisiko 2026? Alle Zahlen in diesem Artikel sind mit Quelle und Stand
+            gekennzeichnet.
           </p>
           <p className="mt-2 text-xs text-muted-foreground">
-            Stand: Juli 2026 · Automatisierte technische Analyse, keine Rechtsberatung
+            Zuletzt aktualisiert: 23. Juli 2026 · Automatisierte technische Analyse, keine Rechtsberatung
           </p>
         </header>
 
         <section className="mt-12">
-          <h2 className="text-2xl font-semibold">Das erste BFSG-Jahr im Überblick</h2>
+          <h2 className="text-2xl font-semibold">Was ist im ersten BFSG-Jahr passiert?</h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
             Das BFSG setzt den European Accessibility Act in deutsches Recht um und gilt für Websites und
             Online-Shops im elektronischen Geschäftsverkehr seit dem 28.06.2025 — ohne allgemeine Schonfrist.
@@ -173,7 +180,7 @@ export default function BfsgEinJahrBilanzPage() {
         </section>
 
         <section className="mt-14">
-          <h2 className="text-2xl font-semibold">Die Marktüberwachung: MLBF ist arbeitsfähig</h2>
+          <h2 className="text-2xl font-semibold">Was macht die Marktüberwachung MLBF?</h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
             Die Marktüberwachungsstelle der Länder für die Barrierefreiheit von Produkten und Dienstleistungen
             (MLBF) hat am 26.09.2025 in Magdeburg ihre Arbeit aufgenommen. Sie ist die gemeinsame Behörde der
@@ -192,7 +199,7 @@ export default function BfsgEinJahrBilanzPage() {
         </section>
 
         <section className="mt-14">
-          <h2 className="text-2xl font-semibold">Abmahnungen 2026: Das Risiko ist professioneller geworden</h2>
+          <h2 className="text-2xl font-semibold">Wie groß ist das Abmahnrisiko 2026?</h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
             Auf die erste breite Abmahnwelle im Sommer 2025 folgte eine zweite mit deutlich höherem formalen
             Anspruch: Aktuelle Forderungsschreiben stützen sich auf automatisiert erstellte
@@ -216,7 +223,7 @@ export default function BfsgEinJahrBilanzPage() {
         </section>
 
         <section className="mt-14">
-          <h2 className="text-2xl font-semibold">Was Website-Betreiber jetzt prüfen sollten</h2>
+          <h2 className="text-2xl font-semibold">Was sollten Website-Betreiber jetzt prüfen?</h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
             Die Bilanz des ersten Jahres zeigt: Weder Marktüberwachung noch Abmahner verschwinden wieder — und
             die Umsetzungslücke im Markt ist groß. Drei Schritte verbessern die Ausgangsposition nachweisbar:

@@ -26,10 +26,24 @@ import {
   STARTPAKET_PACKAGES,
   type PackageId,
 } from "@/lib/config";
+import {
+  EligibilityCheck,
+  ELIGIBILITY_COPY,
+  type EligibilityResult,
+} from "@/components/EligibilityCheck";
 import { useCheckout } from "@/lib/checkout-context";
 import { cn } from "@/lib/utils";
 
 type CustomerType = "consumer" | "business";
+
+// Kurz-Status des Vor-Checks über dem Bestellformular (Transparenz + Option
+// zum erneuten Prüfen). Werte decken sich mit der Backend-Whitelist
+// (scanner/app.js: eligibility-Metadatum).
+const ELIGIBILITY_STATUS: Record<EligibilityResult, string> = {
+  affected: "sehr wahrscheinlich betroffen",
+  unaffected_override: "freiwillige Prüfung (voraussichtlich nicht betroffen)",
+  unsure: "Einordnung unklar — technische Analyse freiwillig",
+};
 
 // Reihenfolge im Selector: Hauptangebot zuerst, dann Abo (Monat + Jahr), dann Cookie.
 // ABO_ANNUAL macht 'abo-jahr' hier auflösbar (packageFor) UND direkt im Modal wählbar
@@ -63,7 +77,14 @@ function packageFor(id: PackageId | null) {
 const DEFAULT_PKG: PackageId = "profi";
 
 export function CheckoutModal() {
-  const { state, closeCheckout, setUrl: pushUrl } = useCheckout();
+  const { state, closeCheckout, setUrl: pushUrl, setEligibility } =
+    useCheckout();
+
+  // Ergebnis des Betroffenheits-Checks (Schritt 0). Lebt im Checkout-Context
+  // und bleibt über Schließen/Öffnen des Modals im selben Seitenbesuch
+  // bestehen (Skip für Rückkehrer, D1) — hier bewusst KEIN Reset im
+  // lastOpen-Block unten.
+  const eligibility = state.eligibility;
 
   // Lokale Auswahl im Modal: wird beim Open mit dem vom Aufrufer gewuenschten
   // Paket seeded (oder DEFAULT_PKG), kann aber im Modal frei gewechselt werden.
@@ -147,6 +168,9 @@ export function CheckoutModal() {
           // Startpaket (agent-01, d10.2): gewähltes Re-Check-Tier mitschicken —
           // das Backend baut daraus die Tier-Subscription (30 Tage Trial).
           ...(isStartpaket(pkg.id) ? { tier: selectedTier } : {}),
+          // Betroffenheits-Check (Schritt 0): nur Kontext zur Bestellung,
+          // kein Gate. Backend whitelistet die Werte (scanner/app.js).
+          eligibility,
         }),
       });
       const data = (await response.json().catch(() => ({}))) as {
@@ -173,19 +197,53 @@ export function CheckoutModal() {
       }}
     >
       {/* Dunkles Glas-Panel (bg-popover) mit Orange-Verlaufs-Rahmen (.glow-border)
-          — nur Optik, Dialog-Verhalten (Fokus-Trap, ESC, Overlay) unveraendert. */}
-      <DialogContent className="glow-border bg-popover sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>Bestellung abschließen</DialogTitle>
-          <DialogDescription>
-            Wählen Sie Ihr Paket. Sie erhalten nach Zahlung automatisch Ihren
-            menschlich geprüften Fix-Plan (PDF) per E-Mail.
-          </DialogDescription>
-        </DialogHeader>
+          — nur Optik, Dialog-Verhalten (Fokus-Trap, ESC, Overlay) unveraendert.
+          max-h + Scroll: der Vor-Check (Schritt 0) stapelt bis zu 4 Fragen +
+          Ergebnis — auf kleinen Viewports muss der Dialog scrollbar bleiben. */}
+      <DialogContent className="glow-border max-h-[90dvh] overflow-y-auto bg-popover sm:max-w-lg">
+        {eligibility === null ? (
+          <>
+            {/* Schritt 0: Betroffenheits-Check VOR der Paketwahl (D1/P0.3).
+                Beratung statt hartem Gate — Ergebnis geht als Kontext in die
+                Bestellung (eligibility-Feld in POST /api/checkout). */}
+            <DialogHeader>
+              <span className="text-xs font-semibold uppercase tracking-wide text-brand-orange">
+                {ELIGIBILITY_COPY.kicker}
+              </span>
+              <DialogTitle>{ELIGIBILITY_COPY.title}</DialogTitle>
+              <DialogDescription>{ELIGIBILITY_COPY.intro}</DialogDescription>
+            </DialogHeader>
+            <EligibilityCheck
+              onDone={(result) => setEligibility(result)}
+              onBack={closeCheckout}
+            />
+          </>
+        ) : (
+          <>
+            <DialogHeader>
+              <DialogTitle>Bestellung abschließen</DialogTitle>
+              <DialogDescription>
+                Wählen Sie Ihr Paket. Sie erhalten nach Zahlung automatisch Ihren
+                menschlich geprüften Fix-Plan (PDF) per E-Mail.
+              </DialogDescription>
+            </DialogHeader>
 
-        <form onSubmit={onSubmit} className="grid gap-4" noValidate>
-          {/* Plan-Selector — alle Pakete im Modal wechselbar, sinnvollster vorausgewaehlt */}
-          <fieldset className="grid gap-2">
+            <form onSubmit={onSubmit} className="grid gap-4" noValidate>
+              {/* Status des Vor-Checks (D1): transparent anzeigen + erneutes
+                  Prüfen erlauben. */}
+              <p className="rounded-md border border-border bg-muted/50 px-3 py-2 text-xs leading-relaxed text-muted-foreground">
+                Vor-Check: {ELIGIBILITY_STATUS[eligibility]}.{" "}
+                <button
+                  type="button"
+                  onClick={() => setEligibility(null)}
+                  className="underline underline-offset-2 hover:text-foreground"
+                >
+                  Erneut prüfen
+                </button>
+              </p>
+
+              {/* Plan-Selector — alle Pakete im Modal wechselbar, sinnvollster vorausgewaehlt */}
+              <fieldset className="grid gap-2">
             <legend className="mb-1.5 text-sm font-medium">Paket</legend>
             <RadioGroup
               value={selectedPkgId}
@@ -385,6 +443,21 @@ export function CheckoutModal() {
             </div>
           )}
 
+          {/* P0.4 (D2): Bestell-Zusammenfassung direkt über dem Submit —
+              verhindert Fehlkäufe bei frei wechselbarer Paketwahl im Modal. */}
+          {pkg && (
+            <p className="rounded-md border border-border bg-muted/50 px-3 py-2 text-xs leading-relaxed text-muted-foreground">
+              Sie buchen:{" "}
+              <span className="font-medium text-foreground">
+                {pkg.name} — {pkg.price}
+                {pkg.priceSuffix ?? ""}
+                {pkg.mode === "payment" ? " einmalig" : ""}
+              </span>{" "}
+              · {pkg.mode === "subscription" ? "Erster Report" : "Lieferung"} in
+              der Regel innerhalb weniger Stunden · Rechnung sofort per E-Mail
+            </p>
+          )}
+
           {/* Submit als oranger 3D-Haupt-CTA (.btn-cta) — type/disabled/Inhalt
               und damit der gesamte Bestell-Flow bleiben identisch. */}
           <button
@@ -403,6 +476,17 @@ export function CheckoutModal() {
               `Zahlungspflichtig bestellen · ${pkg?.price ?? ""}${pkg?.priceSuffix ?? ""}`
             )}
           </button>
+
+          {/* P0.2 (D2): § 7 Abs. 3 UWG-Erhebungshinweis — Voraussetzung für
+              den späteren Bestands-Upsell per E-Mail (Text aus agent-02). */}
+          <p className="text-xs text-muted-foreground">
+            Hinweis nach § 7 Abs. 3 UWG: Wir informieren Sie künftig per E-Mail
+            über eigene, ähnliche Angebote (z. B. unseren monatlichen
+            Re-Check). Sie können dieser Verwendung jederzeit mit Wirkung für
+            die Zukunft widersprechen — z. B. per Antwort auf eine E-Mail oder
+            über den Abmeldelink — ohne dass andere als die Übermittlungskosten
+            nach den Basistarifen entstehen.
+          </p>
 
           <p className="text-xs text-muted-foreground">
             Mit der Bestellung akzeptieren Sie die{" "}
@@ -423,6 +507,8 @@ export function CheckoutModal() {
             .
           </p>
         </form>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );

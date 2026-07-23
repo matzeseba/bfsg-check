@@ -23,28 +23,43 @@
   <div class="card">
     <div class="check">✅</div>
     <h1>Vielen Dank für Ihre Bestellung!</h1>
-    <p id="delivery-text">Ihr vollständiger BFSG-Barrierefreiheits-Report wird
-    gerade automatisch erstellt und in der Regel innerhalb von 1–2 Stunden an
-    Ihre E-Mail-Adresse gesendet — jeder Report wird vor dem Versand persönlich
-    geprüft. Inklusive Entwurf Ihrer Erklärung zur Barrierefreiheit.</p>
-    <p>Bitte prüfen Sie auch Ihren Spam-Ordner. Bei Fragen antworten Sie einfach
-    auf die E-Mail.</p>
+    <!-- Block 1 (D4): Bestätigung + realistischer Prozess. Zeitversprechen
+         harmonisiert mit der LP („in der Regel innerhalb weniger Stunden"),
+         kein „1–2 Stunden" mehr (P0.1 / GELB-4). -->
+    <p id="delivery-text">Ihr vollständiger Report wird gerade erstellt: Erst
+    scannt die Fuchs-Spürnase Ihre Seiten automatisiert (WCAG 2.1 AA / EN 301
+    549), dann sieht sich Matthias Seba (Gründer) das Ergebnis persönlich an.
+    Sie erhalten Report (PDF) und Entwurf Ihrer Erklärung zur Barrierefreiheit
+    in der Regel innerhalb weniger Stunden per E-Mail.</p>
+    <p>Bitte prüfen Sie auch Ihren Spam-Ordner. Fragen zum Report? Antworten
+    Sie einfach auf die E-Mail — Sie erreichen einen Menschen, kein
+    Ticket-System.</p>
+    <!-- Block 2 (D4): Upsell Abo mit Jahres-Anker (249 €, Ersparnis aus
+         12 × 24,99 € = 299,88 € abgeleitet — PAngV-sauber, deckt sich mit
+         dem config.ts-Kommentar). Wird nur nach Report-Kauf (basis/profi)
+         angezeigt, siehe Script unten. -->
+    <div class="upsell" data-upsell="abo">
+      <h2>Ihre Website bleibt nicht stehen — Ihre Prüfung auch nicht</h2>
+      <p>Jedes Update, jedes neue Bild, jedes Plugin kann neue Barrieren
+      erzeugen. Das Fuchs Re-Check-Abo prüft Ihre Website jeden Monat
+      automatisch erneut und schickt Ihnen den aktualisierten Report —
+      24,99 €/Monat (jederzeit zum Monatsende kündbar) oder 249 €/Jahr
+      (spart 50,88 € gegenüber Monatszahlung).</p>
+      <a href="/#pakete">Re-Check-Abo ansehen</a>
+    </div>
     <div class="upsell" data-upsell="cookie">
-      <h2>Die zweite Pflicht-Baustelle: Ihr Cookie-Banner</h2>
-      <p>Ihr BFSG-Report deckt die Barrierefreiheit ab — Cookie-Banner und
-      Einwilligungen (§ 25 TDDDG) sind eine eigene Pflicht. Der Cookie-Check
-      prüft Banner, Einwilligungs-Logik und Tracker-Verhalten Ihrer Website in
-      einer automatisierten technischen Analyse — als eigener PDF-Report ab
-      39 € einmalig.</p>
+      <h2>Die zweite technische Baustelle: Cookies &amp; Consent (§ 25 TDDDG)</h2>
+      <p>Der Cookie-Check misst automatisiert, welche Tracker und Cookies Ihre
+      Website vor einer Einwilligung setzt — inklusive Google-Fonts- und
+      Drittland-Hinweisen. Als eigener PDF-Report ab 39 € einmalig.</p>
       <a href="/#cookie">Cookie-Check ansehen</a>
     </div>
-    <div class="upsell" data-upsell="abo">
-      <h2>Einmal prüfen ist gut. Dranbleiben ist besser.</h2>
-      <p>Websites ändern sich — mit jedem Update können neue Barrieren
-      entstehen. Das Fuchs Re-Check-Abo prüft Ihre Website jeden Monat
-      automatisch neu und liefert Ihnen den aktualisierten Report:
-      24,99 €/Monat (monatlich kündbar) oder 249 €/Jahr.</p>
-      <a class="upsell-link" href="/#pakete">Re-Check-Abo ansehen</a>
+    <!-- Block 3 (D4): Weiterempfehlung — unaufdringlich, kein Incentive. -->
+    <div class="upsell" data-upsell="referral">
+      <h2>Kennen Sie jemanden mit einem Online-Shop?</h2>
+      <p>Wenn der Report Ihnen weiterhilft, empfehlen Sie den Fuchs gern
+      weiter — der kostenlose 60-Sekunden-Check auf bfsg-fuchs.de ist der
+      einfachste Einstieg.</p>
     </div>
     <a href="/">Zurück zur Startseite</a>
   </div>
@@ -56,18 +71,19 @@
 
       // Produktbeschreibung je Paket-Kategorie — der Standardtext im Markup
       // (BFSG-Report) gilt für basis/profi/unbekannt; Cookie- und Abo-Käufer
-      // lesen sonst die falsche Produktbeschreibung (F33).
+      // lesen sonst die falsche Produktbeschreibung (F33). Zeitversprechen
+      // harmonisiert (D4/P0.1), Kündigungs-Transparenz beim Abo ergänzt.
       var DELIVERY_TEXT = {
-        cookie: "Ihr Cookie- & Consent-Report (§ 25 TDDDG) wird gerade automatisch " +
-          "erstellt und in der Regel innerhalb von 1–2 Stunden an Ihre " +
-          "E-Mail-Adresse gesendet — jeder Report wird vor dem Versand " +
-          "persönlich geprüft.",
-        abo: "Ihr erster automatisierter Report inklusive Entwurf Ihrer Erklärung " +
-          "zur Barrierefreiheit wird gerade erstellt und in der Regel innerhalb " +
-          "von 1–2 Stunden gesendet — jeder Report wird vor dem Versand " +
-          "persönlich geprüft. Ab jetzt prüfen wir Ihre Website automatisch " +
-          "jeden Monat erneut und liefern Ihnen den aktualisierten Report per " +
-          "E-Mail."
+        cookie: "Ihr Cookie- & Consent-Report (§ 25 TDDDG) wird gerade erstellt und " +
+          "in der Regel innerhalb weniger Stunden an Ihre E-Mail-Adresse gesendet — " +
+          "jeder Report wird vor dem Versand persönlich geprüft.",
+        abo: "Ihr erster Report inklusive Entwurf Ihrer Erklärung zur Barrierefreiheit " +
+          "wird gerade erstellt und in der Regel innerhalb weniger Stunden gesendet — " +
+          "jeder Report wird vor dem Versand persönlich geprüft. Ab dann prüfen wir " +
+          "Ihre Website jeden Monat automatisch erneut und liefern den aktualisierten " +
+          "Report per E-Mail. Das Monats-Abo ist jederzeit zum Monatsende kündbar; " +
+          "beim Jahres-Abo gilt eine Erstlaufzeit von 12 Monaten (danach monatlich " +
+          "kündbar) — Details jederzeit unter /kuendigen."
       };
       var category = pkg.indexOf("cookie") === 0 ? "cookie" : pkg.indexOf("abo") === 0 ? "abo" : null;
       if (category) {
@@ -75,11 +91,21 @@
         if (textEl) textEl.textContent = DELIVERY_TEXT[category];
       }
 
-      // Das soeben gekaufte Produkt nicht erneut bewerben.
-      var hide = category;
-      if (!hide) return;
-      var el = document.querySelector('[data-upsell="' + hide + '"]');
-      if (el) el.remove();
+      // Upsell-Steuerung (D4):
+      // - das soeben gekaufte Produkt nie erneut bewerben
+      // - Abo-Upsell nur nach Report-Kauf (basis/profi); für Cookie-Käufer ist
+      //   perspektivisch ein Report-Upsell vorgesehen (Copy steht noch aus)
+      // - Weiterempfehlungs-Block immer sichtbar
+      var visible = {
+        abo: category !== "abo" && category !== "cookie",
+        cookie: category !== "cookie",
+        referral: true
+      };
+      var blocks = document.querySelectorAll("[data-upsell]");
+      for (var i = 0; i < blocks.length; i++) {
+        var key = blocks[i].getAttribute("data-upsell");
+        if (!visible[key]) blocks[i].remove();
+      }
     })();
   </script>
 </body>
