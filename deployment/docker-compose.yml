@@ -36,6 +36,13 @@ services:
       - BREVO_LEAD_DOI_TEMPLATE_ID=${BREVO_LEAD_DOI_TEMPLATE_ID:-}
       - BREVO_LEAD_DOI_REDIRECT_URL=${BREVO_LEAD_DOI_REDIRECT_URL:-}
       - ENABLE_ABO=${ENABLE_ABO:-false}
+      # Onboarding-/Dunning-Sequenzen (agent-09). Default AUS = bisheriges
+      # Verhalten (nur Owner-Alert bei past_due). Compose-Env-Regel: ohne diese
+      # Zeilen erreichen die Server-.env-Werte den Container NICHT.
+      # ONBOARDING_WERBUNG_ENABLED erst nach § 7 Abs. 3-Checkliste (scanner/.env.example).
+      - ONBOARDING_ENABLED=${ONBOARDING_ENABLED:-false}
+      - ONBOARDING_WERBUNG_ENABLED=${ONBOARDING_WERBUNG_ENABLED:-false}
+      - DUNNING_PAYMENT_LINK=${DUNNING_PAYMENT_LINK:-}
       - MAX_CONCURRENT_SCANS=${MAX_CONCURRENT_SCANS:-2}
       # Scan-Queue/Rate-Limits + Bezahl-Concurrency (Defaults = Code-Defaults aus
       # app.js, ohne Server-.env-Eintrag ändert sich also nichts).
