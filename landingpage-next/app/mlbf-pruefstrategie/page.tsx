@@ -303,6 +303,11 @@ export default function MlbfPruefstrategiePage() {
           <h2 className="text-xl font-semibold">Weiterführende Themen</h2>
           <ul className="mt-4 grid gap-2 text-sm">
             <li>
+              <Link href="/abmahnung-erhalten" className="text-primary underline underline-offset-2">
+                Abmahnung erhalten — was jetzt? Erste Schritte nach dem Schreiben
+              </Link>
+            </li>
+            <li>
               <Link href="/bfsg-frist" className="text-primary underline underline-offset-2">
                 BFSG-Frist: Was seit dem 28.06.2025 gilt
               </Link>
