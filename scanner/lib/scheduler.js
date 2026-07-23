@@ -41,6 +41,16 @@ export async function releaseJob(sessionId, deps) {
       invoiceNumber: job.invoiceNumber || null,
       releasedBy: via
     });
+    // Onboarding Track A (agent-09): Anker „Tag 1 nach Lieferung" — der Hook
+    // wird NACH erfolgreicher Auslieferung aufgerufen (best-effort, darf die
+    // Freigabe nie kippen). Verdrahtung + Flag-Gate in app.js (releaseDeps).
+    if (deps.onDelivered) {
+      try {
+        await deps.onDelivered({ sessionId, to: job.to, company: job.company || '', pkg: job.pkg, emailKind: job.emailKind || 'bfsg' });
+      } catch (hookErr) {
+        logger?.warn?.({ sessionId, err: hookErr.message }, 'onDelivered-Hook fehlgeschlagen (Auslieferung war erfolgreich)');
+      }
+    }
     logger?.info?.({ sessionId, via }, 'Report freigegeben + ausgeliefert');
     return { released: true, via };
   } catch (err) {

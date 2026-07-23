@@ -138,8 +138,12 @@ export async function deleteUserData(email) {
   const hash = hashEmail(email);
   const { redactOrdersByEmail } = await import('./orders.js');
   const { redactSubsByEmail } = await import('./subscriptions.js');
+  const { redactOnboardingByEmail } = await import('./onboarding.js');
   const ordersRedacted = await redactOrdersByEmail(email, hash);
   const { redacted: subsRedacted, skippedActive } = await redactSubsByEmail(email, hash);
+  // Sequenz-Pläne (agent-09): E-Mail/Firma redigieren + offene Sequenzen
+  // abbrechen — sonst ginge der zeitgesteuerte Versand an eine gelöschte Adresse.
+  const onboardingRedacted = await redactOnboardingByEmail(email, hash);
   const tombstone = {
     type: 'DELETED',
     deletedAt: new Date().toISOString(),
@@ -153,6 +157,7 @@ export async function deleteUserData(email) {
     emailHash: hash,
     ordersRedacted,
     subsRedacted,
+    onboardingRedacted,
     skippedActive,
     notice: 'PII wurde aus allen gespeicherten Bestell-/Abo-Records entfernt (redigiert). ' +
       'Rechnungsdaten unterliegen der gesetzlichen Aufbewahrungspflicht (§147 AO) und bleiben gespeichert (Art. 17 Abs. 3 lit. b DSGVO).' +

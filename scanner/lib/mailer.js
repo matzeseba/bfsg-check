@@ -906,3 +906,360 @@ export async function sendAlert(subject, body) {
     sentry.captureException(e instanceof Error ? e : new Error(String(e)), { stage: 'sendAlert' });
   }
 }
+
+// =====================================================================
+// Onboarding- & Dunning-Sequenzen (agent-09, PR feat/onboarding-dunning-mails)
+// ---------------------------------------------------------------------
+// Texte: marketing/swarm-2026-07-23/agent-09-retention-moat.md (Paket 1 +
+// Paket 2.4) — unverändert übernommen, Platzhalter {{firma}}/{{zahlungs_link}}
+// auf die bestehenden Parameter (company/oneLine, zahlungsLink) gemappt.
+// Rechtsstatus: A1–A4, B1–B4, D1–D3 sind transaktionale Service-Mails an
+// KÄUFER (kein § 7 UWG-Problem, strikt werbefrei). A5 und der Jahres-Absatz
+// in B5 sind WERBLICH (§ 7 Abs. 3 UWG) → nur, wenn werbung=true
+// (ONBOARDING_WERBUNG_ENABLED). Versand-Vorbedingung = Owner-Checkliste
+// (Checkout-Hinweis, DOI, Brevo-Widerspruchs-Blacklist, TTDSG-Tracking aus).
+// Zur Laufzeit gelesen (testbar, kein Modul-Load-Capture).
+export function isOnboardingWerbungEnabled() {
+  return process.env.ONBOARDING_WERBUNG_ENABLED === 'true';
+}
+
+// Signatur wie in agent-09-Texten: menschlicher Absender-Eindruck (Mails sind
+// per Reply beantwortbar — REPLY_TO landet im echten Postfach).
+const SEQ_SIGNOFF = `Mit freundlichen Grüßen\nMatthias Seba — ${FROM_NAME}`;
+
+// Generisches HTML-Kleid für Sequenz-Mails (gleiche Karten-Optik wie
+// buildDelayNotice): Text-Absätze → <p>-Blöcke, Footer als pre-line.
+// PURE Funktion — Betreff/Text/HTML deterministisch testbar.
+function sequenceHtml({ preheader, text }) {
+  const paras = text
+    .split(/\n{2,}/)
+    .map((p) => `<p style="font-size:14px;line-height:1.55;color:#1f2430;margin:0 0 16px;">${escHtml(p).replace(/\n/g, '<br>')}</p>`)
+    .join('\n      ');
+  return `<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><meta name="supported-color-schemes" content="light"></head>
+<body style="margin:0;padding:0;background:#f5f3ef;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1f2430;">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#f5f3ef;font-size:1px;line-height:1px;">${escHtml(preheader)}</div>
+  <div style="max-width:560px;margin:0 auto;padding:24px 14px;">
+    <div style="background:#ffffff;border-radius:16px;padding:26px 24px;border:1px solid #ececec;">
+      ${paras}
+    </div>
+    <div style="white-space:pre-line;font-size:11px;color:#9ca3af;padding:16px 10px 0;line-height:1.5;">${escHtml(legalFooter())}</div>
+  </div>
+</body></html>`;
+}
+
+// Baut Betreff + text/plain + HTML einer Onboarding-Mail (Track A = Report-
+// Käufer, Track B = Re-Check-Abo). PURE Funktion. Gibt NULL zurück, wenn der
+// Step unbekannt ist ODER werblich und werbung=false (A5 fällt dann komplett
+// weg; bei B5 entfällt nur der Jahres-Absatz — der Rest der Mail ist
+// transaktional und geht immer raus).
+export function buildOnboardingMail({ step, company = '', werbung = false } = {}) {
+  const anrede = `Guten Tag${company ? ' ' + oneLine(company) : ''},`;
+  const FUSS = `\n\n${SEQ_SIGNOFF}\n\n${legalFooter()}`;
+  let subject;
+  let body;
+
+  switch (step) {
+    // --- Track A — Report-Käufer (Basis/Profi/Startpaket) [transaktional] ---
+    case 'A1':
+      subject = 'So lesen Sie Ihren Barrierefreiheits-Report in 10 Minuten';
+      body = `${anrede}
+
+gestern haben Sie Ihren Report erhalten. Damit er Ihnen schnell nützt,
+die drei wichtigsten Stellen:
+
+1. Seite 2: Die priorisierte Befundliste — beginnen Sie oben. Die obersten
+   Punkte betreffen die meisten Besucher Ihrer Website.
+2. Pro Befund: der Abschnitt „So beheben Sie das" — direkt umsetzbar,
+   ohne Fachjargon.
+3. Letzte Seite: Hinweise zur Erklärung zur Barrierefreiheit (Vorlage
+   lag Ihrer Lieferung bei).
+
+Eine ehrliche Einordnung: Der Report ist eine automatisierte technische
+Analyse. Er erfasst die technisch prüfbaren Kriterien — nach Branchen-
+konsens sind das etwa 30–50 % aller WCAG-Kriterien. Er ersetzt keine
+vollständige manuelle Prüfung und keine Rechtsberatung.
+
+Bei Fragen antworten Sie einfach auf diese E-Mail.`;
+      break;
+    case 'A2':
+      subject = '3 Verbesserungen, die die meisten in 30 Minuten schaffen';
+      body = `${anrede}
+
+aus unseren Scans: Diese drei Befund-Klassen lassen sich meist ohne
+Agentur beheben — prüfen Sie, ob sie in Ihrem Report auftauchen:
+
+1. Fehlender Alternativtext bei Bildern (Produktfotos, Team-Bilder):
+   im CMS nachpflegbar, Kosten = Zeit.
+2. Fehlende oder unlogische Überschriften-Struktur (h1/h2/h3):
+   meist eine Theme-Einstellung.
+3. Kontraste bei Buttons und Links: ein Farbwert im Theme genügt oft.
+
+Falls Ihr Report andere Prioritäten zeigt: Die Reihenfolge dort ist
+maßgeblich — sie richtet sich nach Schwere und Reichweite des Befunds.
+
+Hinweis wie immer: automatisierte technische Analyse, keine
+Rechtsberatung.
+
+Bei Fragen antworten Sie einfach auf diese E-Mail.`;
+      break;
+    case 'A3':
+      subject = 'Eine kurze Frage zu Ihrem Report (30 Sekunden)';
+      body = `${anrede}
+
+eine Woche ist Ihr Report jetzt bei Ihnen. Eine einzige Frage,
+Antwort genügt als Reply auf diese Mail:
+
+Auf einer Skala von 0 bis 10: Wie wahrscheinlich ist es, dass Sie
+den BFSG-Fuchs einem anderen Website-Betreiber empfehlen?
+(0 = gar nicht, 10 = sehr wahrscheinlich)
+
+Optional dazu: Was war am hilfreichsten — und was hat gefehlt?
+
+Ihr Feedback entscheidet, was wir als Nächstes besser machen.
+Danke Ihnen!`;
+      break;
+    case 'A4':
+      subject = 'Ihre Erklärung zur Barrierefreiheit — 3 häufige Fehler';
+      body = `${anrede}
+
+zu Ihrem Report gehörte eine Vorlage für die Erklärung zur
+Barrierefreiheit. Drei Fehler sehen wir bei der Umsetzung häufig:
+
+1. Die Erklärung ist verlinkt, aber nicht von jeder Seite aus
+   erreichbar (üblich: Footer-Link „Barrierefreiheit").
+2. Der Stand der Erklärung (Datum) fehlt oder ist veraltet.
+3. Es fehlt der Hinweis auf die Feedback-Möglichkeit für Nutzer
+   (Kontaktweg bei Barrieren).
+
+Die Vorlage ist ein technischer Entwurf zur eigenen Prüfung — die
+inhaltsliche und rechtliche Verantwortung für die veröffentlichte
+Fassung liegt bei Ihnen; bei Rechtsfragen hilft eine Fachkanzlei.
+
+Bei Fragen antworten Sie einfach auf diese E-Mail.`;
+      break;
+    case 'A5':
+      // WERBLICH (§ 7 Abs. 3 UWG) — nur nach Owner-Checkliste versenden.
+      if (!werbung) return null;
+      subject = 'Ihre Website hat sich verändert — auch Ihre Befundlage?';
+      body = `${anrede}
+
+Ihr Report ist nun vier Wochen alt. In der Zeit hat sich Ihre Website
+mit hoher Wahrscheinlichkeit verändert: neue Inhalte, neue Produkte,
+Updates des Shopsystems oder Themes. Jede Änderung kann neue Barrieren
+erzeugen — oder alte beheben.
+
+Dafür gibt es den monatlichen Re-Check (24,99 €/Monat, jederzeit
+kündbar): Er prüft Ihre Seiten jeden Monat erneut, zeigt Ihnen die
+Veränderungen seit dem letzten Lauf und liefert die auf den aktuellen
+Stand gebrachte Erklärungs-Vorlage gleich mit.
+
+Details: ${PUBLIC_URL}/#preise
+
+Wie immer gilt: automatisierte technische Analyse, keine Rechtsberatung.
+Wenn Sie keine weiteren Angebote von uns wünschen, genügt eine kurze
+Antwort — wir tragen Sie sofort aus.
+
+Bei Fragen antworten Sie einfach auf diese E-Mail.`;
+      break;
+
+    // --- Track B — Re-Check-Abo-Kunden [transaktional] ---
+    case 'B1':
+      subject = 'Willkommen im Re-Check-Abo — so funktioniert es';
+      body = `${anrede}
+
+Ihr Re-Check-Abo ist aktiv. Was Sie erwarten können:
+
+1. Einmal im Monat prüfen wir Ihre Website erneut (automatisierte
+   technische Analyse nach WCAG 2.1 AA).
+2. Sie erhalten den Report als PDF mit dem Abschnitt „Veränderungen
+   seit letztem Scan" ganz oben.
+3. Die auf den aktuellen Stand gebrachte Vorlage Ihrer Erklärung zur
+   Barrierefreiheit liegt jedem Lauf bei.
+
+Ihr erster Re-Check kommt mit der nächsten monatlichen Abrechnung.
+Kündigen können Sie jederzeit über ${PUBLIC_URL}/kuendigen —
+ohne Angabe von Gründen.
+
+Bei Fragen antworten Sie einfach auf diese E-Mail.`;
+      break;
+    case 'B2':
+      subject = 'Der wichtigste Abschnitt Ihres künftigen Re-Checks';
+      body = `${anrede}
+
+damit Ihr monatlicher Re-Check Sie nicht überrollt, ein Tipp vorab:
+
+Lesen Sie zuerst nur den Block „Veränderungen seit letztem Scan".
+Dort steht in Klartext:
+- welche Befunde NEU dazugekommen sind,
+- welche BEFUND-Klassen verschwunden sind (Ihre Fortschritte),
+- was unverändert ist.
+
+Nur wenn dort etwas Neues steht, lohnt der Blick in den Vollreport.
+Steht dort „keine neuen Befunde", ist alles Weitere Lektüre für
+ruhige Tage.
+
+Automatisierte technische Analyse — erfasst die technisch prüfbaren
+Kriterien (branchenüblich ca. 30–50 % der WCAG-Kriterien), keine
+Rechtsberatung.
+
+Bei Fragen antworten Sie einfach auf diese E-Mail.`;
+      break;
+    case 'B3':
+      subject = 'Eine kurze Frage zu Ihrem Abo (30 Sekunden)';
+      body = `${anrede}
+
+Ihr Re-Check-Abo läuft nun eine Woche. Eine einzige Frage, Antwort
+genügt als Reply:
+
+Auf einer Skala von 0 bis 10: Wie wahrscheinlich ist es, dass Sie
+den monatlichen Re-Check weiterempfehlen?
+(0 = gar nicht, 10 = sehr wahrscheinlich)
+
+Optional: Was soll der Re-Check künftig zusätzlich zeigen?
+
+Danke Ihnen!`;
+      break;
+    case 'B4':
+      subject = 'Kleiner Abo-Vorteil, leicht übersehen: Ihre Erklärung bleibt aktuell';
+      body = `${anrede}
+
+ein Detail Ihres Abos, das leicht untergeht: Jeder monatliche Re-Check
+bringt eine auf den aktuellen Befund-Stand gebrachte Vorlage Ihrer
+Erklärung zur Barrierefreiheit mit.
+
+Wenn Sie die Erklärung auf Ihrer Website veröffentlicht haben:
+Prüfen Sie nach jedem Re-Check kurz, ob sich etwas an den Angaben
+geändert hat — insbesondere nach einem Relaunch oder Umbau.
+
+Die inhaltliche und rechtliche Verantwortung für die veröffentlichte
+Erklärung liegt bei Ihnen; die Vorlage ist ein technischer Entwurf.
+
+Bei Fragen antworten Sie einfach auf diese E-Mail.`;
+      break;
+    case 'B5': {
+      subject = 'Vor Ihrem zweiten Re-Check: zwei Dinge, die sich lohnen';
+      // Der Jahres-Absatz ist WERBLICH (§ 7 Abs. 3 UWG) und wird nur bei
+      // werbung=true eingefügt — die Mail selbst ist transaktional.
+      const jahresAbsatz = `
+
+Übrigens: Als Jahresabo kostet der Re-Check 249 € statt 12 × 24,99 €
+(= 299,88 €) — dieselbe Leistung, 50,88 € weniger im Jahr. Der Wechsel
+ist jederzeit möglich; antworten Sie einfach auf diese Mail.`;
+      body = `${anrede}
+
+bald kommt Ihr nächster monatlicher Re-Check. Zwei Dinge, die den
+Wert erhöhen:
+
+1. Notieren Sie, welche Befunde Sie seit dem letzten Lauf behoben
+   haben. Der Diff-Block zeigt Ihnen dann Ihren tatsächlichen
+   Fortschritt — das ist der beste Nachweis, dass sich die Arbeit
+   lohnt.
+2. Nach einem Relaunch oder größeren Update: Schreiben Sie uns kurz.
+   Wir berücksichtigen den Hinweis bei der Einordnung der neuen Läufe.${werbung ? jahresAbsatz : ''}`;
+      break;
+    }
+    default:
+      return null;
+  }
+
+  const text = `${body}${FUSS}`;
+  const preheader = body.split('\n\n')[1]?.replace(/\n/g, ' ').slice(0, 140) || subject;
+  return { subject, text, html: sequenceHtml({ preheader, text: body + `\n\n${SEQ_SIGNOFF}` }) };
+}
+
+// Baut Betreff + text/plain + HTML einer Dunning-Mail (Zahlungsausfall).
+// PURE Funktion. Alle drei Mails sind strikt werbefrei [transaktional].
+// abbuchungsZeile: Intervall-/Betragsphrase des Abos (z. B. „die monatliche
+// Abbuchung für Ihren Re-Check (24,99 €)" — wird in app.js aus PACKAGES[pkg]
+// gebaut, damit Jahres-Abos und künftige Tiers keinen falschen Betrag nennen).
+// zahlungsLink: sicherer Aktualisierungs-Link (z. B. Stripe Customer Portal —
+// existiert heute NICHT). Fallback ohne Link: Reply-Satz (agent-09-Vorgabe).
+export function buildDunningMail({ step, company = '', abbuchungsZeile = '', zahlungsLink = '' } = {}) {
+  const anrede = `Guten Tag${company ? ' ' + oneLine(company) : ''},`;
+  const FUSS = `\n\n${SEQ_SIGNOFF}\n\n${legalFooter()}`;
+  const abbuchung = abbuchungsZeile || 'die Abbuchung für Ihren Re-Check';
+  const linkSatz = zahlungsLink
+    ? `Aktualisieren Sie Ihre Zahlungsdaten über diesen Link: ${zahlungsLink}`
+    : 'Antworten Sie kurz auf diese Mail — wir senden Ihnen einen sicheren Aktualisierungs-Link.';
+  const linkZeile = zahlungsLink ? `hier ist Ihr Aktualisierungs-Link: ${zahlungsLink}` : linkSatz;
+  let subject;
+  let body;
+
+  switch (step) {
+    case 'D1':
+      subject = 'Ihre Zahlung ist fehlgeschlagen — Ihr Re-Check pausiert vorerst';
+      body = `${anrede}
+
+${abbuchung} ist leider
+fehlgeschlagen. Das passiert häufiger — etwa bei einer neuen Karte
+oder einem zwischenzeitlich gesperrten Konto.
+
+Was das bedeutet: Ihr Abo bleibt vorerst bestehen, aber der nächste
+Re-Check wird erst nach erfolgreicher Zahlung wieder durchgeführt.
+
+Was Sie tun können: ${linkSatz}
+Der Zahlungsdienstleister versucht die Abbuchung automatisch erneut —
+mit aktualisierten Daten klappt das in der Regel sofort.
+
+Bei Fragen antworten Sie einfach auf diese E-Mail.`;
+      break;
+    case 'D2':
+      subject = 'Kurze Erinnerung: Zahlungsdaten für Ihren Re-Check aktualisieren';
+      body = `${anrede}
+
+vor drei Tagen ist die Abbuchung für Ihren Re-Check fehlgeschlagen —
+bisher ist noch keine Zahlung eingegangen.
+
+Falls Sie Ihre Zahlungsdaten bereits aktualisiert haben, können Sie
+diese Mail ignorieren; der erneute Abbuchungsversuch läuft automatisch.
+
+Falls nicht: ${linkZeile}
+
+Solange die Zahlung aussteht, pausiert Ihr monatlicher Re-Check —
+nach erfolgreicher Abbuchung geht es automatisch weiter.
+
+Bei Fragen antworten Sie einfach auf diese E-Mail.`;
+      break;
+    case 'D3':
+      subject = 'Letzte Erinnerung — Ihr Re-Check-Abo endet ohne Zahlungseingang';
+      body = `${anrede}
+
+dies ist die letzte Erinnerung: Seit zehn Tagen ist die Abbuchung für
+Ihren Re-Check fehlgeschlagen, und es ist keine Zahlung eingegangen.
+
+Wenn die Zahlung nicht eingeht, wird Ihr Abo vom Zahlungsdienstleister
+beendet. Es entstehen Ihnen keine weiteren Kosten — vergangene,
+bereits bezahlte Berichte bleiben natürlich Ihre.
+
+Möchten Sie weitermachen, aktualisieren Sie einfach Ihre
+Zahlungsdaten: ${zahlungsLink || 'antworten Sie kurz auf diese Mail — wir senden Ihnen einen sicheren Aktualisierungs-Link.'} — der Re-Check läuft dann
+nahtlos weiter.
+
+Möchten Sie das Abo bewusst beenden, können Sie das jederzeit selbst
+über ${PUBLIC_URL}/kuendigen erledigen.
+
+Bei Fragen antworten Sie einfach auf diese E-Mail.`;
+      break;
+    default:
+      return null;
+  }
+
+  const text = `${body}${FUSS}`;
+  const preheader = body.split('\n\n')[1]?.replace(/\n/g, ' ').slice(0, 140) || subject;
+  return { subject, text, html: sequenceHtml({ preheader, text: body + `\n\n${SEQ_SIGNOFF}` }) };
+}
+
+// Versand-Fassade für die Sequenz-Engine (lib/onboarding.js): dispatcht nach
+// Step-Präfix auf die passenden Builder. Ungültige Adresse → Dry-Run-Skip
+// (kein Throw), damit die Engine robust bleibt. Werbliche Steps, die bei
+// werbung=false kein Template haben, liefern { skipped: 'werbung-disabled' }
+// — die Engine markiert sie dann als erledigt, ohne zu senden.
+export async function sendSequenceStep({ to, step, company = '', werbung = false, abbuchungsZeile = '', zahlungsLink = '' }) {
+  if (!isEmail(to)) return { dryRun: true, skipped: 'invalid-recipient' };
+  const built = step.startsWith('D')
+    ? buildDunningMail({ step, company, abbuchungsZeile, zahlungsLink })
+    : buildOnboardingMail({ step, company, werbung });
+  if (!built) return { dryRun: true, skipped: werbung ? 'unknown-step' : 'werbung-disabled' };
+  return deliver({ to, subject: built.subject, text: built.text, html: built.html, attachments: [] });
+}

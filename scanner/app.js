@@ -20,11 +20,13 @@ import { fulfillOrder, PKG_CONFIG } from './lib/fulfill.js';
 import {
   sendReportFor, sendAlert, sendCancellationConfirmation, sendDsgvoToken, sendDelayNotice,
   sendLeadTeaser, sendOwnerReview, sendOrderReceived, sendKuendigungEingang, sendWiderrufEingang, isTransientMailError,
-  mailerStatus, requireMailerOrExit, isStripeLive, isEmail
+  mailerStatus, requireMailerOrExit, isStripeLive, isEmail,
+  sendSequenceStep, isOnboardingWerbungEnabled
 } from './lib/mailer.js';
 import * as reportQueue from './lib/report-queue.js';
 import * as leadQueue from './lib/lead-queue.js';
 import { startScheduler, releaseJob, recoverInDoubt } from './lib/scheduler.js';
+import { scheduleTrack, cancelBySource, processDue, startOnboardingTicker } from './lib/onboarding.js';
 import { signRelease, verifyRelease, releaseTokenConfigured } from './lib/release-token.js';
 import { signLead, verifyLead, leadTokenConfigured } from './lib/lead-token.js';
 import { randomBytes } from 'node:crypto';
@@ -51,6 +53,15 @@ const ENABLE_ABO = process.env.ENABLE_ABO === 'true'; // Abo standardmäßig AUS
 // ändert sich am Live-Verhalten NICHTS: 'abo'/'abo-jahr' bleiben frei buchbar
 // (kein Gate), und die neuen Paket-IDs existieren im Checkout gar nicht.
 const ABO_TIERS_ENABLED = process.env.ABO_TIERS_ENABLED === 'true';
+
+// Onboarding- & Dunning-Sequenzen (agent-09, marketing/swarm-2026-07-23/
+// agent-09-retention-moat.md): Onboarding-Mails an Käufer (Track A = Report,
+// Track B = Abo) + Kunden-Dunning bei Zahlungsausfall (D1–D3, bisher nur
+// Owner-Alert). Default AUS — Scharfschaltung ist ein Owner-Entscheid.
+// Exportiert für den Flag-Default-Test (test/onboarding.test.js).
+// Werbliche Mails (A5, Jahres-Absatz in B5, § 7 Abs. 3 UWG) hängen am
+// separaten Flag ONBOARDING_WERBUNG_ENABLED (mailer.js, Default ebenfalls AUS).
+export const ONBOARDING_ENABLED = process.env.ONBOARDING_ENABLED === 'true';
 
 // PR5 Owner-Release-Gate: fertige Reports werden vor Auslieferung dem Owner zur
 // Freigabe gemailt (1-Klick-Link) und bei Ablauf des Fensters automatisch versendet.
@@ -95,8 +106,61 @@ function releaseDeps(via = 'auto') {
     sendAlert,
     isTransientMailError,
     logger,
-    via
+    via,
+    // Onboarding Track A: Anker ist die AUSLIEFERUNG (Tag 1 danach), nicht die
+    // Zahlung — der Hook feuert erst nach erfolgreichem Report-Versand.
+    onDelivered: maybeScheduleTrackA
   };
+}
+
+// --- Onboarding/Dunning: Verdrahtung der Sequenz-Engine (lib/onboarding.js) --
+// Track A nur für BFSG-Erstreports (basis/profi/startpaket-*): die agent-09-
+// Texte beziehen sich auf den WCAG-Report + Erklärungs-Vorlage. Cookie-Reports
+// und Abo-Re-Checks (emailKind 'cookie'/'recheck') bekommen KEINE A-Sequenz.
+function maybeScheduleTrackA({ sessionId, to, company = '', emailKind }) {
+  if (!ONBOARDING_ENABLED || emailKind !== 'bfsg' || !isEmail(to)) return Promise.resolve(false);
+  return scheduleTrack({ track: 'A', email: to, company, sourceId: sessionId })
+    .then((r) => r.scheduled)
+    .catch((err) => {
+      logger.warn({ sessionId, err: err.message }, 'Onboarding-Plan (Track A) nicht angelegt');
+      return false;
+    });
+}
+
+// Laufzeit-Deps für processDue/startOnboardingTicker. sendStep geht über die
+// mailer-Fassade (dispatcht A/B/D-Builder); der Werbungs-Flag wird pro Versand
+// gelesen (kein Load-Capture); der Dunning-Guard prüft den lokalen Sub-Status.
+function onboardingDeps() {
+  return {
+    sendStep: ({ record, step }) => sendSequenceStep({
+      to: record.email,
+      company: record.company || '',
+      step,
+      werbung: isOnboardingWerbungEnabled(),
+      abbuchungsZeile: record.abbuchungsZeile || '',
+      // Sicherer Aktualisierungs-Link (z. B. Stripe Customer Portal) existiert
+      // noch nicht — Fallback im Mailtext: Reply-Satz (agent-09-Vorgabe).
+      zahlungsLink: process.env.DUNNING_PAYMENT_LINK || ''
+    }),
+    isDunningActive: async (record) => {
+      const sub = await getSubscription(record.sourceId);
+      return !!sub && sub.status === 'PAST_DUE';
+    },
+    sendAlert,
+    logger
+  };
+}
+
+// Intervall-/Betragsphrase für Dunning-Mail D1 — aus PACKAGES[pkg] gebaut,
+// damit Jahres-Abos (249 €) und künftige Tiers keinen falschen Monatsbetrag
+// nennen (agent-09-Text geht vom Starter-Monatsabo aus).
+function abbuchungsZeileFor(pkg) {
+  const cfg = PACKAGES[pkg];
+  if (!cfg) return '';
+  const betrag = (cfg.amount / 100).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+  return cfg.interval === 'year'
+    ? `die jährliche Abbuchung für Ihren Re-Check (${betrag})`
+    : `die monatliche Abbuchung für Ihren Re-Check (${betrag})`;
 }
 
 // Fertigen Report zur Freigabe einqueuen + Owner-Review-Mail (best-effort) senden.
@@ -377,6 +441,12 @@ async function prePersistCheckout(event) {
       subscriptionId: s.subscription, customerId: s.customer || null,
       email, url: meta.url, company: meta.company || '', pkg: subPkg
     });
+    // Onboarding Track B (agent-09): Anker = Abo-Start (Tag 0). Best-effort —
+    // ein Fehler hier darf die Zahlungs-/Subscription-Persistenz nie kippen.
+    if (ONBOARDING_ENABLED && isEmail(email)) {
+      scheduleTrack({ track: 'B', email, company: meta.company || '', sourceId: s.subscription })
+        .catch((err) => logger.warn({ subscriptionId: s.subscription, err: err.message }, 'Onboarding-Plan (Track B) nicht angelegt'));
+    }
   }
 }
 
@@ -496,6 +566,8 @@ async function handleCheckoutCompleted(event) {
       consentTs: meta.consentTs || ''
     });
     await markStatus(s.id, 'MAILED', { pdfPath: order.pdfPath, invoiceNumber: invoice?.invoiceNumber || null });
+    // Onboarding Track A (Gate-AUS-Pfad): Anker = Auslieferung (Tag 1 danach).
+    await maybeScheduleTrackA({ sessionId: s.id, to: email, company: meta.company || '', emailKind });
     logger.info({ sessionId: s.id, pkg, amount: s.amount_total, invoiceNumber: invoice?.invoiceNumber || null }, 'Report ausgeliefert');
   } catch (err) {
     // Report + Rechnung sind FERTIG, nur die Mail ging nach allen Retries nicht raus.
@@ -861,6 +933,26 @@ async function handleSubscriptionUpdated(event) {
       `Subscription: ${sub.id}\nStripe-Status: ${sub.status}\nRe-Checks pausiert bis Zahlung wieder eingeht.`
     );
     logger.warn({ subscriptionId: sub.id, stripeStatus: sub.status }, 'Abo past_due — Re-Checks pausiert');
+    // Kunden-Dunning (agent-09 Paket 2.4): bisher ging NUR der Owner-Alert raus,
+    // der Kunde erfuhr nichts. D1 (Tag 0) wird hier direkt angestoßen; D2 (Tag 3)
+    // und D3 (Tag 10) über den Onboarding-Ticker — jeweils nur, wenn die
+    // Subscription weiterhin PAST_DUE ist (Guard in processDue). Idempotent pro
+    // Episode: cycleKey enthält den Statuswechsel-Zeitstempel (statusChangedAt),
+    // eine NEUE past_due-Episode nach Recovery startet einen frischen Plan.
+    if (ONBOARDING_ENABLED && isEmail(updated.email)) {
+      try {
+        const cycleKey = `${sub.id}:${updated.statusChangedAt || Date.now()}`;
+        await scheduleTrack({
+          track: 'D', email: updated.email, company: updated.company || '',
+          sourceId: sub.id, cycleKey,
+          startedAt: updated.statusChangedAt || undefined,
+          abbuchungsZeile: abbuchungsZeileFor(updated.pkg)
+        });
+        await processDue(onboardingDeps()); // D1 ist sofort fällig (Tag 0)
+      } catch (err) {
+        logger.warn({ subscriptionId: sub.id, err: err.message }, 'Dunning-Sequenz nicht angestoßen (Owner-Alert ist raus)');
+      }
+    }
   } else if (updated && updated.status === 'ACTIVE') {
     logger.info({ subscriptionId: sub.id }, 'Abo wieder aktiv');
   }
@@ -875,6 +967,12 @@ async function handleSubscriptionDeleted(event) {
     } catch (err) {
       console.error('[webhook] Cancellation-Mail Fehler:', err.message);
     }
+  }
+  // Onboarding/Dunning: offene Sequenzen dieser Subscription abbrechen —
+  // ein gekündigter Kunde bekommt keine weiteren Onboarding-/Mahn-Mails.
+  if (ONBOARDING_ENABLED) {
+    cancelBySource(sub.id, 'subscription-deleted')
+      .catch((err) => logger.warn({ subscriptionId: sub.id, err: err.message }, 'Onboarding-Abbruch nach Kündigung fehlgeschlagen'));
   }
   console.log(`[webhook] Subscription gekündigt: ${sub.id}`);
 }
@@ -1728,6 +1826,13 @@ if (isMain) {
     if (ENABLE_ABO) {
       startAnnualRecheckTicker();
       logger.info({ tickMs: ANNUAL_RECHECK_TICK_MS }, 'Jahres-Abo-Re-Check-Ticker aktiv');
+    }
+    // Onboarding-/Dunning-Sequenzen (agent-09): Ticker versendet fällige Steps
+    // (B/D sowie A nach Auslieferung). Default AUS — Owner-Entscheid; Werbliches
+    // (A5/B5-Jahresabsatz) zusätzlich hinter ONBOARDING_WERBUNG_ENABLED.
+    if (ONBOARDING_ENABLED) {
+      startOnboardingTicker(onboardingDeps());
+      logger.info({ werbung: isOnboardingWerbungEnabled() }, 'Onboarding-/Dunning-Ticker aktiv');
     }
   });
   process.on('SIGTERM', () => server.close(() => process.exit(0)));
