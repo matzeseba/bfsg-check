@@ -35,13 +35,16 @@ jobs:
           # Anthropic-API-Key für den KI-Report-QA-Agenten (PR4). Gleiches Muster wie BREVO:
           # aus GitHub-Secret (maskiert) in die Server-.env upserten. Leer = kein Eintrag.
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Stripe-Secret-Key (rotiert 23.07.2026). Gleiches Muster: aus GitHub-Secret
+          # (maskiert) in die Server-.env upserten. Leer = kein Eintrag.
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
         with:
           host: ${{ secrets.HETZNER_HOST }}
           username: root
           key: ${{ secrets.HETZNER_SSH_KEY }}
           port: 22
           # An den Remote-Skript-Kontext durchreichen (sonst sieht das Skript die Var nicht).
-          envs: BREVO_API_KEY,ANTHROPIC_API_KEY
+          envs: BREVO_API_KEY,ANTHROPIC_API_KEY,STRIPE_SECRET_KEY
           script_stop: true
           request_pty: true
           # Hotfix: cloud-init setzt initial chage -d 0 root → bei jedem SSH-Login fragt
@@ -84,6 +87,18 @@ jobs:
               echo "ANTHROPIC_API_KEY in .env gesetzt (Laenge ${#AKEY_CLEAN})."
             else
               echo "Kein ANTHROPIC_API_KEY-Secret gesetzt — .env unveraendert."
+            fi
+            # STRIPE_SECRET_KEY analog upserten (Key-Rotation 23.07.2026): neuer Key liegt
+            # als GitHub-Secret, wird maskiert durch den Runner in die Server-.env geschrieben
+            # und nie im Klartext geloggt. Leer = .env unveraendert.
+            if [ -n "${STRIPE_SECRET_KEY:-}" ]; then
+              SKEY_CLEAN=$(printf '%s' "$STRIPE_SECRET_KEY" | tr -d '[:space:]')
+              grep -v '^STRIPE_SECRET_KEY=' .env > .env.stripe.tmp
+              printf 'STRIPE_SECRET_KEY=%s\n' "$SKEY_CLEAN" >> .env.stripe.tmp
+              mv .env.stripe.tmp .env
+              echo "STRIPE_SECRET_KEY in .env gesetzt (Praefix $(printf '%s' "$SKEY_CLEAN" | cut -c1-7)..., Laenge ${#SKEY_CLEAN})."
+            else
+              echo "Kein STRIPE_SECRET_KEY-Secret gesetzt — .env unveraendert."
             fi
             set -e
 
