@@ -12,6 +12,8 @@
 // SDK-Installation → `qaReport()` gibt `null` zurück → der Report geht
 // UNVERÄNDERT raus (Owner-Regel „nie ohne Report"). Läuft im Delay-Fenster
 // (PR5), nicht im Webhook-Antwortpfad. Kosten ~$0,01–0,25/Report.
+// Provider-Abstraktion (PR-P3a): Anthropic oder OpenAI-kompatibel, siehe
+// docs/LLM-PROVIDER.md. Prompt und Claim-Regex-Katalog sind provider-neutral.
 
 import { anthropicQaEnabled, callReportQa } from './anthropic-client.js';
 import { ruleInfo } from './rules-de.js';
