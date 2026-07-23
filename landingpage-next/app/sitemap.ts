@@ -135,10 +135,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     // AEO-Sprint-Seiten (23.07.2026, marketing/swarm-2026-07-23/agent-05-seo-aeo.md):
-    // Abmahnung-Kosten ist news-getrieben (Urteile/Abmahnwellen erwartet) → weekly;
+    // Abmahnung-Kosten und Abmahnung-erhalten sind news-getrieben (Urteile zu § 3a UWG
+    // und weitere Abmahnwellen erwartet) → weekly;
     // Ausnahmen und Scanner-vs-Audit sind Evergreen → monthly wie die übrigen Pillar-Pages.
     {
       url: `${siteUrl}/bfsg-abmahnung-kosten`,
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${siteUrl}/abmahnung-erhalten`,
       lastModified,
       changeFrequency: "weekly",
       priority: 0.9,

@@ -236,6 +236,13 @@ export default function BfsgAbmahnungKostenPage() {
             </li>
           </ol>
           <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+            Eine ausführliche Schritt-für-Schritt-Checkliste für die ersten 24–48 Stunden nach dem
+            Schreiben finden Sie hier:{" "}
+            <Link href="/abmahnung-erhalten" className="text-primary underline underline-offset-2">
+              Abmahnung erhalten — was jetzt?
+            </Link>
+          </p>
+          <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
             An genau diesem Punkt setzen wir an — nicht früher und nicht später: BFSG-Fuchs liefert
             eine <strong>automatisierte technische Analyse</strong> Ihrer Website nach WCAG 2.1 AA /
             EN 301 549 mit menschlicher Sichtung vor Auslieferung. Das Ergebnis ist eine
@@ -300,6 +307,11 @@ export default function BfsgAbmahnungKostenPage() {
         <section className="mt-14">
           <h2 className="text-xl font-semibold">Weiterführende Themen</h2>
           <ul className="mt-4 grid gap-2 text-sm">
+            <li>
+              <Link href="/abmahnung-erhalten" className="text-primary underline underline-offset-2">
+                Abmahnung erhalten — was jetzt? Erste Schritte nach dem Schreiben
+              </Link>
+            </li>
             <li>
               <Link href="/mlbf-pruefstrategie" className="text-primary underline underline-offset-2">
                 MLBF-Prüfstrategie 2026: Wird meine Website kontrolliert?
