@@ -2,8 +2,20 @@
 # BFSG-Check täglich Backup — GPG-verschlüsselt, via rclone zu BACKUP_TARGET.
 # Erwartet env: BACKUP_GPG_RECIPIENT (E-Mail des GPG-Pubkeys), BACKUP_TARGET (rclone-Remote z.B. "hetzner-storage:bfsg-backups").
 # Ohne BACKUP_TARGET → nur lokales Backup in /var/backups/bfsg/ (Retention 14 Tage).
+# Wird produktiv via /usr/local/bin/bfsg-backup-run.sh (Cron) aufgerufen — siehe docs/BACKUP.md.
 
 set -euo pipefail
+
+# Env-Fallback: Cron startet ohne Server-Umgebung. Wenn BACKUP_GPG_RECIPIENT
+# oder BACKUP_TARGET fehlen und die Server-.env existiert → sourcen, damit das
+# Offsite-Backup auch ohne korrekt sourcenden Wrapper funktioniert.
+ENV_FILE=/opt/bfsg-check/deployment/.env
+if [ -f "$ENV_FILE" ] && { [ -z "${BACKUP_GPG_RECIPIENT:-}" ] || [ -z "${BACKUP_TARGET:-}" ]; }; then
+  set -a
+  . "$ENV_FILE"
+  set +a
+fi
+
 exec > >(tee -a /var/log/bfsg-backup.log) 2>&1
 echo "=== Backup-Start: $(date -Iseconds) ==="
 

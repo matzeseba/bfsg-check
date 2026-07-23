@@ -12,6 +12,24 @@ users:
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINWLfkNJJv0x1V/bKfIvJv3fg+J5OwSCDcT/tRTF5fdx operator-deploy-key
 
 write_files:
+  - path: /usr/local/bin/bfsg-backup-run.sh
+    permissions: '0755'
+    content: |
+      #!/bin/bash
+      # BFSG-Backup-Wrapper: sourced die Server-.env (BACKUP_GPG_RECIPIENT,
+      # BACKUP_TARGET), bevor das eigentliche Backup-Skript läuft.
+      # Cron (/etc/cron.d/bfsg-backup) ruft NUR diesen Wrapper auf.
+      set -euo pipefail
+      ENV_FILE=/opt/bfsg-check/deployment/.env
+      if [ -f "$ENV_FILE" ]; then
+        set -a
+        . "$ENV_FILE"
+        set +a
+      else
+        echo "[WARN] $ENV_FILE nicht gefunden — Backup läuft ohne Server-Env (nur lokal)" >&2
+      fi
+      exec /opt/bfsg-check/deployment/backup.sh
+
   - path: /opt/bfsg-bootstrap.sh
     permissions: '0755'
     content: |
@@ -78,15 +96,18 @@ write_files:
       docker compose ps
 
       # --- Backup-Cron (täglich 03:00 UTC) ---
+      # Cron ruft den Wrapper /usr/local/bin/bfsg-backup-run.sh auf (per write_files
+      # angelegt). Der Wrapper sourced die Server-.env, damit BACKUP_GPG_RECIPIENT +
+      # BACKUP_TARGET ankommen; backup.sh sourced die .env zusätzlich selbst als Fallback.
       # Erwartet: Eigentümer fügt BACKUP_GPG_RECIPIENT + BACKUP_TARGET in .env hinzu,
       # sowie GPG-Pubkey-Import + rclone.conf in /root/.config/rclone/.
       # Ohne diese Configs läuft Backup nur lokal in /var/backups/bfsg/ (Retention 14 Tage).
       cat > /etc/cron.d/bfsg-backup <<'CRON'
-      0 3 * * * root /opt/bfsg-check/deployment/backup.sh >> /var/log/bfsg-backup.log 2>&1
+      0 3 * * * root /usr/local/bin/bfsg-backup-run.sh
       CRON
       chmod 644 /etc/cron.d/bfsg-backup
       mkdir -p /var/backups/bfsg /root/.config/rclone
-      echo "[bootstrap] Backup-Cron eingerichtet — siehe docs/BACKUP.md für BACKUP_GPG_RECIPIENT + rclone-Setup"
+      echo "[bootstrap] Backup-Cron eingerichtet (Wrapper mit Env-Sourcing) — siehe docs/BACKUP.md für BACKUP_GPG_RECIPIENT + rclone-Setup"
 
 runcmd:
   - bash /opt/bfsg-bootstrap.sh
