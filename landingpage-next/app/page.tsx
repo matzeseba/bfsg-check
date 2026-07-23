@@ -7,10 +7,12 @@ import { Hero } from "@/components/Hero";
 import { HomeJsonLd } from "@/components/JsonLd";
 import { HowItWorks } from "@/components/HowItWorks";
 import { PricingCards } from "@/components/PricingCards";
+import { RecheckSection } from "@/components/RecheckSection";
 import { RiskBand } from "@/components/RiskBand";
 import { RuleTicker } from "@/components/RuleTicker";
 import { StatsBar } from "@/components/StatsBar";
 import { Testimonials } from "@/components/Testimonials";
+import { RECHECK_TIERS_VISIBLE } from "@/lib/config";
 
 // Conversion-Dramaturgie (PAS — Problem, Agitate, Solve): Hero → Schmerz/Frist
 // (RiskBand + Countdown) → Trust-Strip (StatsBar) → Live-Regel-Ticker als schmales
@@ -37,6 +39,10 @@ export default function Home() {
       <Testimonials />
       <FounderSection />
       <PricingCards />
+      {/* Re-Check-Tier-Sektion (agent-01, ENTWURF): erst beim Launch sichtbar
+          (RECHECK_TIERS_VISIBLE in lib/config.ts = Spiegel des Server-Flags
+          ABO_TIERS_ENABLED). Vorher bleibt die Seite exakt wie bisher. */}
+      {RECHECK_TIERS_VISIBLE ? <RecheckSection /> : null}
       <CookieSection />
       <FAQAccordion />
       <CtaSection />

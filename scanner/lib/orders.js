@@ -97,6 +97,30 @@ export async function getOrder(sessionId) {
   return orders.get(sessionId) || null;
 }
 
+// --- Report-Gate (Abo-Tiers, agent-01 d10.1) --------------------------------------
+// Pakete, die als „bezahlter Erst-Report" fürs Gate zählen: die beiden Einmal-
+// Reports sowie die Startpakete (Report darin inklusive). Cookie-Pakete zählen
+// NICHT (kein WCAG-Baseline-Report; Cookie-Käufer werden auch im Upsell-Pfad
+// nicht beworben, agent-01 d6).
+const REPORT_ORDER_PACKAGES = new Set(['basis', 'profi', 'startpaket-basis', 'startpaket-profi']);
+
+// Hat diese E-Mail bereits einen bezahlten Erst-Report? Grundlage = die Order-
+// Records (recordPaid schreibt jede bezahlte Bestellung — Zahlungsnachweis, egal
+// welcher Erfüllungsstatus danach kam). Hinweis: DSGVO-redigierte Orders
+// (Art. 17, E-Mail ersetzt) sind bewusst nicht mehr zuordenbar — betroffene
+// Kunden steigen dann erneut über das Startpaket ein.
+export async function hasPaidReportFor(email) {
+  await ensureLoaded();
+  const norm = String(email || '').toLowerCase().trim();
+  if (!norm) return false;
+  for (const rec of orders.values()) {
+    if (REPORT_ORDER_PACKAGES.has(rec.pkg) && String(rec.email || '').toLowerCase().trim() === norm) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // --- DSGVO Art. 17: echte PII-Redaction -------------------------------------------
 // Redigiert die PII (E-Mail, URL, Firma, Billing-Anschrift, Stripe-customerId) in
 // ALLEN historischen Zeilen dieser E-Mail — per atomarem Datei-Rewrite (tmp+rename)
