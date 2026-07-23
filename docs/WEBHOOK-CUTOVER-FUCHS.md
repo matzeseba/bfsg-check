@@ -5,8 +5,8 @@ Stand: 2026-07. Ziel: Der Stripe-Webhook läuft unter der Marken-Primär
 danach deaktiviert. bfsg-fuchs.de ist die einzige Wahrheit für alle
 nutzerseitigen Links (Domain-SSOT, PR `fix/domain-ssot`).
 
-**Wichtig:** Das Absender-/Kontakt-Postfach bleibt `info@bfsg-fix.de` bzw.
-`no-reply@bfsg-fix.de` — das Postfach `@bfsg-fuchs.de` existiert noch nicht.
+**Wichtig:** Absender-/Kontakt-Postfächer laufen seit 23.07.2026 auf `info@bfsg-fuchs.de` bzw.
+`no-reply@bfsg-fuchs.de` (Brevo-verifiziert); `info@bfsg-fix.de` ist gelöscht.
 Der Cutover betrifft NUR den Webhook/ die öffentliche Domain, NICHT die
 E-Mail-Adressen.
 

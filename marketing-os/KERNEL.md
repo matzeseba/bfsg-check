@@ -93,7 +93,7 @@ technischen Badge-Text).
 - **Harte Grenzen für alle Agenten:** kein Zugriff auf SSH, Prod-Server, Stripe, Brevo,
   GitHub-Secrets oder sonstige Live-APIs; keine Datei-Schreibzugriffe; keine Cold-Outreach-,
   DM- oder Foren-Seeding-Aktionen.
-- **Eskalation an den Owner** (Matthias Seba, `info@bfsg-fix.de`) bei: jeder Veröffentlichung,
+- **Eskalation an den Owner** (Matthias Seba, `info@bfsg-fuchs.de`) bei: jeder Veröffentlichung,
   jedem `block`-Gate-Treffer, jeder rechtlich unklaren Formulierung, jeder Aktion, die ein
   Owner-Konto/Live-System berührt.
 

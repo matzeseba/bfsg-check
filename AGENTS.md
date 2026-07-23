@@ -8,7 +8,7 @@
 ## 🏗️ Projekt-Kontext
 
 - **Produkt/Marke:** BFSG-Fuchs — automatisierter Compliance-Scanner für deutsche Websites (BFSG/WCAG 2.1 AA/TDDDG); Maskottchen „Filo".
-- **Primär-Domain:** **bfsg-fuchs.de** (Inhalts-SSOT: `landingpage-next/lib/config.ts`; Cutover 29.06.2026). bfsg-fix.de läuft parallel (canonical → bfsg-fuchs.de, Stripe-/Webhook-URLs, E-Mail info@bfsg-fix.de). **Alle Außen-Texte IMMER auf Marke BFSG-Fuchs + bfsg-fuchs.de!**
+- **Primär-Domain:** **bfsg-fuchs.de** (Inhalts-SSOT: `landingpage-next/lib/config.ts`; Cutover 29.06.2026). bfsg-fix.de läuft parallel (canonical → bfsg-fuchs.de, Stripe-/Webhook-URLs, E-Mail info@bfsg-fuchs.de). **Alle Außen-Texte IMMER auf Marke BFSG-Fuchs + bfsg-fuchs.de!**
 - **Owner:** Matthias Seba, Lange Straße 20, 27449 Kutenholz, info@matthias-seba.de · § 19 UStG Kleinunternehmer · User-E-Mail für Accounts: matze.seba@outlook.de
 - **Server:** Hetzner CPX22, Nürnberg, Ubuntu 24.04. SSH von diesem PC möglich (Operator-Key via `bootstrap-ssh.yml`); Alias `bfsg` nur auf dem Mac.
 - **Status:** Live (`/health` = ok, stripe live, mailer aktiv).
@@ -95,7 +95,7 @@ _migration/claude-memory/   Migriertes Claude-Code-Auto-Memory (54 Dateien, Stan
 
 1. **Merge-Modus:** Hygiene-PRs (Docs, Lockfile, .gitignore) darf die KI bei grüner CI selbst mergen; produktiv wirksame PRs nur nach ausdrücklicher Owner-Freigabe („merge #N").
 2. **SSH:** Lesender Server-Zugriff (Logs/Verifikation) ist erlaubt; schreibend nie ohne Freigabe.
-3. **Domain:** bfsg-fuchs.de = einzige Wahrheit; **Stripe-Webhook zieht auf bfsg-fuchs.de um** (Runbook: `docs/WEBHOOK-CUTOVER-FUCHS.md`, Caddy routet bereits — nur Stripe-Dashboard + neues Secret nötig). Absender bleibt vorerst info@bfsg-fix.de (leitet an matze.seba@outlook.de + info@matthias-seba.de weiter; Postfach @bfsg-fuchs.de existiert noch nicht).
+3. **Domain:** bfsg-fuchs.de = einzige Wahrheit; **Stripe-Webhook zieht auf bfsg-fuchs.de um** (Runbook: `docs/WEBHOOK-CUTOVER-FUCHS.md`, Caddy routet bereits — nur Stripe-Dashboard + neues Secret nötig). E-Mail komplett auf @bfsg-fuchs.de umgezogen (23.07.): info@bfsg-fuchs.de leitet an matze.seba@outlook.de + info@matthias-seba.de weiter; info@bfsg-fix.de ist gelöscht; Brevo-Absender no-reply@bfsg-fuchs.de aktiv.
 4. **Dashboard:** Zentrales Business-Dashboard kommt — aber **erst nach der vom Owner geplanten Business-Umstrukturierung** (eigene Session). Basis wird dann `aos/`; bis dahin am Dashboard nichts bauen.
 5. **LLM-Provider:** Abstraktion statt fester Anthropic-Kopplung (Key/Modell per Env).
 6. **cockpit/.env:** gelöscht; **Stripe-/GitHub-/Google-Ads-Keys waren vermutlich live → Rotation durch Owner empfohlen.**

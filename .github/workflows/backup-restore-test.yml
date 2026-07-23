@@ -73,4 +73,4 @@ jobs:
             2. docs/BACKUP.md Setup-Schritte
             3. Live-Server: läuft cron @ /etc/cron.d/bfsg-backup?
           to: ${{ secrets.ALERT_EMAIL }}
-          from: BFSG-Check Monitoring <no-reply@bfsg-fix.de>
+          from: BFSG-Fuchs Monitoring <no-reply@bfsg-fuchs.de>

@@ -28,7 +28,7 @@
 | Gegründet | 2026 |
 | Sitz | Kutenholz, Deutschland |
 | Gründer | Matthias Seba (Solo-Founder) |
-| Kontakt | info@bfsg-fix.de |
+| Kontakt | info@bfsg-fuchs.de |
 | Logo | landingpage-next/public/ (Fuchs-Maskottchen „Filo") |
 | OG-Image | https://bfsg-fuchs.de/opengraph-image |
 
@@ -426,7 +426,7 @@ weitere Details bereit.
 
 Mit freundlichen Grüßen
 Matthias Seba
-info@bfsg-fix.de · https://bfsg-fuchs.de
+info@bfsg-fuchs.de · https://bfsg-fuchs.de
 ```
 
 **Wichtig bei Anti-Overlay-Redaktionen (z. B. DBSV-Umfeld):** klar als

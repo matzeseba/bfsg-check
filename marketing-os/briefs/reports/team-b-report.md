@@ -16,7 +16,7 @@
 - `marketing-os/KERNEL.md` (102 Zeilen < 200) — Identity (COO, delegiert, codet nie),
   Agent-Registry-Tabelle (Agent | Rolle | Kanal | Trigger), Routing-Regeln (Playbook→Agent,
   Kanal-Whitelist, Gate-Fluss, Owner-Eskalation, once-Regel), Modell-Policy (Content-Jobs = Sonnet,
-  kein Fable-5), Policy-Verweis + Eskalation an Owner (`info@bfsg-fix.de`).
+  kein Fable-5), Policy-Verweis + Eskalation an Owner (`info@bfsg-fuchs.de`).
 
 ### 8 Agenten-Personas (`marketing-os/agents/`, je < 100 Zeilen, Format Identity/Memory Scope/Constraints/Output-Format)
 | Datei | Zeilen | Kanal |

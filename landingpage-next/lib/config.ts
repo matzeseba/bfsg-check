@@ -53,7 +53,7 @@ export const SITE = {
   title: "BFSG-Test: Website kostenlos auf WCAG prüfen | BFSG-Fuchs",
   description:
     "BFSG-Test in 60 Sekunden: automatisierte WCAG-2.1-AA-Analyse mit 80+ Prüfregeln, menschlicher Sichtung und priorisiertem Fix-Plan. Kostenlos & ohne Anmeldung.",
-  email: "info@bfsg-fix.de",
+  email: "info@bfsg-fuchs.de",
 } as const;
 
 export const BRAND = {

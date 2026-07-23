@@ -12,10 +12,10 @@ const {
   SMTP_PORT = '587',
   SMTP_USER,
   SMTP_PASS,
-  FROM_EMAIL = 'no-reply@bfsg-fix.de',
+  FROM_EMAIL = 'no-reply@bfsg-fuchs.de',
   FROM_NAME = 'BFSG-Fuchs',
   REPLY_TO,
-  INVOICE_CONTACT_EMAIL = 'info@bfsg-fix.de',
+  INVOICE_CONTACT_EMAIL = 'info@bfsg-fuchs.de',
   ADMIN_EMAIL
 } = process.env;
 
@@ -29,8 +29,8 @@ const REPLY_TO_ADDR = REPLY_TO || INVOICE_CONTACT_EMAIL;
 const INVOICE_FROM_NAME = process.env.INVOICE_FROM_NAME || FROM_NAME;
 const INVOICE_FROM_ADDRESS = process.env.INVOICE_FROM_ADDRESS || '';
 // Domain-SSOT: Default ist die Marken-Primär bfsg-fuchs.de (Cutover 2026).
-// Die Absender-/Kontakt-Postfächer bleiben bewusst @bfsg-fix.de (Owner-Beschluss:
-// Postfach @bfsg-fuchs.de existiert noch nicht).
+// Absender-/Kontakt-Postfächer laufen seit 23.07.2026 auf @bfsg-fuchs.de
+// (info@bfsg-fix.de gelöscht; info@bfsg-fuchs.de leitet an die Owner-Adressen weiter).
 const PUBLIC_HOST = (process.env.PUBLIC_URL || 'https://bfsg-fuchs.de')
   .replace(/^https?:\/\//, '').replace(/\/+$/, '');
 // Voll-URL (mit Schema) fuer Links in HTML-Mails; CTA der Value-Mail (PR2).

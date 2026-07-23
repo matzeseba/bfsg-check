@@ -20,7 +20,7 @@
 ## 🏗️ Projekt-Kontext
 
 - **Produkt/Marke:** BFSG-Fuchs — automatisierter Compliance-Scanner für deutsche Websites (BFSG/WCAG/TDDDG); Maskottchen „Filo"
-- **Primär-Domain:** bfsg-fuchs.de (SSOT: `landingpage-next/lib/config.ts`; Cutover 29.06.2026). bfsg-fix.de läuft parallel (canonical → bfsg-fuchs.de, E-Mail info@bfsg-fix.de, Stripe-/Webhook-URLs). Server: Hetzner CPX22, Nürnberg, Ubuntu 24.04. **Alle Außen-Texte (PMs, Listings, Social) IMMER auf Marke BFSG-Fuchs + bfsg-fuchs.de!**
+- **Primär-Domain:** bfsg-fuchs.de (SSOT: `landingpage-next/lib/config.ts`; Cutover 29.06.2026). bfsg-fix.de läuft parallel (canonical → bfsg-fuchs.de, E-Mail info@bfsg-fuchs.de, Stripe-/Webhook-URLs). Server: Hetzner CPX22, Nürnberg, Ubuntu 24.04. **Alle Außen-Texte (PMs, Listings, Social) IMMER auf Marke BFSG-Fuchs + bfsg-fuchs.de!**
 - **Owner:** Matthias Seba, Lange Straße 20, 27449 Kutenholz, info@matthias-seba.de · § 19 UStG Kleinunternehmer
 - **Status:** Live (`/health` = `ok:true, stripe:true, live:true, mailer aktiv`)
 

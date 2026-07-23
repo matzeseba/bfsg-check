@@ -21,8 +21,8 @@ export default function KuendigenPage() {
         kündbar — auf Wunsch auch sofort. Das Jahres-Abo ist zum Ende der
         Erstlaufzeit von 12 Monaten und danach jederzeit mit einer Frist von
         einem Monat kündbar. Eine formlose E-Mail an{" "}
-        <a href="mailto:info@bfsg-fix.de" className="underline">
-          info@bfsg-fix.de
+        <a href="mailto:info@bfsg-fuchs.de" className="underline">
+          info@bfsg-fuchs.de
         </a>{" "}
         genügt ebenfalls.
       </p>
