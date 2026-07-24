@@ -109,7 +109,7 @@ const VERGLEICH: Vergleichszeile[] = [
   },
   {
     merkmal: "Ansprechpartner",
-    fuchs: "Gründer mit Namen und Gesicht; Presse-Zitat it-management.today (Juli 2026)",
+    fuchs: "Gründer mit Namen und Gesicht; Presse-Zitat it-management.today (09.07.2026)",
     bfsguard: "Kein benannter Gründer-Kontakt auf der Website ermittelt",
     erecht24: "Portal mit namentlich bekanntem Gesicht (RA Sören Siebert); Support über Portal-Team",
   },
