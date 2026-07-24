@@ -162,5 +162,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    {
+      // Praxis-Report (PR #173): PM-Ziel-URL, Daten 23.–24.07.2026 → weekly bis PM-Versand, danach monthly
+      url: `${siteUrl}/bfsg-praxis-report-2026`,
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
   ];
 }
