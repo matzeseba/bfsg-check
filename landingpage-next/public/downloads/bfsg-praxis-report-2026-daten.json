@@ -1,80 +1,80 @@
 {
-  "stand": "2026-07-24",
-  "methodik": "axe-core (@axe-core/playwright 4.10.1), nur Startseite; automatisierte Analyse findet nach Government Digital Service 30-50 % der WCAG-Probleme; Selektion Shops: Trusted-Shops-Verzeichnis (keine Zufallsstichprobe), Kommunen: Wikidata P856 + german-gov-domains, Reise/Buchung: Trusted-Shops + Wikidata P856 + Wikipedia Kategorie:Touristikunternehmen; Prozentwerte = Anteil Seiten mit Befund in den Top-3 der Seite",
+  "stand": "2026-07-24 (v5, +Welle 5 Haushalt/Möbel/Bücher)",
+  "methodik": "axe-core (@axe-core/playwright 4.10.1), nur Startseite; automatisierte Analyse findet nach Government Digital Service 30-50 % der WCAG-Probleme; Selektion Shops: Trusted-Shops-Verzeichnis (keine Zufallsstichprobe), Kommunen: Wikidata P856 + german-gov-domains, Reise/Buchung: Trusted-Shops + Wikidata P856 + Wikipedia Kategorie:Touristikunternehmen; Welle 5 (Haushalt/Möbel/Bücher): Trusted-Shops; Prozentwerte = Anteil Seiten mit Befund in den Top-3 der Seite",
   "gesamt": {
-    "n": 411,
-    "score_median": 45,
-    "score_mean": 48.5,
-    "pct_kritisch": 45.7,
+    "n": 527,
+    "score_median": 42,
+    "score_mean": 46.7,
+    "pct_kritisch": 48.8,
     "prio": {
-      "A": 282,
-      "B": 79,
-      "C": 50
+      "A": 372,
+      "B": 98,
+      "C": 57
     },
     "top_befunde": [
       [
         "Zu geringer Farbkontrast",
-        186,
-        45
+        249,
+        47
       ],
       [
         "Links ohne erkennbaren Text",
-        99,
-        24
+        133,
+        25
       ],
       [
         "Bilder ohne Alternativtext",
-        87,
-        21
+        121,
+        23
       ],
       [
         "Schaltflächen ohne Beschriftung",
-        69,
+        89,
         17
       ],
       [
         "Inhalte außerhalb von Landmarks",
-        68,
+        89,
         17
       ]
     ]
   },
   "sektoren": {
-    "Online-Shops (8 Kategorien)": {
-      "n": 172,
-      "score_median": 36.5,
-      "score_mean": 42.4,
-      "pct_kritisch": 49.4,
+    "Online-Shops (11 Kategorien)": {
+      "n": 288,
+      "score_median": 36.0,
+      "score_mean": 41.5,
+      "pct_kritisch": 53.5,
       "prio": {
-        "A": 131,
-        "B": 28,
-        "C": 13
+        "A": 221,
+        "B": 47,
+        "C": 20
       },
       "top_befunde": [
         [
           "Zu geringer Farbkontrast",
-          92,
-          53
+          155,
+          54
         ],
         [
           "Links ohne erkennbaren Text",
-          58,
-          34
+          92,
+          32
         ],
         [
           "Bilder ohne Alternativtext",
-          44,
-          26
-        ],
-        [
-          "Zoom unterdrückt (Viewport)",
-          26,
-          15
+          78,
+          27
         ],
         [
           "Schaltflächen ohne Beschriftung",
-          26,
-          15
+          46,
+          16
+        ],
+        [
+          "Inhalte außerhalb von Landmarks",
+          45,
+          16
         ]
       ]
     },
@@ -456,6 +456,119 @@
           "Zoom unterdrückt (Viewport)",
           2,
           15
+        ]
+      ]
+    },
+    "buecher": {
+      "n": 36,
+      "score_median": 40.5,
+      "score_mean": 44.6,
+      "pct_kritisch": 50.0,
+      "prio": {
+        "A": 24,
+        "B": 7,
+        "C": 5
+      },
+      "top_befunde": [
+        [
+          "Zu geringer Farbkontrast",
+          15,
+          42
+        ],
+        [
+          "Bilder ohne Alternativtext",
+          9,
+          25
+        ],
+        [
+          "Links ohne erkennbaren Text",
+          7,
+          19
+        ],
+        [
+          "Landmarks nicht eindeutig unterscheidbar",
+          6,
+          17
+        ],
+        [
+          "Inhalte außerhalb von Landmarks",
+          5,
+          14
+        ]
+      ]
+    },
+    "haushalt": {
+      "n": 40,
+      "score_median": 32.5,
+      "score_mean": 36.7,
+      "pct_kritisch": 65.0,
+      "prio": {
+        "A": 32,
+        "C": 2,
+        "B": 6
+      },
+      "top_befunde": [
+        [
+          "Zu geringer Farbkontrast",
+          21,
+          52
+        ],
+        [
+          "Bilder ohne Alternativtext",
+          11,
+          28
+        ],
+        [
+          "Links ohne erkennbaren Text",
+          11,
+          28
+        ],
+        [
+          "Inhalte außerhalb von Landmarks",
+          7,
+          18
+        ],
+        [
+          "Link im Fließtext nur farblich hervorgehoben",
+          7,
+          18
+        ]
+      ]
+    },
+    "moebel": {
+      "n": 40,
+      "score_median": 36.5,
+      "score_mean": 39.3,
+      "pct_kritisch": 62.5,
+      "prio": {
+        "B": 6,
+        "A": 34
+      },
+      "top_befunde": [
+        [
+          "Zu geringer Farbkontrast",
+          27,
+          68
+        ],
+        [
+          "Links ohne erkennbaren Text",
+          16,
+          40
+        ],
+        [
+          "Bilder ohne Alternativtext",
+          14,
+          35
+        ],
+        [
+          "Inhalte außerhalb von Landmarks",
+          9,
+          22
+        ],
+        [
+          "Schaltflächen ohne Beschriftung",
+          9,
+          22
         ]
       ]
     }

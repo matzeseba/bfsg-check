@@ -5,29 +5,31 @@ import { PACKAGES } from "@/lib/config";
 
 // Praxis-Report-Download-Seite (Ziel der Pressemitteilung marketing/swarm-2026-07-23/
 // pm-02-final.md — ersetzt dort den Platzhalter [report-slug]). Daten-SSOT:
-// marketing/swarm-2026-07-23/moat-daten/aggregat-2026-07-24.json (n = 411 deduplizierte
-// Scans, 23.–24.07.2026, axe-core 4.10.1, nur Startseiten). Eine 1:1-Kopie liegt als
-// öffentlicher Download unter public/downloads/bfsg-praxis-report-2026-daten.json,
-// die CSV-Variante ist daraus generiert. Aufbau folgt dem Answer-First-Template der
-// AEO-Seiten (vgl. app/bfsg-abmahnung-kosten/page.tsx): FAQ sichtbar 1:1 = FAQPage-JSON-LD.
+// marketing/swarm-2026-07-23/moat-daten/aggregat-2026-07-24.json — Stand v5
+// (n = 527 deduplizierte Scans inkl. Welle 5: Haushalt/Möbel/Bücher, 23.–24.07.2026,
+// axe-core 4.10.1, nur Startseiten). Eine 1:1-Kopie liegt als öffentlicher Download
+// unter public/downloads/bfsg-praxis-report-2026-daten.json, die CSV-Variante ist
+// daraus generiert. Aufbau folgt dem Answer-First-Template der AEO-Seiten
+// (vgl. app/bfsg-abmahnung-kosten/page.tsx): FAQ sichtbar 1:1 = FAQPage-JSON-LD.
 export const metadata: Metadata = {
-  title: "BFSG-Praxis-Report 2026: Auswertung von 411 Websites (Download)",
+  title: "BFSG-Praxis-Report 2026: Auswertung von 527 Websites (Download)",
   description:
-    "Automatisierte technische Analyse von 411 deutschen Website-Startseiten nach WCAG 2.1 AA: 93,2 % mit mindestens einem Befund, Median 5 Befunde pro Seite. Alle Aggregatdaten kostenlos als JSON/CSV.",
+    "Automatisierte technische Analyse von 527 deutschen Website-Startseiten nach WCAG 2.1 AA: 93,9 % mit mindestens einem Befund, Median 5 Befunde pro Seite. Alle Aggregatdaten kostenlos als JSON/CSV.",
   alternates: {
     canonical: "/bfsg-praxis-report-2026",
   },
   openGraph: {
-    title: "BFSG-Praxis-Report 2026: Auswertung von 411 Websites",
+    title: "BFSG-Praxis-Report 2026: Auswertung von 527 Websites",
     description:
-      "93,2 % der untersuchten Startseiten mit mindestens einem automatisiert feststellbaren Befund — alle Aggregatdaten kostenlos zum Download, Methodik offengelegt.",
+      "93,9 % der untersuchten Startseiten mit mindestens einem automatisiert feststellbaren Befund — alle Aggregatdaten kostenlos zum Download, Methodik offengelegt.",
     // relativ — Next resolved gegen metadataBase (SITE.url = bfsg-fuchs.de)
     url: "/bfsg-praxis-report-2026",
     type: "article",
   },
 };
 
-// Sichtbarer „Zuletzt aktualisiert"-Stempel + dateModified (Freshness-Signal).
+// Sichtbarer Stand-Stempel + dateModified (Freshness-Signal). Welle 5 lief am
+// 24.07.2026 — das Datum bleibt daher unverändert.
 const STAND = "24. Juli 2026";
 const DATE_MODIFIED = "2026-07-24";
 
@@ -35,25 +37,25 @@ const DATE_MODIFIED = "2026-07-24";
 // damit Preis-PRs nur eine Stelle anfassen (Preis-Sync-CI: scripts/check-price-sync.mjs).
 const BASIS_PREIS = PACKAGES.find((p) => p.id === "basis")?.price ?? "129 €";
 
-// Alle Werte exakt aus aggregat-2026-07-24.json übernommen (keine Rundung, keine
-// Hochrechnung). Zusatz-Kennzahlen 93,2 % / Median 5 Befunde: in der PM verifizierte
-// Werte (X2/X3, s. Kopf von pm-02-final.md).
+// Alle Werte exakt aus aggregat-2026-07-24.json (v5) übernommen (keine Rundung, keine
+// Hochrechnung). Zusatz-Kennzahlen 93,9 % / Median 5 Befunde: verifizierte Werte
+// (X2/X3, s. Kopf von pm-02-final.md).
 const KENNZAHLEN = {
-  n: 411,
+  n: 527,
   zeitraum: "23.–24. Juli 2026",
-  pctMitBefund: 93.2,
+  pctMitBefund: 93.9,
   medianBefunde: 5,
-  pctKritisch: 45.7,
+  pctKritisch: 48.8,
 };
 
 type TopBefund = { label: string; seiten: number; prozent: number };
 
 const TOP_BEFUNDE_GESAMT: TopBefund[] = [
-  { label: "Zu geringer Farbkontrast", seiten: 186, prozent: 45 },
-  { label: "Links ohne erkennbaren Text", seiten: 99, prozent: 24 },
-  { label: "Bilder ohne Alternativtext", seiten: 87, prozent: 21 },
-  { label: "Schaltflächen ohne Beschriftung", seiten: 69, prozent: 17 },
-  { label: "Inhalte außerhalb von Landmarks", seiten: 68, prozent: 17 },
+  { label: "Zu geringer Farbkontrast", seiten: 249, prozent: 47 },
+  { label: "Links ohne erkennbaren Text", seiten: 133, prozent: 25 },
+  { label: "Bilder ohne Alternativtext", seiten: 121, prozent: 23 },
+  { label: "Schaltflächen ohne Beschriftung", seiten: 89, prozent: 17 },
+  { label: "Inhalte außerhalb von Landmarks", seiten: 89, prozent: 17 },
 ];
 
 type Sektor = {
@@ -67,17 +69,17 @@ type Sektor = {
 
 const SEKTOREN: Sektor[] = [
   {
-    name: "Online-Shops (8 Kategorien)",
-    n: 172,
-    scoreMedian: 36.5,
-    scoreMean: 42.4,
-    pctKritisch: 49.4,
+    name: "Online-Shops (11 Kategorien)",
+    n: 288,
+    scoreMedian: 36,
+    scoreMean: 41.5,
+    pctKritisch: 53.5,
     topBefunde: [
-      { label: "Zu geringer Farbkontrast", seiten: 92, prozent: 53 },
-      { label: "Links ohne erkennbaren Text", seiten: 58, prozent: 34 },
-      { label: "Bilder ohne Alternativtext", seiten: 44, prozent: 26 },
-      { label: "Zoom unterdrückt (Viewport)", seiten: 26, prozent: 15 },
-      { label: "Schaltflächen ohne Beschriftung", seiten: 26, prozent: 15 },
+      { label: "Zu geringer Farbkontrast", seiten: 155, prozent: 54 },
+      { label: "Links ohne erkennbaren Text", seiten: 92, prozent: 32 },
+      { label: "Bilder ohne Alternativtext", seiten: 78, prozent: 27 },
+      { label: "Schaltflächen ohne Beschriftung", seiten: 46, prozent: 16 },
+      { label: "Inhalte außerhalb von Landmarks", seiten: 45, prozent: 16 },
     ],
   },
   {
@@ -119,7 +121,8 @@ type ShopKategorie = {
 
 // Anzeigenamen: wo die PM (pm-02-final.md) Kategorienamen nennt, werden diese
 // übernommen (Garten, Sport/Outdoor, Schmuck/Uhren, Drogerie/Kosmetik); die übrigen
-// sind die kapitalisierten Daten-Schlüssel aus dem Aggregat.
+// sind die kapitalisierten Daten-Schlüssel aus dem Aggregat (Welle 5: Bücher,
+// Haushalt, Möbel). Reihenfolge = Reihenfolge im JSON.
 const SHOP_KATEGORIEN: ShopKategorie[] = [
   { name: "Garten", n: 43, scoreMedian: 41, pctKritisch: 48.8 },
   { name: "Sport/Outdoor", n: 40, scoreMedian: 30, pctKritisch: 50 },
@@ -129,6 +132,9 @@ const SHOP_KATEGORIEN: ShopKategorie[] = [
   { name: "Baumarkt", n: 10, scoreMedian: 40.5, pctKritisch: 60 },
   { name: "Drogerie/Kosmetik", n: 19, scoreMedian: 51, pctKritisch: 42.1 },
   { name: "Spielwaren", n: 13, scoreMedian: 37, pctKritisch: 53.8 },
+  { name: "Bücher", n: 36, scoreMedian: 40.5, pctKritisch: 50 },
+  { name: "Haushalt", n: 40, scoreMedian: 32.5, pctKritisch: 65 },
+  { name: "Möbel", n: 40, scoreMedian: 36.5, pctKritisch: 62.5 },
 ];
 
 const FAQ = [
@@ -138,7 +144,7 @@ const FAQ = [
   },
   {
     q: "Sind die Ergebnisse repräsentativ für alle deutschen Websites?",
-    a: "Nein. Die Auswahl ist keine Zufallsstichprobe: Online-Shops stammen aus dem Trusted-Shops-Verzeichnis, Kommunen und öffentliche Einrichtungen über Wikidata P856 und das Verzeichnis german-gov-domains, Reise- und Buchungsportale über Trusted-Shops, Wikidata P856 und die Wikipedia-Kategorie Touristikunternehmen. Die Werte beschreiben die untersuchte Stichprobe von 411 Startseiten — nicht den Gesamtmarkt.",
+    a: "Nein. Die Auswahl ist keine Zufallsstichprobe: Online-Shops stammen aus dem Trusted-Shops-Verzeichnis, Kommunen und öffentliche Einrichtungen über Wikidata P856 und das Verzeichnis german-gov-domains, Reise- und Buchungsportale über Trusted-Shops, Wikidata P856 und die Wikipedia-Kategorie Touristikunternehmen. Die Werte beschreiben die untersuchte Stichprobe von 527 Startseiten — nicht den Gesamtmarkt.",
   },
   {
     q: "Warum liegt die tatsächliche Verbreitung der Befunde über den Prozentwerten?",
@@ -150,7 +156,7 @@ const FAQ = [
   },
   {
     q: "Was bedeutet der Score von 0 bis 100?",
-    a: "Der Score ist ein technischer Wert des Scanners: Er startet bei 100 (kein automatisierter Befund) und sinkt mit Anzahl und Schwere der gefundenen Befunde. Ein Median von 45 bedeutet also: Die Hälfte der untersuchten Seiten lag bei 45 Punkten oder darunter. Der Score sagt nichts darüber aus, wie eine manuelle Prüfung die Seite bewerten würde.",
+    a: "Der Score ist ein technischer Wert des Scanners: Er startet bei 100 (kein automatisierter Befund) und sinkt mit Anzahl und Schwere der gefundenen Befunde. Ein Median von 42 bedeutet also: Die Hälfte der untersuchten Seiten lag bei 42 Punkten oder darunter. Der Score sagt nichts darüber aus, wie eine manuelle Prüfung die Seite bewerten würde.",
   },
 ];
 
@@ -171,9 +177,9 @@ export default function BfsgPraxisReport2026Page() {
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "Article",
-    headline: "BFSG-Praxis-Report 2026: Auswertung von 411 deutschen Website-Startseiten",
+    headline: "BFSG-Praxis-Report 2026: Auswertung von 527 deutschen Website-Startseiten",
     description:
-      "Automatisierte technische Analyse von 411 deutschen Website-Startseiten nach WCAG 2.1 AA: Kennzahlen, Top-Befunde, Sektoren und Methodik — mit kostenlosem Daten-Download.",
+      "Automatisierte technische Analyse von 527 deutschen Website-Startseiten nach WCAG 2.1 AA: Kennzahlen, Top-Befunde, Sektoren und Methodik — mit kostenlosem Daten-Download.",
     url: "https://bfsg-fuchs.de/bfsg-praxis-report-2026",
     inLanguage: "de-DE",
     datePublished: "2026-07-24",
@@ -187,7 +193,7 @@ export default function BfsgPraxisReport2026Page() {
     "@type": "Dataset",
     name: "BFSG-Praxis-Report 2026 — Aggregatdaten",
     description:
-      "Aggregierte Ergebnisse automatisierter WCAG-2.1-AA-Analysen von 411 deutschen Website-Startseiten (23.–24.07.2026, axe-core 4.10.1). Weiterverwendung unter Quellenangabe.",
+      "Aggregierte Ergebnisse automatisierter WCAG-2.1-AA-Analysen von 527 deutschen Website-Startseiten (23.–24.07.2026, axe-core 4.10.1). Weiterverwendung unter Quellenangabe.",
     url: "https://bfsg-fuchs.de/bfsg-praxis-report-2026",
     inLanguage: "de-DE",
     datePublished: "2026-07-24",
@@ -217,25 +223,25 @@ export default function BfsgPraxisReport2026Page() {
       <article className="mx-auto w-full max-w-3xl px-6 py-16">
         <header>
           <p className="font-mono text-xs font-semibold tracking-widest text-muted-foreground uppercase">
-            BFSG-Praxis-Report 2026 · Auswertung n = 411 · 23.–24. Juli 2026
+            BFSG-Praxis-Report 2026 · Auswertung n = 527 · 23.–24. Juli 2026
           </p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
             BFSG-Praxis-Report 2026: So viele deutsche Websites zeigen automatisiert
             feststellbare WCAG-Befunde
           </h1>
           <p className="mt-4 text-base leading-relaxed font-medium">
-            Der BFSG-Praxis-Report 2026 wertet 411 deutsche Website-Startseiten aus — 172
-            Online-Shops in acht Kategorien, 123 Reise- und Buchungsportale sowie 116
+            Der BFSG-Praxis-Report 2026 wertet 527 deutsche Website-Startseiten aus — 288
+            Online-Shops in elf Kategorien, 123 Reise- und Buchungsportale sowie 116
             Kommunen und öffentliche Einrichtungen. Geprüft wurde am 23. und 24. Juli 2026
             automatisiert mit axe-core 4.10.1 gegen die Kriterien der WCAG 2.1 AA. Das
-            Ergebnis: 93,2 % der Seiten weisen mindestens einen automatisiert
+            Ergebnis: 93,9 % der Seiten weisen mindestens einen automatisiert
             feststellbaren Befund auf, im Median sind es 5 Befunde pro Seite. Alle
             Aggregatdaten stehen auf dieser Seite kostenlos und ohne Registrierung zum
             Download.
           </p>
           <p className="mt-2 text-xs text-muted-foreground">
-            Zuletzt aktualisiert: {STAND} · Automatisierte technische Analyse, keine
-            Rechtsberatung
+            Stand 24.07.2026, n = 527 · Zuletzt aktualisiert: {STAND} · Automatisierte
+            technische Analyse, keine Rechtsberatung
           </p>
         </header>
 
@@ -304,8 +310,8 @@ export default function BfsgPraxisReport2026Page() {
         <section className="mt-14">
           <h2 className="text-2xl font-semibold">Welche Befunde treten am häufigsten auf?</h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            Über alle 411 Startseiten hinweg dominieren fünf Befund-Typen. Angeführt wird
-            die Auswertung von zu geringem Farbkontrast — ein Muster, das auf 45 % der
+            Über alle 527 Startseiten hinweg dominieren fünf Befund-Typen. Angeführt wird
+            die Auswertung von zu geringem Farbkontrast — ein Muster, das auf 47 % der
             Seiten zu den drei häufigsten Befunden zählte:
           </p>
           <div className="mt-6 overflow-x-auto rounded-xl border border-border">
@@ -405,11 +411,11 @@ export default function BfsgPraxisReport2026Page() {
         </section>
 
         <section className="mt-14">
-          <h2 className="text-2xl font-semibold">Wie unterscheiden sich die acht Shop-Kategorien?</h2>
+          <h2 className="text-2xl font-semibold">Wie unterscheiden sich die elf Shop-Kategorien?</h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            Innerhalb der 172 Online-Shops liegen die Kategorien teils weit auseinander —
+            Innerhalb der 288 Online-Shops liegen die Kategorien teils weit auseinander —
             der Anteil der Seiten mit kritischem Befund reicht von 27,3 % (Tier) bis
-            60 % (Baumarkt). Bei kleinen Stichproben (n = 10 bis 43) schwanken die Werte
+            65 % (Haushalt). Bei kleinen Stichproben (n = 10 bis 43) schwanken die Werte
             jedoch stärker; sie sind als Orientierung, nicht als Rangfolge zu lesen:
           </p>
           <div className="mt-6 overflow-x-auto rounded-xl border border-border">
@@ -447,8 +453,9 @@ export default function BfsgPraxisReport2026Page() {
           <ul className="mt-4 list-disc space-y-3 pl-5 text-sm text-muted-foreground">
             <li>
               <strong>Messwerkzeug und Zeitraum:</strong> axe-core 4.10.1
-              (@axe-core/playwright) in Playwright/Chromium, Scans am 23. und 24. Juli 2026,
-              411 nach Domain deduplizierte Startseiten.
+              (@axe-core/playwright) in Playwright/Chromium, Scans am 23. und 24. Juli 2026
+              in fünf Wellen, 527 nach Domain deduplizierte Startseiten. Welle 5 (Haushalt,
+              Möbel, Bücher) lief am 24.07.2026.
             </li>
             <li>
               <strong>Nur Startseiten:</strong> Geprüft wurde ausschließlich die jeweilige
@@ -456,7 +463,8 @@ export default function BfsgPraxisReport2026Page() {
               nicht Teil der Auswertung — Mängel dort erscheinen in diesen Zahlen nicht.
             </li>
             <li>
-              <strong>Keine Zufallsstichprobe:</strong> Online-Shops stammen aus dem
+              <strong>Keine Zufallsstichprobe:</strong> Online-Shops aller elf Kategorien —
+              seit Scan-Welle 5 inklusive Haushalt, Möbel und Bücher — stammen aus dem
               Trusted-Shops-Verzeichnis, Kommunen und öffentliche Einrichtungen über
               Wikidata P856 und das Verzeichnis german-gov-domains, Reise- und
               Buchungsportale über Trusted-Shops, Wikidata P856 und die Wikipedia-Kategorie
@@ -551,7 +559,7 @@ export default function BfsgPraxisReport2026Page() {
         <aside className="mt-12 rounded-xl border border-border bg-muted/30 px-5 py-4 text-xs leading-relaxed text-muted-foreground">
           <strong>Wichtiger Hinweis:</strong> Der BFSG-Praxis-Report 2026 ist eine
           automatisierte technische Analyse und keine Rechtsberatung. Die Auswertung
-          beschreibt den automatisierbar prüfbaren Zustand von 411 Startseiten zum
+          beschreibt den automatisierbar prüfbaren Zustand von 527 Startseiten zum
           Zeitpunkt der Scans (23.–24. Juli 2026); sie ersetzt weder eine manuelle Prüfung
           der eigenen Website noch eine rechtliche Bewertung. Alle Angaben zum Stand{" "}
           {STAND}.
