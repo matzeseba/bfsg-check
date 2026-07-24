@@ -163,6 +163,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      // Vergleichsseite Fuchs/BFSGuard/eRecht24 (ASSET 6, Owner-Freigabe G4 24.07.2026):
+      // Evergreen mit Stichtag-Pflicht (Preise der Wettbewerber ändern sich) → monthly, 0.8
+      url: `${siteUrl}/bfsg-fuchs-vs-bfsguard-erecht24`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       // Praxis-Report (PR #173): PM-Ziel-URL, Daten 23.–24.07.2026 → weekly bis PM-Versand, danach monthly
       url: `${siteUrl}/bfsg-praxis-report-2026`,
       lastModified,
